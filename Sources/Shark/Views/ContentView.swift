@@ -5,12 +5,20 @@ public struct ContentView: View {
     @State private var workspaceState = WorkspaceState()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var isTerminalVisible = false
+    @State private var isInspectorVisible = false
     @State private var terminalSession = PTYSession()
 
     public init() {}
 
     private var activeState: NavigationState {
         workspaceState.activeNavigationState
+    }
+
+    private var inspectorTargetURL: URL {
+        if let firstSelected = activeState.selectedItemIDs.first {
+            return firstSelected
+        }
+        return activeState.currentURL
     }
 
     public var body: some View {
@@ -27,9 +35,22 @@ public struct ContentView: View {
                     filterBar
                 }
 
-                // Dual Pane or Single Pane Workspace Container
-                DualPaneContainerView(tab: workspaceState.activeTab)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Middle Area: Dual Pane + optional Right Inspector
+                HStack(spacing: 0) {
+                    // Dual Pane or Single Pane Workspace Container
+                    DualPaneContainerView(tab: workspaceState.activeTab)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                    // Information Inspector Panel (F11)
+                    if isInspectorVisible {
+                        Divider()
+                        InspectorPanelView(
+                            targetURL: inspectorTargetURL,
+                            isPresented: $isInspectorVisible
+                        )
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 // Bottom Embedded Terminal Drawer (F4)
                 if isTerminalVisible {
@@ -96,6 +117,15 @@ public struct ContentView: View {
                 }
                 .help("Toggle Terminal Drawer (F4 or ⌥⌘T)")
                 .keyboardShortcut("t", modifiers: [.command, .option])
+
+                // Inspector Toggle (F11 / Cmd+Option+I)
+                Button(action: {
+                    isInspectorVisible.toggle()
+                }) {
+                    Image(systemName: isInspectorVisible ? "info.circle.fill" : "info.circle")
+                }
+                .help("Toggle Information Inspector (F11 or ⌥⌘I)")
+                .keyboardShortcut("i", modifiers: [.command, .option])
 
                 // Filter bar toggle (Cmd+I)
                 Button(action: {

@@ -35,8 +35,8 @@
 
 ### Information Inspector (INSP)
 
-- [ ] **INSP-01**: User can toggle the right-hand Information / Inspector panel (`F11`).
-- [ ] **INSP-02**: Inspector displays rich metadata including file size, POSIX permissions, owner/group, MIME type, image dimensions, audio/video duration, and file hashes.
+- [x] **INSP-01**: User can toggle the right-hand Information / Inspector panel (`F11`).
+- [x] **INSP-02**: Inspector displays rich metadata including file size, POSIX permissions, owner/group, MIME type, image dimensions, audio/video duration, and file hashes.
 
 ### File Operations & Live Updates (OPS)
 
@@ -83,8 +83,8 @@
 | TERM-01 | Phase 4 | Complete |
 | TERM-02 | Phase 4 | Complete |
 | TERM-03 | Phase 4 | Complete |
-| INSP-01 | Phase 5 | Pending |
-| INSP-02 | Phase 5 | Pending |
+| INSP-01 | Phase 5 | Complete |
+| INSP-02 | Phase 5 | Complete |
 | OPS-01 | Phase 6 | Pending |
 | OPS-02 | Phase 6 | Pending |
 | OPS-03 | Phase 6 | Pending |
@@ -93,10 +93,10 @@
 
 **Coverage:**
 - v1 requirements: 23 total
-- Completed: 16
+- Completed: 18
 - Mapped to phases: 23
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 4 completion*
+*Last updated: 2026-10-13 after Phase 5 completion*
