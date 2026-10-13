@@ -6,7 +6,7 @@ Shark delivers KDE Dolphin's power-user file management experience natively on m
 
 ## Phases
 
-- [ ] **Phase 1: Core Navigation & macOS Foundation** - Native Swift/SwiftUI app scaffolding, high-performance FileSystem service, Places sidebar, clickable/editable breadcrumb bar, and directory navigation.
+- [x] **Phase 1: Core Navigation & macOS Foundation** - Native Swift/SwiftUI app scaffolding, high-performance FileSystem service, Places sidebar, clickable/editable breadcrumb bar, and directory navigation.
 - [ ] **Phase 2: Dual-Pane Split View & Tabbed Workspace** - Dolphin F3 dual-pane split navigation, active pane focus management, and multi-tab browsing (Cmd+T / Cmd+W).
 - [ ] **Phase 3: View Modes, Instant Filtering & Quick Look** - Details/Table view with column sorting, Grid/Icons view with zoomable thumbnails, Compact view, live filter bar (Cmd+I), and native Quick Look (Space).
 - [ ] **Phase 4: Embedded Terminal Drawer (F4)** - Collapsible bottom terminal panel with native PTY running user login shell ($SHELL) and bidirectional directory synchronization.
@@ -27,7 +27,7 @@ Shark delivers KDE Dolphin's power-user file management experience natively on m
 **Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: Build Swift 6 package / app structure, FileItem models, FileSystemService, PlacesSidebar, BreadcrumbBar, and DirectoryView.
+- [x] 01-01: Build Swift 6 package / app structure, FileItem models, FileSystemService, PlacesSidebar, BreadcrumbBar, and DirectoryView.
 
 ### Phase 2: Dual-Pane Split View & Tabbed Workspace
 **Goal**: Implement Dolphin's iconic dual-pane split view (F3) and full multi-tab workflow.
@@ -98,4 +98,4 @@ Plans:
 
 ---
 *Roadmap defined: 2026-10-13*
-*Last updated: 2026-10-13 after initial definition*
+*Last updated: 2026-10-13 after Phase 1 completion*

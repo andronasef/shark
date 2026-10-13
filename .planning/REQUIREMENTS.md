@@ -7,11 +7,11 @@
 
 ### Core Navigation & Sidebar (CORE)
 
-- [ ] **CORE-01**: User can browse any local directory with high-performance async loading and smooth scrolling.
-- [ ] **CORE-02**: User can navigate via Places sidebar including System Volumes, User Folders (Home, Desktop, Downloads, Documents), and Trash.
-- [ ] **CORE-03**: User can pin custom folders to the Favorites section in the sidebar.
-- [ ] **CORE-04**: User can navigate via clickable breadcrumbs and toggle direct path text editing (`Cmd+L`).
-- [ ] **CORE-05**: User can use history navigation (Back `Cmd+[`, Forward `Cmd+]`, Up `Cmd+Up`).
+- [x] **CORE-01**: User can browse any local directory with high-performance async loading and smooth scrolling.
+- [x] **CORE-02**: User can navigate via Places sidebar including System Volumes, User Folders (Home, Desktop, Downloads, Documents), and Trash.
+- [x] **CORE-03**: User can pin custom folders to the Favorites section in the sidebar.
+- [x] **CORE-04**: User can navigate via clickable breadcrumbs and toggle direct path text editing (`Cmd+L`).
+- [x] **CORE-05**: User can use history navigation (Back `Cmd+[`, Forward `Cmd+]`, Up `Cmd+Up`).
 
 ### Split-Pane & Tabs (SPLIT)
 
@@ -67,11 +67,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 1 | Pending |
-| CORE-04 | Phase 1 | Pending |
-| CORE-05 | Phase 1 | Pending |
+| CORE-01 | Phase 1 | Complete |
+| CORE-02 | Phase 1 | Complete |
+| CORE-03 | Phase 1 | Complete |
+| CORE-04 | Phase 1 | Complete |
+| CORE-05 | Phase 1 | Complete |
 | SPLIT-01 | Phase 2 | Pending |
 | SPLIT-02 | Phase 2 | Pending |
 | SPLIT-03 | Phase 2 | Pending |
@@ -93,9 +93,10 @@
 
 **Coverage:**
 - v1 requirements: 23 total
+- Completed: 5
 - Mapped to phases: 23
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after initial definition*
+*Last updated: 2026-10-13 after Phase 1 completion*
