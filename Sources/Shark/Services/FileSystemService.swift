@@ -185,15 +185,15 @@ public actor FileSystemService {
     }
 
     /// Resolves user input paths (including ~ expansion and absolute paths).
-    public func resolvePath(_ rawPath: String) -> URL? {
+    nonisolated public func resolvePath(_ rawPath: String) -> URL? {
         let trimmed = rawPath.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
         let expanded: String
         if trimmed == "~" {
-            expanded = fileManager.homeDirectoryForCurrentUser.path
+            expanded = FileManager.default.homeDirectoryForCurrentUser.path
         } else if trimmed.hasPrefix("~/") {
-            let home = fileManager.homeDirectoryForCurrentUser.path
+            let home = FileManager.default.homeDirectoryForCurrentUser.path
             expanded = home + String(trimmed.dropFirst())
         } else {
             expanded = trimmed
@@ -201,17 +201,18 @@ public actor FileSystemService {
 
         let url = URL(fileURLWithPath: expanded).standardizedFileURL
         var isDir: ObjCBool = false
-        if fileManager.fileExists(atPath: url.path, isDirectory: &isDir) {
+        if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) {
             return url
         }
         return nil
     }
 
     /// Returns parent directory if not already root.
-    public func parentDirectory(of url: URL) -> URL? {
+    nonisolated public func parentDirectory(of url: URL) -> URL? {
         let standardized = url.standardizedFileURL
-        let parent = standardized.deletingLastPathComponent()
-        if parent.path == standardized.path {
+        guard standardized.path != "/" else { return nil }
+        let parent = standardized.deletingLastPathComponent().standardizedFileURL
+        if parent.path == standardized.path || parent.path == "/.." {
             return nil
         }
         return parent

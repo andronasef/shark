@@ -14,7 +14,8 @@ public struct TerminalView: NSViewRepresentable {
         scrollView.hasHorizontalScroller = false
         scrollView.autohidesScrollers = true
 
-        let textView = TerminalNSView(session: session)
+        let textView = TerminalNSView(frame: .zero)
+        textView.configure(session: session)
         textView.minSize = NSSize(width: 0, height: 0)
         textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
         textView.isVerticallyResizable = true
@@ -22,6 +23,7 @@ public struct TerminalView: NSViewRepresentable {
         textView.autoresizingMask = [.width]
         textView.textContainer?.containerSize = NSSize(width: scrollView.contentSize.width, height: CGFloat.greatestFiniteMagnitude)
         textView.textContainer?.widthTracksTextView = true
+        textView.string = session.outputText
 
         scrollView.documentView = textView
         context.coordinator.textView = textView
@@ -38,6 +40,9 @@ public struct TerminalView: NSViewRepresentable {
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         if let textView = nsView.documentView as? TerminalNSView {
             textView.session = session
+            if textView.string != session.outputText {
+                textView.string = session.outputText
+            }
         }
     }
 
@@ -65,17 +70,8 @@ public struct TerminalView: NSViewRepresentable {
 final class TerminalNSView: NSTextView {
     var session: PTYSession?
 
-    init(session: PTYSession) {
+    func configure(session: PTYSession) {
         self.session = session
-        super.init(frame: .zero)
-        configureTerminalAppearance()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func configureTerminalAppearance() {
         self.backgroundColor = NSColor(white: 0.1, alpha: 1.0)
         self.textColor = NSColor(red: 0.9, green: 0.9, blue: 0.92, alpha: 1.0)
         self.insertionPointColor = NSColor.white

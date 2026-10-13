@@ -58,42 +58,41 @@ public struct BreadcrumbBarView: View {
                     isFieldFocused = true
                 }
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 2) {
-                        ForEach(pathSegments, id: \.url) { segment in
-                            Button(action: {
-                                navigationState.navigateTo(segment.url)
-                            }) {
-                                HStack(spacing: 2) {
-                                    if segment.isRoot {
-                                        Image(systemName: "internaldrive")
-                                            .font(.caption)
-                                    }
-                                    Text(segment.title)
-                                        .font(.system(size: 12, weight: segment.isLast ? .semibold : .regular))
+                HStack(spacing: 2) {
+                    ForEach(pathSegments, id: \.url) { segment in
+                        Button(action: {
+                            navigationState.navigateTo(segment.url)
+                        }) {
+                            HStack(spacing: 2) {
+                                if segment.isRoot {
+                                    Image(systemName: "internaldrive")
+                                        .font(.caption)
                                 }
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 4)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .fill(segment.isLast ? Color.accentColor.opacity(0.15) : Color.clear)
-                                )
+                                Text(segment.title)
+                                    .font(.system(size: 12, weight: segment.isLast ? .semibold : .regular))
                             }
-                            .buttonStyle(.plain)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 4)
+                            .background(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(segment.isLast ? Color.accentColor.opacity(0.15) : Color.clear)
+                            )
+                        }
+                        .buttonStyle(.plain)
 
-                            if !segment.isLast {
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.secondary.opacity(0.6))
-                            }
+                        if !segment.isLast {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.secondary.opacity(0.6))
                         }
                     }
-                    .padding(.horizontal, 4)
                 }
+                .padding(.horizontal, 4)
                 .background(
                     RoundedRectangle(cornerRadius: 6)
                         .fill(Color(nsColor: .controlBackgroundColor).opacity(0.5))
                 )
+                .clipped()
 
                 Button(action: {
                     navigationState.pathInputText = navigationState.currentURL.path
@@ -129,8 +128,11 @@ public struct BreadcrumbBarView: View {
         var cursor = current
         while true {
             ancestry.append(cursor)
-            let parent = cursor.deletingLastPathComponent()
-            if parent.path == cursor.path {
+            if cursor.path == "/" {
+                break
+            }
+            let parent = cursor.deletingLastPathComponent().standardizedFileURL
+            if parent.path == cursor.path || parent.path == "/.." {
                 break
             }
             cursor = parent

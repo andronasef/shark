@@ -79,8 +79,7 @@ public final class NavigationState {
     }
 
     public var canGoUp: Bool {
-        let parent = currentURL.deletingLastPathComponent()
-        return parent.path != currentURL.path
+        currentURL.path != "/"
     }
 
     public var filteredAndSortedItems: [FileItem] {
@@ -115,7 +114,7 @@ public final class NavigationState {
                 comparison = a.permissionsString.compare(b.permissionsString)
             }
 
-            return sortAscending ? comparison == .orderedAscending : comparison == .orderedDescending
+            return sortAscending ? (comparison == .orderedAscending) : (comparison == .orderedDescending)
         }
 
         return result
@@ -167,8 +166,8 @@ public final class NavigationState {
     }
 
     public func goUp() {
-        let parent = currentURL.deletingLastPathComponent()
-        guard parent.path != currentURL.path else { return }
+        guard canGoUp else { return }
+        let parent = currentURL.deletingLastPathComponent().standardizedFileURL
         navigateTo(parent)
     }
 
@@ -187,16 +186,18 @@ public final class NavigationState {
     }
 
     public func commitPathInput() {
-        let resolved = Task { () -> URL? in
-            await fileSystemService.resolvePath(pathInputText)
+        let input = pathInputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        isEditingPath = false
+
+        guard !input.isEmpty else {
+            pathInputText = currentURL.path
+            return
         }
-        Task {
-            if let targetURL = await resolved.value {
-                isEditingPath = false
-                navigateTo(targetURL)
-            } else {
-                errorMessage = "Directory not found: \(pathInputText)"
-            }
+
+        if let resolved = fileSystemService.resolvePath(input) {
+            navigateTo(resolved)
+        } else {
+            pathInputText = currentURL.path
         }
     }
 }
