@@ -40,11 +40,11 @@
 
 ### File Operations & Live Updates (OPS)
 
-- [ ] **OPS-01**: User can perform non-blocking file operations: Copy, Move, Duplicate, Move to Trash, and Delete.
-- [ ] **OPS-02**: User can create new folders (`Cmd+Shift+N`) and new empty files.
-- [ ] **OPS-03**: User can rename files inline and perform multi-file batch renames.
-- [ ] **OPS-04**: Directory views automatically refresh in real-time when external changes happen using macOS `FSEvents`.
-- [ ] **OPS-05**: User can drag and drop items between panes, to/from Finder, and to the sidebar.
+- [x] **OPS-01**: User can perform non-blocking file operations: Copy, Move, Duplicate, Move to Trash, and Delete.
+- [x] **OPS-02**: User can create new folders (`Cmd+Shift+N`) and new empty files.
+- [x] **OPS-03**: User can rename files inline and perform multi-file batch renames.
+- [x] **OPS-04**: Directory views automatically refresh in real-time when external changes happen using macOS `FSEvents`.
+- [x] **OPS-05**: User can drag and drop items between panes, to/from Finder, and to the sidebar.
 
 ## v2 Requirements
 
@@ -85,18 +85,18 @@
 | TERM-03 | Phase 4 | Complete |
 | INSP-01 | Phase 5 | Complete |
 | INSP-02 | Phase 5 | Complete |
-| OPS-01 | Phase 6 | Pending |
-| OPS-02 | Phase 6 | Pending |
-| OPS-03 | Phase 6 | Pending |
-| OPS-04 | Phase 6 | Pending |
-| OPS-05 | Phase 6 | Pending |
+| OPS-01 | Phase 6 | Complete |
+| OPS-02 | Phase 6 | Complete |
+| OPS-03 | Phase 6 | Complete |
+| OPS-04 | Phase 6 | Complete |
+| OPS-05 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Completed: 18
+- Completed: 23
 - Mapped to phases: 23
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 5 completion*
+*Last updated: 2026-10-13 after Phase 6 completion*

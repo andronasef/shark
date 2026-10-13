@@ -8,6 +8,9 @@ public struct ContentView: View {
     @State private var isInspectorVisible = false
     @State private var terminalSession = PTYSession()
 
+    @State private var showingNewItemSheet: NewItemType?
+    @State private var showingBatchRenameSheet = false
+
     public init() {}
 
     private var activeState: NavigationState {
@@ -67,6 +70,24 @@ public struct ContentView: View {
                 terminalSession.syncDirectory(to: newURL)
             }
         }
+        .sheet(item: $showingNewItemSheet) { itemType in
+            NewItemSheet(
+                type: itemType,
+                parentURL: activeState.currentURL,
+                onCreated: {
+                    Task { await activeState.reloadCurrentDirectory() }
+                }
+            )
+        }
+        .sheet(isPresented: $showingBatchRenameSheet) {
+            let selectedItems = activeState.items.filter { activeState.selectedItemIDs.contains($0.id) }
+            BatchRenameSheet(
+                items: selectedItems,
+                onRenameComplete: {
+                    Task { await activeState.reloadCurrentDirectory() }
+                }
+            )
+        }
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
                 // Back Button (Cmd+[)
@@ -100,6 +121,15 @@ public struct ContentView: View {
             }
 
             ToolbarItemGroup(placement: .primaryAction) {
+                // New Folder Button (Cmd+Shift+N)
+                Button(action: {
+                    showingNewItemSheet = .folder
+                }) {
+                    Image(systemName: "folder.badge.plus")
+                }
+                .help("New Folder (⇧⌘N)")
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+
                 // Split View Toggle (F3 / Cmd+Option+S)
                 Button(action: {
                     workspaceState.toggleSplit()
@@ -172,6 +202,20 @@ public struct ContentView: View {
                     triggerQuickLook()
                 }
                 .keyboardShortcut(.space, modifiers: [])
+
+                // Trash selected (Cmd+Delete)
+                Button("") {
+                    trashSelectedItems()
+                }
+                .keyboardShortcut(.delete, modifiers: .command)
+
+                // Batch Rename selected (Cmd+Shift+R)
+                Button("") {
+                    if activeState.selectedItemIDs.count > 1 {
+                        showingBatchRenameSheet = true
+                    }
+                }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
 
                 // View Mode Shortcuts (Cmd+1, Cmd+2, Cmd+3)
                 Button("") { activeState.viewMode = .details }
@@ -263,6 +307,15 @@ public struct ContentView: View {
         let urls = Array(activeState.selectedItemIDs)
         if !urls.isEmpty {
             QuickLookCoordinator.shared.toggleQuickLook(for: urls)
+        }
+    }
+
+    private func trashSelectedItems() {
+        let urls = Array(activeState.selectedItemIDs)
+        guard !urls.isEmpty else { return }
+        Task {
+            try? await FileOperationsService.shared.trash(items: urls)
+            await activeState.reloadCurrentDirectory()
         }
     }
 }

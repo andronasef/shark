@@ -30,6 +30,7 @@ public struct IconsGridView: View {
                         isSelected: isSelected
                     )
                     .contentShape(Rectangle())
+                    .draggable(item.url)
                     .onTapGesture {
                         navigationState.selectedItemIDs = [item.id]
                     }

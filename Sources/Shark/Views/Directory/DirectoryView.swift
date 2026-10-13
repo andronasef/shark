@@ -4,6 +4,10 @@ import AppKit
 public struct DirectoryView: View {
     @Bindable var navigationState: NavigationState
 
+    @State private var fseventsWatcher = FSEventsWatcher()
+    @State private var showingNewItemSheet: NewItemType?
+    @State private var showingBatchRenameSheet = false
+
     public init(navigationState: NavigationState) {
         self.navigationState = navigationState
     }
@@ -12,12 +16,51 @@ public struct DirectoryView: View {
         VStack(spacing: 0) {
             contentArea
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .dropDestination(for: URL.self) { urls, location in
+                    handleDrop(urls: urls)
+                    return true
+                }
 
             statusBar
         }
         .task(id: navigationState.currentURL) {
             await navigationState.reloadCurrentDirectory()
+            setupFSEventsWatcher()
         }
+        .onDisappear {
+            fseventsWatcher.stop()
+        }
+        .sheet(item: $showingNewItemSheet) { itemType in
+            NewItemSheet(
+                type: itemType,
+                parentURL: navigationState.currentURL,
+                onCreated: {
+                    Task { await navigationState.reloadCurrentDirectory() }
+                }
+            )
+        }
+        .sheet(isPresented: $showingBatchRenameSheet) {
+            let selectedItems = navigationState.items.filter { navigationState.selectedItemIDs.contains($0.id) }
+            BatchRenameSheet(
+                items: selectedItems,
+                onRenameComplete: {
+                    Task { await navigationState.reloadCurrentDirectory() }
+                }
+            )
+        }
+        .contextMenu {
+            directoryBackgroundContextMenu
+        }
+    }
+
+    private func setupFSEventsWatcher() {
+        fseventsWatcher.stop()
+        fseventsWatcher.onChange = { [weak navigationState] in
+            Task { @MainActor in
+                await navigationState?.reloadCurrentDirectory()
+            }
+        }
+        fseventsWatcher.watch(url: navigationState.currentURL)
     }
 
     // MARK: - Main Content Area
@@ -103,6 +146,7 @@ public struct DirectoryView: View {
                             .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
                     )
                     .contentShape(Rectangle())
+                    .draggable(item.url)
                     .onTapGesture {
                         navigationState.selectedItemIDs = [item.id]
                     }
@@ -172,6 +216,14 @@ public struct DirectoryView: View {
         }
     }
 
+    private func handleDrop(urls: [URL]) {
+        let destination = navigationState.currentURL
+        Task {
+            try? await FileOperationsService.shared.copy(items: urls, to: destination)
+            await navigationState.reloadCurrentDirectory()
+        }
+    }
+
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
         Button("Open") {
@@ -188,6 +240,19 @@ public struct DirectoryView: View {
 
         Divider()
 
+        Button("Duplicate") {
+            Task {
+                try? await FileOperationsService.shared.duplicate(items: [item.url])
+                await navigationState.reloadCurrentDirectory()
+            }
+        }
+
+        if navigationState.selectedItemIDs.count > 1 {
+            Button("Batch Rename...") {
+                showingBatchRenameSheet = true
+            }
+        }
+
         Button("Copy Path") {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(item.url.path, forType: .string)
@@ -196,10 +261,33 @@ public struct DirectoryView: View {
         Divider()
 
         Button(role: .destructive, action: {
-            try? FileManager.default.trashItem(at: item.url, resultingItemURL: nil)
-            Task { await navigationState.reloadCurrentDirectory() }
+            Task {
+                try? await FileOperationsService.shared.trash(items: [item.url])
+                await navigationState.reloadCurrentDirectory()
+            }
         }) {
             Label("Move to Trash", systemImage: "trash")
         }
     }
+
+    @ViewBuilder
+    private var directoryBackgroundContextMenu: some View {
+        Button("New Folder...") {
+            showingNewItemSheet = .folder
+        }
+
+        Button("New File...") {
+            showingNewItemSheet = .file
+        }
+
+        Divider()
+
+        Button("Reload") {
+            Task { await navigationState.reloadCurrentDirectory() }
+        }
+    }
+}
+
+extension NewItemType: Identifiable {
+    public var id: String { title }
 }

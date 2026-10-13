@@ -73,6 +73,15 @@ public struct PlacesSidebarView: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(navigationState.currentURL.path == item.url.path ? Color.accentColor.opacity(0.18) : Color.clear)
         )
+        .dropDestination(for: URL.self) { urls, location in
+            Task {
+                try? await FileOperationsService.shared.copy(items: urls, to: item.url)
+                if navigationState.currentURL.standardizedFileURL.path == item.url.standardizedFileURL.path {
+                    await navigationState.reloadCurrentDirectory()
+                }
+            }
+            return true
+        }
     }
 
     private func loadSidebarItems() async {

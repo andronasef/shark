@@ -36,6 +36,7 @@ public struct DetailsTableView: View {
                         .lineLimit(1)
                 }
                 .contentShape(Rectangle())
+                .draggable(item.url)
                 .onTapGesture(count: 2) {
                     onActivate(item)
                 }

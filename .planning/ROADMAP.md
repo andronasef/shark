@@ -11,7 +11,7 @@ Shark delivers KDE Dolphin's power-user file management experience natively on m
 - [x] **Phase 3: View Modes, Instant Filtering & Quick Look** - Details/Table view with column sorting, Grid/Icons view with zoomable thumbnails, Compact view, live filter bar (Cmd+I), and native Quick Look (Space).
 - [x] **Phase 4: Embedded Terminal Drawer (F4)** - Collapsible bottom terminal panel with native PTY running user login shell ($SHELL) and bidirectional directory synchronization.
 - [x] **Phase 5: Information & Metadata Inspector (F11)** - Collapsible right-hand inspector with detailed metadata, POSIX permissions, media attributes, checksums, and preview.
-- [ ] **Phase 6: File Operations Engine, FSEvents & Drag-and-Drop** - Async non-blocking file operations (copy, move, trash, delete, batch rename), live FSEvents filesystem monitoring, and native drag-and-drop.
+- [x] **Phase 6: File Operations Engine, FSEvents & Drag-and-Drop** - Async non-blocking file operations (copy, move, trash, delete, batch rename), live FSEvents filesystem monitoring, and native drag-and-drop.
 
 ## Phase Details
 
@@ -94,8 +94,8 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 06-01: Implement FileOperationsManager actor, BatchRenameSheet, FSEventsWatcher, and DragDropCoordinator.
+- [x] 06-01: Implement FileOperationsManager actor, BatchRenameSheet, FSEventsWatcher, and DragDropCoordinator.
 
 ---
 *Roadmap defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 5 completion*
+*Last updated: 2026-10-13 - All 6 phases completed*
