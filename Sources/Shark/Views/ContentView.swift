@@ -1,35 +1,43 @@
 import SwiftUI
+import AppKit
 
 public struct ContentView: View {
-    @State private var navigationState = NavigationState()
+    @State private var workspaceState = WorkspaceState()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
     public init() {}
 
+    private var activeState: NavigationState {
+        workspaceState.activeNavigationState
+    }
+
     public var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            PlacesSidebarView(navigationState: navigationState)
+            PlacesSidebarView(navigationState: activeState)
                 .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 280)
         } detail: {
             VStack(spacing: 0) {
+                // Tab Bar
+                TabBarView(workspaceState: workspaceState)
+
                 // Filter Bar (Cmd+I)
-                if navigationState.isFilterBarVisible {
+                if activeState.isFilterBarVisible {
                     HStack(spacing: 8) {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                             .foregroundColor(.secondary)
-                        TextField("Filter items (e.g. *.swift or filename)...", text: $navigationState.filterText)
+                        TextField("Filter items (e.g. *.swift or filename)...", text: Bindable(activeState).filterText)
                             .textFieldStyle(.plain)
                             .font(.system(size: 12))
-                        if !navigationState.filterText.isEmpty {
-                            Button(action: { navigationState.filterText = "" }) {
+                        if !activeState.filterText.isEmpty {
+                            Button(action: { activeState.filterText = "" }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.secondary)
                             }
                             .buttonStyle(.plain)
                         }
                         Button(action: {
-                            navigationState.isFilterBarVisible = false
-                            navigationState.filterText = ""
+                            activeState.isFilterBarVisible = false
+                            activeState.filterText = ""
                         }) {
                             Text("Done")
                                 .font(.caption)
@@ -41,55 +49,64 @@ public struct ContentView: View {
                     Divider()
                 }
 
-                // Directory Contents View
-                DirectoryView(navigationState: navigationState)
+                // Dual Pane or Single Pane Workspace Container
+                DualPaneContainerView(tab: workspaceState.activeTab)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
                 // Back Button (Cmd+[)
-                Button(action: { navigationState.goBack() }) {
+                Button(action: { activeState.goBack() }) {
                     Image(systemName: "chevron.backward")
                 }
-                .disabled(!navigationState.canGoBack)
+                .disabled(!activeState.canGoBack)
                 .help("Back (⌘[)")
                 .keyboardShortcut("[", modifiers: .command)
 
                 // Forward Button (Cmd+])
-                Button(action: { navigationState.goForward() }) {
+                Button(action: { activeState.goForward() }) {
                     Image(systemName: "chevron.forward")
                 }
-                .disabled(!navigationState.canGoForward)
+                .disabled(!activeState.canGoForward)
                 .help("Forward (⌘])")
                 .keyboardShortcut("]", modifiers: .command)
 
                 // Up Button (Cmd+Up)
-                Button(action: { navigationState.goUp() }) {
+                Button(action: { activeState.goUp() }) {
                     Image(systemName: "chevron.up")
                 }
-                .disabled(!navigationState.canGoUp)
+                .disabled(!activeState.canGoUp)
                 .help("Enclosing Folder (⌘↑)")
                 .keyboardShortcut(.upArrow, modifiers: .command)
             }
 
             ToolbarItem(placement: .principal) {
-                BreadcrumbBarView(navigationState: navigationState)
+                BreadcrumbBarView(navigationState: activeState)
                     .frame(minWidth: 260, idealWidth: 420)
             }
 
             ToolbarItemGroup(placement: .primaryAction) {
+                // Split View Toggle (F3 / Cmd+Option+S)
+                Button(action: {
+                    workspaceState.toggleSplit()
+                }) {
+                    Image(systemName: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
+                }
+                .help("Toggle Split View (F3 or ⌥⌘S)")
+                .keyboardShortcut("s", modifiers: [.command, .option])
+
                 // Filter bar toggle (Cmd+I)
                 Button(action: {
-                    navigationState.isFilterBarVisible.toggle()
+                    activeState.isFilterBarVisible.toggle()
                 }) {
-                    Image(systemName: navigationState.isFilterBarVisible ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                    Image(systemName: activeState.isFilterBarVisible ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
                 }
                 .help("Filter (⌘I)")
                 .keyboardShortcut("i", modifiers: .command)
 
                 // View Mode Picker
-                Picker("View Mode", selection: $navigationState.viewMode) {
+                Picker("View Mode", selection: Bindable(activeState).viewMode) {
                     ForEach(ViewMode.allCases) { mode in
                         Image(systemName: mode.iconName).tag(mode)
                     }
@@ -99,16 +116,16 @@ public struct ContentView: View {
 
                 // Show Hidden Files Toggle (Cmd+Shift+.)
                 Button(action: {
-                    navigationState.showHiddenFiles.toggle()
+                    activeState.showHiddenFiles.toggle()
                 }) {
-                    Image(systemName: navigationState.showHiddenFiles ? "eye.fill" : "eye.slash")
+                    Image(systemName: activeState.showHiddenFiles ? "eye.fill" : "eye.slash")
                 }
                 .help("Toggle Hidden Files (⇧⌘.)")
                 .keyboardShortcut(".", modifiers: [.command, .shift])
 
                 // Reload button (Cmd+R)
                 Button(action: {
-                    Task { await navigationState.reloadCurrentDirectory() }
+                    Task { await activeState.reloadCurrentDirectory() }
                 }) {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -116,13 +133,46 @@ public struct ContentView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         }
-        // Direct Path Edit keyboard shortcut (Cmd+L)
+        // Background Keyboard Shortcuts
         .background {
-            Button("") {
-                navigationState.pathInputText = navigationState.currentURL.path
-                navigationState.isEditingPath.toggle()
+            Group {
+                // Direct Path Edit (Cmd+L)
+                Button("") {
+                    activeState.pathInputText = activeState.currentURL.path
+                    activeState.isEditingPath.toggle()
+                }
+                .keyboardShortcut("l", modifiers: .command)
+
+                // Switch Active Split Pane (Tab)
+                Button("") {
+                    workspaceState.toggleActivePane()
+                }
+                .keyboardShortcut(.tab, modifiers: [])
+
+                // New Tab (Cmd+T)
+                Button("") {
+                    workspaceState.newTab()
+                }
+                .keyboardShortcut("t", modifiers: .command)
+
+                // Close Tab (Cmd+W)
+                Button("") {
+                    workspaceState.closeTab(id: workspaceState.activeTabID)
+                }
+                .keyboardShortcut("w", modifiers: .command)
+
+                // Next Tab (Cmd+Shift+])
+                Button("") {
+                    workspaceState.nextTab()
+                }
+                .keyboardShortcut("]", modifiers: [.command, .shift])
+
+                // Previous Tab (Cmd+Shift+[)
+                Button("") {
+                    workspaceState.previousTab()
+                }
+                .keyboardShortcut("[", modifiers: [.command, .shift])
             }
-            .keyboardShortcut("l", modifiers: .command)
             .opacity(0)
         }
     }

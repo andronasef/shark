@@ -1,26 +1,30 @@
 import SwiftUI
+import AppKit
 
 @main
 struct SharkApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(minWidth: 700, minHeight: 450)
+                .frame(minWidth: 800, minHeight: 500)
         }
         .windowStyle(.titleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             SidebarCommands()
-            CommandGroup(replacing: .newItem) {
-                Button("New Tab") {
-                    // Handled in Phase 2
+            
+            CommandMenu("View") {
+                Button("Toggle Split View") {
+                    // Handled in ContentView via F3 / ⌥⌘S
                 }
-                .keyboardShortcut("t", modifiers: .command)
+                .keyboardShortcut("s", modifiers: [.command, .option])
 
-                Button("New Folder") {
-                    // Handled in Phase 6
+                Divider()
+
+                Button("Show/Hide Hidden Files") {
+                    // Handled in ContentView
                 }
-                .keyboardShortcut("n", modifiers: [.command, .shift])
+                .keyboardShortcut(".", modifiers: [.command, .shift])
             }
         }
     }

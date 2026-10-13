@@ -15,9 +15,9 @@
 
 ### Split-Pane & Tabs (SPLIT)
 
-- [ ] **SPLIT-01**: User can toggle dual-pane split view (`F3`) to browse two directories side by side.
-- [ ] **SPLIT-02**: User can switch active pane via keyboard (`Tab` or mouse click) with clear visual focus styling.
-- [ ] **SPLIT-03**: User can open, close, and reorder tabs (`Cmd+T`, `Cmd+W`), with each tab preserving its own path, view mode, and split state.
+- [x] **SPLIT-01**: User can toggle dual-pane split view (`F3`) to browse two directories side by side.
+- [x] **SPLIT-02**: User can switch active pane via keyboard (`Tab` or mouse click) with clear visual focus styling.
+- [x] **SPLIT-03**: User can open, close, and reorder tabs (`Cmd+T`, `Cmd+W`), with each tab preserving its own path, view mode, and split state.
 
 ### View Modes & Filtering (VIEW)
 
@@ -72,9 +72,9 @@
 | CORE-03 | Phase 1 | Complete |
 | CORE-04 | Phase 1 | Complete |
 | CORE-05 | Phase 1 | Complete |
-| SPLIT-01 | Phase 2 | Pending |
-| SPLIT-02 | Phase 2 | Pending |
-| SPLIT-03 | Phase 2 | Pending |
+| SPLIT-01 | Phase 2 | Complete |
+| SPLIT-02 | Phase 2 | Complete |
+| SPLIT-03 | Phase 2 | Complete |
 | VIEW-01 | Phase 3 | Pending |
 | VIEW-02 | Phase 3 | Pending |
 | VIEW-03 | Phase 3 | Pending |
@@ -93,10 +93,10 @@
 
 **Coverage:**
 - v1 requirements: 23 total
-- Completed: 5
+- Completed: 8
 - Mapped to phases: 23
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 1 completion*
+*Last updated: 2026-10-13 after Phase 2 completion*
