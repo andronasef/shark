@@ -27,10 +27,10 @@ public struct ContentView: View {
     public var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             PlacesSidebarView(navigationState: activeState)
-                .navigationSplitViewColumnWidth(min: 160, ideal: 200, max: 280)
+                .navigationSplitViewColumnWidth(min: 170, ideal: 210, max: 280)
         } detail: {
             VStack(spacing: 0) {
-                // Tab Bar
+                // Tab Bar matching Finder's sub-toolbar
                 TabBarView(workspaceState: workspaceState)
 
                 // Filter Bar (Cmd+I)
@@ -90,191 +90,236 @@ public struct ContentView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
-                // Back Button (Cmd+[)
-                Button(action: { activeState.goBack() }) {
-                    Image(systemName: "chevron.backward")
-                }
-                .disabled(!activeState.canGoBack)
-                .help("Back (⌘[)")
-                .keyboardShortcut("[", modifiers: .command)
+                // Back / Forward ControlGroup
+                VStack(spacing: 2) {
+                    HStack(spacing: 0) {
+                        Button(action: { activeState.goBack() }) {
+                            Image(systemName: "chevron.backward")
+                                .font(.system(size: 12, weight: .semibold))
+                                .frame(width: 22, height: 20)
+                        }
+                        .disabled(!activeState.canGoBack)
+                        .buttonStyle(.plain)
 
-                // Forward Button (Cmd+])
-                Button(action: { activeState.goForward() }) {
-                    Image(systemName: "chevron.forward")
-                }
-                .disabled(!activeState.canGoForward)
-                .help("Forward (⌘])")
-                .keyboardShortcut("]", modifiers: .command)
+                        Divider()
+                            .frame(height: 14)
 
-                // Up Button (Cmd+Up)
-                Button(action: { activeState.goUp() }) {
-                    Image(systemName: "chevron.up")
-                }
-                .disabled(!activeState.canGoUp)
-                .help("Enclosing Folder (⌘↑)")
-                .keyboardShortcut(.upArrow, modifiers: .command)
-            }
+                        Button(action: { activeState.goForward() }) {
+                            Image(systemName: "chevron.forward")
+                                .font(.system(size: 12, weight: .semibold))
+                                .frame(width: 22, height: 20)
+                        }
+                        .disabled(!activeState.canGoForward)
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(Color(nsColor: .controlBackgroundColor).opacity(0.8))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
+                    )
 
-            ToolbarItem(placement: .principal) {
-                BreadcrumbBarView(navigationState: activeState)
-                    .frame(minWidth: 260, idealWidth: 420)
+                    Text("Back/Forward")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                }
+                .help("Navigation History (⌘[ / ⌘])")
+
+                // Folder Title with Native Icon
+                HStack(spacing: 6) {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: activeState.currentURL.path))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16, height: 16)
+                    Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
+                        .font(.system(size: 13, weight: .semibold))
+                        .lineLimit(1)
+                }
+                .padding(.leading, 8)
             }
 
             ToolbarItemGroup(placement: .primaryAction) {
-                // New Folder Button (Cmd+Shift+N)
-                Button(action: {
-                    showingNewItemSheet = .folder
-                }) {
-                    Image(systemName: "folder.badge.plus")
+                // Path Menu
+                Menu {
+                    BreadcrumbMenuContent(navigationState: activeState)
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: "list.bullet.below.rectangle")
+                            .font(.system(size: 12))
+                        Text("Path").font(.system(size: 9)).foregroundColor(.secondary)
+                    }
                 }
-                .help("New Folder (⇧⌘N)")
-                .keyboardShortcut("n", modifiers: [.command, .shift])
+                .help("Show Path Hierarchy")
 
-                // Split View Toggle (F3 / Cmd+Option+S)
+                // View Mode Picker (4 modes matching Finder)
+                VStack(spacing: 2) {
+                    Picker("View", selection: Bindable(activeState).viewMode) {
+                        Image(systemName: "square.grid.2x2").tag(ViewMode.grid)
+                        Image(systemName: "list.bullet").tag(ViewMode.details)
+                        Image(systemName: "rectangle.split.3x1").tag(ViewMode.compact)
+                        Image(systemName: "macwindow").tag(ViewMode.gallery)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 110)
+
+                    Text("View").font(.system(size: 9)).foregroundColor(.secondary)
+                }
+
+                // Group Menu
+                Menu {
+                    Picker("Sort By", selection: Bindable(activeState).sortField) {
+                        ForEach(SortField.allCases) { field in
+                            Text(field.rawValue).tag(field)
+                        }
+                    }
+                    Divider()
+                    Button(activeState.sortAscending ? "Descending" : "Ascending") {
+                        activeState.sortAscending.toggle()
+                    }
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: "square.grid.3x1.below.line.grid.1x2")
+                            .font(.system(size: 12))
+                        Text("Group").font(.system(size: 9)).foregroundColor(.secondary)
+                    }
+                }
+                .help("Group & Sort")
+
+                // Share Button
+                Button(action: {
+                    shareCurrentSelection()
+                }) {
+                    VStack(spacing: 2) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 12))
+                        Text("Share").font(.system(size: 9)).foregroundColor(.secondary)
+                    }
+                }
+                .help("Share Selection")
+
+                // Add Tags Button
+                Button(action: {}) {
+                    VStack(spacing: 2) {
+                        Image(systemName: "tag")
+                            .font(.system(size: 12))
+                        Text("Add Tags").font(.system(size: 9)).foregroundColor(.secondary)
+                    }
+                }
+                .help("Add Tags")
+
+                // Action Menu
+                Menu {
+                    Button("New Folder") { showingNewItemSheet = .folder }
+                    Button("New File") { showingNewItemSheet = .file }
+                    Divider()
+                    Button("Get Info (⌘I)") { isInspectorVisible.toggle() }
+                    Button("Duplicate (⌘D)") { duplicateSelected() }
+                    Button("Rename...") {
+                        if activeState.selectedItemIDs.count > 1 {
+                            showingBatchRenameSheet = true
+                        }
+                    }
+                    Divider()
+                    Button("Move to Trash (⌘⌫)") { trashSelectedItems() }
+                    Divider()
+                    Button("Show Hidden Files (⇧⌘.)") { activeState.showHiddenFiles.toggle() }
+                } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.system(size: 12))
+                        Text("Action").font(.system(size: 9)).foregroundColor(.secondary)
+                    }
+                }
+                .help("Action Menu")
+
+                // Dolphin Features: Split & Terminal
                 Button(action: {
                     workspaceState.toggleSplit()
                 }) {
-                    Image(systemName: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
+                    VStack(spacing: 2) {
+                        Image(systemName: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
+                            .font(.system(size: 12))
+                        Text("Split").font(.system(size: 9)).foregroundColor(.secondary)
+                    }
                 }
-                .help("Toggle Split View (F3 or ⌥⌘S)")
-                .keyboardShortcut("s", modifiers: [.command, .option])
+                .help("Toggle Split View")
 
-                // Terminal Drawer Toggle (F4 / Cmd+Option+T)
                 Button(action: {
                     toggleTerminalDrawer()
                 }) {
-                    Image(systemName: isTerminalVisible ? "terminal.fill" : "terminal")
-                }
-                .help("Toggle Terminal Drawer (F4 or ⌥⌘T)")
-                .keyboardShortcut("t", modifiers: [.command, .option])
-
-                // Inspector Toggle (F11 / Cmd+Option+I)
-                Button(action: {
-                    isInspectorVisible.toggle()
-                }) {
-                    Image(systemName: isInspectorVisible ? "info.circle.fill" : "info.circle")
-                }
-                .help("Toggle Information Inspector (F11 or ⌥⌘I)")
-                .keyboardShortcut("i", modifiers: [.command, .option])
-
-                // Filter bar toggle (Cmd+I)
-                Button(action: {
-                    activeState.isFilterBarVisible.toggle()
-                }) {
-                    Image(systemName: activeState.isFilterBarVisible ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                }
-                .help("Filter (⌘I)")
-                .keyboardShortcut("i", modifiers: .command)
-
-                // View Mode Picker
-                Picker("View Mode", selection: Bindable(activeState).viewMode) {
-                    ForEach(ViewMode.allCases) { mode in
-                        Image(systemName: mode.iconName).tag(mode)
+                    VStack(spacing: 2) {
+                        Image(systemName: isTerminalVisible ? "terminal.fill" : "terminal")
+                            .font(.system(size: 12))
+                        Text("Terminal").font(.system(size: 9)).foregroundColor(.secondary)
                     }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 100)
+                .help("Toggle Terminal")
 
-                // Show Hidden Files Toggle (Cmd+Shift+.)
-                Button(action: {
-                    activeState.showHiddenFiles.toggle()
-                }) {
-                    Image(systemName: activeState.showHiddenFiles ? "eye.fill" : "eye.slash")
-                }
-                .help("Toggle Hidden Files (⇧⌘.)")
-                .keyboardShortcut(".", modifiers: [.command, .shift])
+                // Search Bar
+                VStack(spacing: 2) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 10))
 
-                // Reload button (Cmd+R)
-                Button(action: {
-                    Task { await activeState.reloadCurrentDirectory() }
-                }) {
-                    Image(systemName: "arrow.clockwise")
+                        TextField("Search", text: Bindable(activeState).filterText)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 11))
+                            .frame(width: 80)
+
+                        if !activeState.filterText.isEmpty {
+                            Button(action: { activeState.filterText = "" }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.secondary)
+                                    .font(.system(size: 10))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(Color(nsColor: .controlBackgroundColor).opacity(0.8))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
+                    )
+
+                    Text("Search").font(.system(size: 9)).foregroundColor(.secondary)
                 }
-                .help("Reload (⌘R)")
-                .keyboardShortcut("r", modifiers: .command)
             }
         }
-        // Background Keyboard Shortcuts
         .background {
             Group {
-                // Quick Look (Space)
+                Button("") { triggerQuickLook() }.keyboardShortcut(.space, modifiers: [])
+                Button("") { trashSelectedItems() }.keyboardShortcut(.delete, modifiers: .command)
                 Button("") {
-                    triggerQuickLook()
-                }
-                .keyboardShortcut(.space, modifiers: [])
-
-                // Trash selected (Cmd+Delete)
-                Button("") {
-                    trashSelectedItems()
-                }
-                .keyboardShortcut(.delete, modifiers: .command)
-
-                // Batch Rename selected (Cmd+Shift+R)
-                Button("") {
-                    if activeState.selectedItemIDs.count > 1 {
-                        showingBatchRenameSheet = true
-                    }
-                }
-                .keyboardShortcut("r", modifiers: [.command, .shift])
-
-                // View Mode Shortcuts (Cmd+1, Cmd+2, Cmd+3)
-                Button("") { activeState.viewMode = .details }
-                    .keyboardShortcut("1", modifiers: .command)
-
-                Button("") { activeState.viewMode = .grid }
-                    .keyboardShortcut("2", modifiers: .command)
-
-                Button("") { activeState.viewMode = .compact }
-                    .keyboardShortcut("3", modifiers: .command)
-
-                // Direct Path Edit (Cmd+L)
-                Button("") {
-                    activeState.pathInputText = activeState.currentURL.path
-                    activeState.isEditingPath.toggle()
-                }
-                .keyboardShortcut("l", modifiers: .command)
-
-                // Switch Active Split Pane (Tab)
-                Button("") {
-                    workspaceState.toggleActivePane()
-                }
-                .keyboardShortcut(.tab, modifiers: [])
-
-                // New Tab (Cmd+T)
-                Button("") {
-                    workspaceState.newTab()
-                }
-                .keyboardShortcut("t", modifiers: .command)
-
-                // Close Tab (Cmd+W)
-                Button("") {
-                    workspaceState.closeTab(id: workspaceState.activeTabID)
-                }
-                .keyboardShortcut("w", modifiers: .command)
-
-                // Next Tab (Cmd+Shift+])
-                Button("") {
-                    workspaceState.nextTab()
-                }
-                .keyboardShortcut("]", modifiers: [.command, .shift])
-
-                // Previous Tab (Cmd+Shift+[)
-                Button("") {
-                    workspaceState.previousTab()
-                }
-                .keyboardShortcut("[", modifiers: [.command, .shift])
+                    if activeState.selectedItemIDs.count > 1 { showingBatchRenameSheet = true }
+                }.keyboardShortcut("r", modifiers: [.command, .shift])
+                Button("") { activeState.viewMode = .grid }.keyboardShortcut("1", modifiers: .command)
+                Button("") { activeState.viewMode = .details }.keyboardShortcut("2", modifiers: .command)
+                Button("") { activeState.viewMode = .compact }.keyboardShortcut("3", modifiers: .command)
+                Button("") { activeState.viewMode = .gallery }.keyboardShortcut("4", modifiers: .command)
+                Button("") { workspaceState.toggleSplit() }.keyboardShortcut("s", modifiers: [.command, .shift])
+                Button("") { toggleTerminalDrawer() }.keyboardShortcut("t", modifiers: [.command, .shift])
+                Button("") { isInspectorVisible.toggle() }.keyboardShortcut("i", modifiers: [.command, .option])
             }
             .opacity(0)
+            .allowsHitTesting(false)
         }
     }
 
     private var filterBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "line.3.horizontal.decrease.circle")
+        HStack {
+            Image(systemName: "line.3.horizontal.decrease")
                 .foregroundColor(.secondary)
-            TextField("Filter items (e.g. *.swift or filename)...", text: Bindable(activeState).filterText)
+            TextField("Filter filenames in current folder...", text: Bindable(activeState).filterText)
                 .textFieldStyle(.plain)
-                .font(.system(size: 12))
             if !activeState.filterText.isEmpty {
                 Button(action: { activeState.filterText = "" }) {
                     Image(systemName: "xmark.circle.fill")
@@ -282,17 +327,15 @@ public struct ContentView: View {
                 }
                 .buttonStyle(.plain)
             }
-            Button(action: {
+            Button("Done") {
                 activeState.isFilterBarVisible = false
-                activeState.filterText = ""
-            }) {
-                Text("Done")
-                    .font(.caption)
             }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background(Color(nsColor: .controlBackgroundColor))
+        .background(Color(nsColor: .controlBackgroundColor).opacity(0.6))
         .overlay(Divider(), alignment: .bottom)
     }
 
@@ -304,10 +347,8 @@ public struct ContentView: View {
     }
 
     private func triggerQuickLook() {
-        let urls = Array(activeState.selectedItemIDs)
-        if !urls.isEmpty {
-            QuickLookCoordinator.shared.toggleQuickLook(for: urls)
-        }
+        guard let firstID = activeState.selectedItemIDs.first else { return }
+        QuickLookCoordinator.shared.toggleQuickLook(for: [firstID])
     }
 
     private func trashSelectedItems() {
@@ -317,5 +358,54 @@ public struct ContentView: View {
             try? await FileOperationsService.shared.trash(items: urls)
             await activeState.reloadCurrentDirectory()
         }
+    }
+
+    private func duplicateSelected() {
+        let urls = Array(activeState.selectedItemIDs)
+        guard !urls.isEmpty else { return }
+        Task {
+            try? await FileOperationsService.shared.duplicate(items: urls)
+            await activeState.reloadCurrentDirectory()
+        }
+    }
+
+    private func shareCurrentSelection() {
+        let urls = Array(activeState.selectedItemIDs)
+        guard !urls.isEmpty else { return }
+        let picker = NSSharingServicePicker(items: urls)
+        if let window = NSApp.keyWindow {
+            picker.show(relativeTo: .zero, of: window.contentView ?? NSView(), preferredEdge: .minY)
+        }
+    }
+}
+
+private struct BreadcrumbMenuContent: View {
+    @Bindable var navigationState: NavigationState
+
+    var body: some View {
+        let segments = getSegments()
+        ForEach(segments, id: \.self) { url in
+            Button(action: {
+                navigationState.navigateTo(url)
+            }) {
+                HStack {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
+                    Text(url.lastPathComponent.isEmpty ? "Macintosh HD" : url.lastPathComponent)
+                }
+            }
+        }
+    }
+
+    private func getSegments() -> [URL] {
+        var res: [URL] = []
+        var cur = navigationState.currentURL.standardizedFileURL
+        while true {
+            res.insert(cur, at: 0)
+            if cur.path == "/" { break }
+            let parent = cur.deletingLastPathComponent()
+            if parent.path == cur.path { break }
+            cur = parent
+        }
+        return res
     }
 }

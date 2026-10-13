@@ -1,11 +1,10 @@
 import Foundation
-import SwiftUI
 import Observation
 
 public enum SortField: String, CaseIterable, Identifiable, Sendable {
     case name = "Name"
-    case size = "Size"
     case dateModified = "Date Modified"
+    case size = "Size"
     case kind = "Kind"
     case permissions = "Permissions"
 
@@ -13,17 +12,19 @@ public enum SortField: String, CaseIterable, Identifiable, Sendable {
 }
 
 public enum ViewMode: String, CaseIterable, Identifiable, Sendable {
-    case details = "Details"
     case grid = "Icons"
-    case compact = "Compact"
+    case details = "List"
+    case compact = "Columns"
+    case gallery = "Gallery"
 
     public var id: String { rawValue }
 
     public var iconName: String {
         switch self {
-        case .details: return "list.bullet"
         case .grid: return "square.grid.2x2"
-        case .compact: return "list.dash"
+        case .details: return "list.bullet"
+        case .compact: return "rectangle.split.3x1"
+        case .gallery: return "macwindow"
         }
     }
 }
@@ -52,7 +53,7 @@ public final class NavigationState {
     public var filterText: String = ""
     public var isFilterBarVisible: Bool = false
 
-    public var viewMode: ViewMode = .details
+    public var viewMode: ViewMode = .grid
     public var iconSize: CGFloat = 80.0
 
     public var sortField: SortField = .name
@@ -79,60 +80,18 @@ public final class NavigationState {
     }
 
     public var canGoUp: Bool {
-        currentURL.path != "/"
+        currentURL.path != "/" && currentURL.deletingLastPathComponent().path != currentURL.path
     }
 
-    public var filteredAndSortedItems: [FileItem] {
-        var result = items
+    public func navigateTo(_ url: URL) {
+        let standardized = url.standardizedFileURL
+        guard standardized != currentURL else { return }
 
-        // Filter
-        if !filterText.trimmingCharacters(in: .whitespaces).isEmpty {
-            let query = filterText.lowercased()
-            result = result.filter { item in
-                item.name.lowercased().contains(query) ||
-                item.kindDescription.lowercased().contains(query)
-            }
-        }
-
-        // Sort: Always keep directories first (Dolphin style) unless specified otherwise
-        result.sort { a, b in
-            if a.isDirectory != b.isDirectory {
-                return a.isDirectory && !b.isDirectory
-            }
-
-            let comparison: ComparisonResult
-            switch sortField {
-            case .name:
-                comparison = a.name.localizedStandardCompare(b.name)
-            case .size:
-                comparison = a.fileSize < b.fileSize ? .orderedAscending : (a.fileSize > b.fileSize ? .orderedDescending : .orderedSame)
-            case .dateModified:
-                comparison = a.dateModified.compare(b.dateModified)
-            case .kind:
-                comparison = a.kindDescription.localizedStandardCompare(b.kindDescription)
-            case .permissions:
-                comparison = a.permissionsString.compare(b.permissionsString)
-            }
-
-            return sortAscending ? (comparison == .orderedAscending) : (comparison == .orderedDescending)
-        }
-
-        return result
-    }
-
-    public func navigateTo(_ url: URL, recordHistory: Bool = true) {
-        let normalized = url.standardizedFileURL
-        guard normalized != currentURL else { return }
-
-        if recordHistory {
-            backStack.append(currentURL)
-            forwardStack.removeAll()
-        }
-
-        currentURL = normalized
-        pathInputText = normalized.path
+        backStack.append(currentURL)
+        forwardStack.removeAll()
+        currentURL = standardized
+        pathInputText = standardized.path
         selectedItemIDs.removeAll()
-        filterText = ""
 
         Task {
             await reloadCurrentDirectory()
@@ -140,12 +99,11 @@ public final class NavigationState {
     }
 
     public func goBack() {
-        guard let previous = backStack.popLast() else { return }
+        guard canGoBack, let previous = backStack.popLast() else { return }
         forwardStack.append(currentURL)
         currentURL = previous
         pathInputText = previous.path
         selectedItemIDs.removeAll()
-        filterText = ""
 
         Task {
             await reloadCurrentDirectory()
@@ -153,12 +111,11 @@ public final class NavigationState {
     }
 
     public func goForward() {
-        guard let next = forwardStack.popLast() else { return }
+        guard canGoForward, let next = forwardStack.popLast() else { return }
         backStack.append(currentURL)
         currentURL = next
         pathInputText = next.path
         selectedItemIDs.removeAll()
-        filterText = ""
 
         Task {
             await reloadCurrentDirectory()
@@ -167,37 +124,71 @@ public final class NavigationState {
 
     public func goUp() {
         guard canGoUp else { return }
-        let parent = currentURL.deletingLastPathComponent().standardizedFileURL
+        let parent = currentURL.deletingLastPathComponent()
+        guard parent.path != currentURL.path else { return }
         navigateTo(parent)
     }
 
     public func reloadCurrentDirectory() async {
         isLoading = true
         errorMessage = nil
+
         do {
-            let loaded = try await fileSystemService.contentsOfDirectory(at: currentURL, showHidden: showHiddenFiles)
-            self.items = loaded
-            self.isLoading = false
+            let fetchedItems = try await fileSystemService.contentsOfDirectory(
+                at: currentURL,
+                showHidden: showHiddenFiles
+            )
+            self.items = fetchedItems
         } catch {
             self.errorMessage = error.localizedDescription
             self.items = []
-            self.isLoading = false
         }
+        self.isLoading = false
     }
 
     public func commitPathInput() {
-        let input = pathInputText.trimmingCharacters(in: .whitespacesAndNewlines)
         isEditingPath = false
-
-        guard !input.isEmpty else {
-            pathInputText = currentURL.path
-            return
-        }
-
-        if let resolved = fileSystemService.resolvePath(input) {
+        if let resolved = fileSystemService.resolvePath(pathInputText) {
             navigateTo(resolved)
         } else {
-            pathInputText = currentURL.path
+            errorMessage = "Path not found: \(pathInputText)"
         }
+    }
+
+    public var filteredAndSortedItems: [FileItem] {
+        var result = items
+
+        if !filterText.isEmpty {
+            let query = filterText.lowercased()
+            result = result.filter { $0.name.lowercased().contains(query) }
+        }
+
+        result.sort { itemA, itemB in
+            if itemA.isDirectory != itemB.isDirectory {
+                return itemA.isDirectory
+            }
+
+            switch sortField {
+            case .name:
+                let comp = itemA.name.localizedStandardCompare(itemB.name)
+                return sortAscending ? comp == .orderedAscending : comp == .orderedDescending
+            case .dateModified:
+                return sortAscending
+                    ? itemA.dateModified < itemB.dateModified
+                    : itemA.dateModified > itemB.dateModified
+            case .size:
+                return sortAscending
+                    ? itemA.fileSize < itemB.fileSize
+                    : itemA.fileSize > itemB.fileSize
+            case .kind:
+                let comp = itemA.kindDescription.localizedStandardCompare(itemB.kindDescription)
+                return sortAscending ? comp == .orderedAscending : comp == .orderedDescending
+            case .permissions:
+                let comp = itemA.permissionsString.localizedStandardCompare(itemB.permissionsString)
+                return sortAscending ? comp == .orderedAscending : comp == .orderedDescending
+            }
+        }
+
+        return result
     }
 }

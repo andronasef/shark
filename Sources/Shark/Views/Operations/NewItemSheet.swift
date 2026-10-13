@@ -1,8 +1,10 @@
 import SwiftUI
 
-public enum NewItemType {
+public enum NewItemType: String, Identifiable {
     case folder
     case file
+
+    public var id: String { rawValue }
 
     public var title: String {
         switch self {
@@ -44,18 +46,27 @@ public struct NewItemSheet: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Label(type.title, systemImage: type.icon)
-                .font(.headline)
+        VStack(spacing: 16) {
+            HStack(spacing: 12) {
+                Image(systemName: type.icon)
+                    .font(.system(size: 28))
+                    .foregroundColor(.accentColor)
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Name:")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                TextField("Enter name", text: $itemName)
-                    .textFieldStyle(.roundedBorder)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(type.title)
+                        .font(.headline)
+                    Text("In: \(parentURL.lastPathComponent)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
             }
+
+            TextField("Item name", text: $itemName)
+                .textFieldStyle(.roundedBorder)
+                .onSubmit {
+                    createItem()
+                }
 
             if let error = errorMessage {
                 Text(error)
@@ -65,7 +76,6 @@ public struct NewItemSheet: View {
 
             HStack {
                 Spacer()
-
                 Button("Cancel") {
                     dismiss()
                 }
@@ -74,39 +84,34 @@ public struct NewItemSheet: View {
                 Button("Create") {
                     createItem()
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(itemName.trimmingCharacters(in: .whitespaces).isEmpty || isCreating)
                 .keyboardShortcut(.defaultAction)
+                .disabled(itemName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isCreating)
             }
         }
         .padding(20)
-        .frame(width: 340)
+        .frame(width: 380)
     }
 
     private func createItem() {
+        let trimmed = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
         isCreating = true
         errorMessage = nil
-
-        let name = itemName.trimmingCharacters(in: .whitespaces)
 
         Task {
             do {
                 switch type {
                 case .folder:
-                    _ = try await FileOperationsService.shared.createFolder(named: name, at: parentURL)
+                    _ = try await FileOperationsService.shared.createFolder(named: trimmed, at: parentURL)
                 case .file:
-                    _ = try await FileOperationsService.shared.createFile(named: name, at: parentURL)
+                    _ = try await FileOperationsService.shared.createFile(named: trimmed, at: parentURL)
                 }
-
-                await MainActor.run {
-                    onCreated()
-                    dismiss()
-                }
+                onCreated()
+                dismiss()
             } catch {
-                await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                    self.isCreating = false
-                }
+                errorMessage = error.localizedDescription
+                isCreating = false
             }
         }
     }

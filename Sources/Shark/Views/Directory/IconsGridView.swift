@@ -19,14 +19,14 @@ public struct IconsGridView: View {
     public var body: some View {
         ScrollView {
             LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: navigationState.iconSize, maximum: navigationState.iconSize + 40), spacing: 16)],
-                spacing: 16
+                columns: [GridItem(.adaptive(minimum: 96, maximum: 112), spacing: 20)],
+                spacing: 24
             ) {
                 ForEach(navigationState.filteredAndSortedItems) { item in
                     let isSelected = navigationState.selectedItemIDs.contains(item.id)
                     IconGridItemView(
                         item: item,
-                        iconSize: navigationState.iconSize,
+                        iconSize: 76,
                         isSelected: isSelected
                     )
                     .contentShape(Rectangle())
@@ -42,7 +42,11 @@ public struct IconsGridView: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(20)
+        }
+        .onTapGesture {
+            // Clicking empty canvas clears selection
+            navigationState.selectedItemIDs.removeAll()
         }
     }
 }
@@ -55,37 +59,37 @@ private struct IconGridItemView: View {
     @State private var thumbnailImage: NSImage?
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 5) {
+            // Icon presentation matching native macOS Finder
             Group {
                 if let thumb = thumbnailImage {
                     Image(nsImage: thumb)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 } else {
-                    Image(systemName: item.systemIconName)
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .foregroundColor(item.isDirectory ? .accentColor : .primary)
                 }
             }
-            .frame(width: iconSize * 0.6, height: iconSize * 0.6)
-            .shadow(color: .black.opacity(0.1), radius: 2, y: 1)
+            .frame(width: iconSize, height: iconSize)
+            .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
 
+            // Finder-authentic selection label
             Text(item.name)
-                .font(.system(size: 11))
+                .font(.system(size: 11, weight: isSelected ? .medium : .regular))
+                .foregroundColor(isSelected ? .white : .primary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 4)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(isSelected ? Color(nsColor: .controlAccentColor) : Color.clear)
+                )
         }
-        .frame(width: iconSize + 20, height: iconSize + 34)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
-        )
+        .frame(width: 96, alignment: .top)
+        .contentShape(Rectangle())
         .task(id: item.url) {
             let thumb = await ThumbnailService.shared.thumbnail(
                 for: item.url,

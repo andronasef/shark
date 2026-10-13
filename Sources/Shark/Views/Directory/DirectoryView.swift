@@ -16,7 +16,7 @@ public struct DirectoryView: View {
         VStack(spacing: 0) {
             contentArea
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .dropDestination(for: URL.self) { urls, location in
+                .dropDestination(for: URL.self) { urls, _ in
                     handleDrop(urls: urls)
                     return true
                 }
@@ -118,6 +118,8 @@ public struct DirectoryView: View {
                 )
             case .compact:
                 compactList
+            case .gallery:
+                galleryView
             }
         }
     }
@@ -129,21 +131,24 @@ public struct DirectoryView: View {
                 ForEach(navigationState.filteredAndSortedItems) { item in
                     let isSelected = navigationState.selectedItemIDs.contains(item.id)
                     HStack(spacing: 8) {
-                        Image(systemName: item.systemIconName)
-                            .foregroundColor(item.isDirectory ? .accentColor : .primary)
-                            .frame(width: 16)
+                        Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 16, height: 16)
                         Text(item.name)
+                            .font(.system(size: 12))
+                            .foregroundColor(isSelected ? .white : .primary)
                             .lineLimit(1)
                         Spacer()
                         Text(item.formattedSize)
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundColor(.secondary)
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
                     }
                     .padding(.vertical, 4)
                     .padding(.horizontal, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+                            .fill(isSelected ? Color.accentColor : Color.clear)
                     )
                     .contentShape(Rectangle())
                     .draggable(item.url)
@@ -159,6 +164,78 @@ public struct DirectoryView: View {
                 }
             }
             .padding(8)
+        }
+    }
+
+    // MARK: - Gallery View
+    private var galleryView: some View {
+        VStack(spacing: 0) {
+            let selectedItem = navigationState.filteredAndSortedItems.first { navigationState.selectedItemIDs.contains($0.id) }
+                ?? navigationState.filteredAndSortedItems.first
+
+            // Hero Preview Area
+            if let item = selectedItem {
+                VStack(spacing: 12) {
+                    Spacer()
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 180, maxHeight: 180)
+                        .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
+
+                    Text(item.name)
+                        .font(.headline)
+                        .lineLimit(1)
+
+                    Text("\(item.kindDescription) • \(item.formattedSize)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(nsColor: .windowBackgroundColor).opacity(0.4))
+            }
+
+            Divider()
+
+            // Horizontal Filmstrip
+            ScrollView(.horizontal, showsIndicators: true) {
+                LazyHStack(spacing: 12) {
+                    ForEach(navigationState.filteredAndSortedItems) { item in
+                        let isSelected = navigationState.selectedItemIDs.contains(item.id)
+                        VStack(spacing: 4) {
+                            Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 48, height: 48)
+
+                            Text(item.name)
+                                .font(.system(size: 10, weight: isSelected ? .medium : .regular))
+                                .foregroundColor(isSelected ? .white : .primary)
+                                .lineLimit(1)
+                                .frame(width: 60)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 1)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(isSelected ? Color.accentColor : Color.clear)
+                                )
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            navigationState.selectedItemIDs = [item.id]
+                        }
+                        .onTapGesture(count: 2) {
+                            handleActivate(item)
+                        }
+                        .contextMenu {
+                            contextMenu(for: item)
+                        }
+                    }
+                }
+                .padding(10)
+            }
+            .frame(height: 90)
         }
     }
 
@@ -260,34 +337,41 @@ public struct DirectoryView: View {
 
         Divider()
 
-        Button(role: .destructive, action: {
+        Button("Move to Trash", role: .destructive) {
             Task {
                 try? await FileOperationsService.shared.trash(items: [item.url])
                 await navigationState.reloadCurrentDirectory()
             }
-        }) {
-            Label("Move to Trash", systemImage: "trash")
         }
     }
 
     @ViewBuilder
     private var directoryBackgroundContextMenu: some View {
-        Button("New Folder...") {
+        Button("New Folder") {
             showingNewItemSheet = .folder
         }
 
-        Button("New File...") {
+        Button("New File") {
             showingNewItemSheet = .file
         }
 
         Divider()
 
         Button("Reload") {
-            Task { await navigationState.reloadCurrentDirectory() }
+            Task {
+                await navigationState.reloadCurrentDirectory()
+            }
+        }
+
+        Button("Show Hidden Files") {
+            navigationState.showHiddenFiles.toggle()
+        }
+
+        Divider()
+
+        Button("Copy Path") {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
         }
     }
-}
-
-extension NewItemType: Identifiable {
-    public var id: String { title }
 }

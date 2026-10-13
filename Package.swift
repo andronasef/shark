@@ -12,11 +12,15 @@ let package = Package(
             targets: ["Shark"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", from: "1.0.7")
+    ],
     targets: [
         .executableTarget(
             name: "Shark",
-            dependencies: [],
+            dependencies: [
+                .product(name: "SwiftTerm", package: "SwiftTerm")
+            ],
             path: "Sources/Shark"
         ),
         .testTarget(
