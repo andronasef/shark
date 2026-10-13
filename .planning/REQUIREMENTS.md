@@ -21,11 +21,11 @@
 
 ### View Modes & Filtering (VIEW)
 
-- [ ] **VIEW-01**: User can switch between Details/Table view, Grid/Icons view, and Compact List view.
-- [ ] **VIEW-02**: User can sort items in Details view by Name, Size, Date Modified, Kind, and Permissions.
-- [ ] **VIEW-03**: User can adjust icon/thumbnail zoom level in Grid view.
-- [ ] **VIEW-04**: User can instantly filter the active directory using the live filter bar (`Cmd+I`).
-- [ ] **VIEW-05**: User can trigger native Quick Look preview on selected items using `Space`.
+- [x] **VIEW-01**: User can switch between Details/Table view, Grid/Icons view, and Compact List view.
+- [x] **VIEW-02**: User can sort items in Details view by Name, Size, Date Modified, Kind, and Permissions.
+- [x] **VIEW-03**: User can adjust icon/thumbnail zoom level in Grid view.
+- [x] **VIEW-04**: User can instantly filter the active directory using the live filter bar (`Cmd+I`).
+- [x] **VIEW-05**: User can trigger native Quick Look preview on selected items using `Space`.
 
 ### Embedded Terminal Drawer (TERM)
 
@@ -75,11 +75,11 @@
 | SPLIT-01 | Phase 2 | Complete |
 | SPLIT-02 | Phase 2 | Complete |
 | SPLIT-03 | Phase 2 | Complete |
-| VIEW-01 | Phase 3 | Pending |
-| VIEW-02 | Phase 3 | Pending |
-| VIEW-03 | Phase 3 | Pending |
-| VIEW-04 | Phase 3 | Pending |
-| VIEW-05 | Phase 3 | Pending |
+| VIEW-01 | Phase 3 | Complete |
+| VIEW-02 | Phase 3 | Complete |
+| VIEW-03 | Phase 3 | Complete |
+| VIEW-04 | Phase 3 | Complete |
+| VIEW-05 | Phase 3 | Complete |
 | TERM-01 | Phase 4 | Pending |
 | TERM-02 | Phase 4 | Pending |
 | TERM-03 | Phase 4 | Pending |
@@ -93,10 +93,10 @@
 
 **Coverage:**
 - v1 requirements: 23 total
-- Completed: 8
+- Completed: 13
 - Mapped to phases: 23
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 2 completion*
+*Last updated: 2026-10-13 after Phase 3 completion*

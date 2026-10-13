@@ -9,152 +9,73 @@ public struct DirectoryView: View {
     }
 
     public var body: some View {
-        Group {
-            if navigationState.isLoading && navigationState.items.isEmpty {
-                VStack(spacing: 12) {
-                    ProgressView()
-                    Text("Loading directory...")
-                        .foregroundColor(.secondary)
-                        .font(.callout)
-                }
+        VStack(spacing: 0) {
+            contentArea
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let error = navigationState.errorMessage {
-                VStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 36))
-                        .foregroundColor(.orange)
-                    Text("Unable to open directory")
-                        .font(.headline)
-                    Text(error)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    Button("Try Again") {
-                        Task { await navigationState.reloadCurrentDirectory() }
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if navigationState.filteredAndSortedItems.isEmpty {
-                VStack(spacing: 8) {
-                    Image(systemName: "folder")
-                        .font(.system(size: 40))
-                        .foregroundColor(.secondary.opacity(0.5))
-                    Text(navigationState.filterText.isEmpty ? "Folder is Empty" : "No Matching Items")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                switch navigationState.viewMode {
-                case .details:
-                    detailsList
-                case .grid:
-                    iconsGrid
-                case .compact:
-                    compactList
-                }
-            }
+
+            statusBar
         }
         .task(id: navigationState.currentURL) {
             await navigationState.reloadCurrentDirectory()
         }
     }
 
-    // MARK: - Details / Table View
-    private var detailsList: some View {
-        Table(navigationState.filteredAndSortedItems, selection: $navigationState.selectedItemIDs) {
-            TableColumn("Name") { item in
-                HStack(spacing: 8) {
-                    Image(systemName: item.systemIconName)
-                        .foregroundColor(item.isDirectory ? .accentColor : .primary)
-                        .frame(width: 18)
-                    Text(item.name)
-                        .lineLimit(1)
-                }
-                .contentShape(Rectangle())
-                .onTapGesture(count: 2) {
-                    handleActivate(item)
-                }
-                .contextMenu {
-                    contextMenu(for: item)
-                }
+    // MARK: - Main Content Area
+    @ViewBuilder
+    private var contentArea: some View {
+        if navigationState.isLoading && navigationState.items.isEmpty {
+            VStack(spacing: 12) {
+                ProgressView()
+                Text("Loading directory...")
+                    .foregroundColor(.secondary)
+                    .font(.callout)
             }
-            .width(min: 180, ideal: 300)
-
-            TableColumn("Size") { item in
-                Text(item.formattedSize)
-                    .font(.system(.body, design: .monospaced))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let error = navigationState.errorMessage {
+            VStack(spacing: 12) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 36))
+                    .foregroundColor(.orange)
+                Text("Unable to open directory")
+                    .font(.headline)
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                Button("Try Again") {
+                    Task { await navigationState.reloadCurrentDirectory() }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if navigationState.filteredAndSortedItems.isEmpty {
+            VStack(spacing: 8) {
+                Image(systemName: "folder")
+                    .font(.system(size: 40))
+                    .foregroundColor(.secondary.opacity(0.5))
+                Text(navigationState.filterText.isEmpty ? "Folder is Empty" : "No Matching Items")
+                    .font(.headline)
                     .foregroundColor(.secondary)
             }
-            .width(min: 80, ideal: 100)
-
-            TableColumn("Date Modified") { item in
-                Text(item.dateModified.formatted(date: .abbreviated, time: .shortened))
-                    .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            switch navigationState.viewMode {
+            case .details:
+                DetailsTableView(
+                    navigationState: navigationState,
+                    onActivate: handleActivate,
+                    contextMenu: contextMenu
+                )
+            case .grid:
+                IconsGridView(
+                    navigationState: navigationState,
+                    onActivate: handleActivate,
+                    contextMenu: contextMenu
+                )
+            case .compact:
+                compactList
             }
-            .width(min: 120, ideal: 160)
-
-            TableColumn("Kind") { item in
-                Text(item.kindDescription)
-                    .foregroundColor(.secondary)
-            }
-            .width(min: 100, ideal: 140)
-
-            TableColumn("Permissions") { item in
-                Text(item.permissionsString)
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundColor(.secondary)
-            }
-            .width(min: 90, ideal: 110)
-        }
-    }
-
-    // MARK: - Grid / Icons View
-    private var iconsGrid: some View {
-        ScrollView {
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: navigationState.iconSize, maximum: navigationState.iconSize + 40), spacing: 16)],
-                spacing: 16
-            ) {
-                ForEach(navigationState.filteredAndSortedItems) { item in
-                    let isSelected = navigationState.selectedItemIDs.contains(item.id)
-                    VStack(spacing: 6) {
-                        Image(systemName: item.systemIconName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: navigationState.iconSize * 0.55, height: navigationState.iconSize * 0.55)
-                            .foregroundColor(item.isDirectory ? .accentColor : .primary)
-
-                        Text(item.name)
-                            .font(.system(size: 11))
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 4)
-                    }
-                    .frame(width: navigationState.iconSize + 20, height: navigationState.iconSize + 30)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5)
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        navigationState.selectedItemIDs = [item.id]
-                    }
-                    .onTapGesture(count: 2) {
-                        handleActivate(item)
-                    }
-                    .contextMenu {
-                        contextMenu(for: item)
-                    }
-                }
-            }
-            .padding()
         }
     }
 
@@ -197,6 +118,51 @@ public struct DirectoryView: View {
         }
     }
 
+    // MARK: - Dolphin Status Bar
+    private var statusBar: some View {
+        HStack(spacing: 12) {
+            let total = navigationState.items.count
+            let filtered = navigationState.filteredAndSortedItems.count
+            let selected = navigationState.selectedItemIDs.count
+
+            HStack(spacing: 6) {
+                if !navigationState.filterText.isEmpty {
+                    Text("\(filtered) of \(total) items")
+                } else {
+                    Text("\(total) items")
+                }
+
+                if selected > 0 {
+                    Text("(\(selected) selected)")
+                        .foregroundColor(.accentColor)
+                }
+            }
+            .font(.system(size: 11))
+            .foregroundColor(.secondary)
+
+            Spacer()
+
+            if navigationState.viewMode == .grid {
+                HStack(spacing: 6) {
+                    Image(systemName: "photo")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+
+                    Slider(value: $navigationState.iconSize, in: 48...192, step: 8)
+                        .frame(width: 100)
+
+                    Image(systemName: "photo.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .background(Color(nsColor: .controlBackgroundColor).opacity(0.6))
+        .overlay(Divider(), alignment: .top)
+    }
+
     // MARK: - Actions
     private func handleActivate(_ item: FileItem) {
         if item.isNavigableDirectory {
@@ -210,6 +176,10 @@ public struct DirectoryView: View {
     private func contextMenu(for item: FileItem) -> some View {
         Button("Open") {
             handleActivate(item)
+        }
+
+        Button("Quick Look") {
+            QuickLookCoordinator.shared.toggleQuickLook(for: [item.url])
         }
 
         Button("Show in Finder") {

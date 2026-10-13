@@ -136,6 +136,22 @@ public struct ContentView: View {
         // Background Keyboard Shortcuts
         .background {
             Group {
+                // Quick Look (Space)
+                Button("") {
+                    triggerQuickLook()
+                }
+                .keyboardShortcut(.space, modifiers: [])
+
+                // View Mode Shortcuts (Cmd+1, Cmd+2, Cmd+3)
+                Button("") { activeState.viewMode = .details }
+                    .keyboardShortcut("1", modifiers: .command)
+
+                Button("") { activeState.viewMode = .grid }
+                    .keyboardShortcut("2", modifiers: .command)
+
+                Button("") { activeState.viewMode = .compact }
+                    .keyboardShortcut("3", modifiers: .command)
+
                 // Direct Path Edit (Cmd+L)
                 Button("") {
                     activeState.pathInputText = activeState.currentURL.path
@@ -174,6 +190,13 @@ public struct ContentView: View {
                 .keyboardShortcut("[", modifiers: [.command, .shift])
             }
             .opacity(0)
+        }
+    }
+
+    private func triggerQuickLook() {
+        let urls = Array(activeState.selectedItemIDs)
+        if !urls.isEmpty {
+            QuickLookCoordinator.shared.toggleQuickLook(for: urls)
         }
     }
 }
