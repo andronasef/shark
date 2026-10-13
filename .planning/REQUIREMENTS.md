@@ -29,9 +29,9 @@
 
 ### Embedded Terminal Drawer (TERM)
 
-- [ ] **TERM-01**: User can toggle the embedded bottom terminal drawer (`F4`).
-- [ ] **TERM-02**: Terminal runs an interactive pseudo-terminal (PTY) with the user's login shell ($SHELL, e.g. zsh).
-- [ ] **TERM-03**: Terminal tracks the active pane's working directory upon pane change or file navigation.
+- [x] **TERM-01**: User can toggle the embedded bottom terminal drawer (`F4`).
+- [x] **TERM-02**: Terminal runs an interactive pseudo-terminal (PTY) with the user's login shell ($SHELL, e.g. zsh).
+- [x] **TERM-03**: Terminal tracks the active pane's working directory upon pane change or file navigation.
 
 ### Information Inspector (INSP)
 
@@ -80,9 +80,9 @@
 | VIEW-03 | Phase 3 | Complete |
 | VIEW-04 | Phase 3 | Complete |
 | VIEW-05 | Phase 3 | Complete |
-| TERM-01 | Phase 4 | Pending |
-| TERM-02 | Phase 4 | Pending |
-| TERM-03 | Phase 4 | Pending |
+| TERM-01 | Phase 4 | Complete |
+| TERM-02 | Phase 4 | Complete |
+| TERM-03 | Phase 4 | Complete |
 | INSP-01 | Phase 5 | Pending |
 | INSP-02 | Phase 5 | Pending |
 | OPS-01 | Phase 6 | Pending |
@@ -93,10 +93,10 @@
 
 **Coverage:**
 - v1 requirements: 23 total
-- Completed: 13
+- Completed: 16
 - Mapped to phases: 23
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 3 completion*
+*Last updated: 2026-10-13 after Phase 4 completion*

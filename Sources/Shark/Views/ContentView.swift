@@ -4,6 +4,8 @@ import AppKit
 public struct ContentView: View {
     @State private var workspaceState = WorkspaceState()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var isTerminalVisible = false
+    @State private var terminalSession = PTYSession()
 
     public init() {}
 
@@ -22,37 +24,27 @@ public struct ContentView: View {
 
                 // Filter Bar (Cmd+I)
                 if activeState.isFilterBarVisible {
-                    HStack(spacing: 8) {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.secondary)
-                        TextField("Filter items (e.g. *.swift or filename)...", text: Bindable(activeState).filterText)
-                            .textFieldStyle(.plain)
-                            .font(.system(size: 12))
-                        if !activeState.filterText.isEmpty {
-                            Button(action: { activeState.filterText = "" }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.secondary)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        Button(action: {
-                            activeState.isFilterBarVisible = false
-                            activeState.filterText = ""
-                        }) {
-                            Text("Done")
-                                .font(.caption)
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color(nsColor: .controlBackgroundColor))
-                    Divider()
+                    filterBar
                 }
 
                 // Dual Pane or Single Pane Workspace Container
                 DualPaneContainerView(tab: workspaceState.activeTab)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                // Bottom Embedded Terminal Drawer (F4)
+                if isTerminalVisible {
+                    TerminalDrawerContainerView(
+                        session: terminalSession,
+                        isPresented: $isTerminalVisible
+                    )
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .onChange(of: activeState.currentURL) { _, newURL in
+            if isTerminalVisible {
+                terminalSession.syncDirectory(to: newURL)
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
@@ -95,6 +87,15 @@ public struct ContentView: View {
                 }
                 .help("Toggle Split View (F3 or ⌥⌘S)")
                 .keyboardShortcut("s", modifiers: [.command, .option])
+
+                // Terminal Drawer Toggle (F4 / Cmd+Option+T)
+                Button(action: {
+                    toggleTerminalDrawer()
+                }) {
+                    Image(systemName: isTerminalVisible ? "terminal.fill" : "terminal")
+                }
+                .help("Toggle Terminal Drawer (F4 or ⌥⌘T)")
+                .keyboardShortcut("t", modifiers: [.command, .option])
 
                 // Filter bar toggle (Cmd+I)
                 Button(action: {
@@ -190,6 +191,41 @@ public struct ContentView: View {
                 .keyboardShortcut("[", modifiers: [.command, .shift])
             }
             .opacity(0)
+        }
+    }
+
+    private var filterBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+                .foregroundColor(.secondary)
+            TextField("Filter items (e.g. *.swift or filename)...", text: Bindable(activeState).filterText)
+                .textFieldStyle(.plain)
+                .font(.system(size: 12))
+            if !activeState.filterText.isEmpty {
+                Button(action: { activeState.filterText = "" }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            Button(action: {
+                activeState.isFilterBarVisible = false
+                activeState.filterText = ""
+            }) {
+                Text("Done")
+                    .font(.caption)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color(nsColor: .controlBackgroundColor))
+        .overlay(Divider(), alignment: .bottom)
+    }
+
+    private func toggleTerminalDrawer() {
+        isTerminalVisible.toggle()
+        if isTerminalVisible {
+            terminalSession.syncDirectory(to: activeState.currentURL)
         }
     }
 

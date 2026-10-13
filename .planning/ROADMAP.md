@@ -9,7 +9,7 @@ Shark delivers KDE Dolphin's power-user file management experience natively on m
 - [x] **Phase 1: Core Navigation & macOS Foundation** - Native Swift/SwiftUI app scaffolding, high-performance FileSystem service, Places sidebar, clickable/editable breadcrumb bar, and directory navigation.
 - [x] **Phase 2: Dual-Pane Split View & Tabbed Workspace** - Dolphin F3 dual-pane split navigation, active pane focus management, and multi-tab browsing (Cmd+T / Cmd+W).
 - [x] **Phase 3: View Modes, Instant Filtering & Quick Look** - Details/Table view with column sorting, Grid/Icons view with zoomable thumbnails, Compact view, live filter bar (Cmd+I), and native Quick Look (Space).
-- [ ] **Phase 4: Embedded Terminal Drawer (F4)** - Collapsible bottom terminal panel with native PTY running user login shell ($SHELL) and bidirectional directory synchronization.
+- [x] **Phase 4: Embedded Terminal Drawer (F4)** - Collapsible bottom terminal panel with native PTY running user login shell ($SHELL) and bidirectional directory synchronization.
 - [ ] **Phase 5: Information & Metadata Inspector (F11)** - Collapsible right-hand inspector with detailed metadata, POSIX permissions, media attributes, checksums, and preview.
 - [ ] **Phase 6: File Operations Engine, FSEvents & Drag-and-Drop** - Async non-blocking file operations (copy, move, trash, delete, batch rename), live FSEvents filesystem monitoring, and native drag-and-drop.
 
@@ -68,7 +68,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: Build PTYSession, TerminalView (ANSI terminal emulator / NSViewRepresentable), and TerminalDrawer synced with active pane navigation.
+- [x] 04-01: Build PTYSession, TerminalView (ANSI terminal emulator / NSViewRepresentable), and TerminalDrawer synced with active pane navigation.
 
 ### Phase 5: Information & Metadata Inspector (F11)
 **Goal**: Build Dolphin's F11 inspector panel for deep file inspection and metadata exploration.
@@ -98,4 +98,4 @@ Plans:
 
 ---
 *Roadmap defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 3 completion*
+*Last updated: 2026-10-13 after Phase 4 completion*
