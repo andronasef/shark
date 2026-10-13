@@ -1,7 +1,9 @@
 import SwiftUI
 import AppKit
+import Inject
 
 public struct IconsGridView: View {
+    @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
     let onActivate: (FileItem) -> Void
     let contextMenuBuilder: (FileItem) -> AnyView
@@ -48,6 +50,7 @@ public struct IconsGridView: View {
             // Clicking empty canvas clears selection
             navigationState.selectedItemIDs.removeAll()
         }
+        .enableInjection()
     }
 }
 

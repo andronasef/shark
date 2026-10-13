@@ -1,7 +1,9 @@
 import SwiftUI
 import AppKit
+import Inject
 
 public struct DirectoryView: View {
+    @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
 
     @State private var fseventsWatcher = FSEventsWatcher()
@@ -51,6 +53,7 @@ public struct DirectoryView: View {
         .contextMenu {
             directoryBackgroundContextMenu
         }
+        .enableInjection()
     }
 
     private func setupFSEventsWatcher() {

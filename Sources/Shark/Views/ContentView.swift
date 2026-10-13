@@ -1,7 +1,10 @@
 import SwiftUI
 import AppKit
+import Inject
 
 public struct ContentView: View {
+    @ObserveInjection var inject
+
     @State private var workspaceState = WorkspaceState()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var isTerminalVisible = false
@@ -40,11 +43,9 @@ public struct ContentView: View {
 
                 // Middle Area: Dual Pane + optional Right Inspector
                 HStack(spacing: 0) {
-                    // Dual Pane or Single Pane Workspace Container
                     DualPaneContainerView(tab: workspaceState.activeTab)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    // Information Inspector Panel (F11)
                     if isInspectorVisible {
                         Divider()
                         InspectorPanelView(
@@ -89,8 +90,8 @@ public struct ContentView: View {
             )
         }
         .toolbar {
-            ToolbarItemGroup(placement: .navigation) {
-                // Back / Forward ControlGroup
+            // MARK: - Navigation Group: Back / Forward & Current Title
+            ToolbarItem(id: "nav-history", placement: .navigation) {
                 VStack(spacing: 2) {
                     HStack(spacing: 0) {
                         Button(action: { activeState.goBack() }) {
@@ -127,8 +128,9 @@ public struct ContentView: View {
                         .foregroundColor(.secondary)
                 }
                 .help("Navigation History (⌘[ / ⌘])")
+            }
 
-                // Folder Title with Native Icon
+            ToolbarItem(id: "current-title", placement: .navigation) {
                 HStack(spacing: 6) {
                     Image(nsImage: NSWorkspace.shared.icon(forFile: activeState.currentURL.path))
                         .resizable()
@@ -138,23 +140,30 @@ public struct ContentView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
                 }
-                .padding(.leading, 8)
+                .padding(.leading, 4)
             }
 
-            ToolbarItemGroup(placement: .primaryAction) {
-                // Path Menu
+            // MARK: - Actions
+            ToolbarItem(id: "path-menu", placement: .primaryAction) {
                 Menu {
                     BreadcrumbMenuContent(navigationState: activeState)
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "list.bullet.below.rectangle")
-                            .font(.system(size: 12))
-                        Text("Path").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Path")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 32)
+                    .contentShape(Rectangle())
                 }
+                .menuStyle(.borderlessButton)
                 .help("Show Path Hierarchy")
+            }
 
-                // View Mode Picker (4 modes matching Finder)
+            ToolbarItem(id: "view-mode", placement: .primaryAction) {
                 VStack(spacing: 2) {
                     Picker("View", selection: Bindable(activeState).viewMode) {
                         Image(systemName: "square.grid.2x2").tag(ViewMode.grid)
@@ -163,12 +172,16 @@ public struct ContentView: View {
                         Image(systemName: "macwindow").tag(ViewMode.gallery)
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 110)
+                    .labelsHidden()
+                    .frame(width: 116)
 
-                    Text("View").font(.system(size: 9)).foregroundColor(.secondary)
+                    Text("View")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
                 }
+            }
 
-                // Group Menu
+            ToolbarItem(id: "group-menu", placement: .primaryAction) {
                 Menu {
                     Picker("Sort By", selection: Bindable(activeState).sortField) {
                         ForEach(SortField.allCases) { field in
@@ -182,35 +195,56 @@ public struct ContentView: View {
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "square.grid.3x1.below.line.grid.1x2")
-                            .font(.system(size: 12))
-                        Text("Group").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Group")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 36)
+                    .contentShape(Rectangle())
                 }
+                .menuStyle(.borderlessButton)
                 .help("Group & Sort")
+            }
 
-                // Share Button
+            ToolbarItem(id: "share-button", placement: .primaryAction) {
                 Button(action: {
                     shareCurrentSelection()
                 }) {
                     VStack(spacing: 2) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 12))
-                        Text("Share").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Share")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 32)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .help("Share Selection")
+            }
 
-                // Add Tags Button
+            ToolbarItem(id: "tags-button", placement: .primaryAction) {
                 Button(action: {}) {
                     VStack(spacing: 2) {
                         Image(systemName: "tag")
-                            .font(.system(size: 12))
-                        Text("Add Tags").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Add Tags")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 44)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .help("Add Tags")
+            }
 
-                // Action Menu
+            ToolbarItem(id: "action-menu", placement: .primaryAction) {
                 Menu {
                     Button("New Folder") { showingNewItemSheet = .folder }
                     Button("New File") { showingNewItemSheet = .file }
@@ -229,36 +263,60 @@ public struct ContentView: View {
                 } label: {
                     VStack(spacing: 2) {
                         Image(systemName: "ellipsis.circle")
-                            .font(.system(size: 12))
-                        Text("Action").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Action")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 36)
+                    .contentShape(Rectangle())
                 }
+                .menuStyle(.borderlessButton)
                 .help("Action Menu")
+            }
 
-                // Dolphin Features: Split & Terminal
+            // MARK: - Dolphin Features: Split & Terminal
+            ToolbarItem(id: "split-view", placement: .primaryAction) {
                 Button(action: {
                     workspaceState.toggleSplit()
                 }) {
                     VStack(spacing: 2) {
                         Image(systemName: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
-                            .font(.system(size: 12))
-                        Text("Split").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Split")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 30)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .help("Toggle Split View")
+            }
 
+            ToolbarItem(id: "terminal-view", placement: .primaryAction) {
                 Button(action: {
                     toggleTerminalDrawer()
                 }) {
                     VStack(spacing: 2) {
                         Image(systemName: isTerminalVisible ? "terminal.fill" : "terminal")
-                            .font(.system(size: 12))
-                        Text("Terminal").font(.system(size: 9)).foregroundColor(.secondary)
+                            .font(.system(size: 13))
+                            .frame(height: 18)
+                        Text("Terminal")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
+                    .frame(width: 44)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .help("Toggle Terminal")
+            }
 
-                // Search Bar
+            // MARK: - Search Field
+            ToolbarItem(id: "search-field", placement: .primaryAction) {
                 VStack(spacing: 2) {
                     HStack(spacing: 4) {
                         Image(systemName: "magnifyingglass")
@@ -268,7 +326,7 @@ public struct ContentView: View {
                         TextField("Search", text: Bindable(activeState).filterText)
                             .textFieldStyle(.plain)
                             .font(.system(size: 11))
-                            .frame(width: 80)
+                            .frame(width: 90)
 
                         if !activeState.filterText.isEmpty {
                             Button(action: { activeState.filterText = "" }) {
@@ -290,7 +348,9 @@ public struct ContentView: View {
                             .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
                     )
 
-                    Text("Search").font(.system(size: 9)).foregroundColor(.secondary)
+                    Text("Search")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
                 }
             }
         }
@@ -312,6 +372,7 @@ public struct ContentView: View {
             .opacity(0)
             .allowsHitTesting(false)
         }
+        .enableInjection()
     }
 
     private var filterBar: some View {

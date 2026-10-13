@@ -1,6 +1,8 @@
 import SwiftUI
+import Inject
 
 public struct PlacesSidebarView: View {
+    @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
     @State private var favorites: [SidebarItem] = []
     @State private var locations: [SidebarItem] = []
@@ -40,19 +42,19 @@ public struct PlacesSidebarView: View {
             }
 
             // Favorites section
-            Section(header: Text("Favorites").font(.caption).fontWeight(.semibold).foregroundColor(.secondary)) {
+            Section("Favorites") {
                 ForEach(favorites) { item in
                     sidebarRow(
                         name: item.name,
                         iconName: item.iconName,
                         url: item.url,
-                        iconColor: .secondary
+                        iconColor: .accentColor
                     )
                 }
             }
 
             // Locations section
-            Section(header: Text("Locations").font(.caption).fontWeight(.semibold).foregroundColor(.secondary)) {
+            Section("Locations") {
                 ForEach(locations) { item in
                     sidebarRow(
                         name: item.name,
@@ -64,7 +66,7 @@ public struct PlacesSidebarView: View {
             }
 
             // Tags section
-            Section(header: Text("Tags").font(.caption).fontWeight(.semibold).foregroundColor(.secondary)) {
+            Section("Tags") {
                 ForEach(tagItems, id: \.name) { tag in
                     Button(action: {
                         navigationState.filterText = tag.name
@@ -104,6 +106,7 @@ public struct PlacesSidebarView: View {
         .task {
             await loadSidebarItems()
         }
+        .enableInjection()
     }
 
     @ViewBuilder
@@ -150,67 +153,43 @@ public struct PlacesSidebarView: View {
     }
 
     private func loadSidebarItems() async {
-        let fm = FileManager.default
-        let home = fm.homeDirectoryForCurrentUser
+        let places = await fileSystemService.standardPlaces()
 
-        // Favorites
-        var favs: [SidebarItem] = []
+        // Favorites: Projects, Applications, Desktop, Documents, Downloads
+        let favNames = ["Projects", "Applications", "Desktop", "Documents", "Downloads"]
+        var loadedFavorites: [SidebarItem] = []
+        for name in favNames {
+            if let found = places.first(where: { $0.name == name }) {
+                loadedFavorites.append(found)
+            }
+        }
+        // If Projects doesn't exist in standard places, add ~/Developer
+        if !loadedFavorites.contains(where: { $0.name == "Projects" }) {
+            let projectsURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Developer")
+            loadedFavorites.insert(SidebarItem(name: "Projects", url: projectsURL, iconName: "folder.fill", section: .favorites), at: 0)
+        }
+        self.favorites = loadedFavorites
 
-        // Projects (check if exists, else Dev or Documents)
-        let projectsURL = home.appendingPathComponent("Documents/Work/Dev/Projects")
-        if fm.fileExists(atPath: projectsURL.path) {
-            favs.append(SidebarItem(name: "Projects", url: projectsURL, iconName: "folder", section: .places))
+        // Locations: iCloud Drive, Home, Macintosh HD, AirDrop, Trash, plus mounted volumes
+        var loadedLocations: [SidebarItem] = []
+        let homeURL = FileManager.default.homeDirectoryForCurrentUser
+        let username = homeURL.lastPathComponent
+
+        loadedLocations.append(SidebarItem(name: "iCloud Drive", url: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs"), iconName: "icloud", section: .places))
+        loadedLocations.append(SidebarItem(name: username, url: homeURL, iconName: "house", section: .places))
+        loadedLocations.append(SidebarItem(name: "Macintosh HD", url: URL(fileURLWithPath: "/"), iconName: "internaldrive", section: .places))
+        loadedLocations.append(SidebarItem(name: "AirDrop", url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "radiowaves.right", section: .places))
+
+        let mounted = await fileSystemService.mountedVolumes()
+        for vol in mounted {
+            if vol.url.path != "/" {
+                loadedLocations.append(vol)
+            }
         }
 
-        // Applications
-        if let appURL = fm.urls(for: .applicationDirectory, in: .localDomainMask).first {
-            favs.append(SidebarItem(name: "Applications", url: appURL, iconName: "app.badge", section: .places))
-        }
+        let trashURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".Trash")
+        loadedLocations.append(SidebarItem(name: "Trash", url: trashURL, iconName: "trash", section: .places))
 
-        // Desktop
-        if let deskURL = fm.urls(for: .desktopDirectory, in: .userDomainMask).first {
-            favs.append(SidebarItem(name: "Desktop", url: deskURL, iconName: "menubar.dock.rectangle", section: .places))
-        }
-
-        // Documents
-        if let docURL = fm.urls(for: .documentDirectory, in: .userDomainMask).first {
-            favs.append(SidebarItem(name: "Documents", url: docURL, iconName: "doc.text", section: .places))
-        }
-
-        // Downloads
-        if let dlURL = fm.urls(for: .downloadsDirectory, in: .userDomainMask).first {
-            favs.append(SidebarItem(name: "Downloads", url: dlURL, iconName: "arrow.down.circle", section: .places))
-        }
-
-        self.favorites = favs
-
-        // Locations
-        var locs: [SidebarItem] = []
-
-        // iCloud Drive
-        let iCloudURL = home.appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs")
-        locs.append(SidebarItem(name: "iCloud Drive", url: iCloudURL, iconName: "cloud", section: .places))
-
-        // User Home
-        locs.append(SidebarItem(name: home.lastPathComponent, url: home, iconName: "house", section: .places))
-
-        // Macintosh HD (Root)
-        locs.append(SidebarItem(name: "Macintosh HD", url: URL(fileURLWithPath: "/"), iconName: "internaldrive", section: .volumes))
-
-        // AirDrop
-        let airdropURL = URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app")
-        locs.append(SidebarItem(name: "AirDrop", url: airdropURL, iconName: "radiowaves.right", section: .places))
-
-        // Mounted volumes
-        let extraVolumes = await fileSystemService.mountedVolumes()
-        for vol in extraVolumes where vol.url.path != "/" {
-            locs.append(vol)
-        }
-
-        // Trash
-        let trashURL = home.appendingPathComponent(".Trash")
-        locs.append(SidebarItem(name: "Trash", url: trashURL, iconName: "trash", section: .system))
-
-        self.locations = locs
+        self.locations = loadedLocations
     }
 }

@@ -1,6 +1,8 @@
 import SwiftUI
+import Inject
 
 public struct TabBarView: View {
+    @ObserveInjection var inject
     @Bindable var workspaceState: WorkspaceState
 
     public init(workspaceState: WorkspaceState) {
@@ -91,5 +93,6 @@ public struct TabBarView: View {
         .padding(.horizontal, 10)
         .padding(.top, 4)
         .padding(.bottom, 2)
+        .enableInjection()
     }
 }
