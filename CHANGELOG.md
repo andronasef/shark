@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Matched the Places sidebar to the supplied reference with an inset rounded panel, larger monochrome icons, 32 pt rows, explicit section spacing, and brighter tag colors. Standard places now appear immediately while mounted volumes load.
 
 ### Fixed
+- Fixed Shark freezing and consuming tens of GB of memory when navigating to the disk root (e.g. clicking "Macintosh HD" in the path bar). The path bar now builds its folder chain from path components, which always ends at `/`.
 - Back, Forward, Up, and the tab close button now respond to clicks anywhere on the button, not only on the icon.
 - Hover previews now show the whole image instead of a zoomed crop, and very tall or wide images (page screenshots, banners) show a square view of their start rather than a thin sliver.
 - Long file names in the "Compress" context-menu item are now shortened in the middle, keeping the start and extension, so the menu stays compact.

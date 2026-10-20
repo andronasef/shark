@@ -180,20 +180,7 @@ public struct BottomPathBarView: View {
     }
 
     private var segments: [PathSeg] {
-        var ancestry: [URL] = []
-        var cursor = navigationState.currentURL.standardizedFileURL
-        while true {
-            ancestry.append(cursor)
-            let parent = cursor.deletingLastPathComponent()
-            if parent.path == cursor.path || parent.path == "/" {
-                if parent.path == "/" && cursor.path != "/" {
-                    ancestry.append(parent)
-                }
-                break
-            }
-            cursor = parent
-        }
-        ancestry.reverse()
+        let ancestry = navigationState.currentURL.ancestorChain
 
         return ancestry.enumerated().map { index, url in
             let isRoot = index == 0

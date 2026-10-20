@@ -145,23 +145,7 @@ public struct BreadcrumbBarView: View {
 
     private var pathSegments: [PathSegment] {
         var segments: [PathSegment] = []
-        let current = navigationState.currentURL.standardizedFileURL
-
-        var hierarchy: [URL] = []
-        var walker = current
-        while true {
-            hierarchy.append(walker)
-            let parent = walker.deletingLastPathComponent()
-            if parent.path == walker.path || parent.path == "/" {
-                if parent.path == "/" && walker.path != "/" {
-                    hierarchy.append(parent)
-                }
-                break
-            }
-            walker = parent
-        }
-
-        hierarchy.reverse()
+        let hierarchy = navigationState.currentURL.ancestorChain
 
         for (index, url) in hierarchy.enumerated() {
             let isRoot = index == 0
