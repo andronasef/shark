@@ -7,6 +7,12 @@ public struct IconsGridView: View {
     let onActivate: (FileItem) -> Void
     let contextMenuBuilder: (FileItem) -> AnyView
 
+    // Rubberband marquee selection state
+    @State private var dragStart: CGPoint? = nil
+    @State private var dragCurrent: CGPoint? = nil
+    @State private var initialSelectionBeforeDrag: Set<URL> = []
+    @State private var itemFrames: [URL: CGRect] = [:]
+
     public init(
         navigationState: NavigationState,
         onActivate: @escaping (FileItem) -> Void,
@@ -17,47 +23,161 @@ public struct IconsGridView: View {
         self.contextMenuBuilder = { AnyView(contextMenu($0)) }
     }
 
+    private var marqueeRect: CGRect? {
+        guard let start = dragStart, let current = dragCurrent else { return nil }
+        let x = min(start.x, current.x)
+        let y = min(start.y, current.y)
+        let w = abs(current.x - start.x)
+        let h = abs(current.y - start.y)
+        return CGRect(x: x, y: y, width: w, height: h)
+    }
+
     public var body: some View {
-        ScrollView {
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 96, maximum: 112), spacing: 20)],
-                spacing: 24
-            ) {
-                ForEach(navigationState.filteredAndSortedItems) { item in
-                    let isSelected = navigationState.selectedItemIDs.contains(item.id)
-                    IconGridItemView(
-                        item: item,
-                        iconSize: 76,
-                        isSelected: isSelected,
-                        navigationState: navigationState
-                    )
-                    .contentShape(Rectangle())
-                    .draggable(item.url)
-                    .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
-                    .onTapGesture {
-                        navigationState.selectedItemIDs = [item.id]
-                    }
-                    .onTapGesture(count: 2) {
-                        onActivate(item)
-                    }
-                    .onMiddleClick {
-                        if item.isNavigableDirectory {
-                            workspace?.open(item.url, from: navigationState, newTab: true)
+        GeometryReader { containerGeo in
+            ScrollView {
+                ZStack(alignment: .topLeading) {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 104, maximum: 128), spacing: 20)],
+                        spacing: 24
+                    ) {
+                        ForEach(navigationState.filteredAndSortedItems) { item in
+                            let isSelected = navigationState.selectedItemIDs.contains(item.id)
+                            IconGridItemView(
+                                item: item,
+                                iconSize: 76,
+                                isSelected: isSelected,
+                                navigationState: navigationState
+                            )
+                            .background(
+                                GeometryReader { itemGeo in
+                                    Color.clear
+                                        .preference(
+                                            key: ItemFramePreferenceKey.self,
+                                            value: [item.url: itemGeo.frame(in: .named("IconGridCoordinateSpace"))]
+                                        )
+                                }
+                            )
+                            .contentShape(Rectangle())
+                            .draggable(item.url)
+                            .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
+                            .onTapGesture {
+                                handleItemClick(item)
+                            }
+                            .onTapGesture(count: 2) {
+                                onActivate(item)
+                            }
+                            .onMiddleClick {
+                                if item.isNavigableDirectory {
+                                    workspace?.open(item.url, from: navigationState, newTab: true)
+                                }
+                            }
+                            .contextMenu {
+                                contextMenuBuilder(item)
+                            }
                         }
                     }
-                    .contextMenu {
-                        contextMenuBuilder(item)
+                    .padding(20)
+
+                    // Finder Rubberband Marquee Drag Selection Rectangle
+                    if let rect = marqueeRect, rect.width > 2 || rect.height > 2 {
+                        Rectangle()
+                            .fill(Color.accentColor.opacity(0.18))
+                            .overlay(
+                                Rectangle()
+                                    .stroke(Color.accentColor.opacity(0.65), lineWidth: 1)
+                            )
+                            .frame(width: rect.width, height: rect.height)
+                            .offset(x: rect.minX, y: rect.minY)
+                            .allowsHitTesting(false)
                     }
                 }
+                .frame(maxWidth: .infinity, minHeight: containerGeo.size.height, alignment: .topLeading)
+                .coordinateSpace(name: "IconGridCoordinateSpace")
+                .onPreferenceChange(ItemFramePreferenceKey.self) { frames in
+                    itemFrames = frames
+                }
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 3, coordinateSpace: .named("IconGridCoordinateSpace"))
+                        .onChanged { value in
+                            if dragStart == nil {
+                                dragStart = value.startLocation
+                                let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
+                                initialSelectionBeforeDrag = isShiftOrCmd ? navigationState.selectedItemIDs : []
+                            }
+                            dragCurrent = value.location
+
+                            if let rect = marqueeRect {
+                                updateMarqueeSelection(rect: rect)
+                            }
+                        }
+                        .onEnded { _ in
+                            dragStart = nil
+                            dragCurrent = nil
+                            initialSelectionBeforeDrag = []
+                        }
+                )
+                .onTapGesture {
+                    // Clicking empty canvas clears selection
+                    let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
+                    if !isShiftOrCmd {
+                        navigationState.selectedItemIDs.removeAll()
+                    }
+                    navigationState.cancelRenaming()
+                }
             }
-            .padding(20)
-        }
-        .onTapGesture {
-            // Clicking empty canvas clears selection
-            navigationState.selectedItemIDs.removeAll()
-            navigationState.cancelRenaming()
         }
         .enableInjection()
+    }
+
+    private func handleItemClick(_ item: FileItem) {
+        let isCmd = NSEvent.modifierFlags.contains(.command)
+        let isShift = NSEvent.modifierFlags.contains(.shift)
+
+        if isCmd {
+            // Toggle selection
+            if navigationState.selectedItemIDs.contains(item.id) {
+                navigationState.selectedItemIDs.remove(item.id)
+            } else {
+                navigationState.selectedItemIDs.insert(item.id)
+            }
+        } else if isShift, let lastSelected = navigationState.selectedItemIDs.first {
+            // Range selection
+            let items = navigationState.filteredAndSortedItems
+            if let idx1 = items.firstIndex(where: { $0.id == lastSelected }),
+               let idx2 = items.firstIndex(where: { $0.id == item.id }) {
+                let lower = min(idx1, idx2)
+                let upper = max(idx1, idx2)
+                let rangeItems = items[lower...upper].map(\.id)
+                navigationState.selectedItemIDs.formUnion(rangeItems)
+            } else {
+                navigationState.selectedItemIDs.insert(item.id)
+            }
+        } else {
+            // Single select
+            navigationState.selectedItemIDs = [item.id]
+        }
+    }
+
+    private func updateMarqueeSelection(rect: CGRect) {
+        var newlySelected = initialSelectionBeforeDrag
+
+        for (url, frame) in itemFrames {
+            if rect.intersects(frame) {
+                newlySelected.insert(url)
+            } else if !initialSelectionBeforeDrag.contains(url) {
+                newlySelected.remove(url)
+            }
+        }
+
+        navigationState.selectedItemIDs = newlySelected
+    }
+}
+
+private struct ItemFramePreferenceKey: PreferenceKey {
+    static let defaultValue: [URL: CGRect] = [:]
+    static func reduce(value: inout [URL: CGRect], nextValue: () -> [URL: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
@@ -98,20 +218,33 @@ private struct IconGridItemView: View {
                 )
                 .frame(width: 90, height: 20)
             } else {
-                Text(item.name)
-                    .font(.system(size: 11))
-                    .foregroundColor(isSelected ? .white : .primary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(isSelected ? Color.accentColor : Color.clear)
-                    )
+                VStack(spacing: 1) {
+                    Text(item.name)
+                        .font(.system(size: 11, weight: isSelected ? .medium : .regular))
+                        .foregroundColor(isSelected ? .white : .primary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(isSelected ? Color.accentColor : Color.clear)
+                        )
+
+                    // Secondary size / item count badge below label
+                    if item.isDirectory {
+                        Text("folder")
+                            .font(.system(size: 9))
+                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                    } else {
+                        Text(item.formattedSize)
+                            .font(.system(size: 9))
+                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                    }
+                }
             }
         }
-        .frame(width: max(iconSize + 16, 96))
+        .frame(width: max(iconSize + 28, 104))
         .task {
             if !item.isDirectory {
                 thumbnail = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: iconSize * 2, height: iconSize * 2))

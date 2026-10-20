@@ -168,7 +168,26 @@ public struct DirectoryView: View {
                     .contentShape(Rectangle())
                     .draggable(item.url)
                     .onTapGesture {
-                        navigationState.selectedItemIDs = [item.id]
+                        let isCmd = NSEvent.modifierFlags.contains(.command)
+                        let isShift = NSEvent.modifierFlags.contains(.shift)
+                        if isCmd {
+                            if navigationState.selectedItemIDs.contains(item.id) {
+                                navigationState.selectedItemIDs.remove(item.id)
+                            } else {
+                                navigationState.selectedItemIDs.insert(item.id)
+                            }
+                        } else if isShift, let first = navigationState.selectedItemIDs.first {
+                            let items = navigationState.filteredAndSortedItems
+                            if let idx1 = items.firstIndex(where: { $0.id == first }),
+                               let idx2 = items.firstIndex(where: { $0.id == item.id }) {
+                                let slice = items[min(idx1, idx2)...max(idx1, idx2)].map(\.id)
+                                navigationState.selectedItemIDs.formUnion(slice)
+                            } else {
+                                navigationState.selectedItemIDs.insert(item.id)
+                            }
+                        } else {
+                            navigationState.selectedItemIDs = [item.id]
+                        }
                     }
                     .onTapGesture(count: 2) {
                         handleActivate(item)
