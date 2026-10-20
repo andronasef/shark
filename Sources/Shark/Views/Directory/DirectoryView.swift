@@ -29,6 +29,9 @@ public struct DirectoryView: View {
                     handleDrop(urls: urls)
                     return true
                 }
+                .onCommandScrollZoom { delta in
+                    navigationState.adjustZoom(delta: delta)
+                }
 
             if navigationState.isBottomPathBarVisible {
                 BottomPathBarView(navigationState: navigationState, workspace: workspace)

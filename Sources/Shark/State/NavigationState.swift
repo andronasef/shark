@@ -155,8 +155,14 @@ public final class NavigationState {
     }
 
     public func adjustZoom(delta: CGFloat) {
-        // Positive delta means scroll up / gesture zoom in
-        let step = delta * 2.0
+        // Normalize discrete mouse wheel vs continuous trackpad gestures
+        let step: CGFloat
+        if abs(delta) > 5.0 {
+            // Trackpad swipe or large wheel flick
+            step = (delta > 0 ? 1 : -1) * 8.0
+        } else {
+            step = (delta > 0 ? 1 : -1) * 4.0
+        }
         let newSize = max(48.0, min(192.0, iconSize + step))
         iconSize = newSize
     }

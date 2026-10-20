@@ -3,8 +3,6 @@ import AppKit
 
 public struct CommandScrollZoomModifier: ViewModifier {
     let onZoom: (CGFloat) -> Void
-    @State private var isHovered: Bool = false
-    @State private var monitor: Any? = nil
 
     public init(onZoom: @escaping (CGFloat) -> Void) {
         self.onZoom = onZoom
@@ -12,40 +10,52 @@ public struct CommandScrollZoomModifier: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .onHover { hovered in
-                isHovered = hovered
-                if hovered {
-                    startMonitoring()
-                } else {
-                    stopMonitoring()
-                }
-            }
-            .onDisappear {
-                stopMonitoring()
-            }
+            .overlay(
+                CommandScrollZoomRepresentable(onZoom: onZoom)
+                    .allowsHitTesting(true)
+            )
+    }
+}
+
+private struct CommandScrollZoomRepresentable: NSViewRepresentable {
+    let onZoom: (CGFloat) -> Void
+
+    func makeNSView(context: Context) -> CommandScrollZoomNSView {
+        let view = CommandScrollZoomNSView()
+        view.onZoom = onZoom
+        return view
     }
 
-    private func startMonitoring() {
-        guard monitor == nil else { return }
-        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [self] event in
-            // Check if Command key is held
-            if event.modifierFlags.contains(.command) && isHovered {
-                let delta = event.scrollingDeltaY
-                if abs(delta) > 0.1 {
-                    onZoom(delta)
-                    // Intercept so the scroll view does not scroll vertically while zooming
-                    return nil
-                }
+    func updateNSView(_ nsView: CommandScrollZoomNSView, context: Context) {
+        nsView.onZoom = onZoom
+    }
+}
+
+private class CommandScrollZoomNSView: NSView {
+    var onZoom: ((CGFloat) -> Void)?
+
+    override func scrollWheel(with event: NSEvent) {
+        if event.modifierFlags.contains(.command) {
+            let delta = event.scrollingDeltaY
+            if abs(delta) > 0.05 {
+                onZoom?(delta)
+                return
             }
-            return event
         }
+        // Forward ordinary scroll wheel event up the responder chain to the NSScrollView
+        nextResponder?.scrollWheel(with: event)
     }
 
-    private func stopMonitoring() {
-        if let existing = monitor {
-            NSEvent.removeMonitor(existing)
-            monitor = nil
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        // Intercept when Command is pressed during scroll, otherwise allow all mouse clicks & gestures to pass through
+        if let currentEvent = NSApp.currentEvent {
+            if currentEvent.type == .scrollWheel && currentEvent.modifierFlags.contains(.command) {
+                if bounds.contains(point) {
+                    return self
+                }
+            }
         }
+        return nil
     }
 }
 
