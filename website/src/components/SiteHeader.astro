@@ -1,6 +1,6 @@
 ---
 import DownloadLink from './DownloadLink.astro';
-interface Props { currentPage?: 'home' | 'features'; }
+interface Props { currentPage?: 'home' | 'features' | 'privacy'; }
 const { currentPage = 'home' } = Astro.props;
 const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 const icon = `${home}icon.png`;

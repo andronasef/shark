@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import '../styles/privacy.css';
+---
+<Layout
+  title="Privacy Policy — Shark for macOS"
+  description="Shark's privacy policy: your files stay strictly on your Mac. Learn about our local-first architecture and optional anonymous telemetry."
+>
+  <SiteHeader currentPage="privacy" />
+  <main id="main">
+    <section class="privacy-hero container">
+      <h1>Privacy Policy<br /><span>Your files are yours.</span></h1>
+      <p class="privacy-meta">Last updated: October 21, 2026</p>
+    </section>
+
+    <div class="privacy-layout container">
+      <div class="privacy-card">
+        <h2>1. Principles & Local-First Architecture</h2>
+        <p>
+          Shark is built to be a fast, native file manager for macOS. We believe your folders, file names, file contents,
+          and terminal sessions are private and belong solely to you.
+        </p>
+        <div class="privacy-highlight">
+          <p>
+            <strong>Core Guarantee:</strong> Shark executes entirely locally on your Mac. We never scan, upload, index, transmit,
+            or store your files, directory listings, or documents on any remote server.
+          </p>
+        </div>
+      </div>
+
+      <div class="privacy-card">
+        <h2>2. Telemetry and Diagnostics</h2>
+        <p>
+          To maintain app stability and improve performance, Shark includes privacy-respecting telemetry powered by Google Firebase
+          (Firebase Analytics and Crashlytics). This collection is strictly non-identifiable and minimal:
+        </p>
+        <ul>
+          <li>
+            <strong>Product Interaction (Usage Data):</strong> Aggregated, anonymous metrics about feature interactions (such as opening split view, toggling dark mode, or launching preferences). This helps us understand what works well and where to focus development.
+          </li>
+          <li>
+            <strong>Crash Data (Diagnostics):</strong> Anonymous crash traces, operating system version, and device architecture to help us find and resolve bugs quickly.
+          </li>
+        </ul>
+        <div class="privacy-highlight">
+          <p>
+            <strong>No Personal Identifiers:</strong> We never collect names, email addresses, IP addresses, Apple IDs, file names, or file paths. Telemetry is not linked to your identity and is never used for advertising, cross-app tracking, or data brokers.
+          </p>
+        </div>
+      </div>
+
+      <div class="privacy-card">
+        <h2>3. Complete User Control & Opt-Out</h2>
+        <p>
+          You have direct control over telemetry at any time:
+        </p>
+        <ul>
+          <li>Open <strong>Shark → Settings</strong> (or press <kbd>⌘,</kbd>).</li>
+          <li>Select the <strong>Privacy</strong> tab.</li>
+          <li>Toggle off <em>Send Anonymous Usage Statistics</em> or <em>Send Crash Reports</em>.</li>
+        </ul>
+        <p>
+          When disabled, telemetry initialization and network calls are completely suppressed.
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <h2>4. Third-Party Services</h2>
+        <p>
+          Shark integrates the Google Firebase iOS/macOS SDK solely for anonymous telemetry and crash reporting as described above.
+          No third-party advertising SDKs, tracking pixels, or data-brokering tools are embedded in Shark.
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <h2>5. Sandbox & macOS Permissions</h2>
+        <p>
+          Shark runs within the macOS App Sandbox. Access to folders, external drives, and network resources is governed strictly
+          by explicit user actions (such as picking a directory in an open dialog) and macOS system permission prompts.
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <h2>6. Changes to this Policy</h2>
+        <p>
+          If we make updates to our privacy policy, we will update the "Last updated" date at the top of this page. Substantial changes
+          will also be highlighted in release notes.
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <h2>7. Contact</h2>
+        <p>
+          If you have questions, feedback, or concerns regarding your privacy while using Shark, please contact us:
+        </p>
+        <ul>
+          <li>Email: <a href="mailto:hello@andronasef.com">hello@andronasef.com</a></li>
+          <li>GitHub: <a href="https://github.com/andronasef/shark/issues">github.com/andronasef/shark/issues</a></li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>
