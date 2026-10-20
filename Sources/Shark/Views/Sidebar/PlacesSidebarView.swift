@@ -37,7 +37,7 @@ public struct PlacesSidebarView: View {
                 )
                 sidebarRow(
                     name: "Shared",
-                    iconName: "person.2",
+                    iconName: "folder.badge.person.crop",
                     url: URL(fileURLWithPath: "/Users/Shared"),
                     iconColor: .secondary
                 )
@@ -122,9 +122,9 @@ public struct PlacesSidebarView: View {
                     ForEach(Array(RecentFoldersService.shared.frequentFolders.prefix(5)), id: \.self) { url in
                         sidebarRow(
                             name: url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent,
-                            iconName: "folder.fill",
+                            iconName: "folder",
                             url: url,
-                            iconColor: .orange
+                            iconColor: .secondary
                         )
                     }
                 }
@@ -165,11 +165,13 @@ public struct PlacesSidebarView: View {
 
                 Button(action: {}) {
                     HStack(spacing: 10) {
-                        Image(systemName: "tag")
-                            .foregroundColor(.secondary)
-                            .frame(width: 14)
+                        Image(systemName: "circle.circle")
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundColor(.primary.opacity(0.85))
+                            .frame(width: 18)
                         Text("All Tags...")
                             .font(.system(size: 13))
+                            .foregroundColor(.primary)
                         Spacer()
                     }
                     .contentShape(Rectangle())
@@ -204,31 +206,25 @@ public struct PlacesSidebarView: View {
             }
         }) {
             HStack(spacing: 10) {
-                if iconName.hasPrefix("folder") && FolderIconService.shared.folderIcon(color: iconColor == .orange ? .orange : .blue) != nil {
-                    Image(nsImage: FolderIconService.shared.folderIcon(color: iconColor == .orange ? .orange : .blue)!)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18, height: 18)
-                } else {
-                    Image(systemName: iconName)
-                        .font(.system(size: 14))
-                        .foregroundColor(isSelected ? .white : iconColor)
-                        .frame(width: 18)
-                }
+                Image(systemName: iconName)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(isSelected ? .accentColor : .primary.opacity(0.85))
+                    .frame(width: 18)
+
                 Text(name)
-                    .font(.system(size: 13))
-                    .foregroundColor(isSelected ? .white : .primary)
+                    .font(.system(size: 13, weight: isSelected ? .medium : .regular))
+                    .foregroundColor(isSelected ? .accentColor : .primary)
                     .lineLimit(1)
                 Spacer()
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .padding(.vertical, 4)
+        .padding(.vertical, 5)
         .padding(.horizontal, 8)
         .background(
             RoundedRectangle(cornerRadius: 6)
-                .fill(isSelected ? Color.accentColor : Color.clear)
+                .fill(isSelected ? Color.white.opacity(0.08) : Color.clear)
         )
         .onMiddleClick {
             workspace?.open(url, from: navigationState, newTab: true)
@@ -268,7 +264,7 @@ public struct PlacesSidebarView: View {
         // If Projects doesn't exist in standard places, add ~/Developer
         if !loadedFavorites.contains(where: { $0.name == "Projects" }) {
             let projectsURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Developer")
-            loadedFavorites.insert(SidebarItem(name: "Projects", url: projectsURL, iconName: "folder.fill", section: .favorites), at: 0)
+            loadedFavorites.insert(SidebarItem(name: "Projects", url: projectsURL, iconName: "folder", section: .favorites), at: 0)
         }
         self.favorites = loadedFavorites
 
@@ -280,7 +276,7 @@ public struct PlacesSidebarView: View {
         loadedLocations.append(SidebarItem(name: "iCloud Drive", url: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs"), iconName: "icloud", section: .places))
         loadedLocations.append(SidebarItem(name: username, url: homeURL, iconName: "house", section: .places))
         loadedLocations.append(SidebarItem(name: "Macintosh HD", url: URL(fileURLWithPath: "/"), iconName: "internaldrive", section: .places))
-        loadedLocations.append(SidebarItem(name: "AirDrop", url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "radiowaves.right", section: .places))
+        loadedLocations.append(SidebarItem(name: "AirDrop", url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "airdrop", section: .places))
 
         let mounted = await fileSystemService.mountedVolumes()
         for vol in mounted {

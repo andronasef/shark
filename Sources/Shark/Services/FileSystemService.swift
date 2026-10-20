@@ -110,7 +110,7 @@ public actor FileSystemService {
             places.append(SidebarItem(
                 name: "Desktop",
                 url: desktopURL,
-                iconName: "menubar.dock.rectangle",
+                iconName: "macwindow",
                 section: .places
             ))
         }
@@ -120,7 +120,7 @@ public actor FileSystemService {
             places.append(SidebarItem(
                 name: "Documents",
                 url: docsURL,
-                iconName: "doc.text",
+                iconName: "doc",
                 section: .places
             ))
         }
@@ -157,7 +157,7 @@ public actor FileSystemService {
             for vURL in volumeURLs {
                 let name = (try? vURL.resourceValues(forKeys: [.volumeLocalizedNameKey]).volumeLocalizedName) ?? vURL.lastPathComponent
                 let isRemovable = (try? vURL.resourceValues(forKeys: [.volumeIsRemovableKey]).volumeIsRemovable) ?? false
-                let icon = isRemovable ? "externaldrive.fill" : "internaldrive.fill"
+                let icon = isRemovable ? "externaldrive" : "internaldrive"
                 
                 volumeItems.append(SidebarItem(
                     id: vURL.path,
@@ -176,7 +176,7 @@ public actor FileSystemService {
                 id: "/",
                 name: "Macintosh HD",
                 url: URL(fileURLWithPath: "/"),
-                iconName: "internaldrive.fill",
+                iconName: "internaldrive",
                 section: .volumes
             ))
         }
