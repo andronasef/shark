@@ -14,12 +14,24 @@ concurrency:
 
 jobs:
   release:
-    runs-on: macos-14 # Apple Silicon runner
+    runs-on: macos-15 # macOS 15 includes Xcode 16 / Swift 6.0
     timeout-minutes: 45
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Select Xcode 16 (Swift 6)
+        run: |
+          if [ -d "/Applications/Xcode_16.1.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_16.0.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_16.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+          fi
+          xcodebuild -version
+          swift --version
 
       - name: Validate release configuration
         env:
@@ -36,8 +48,6 @@ jobs:
             [[ -n "${!name}" ]] || { echo "Missing release secret: $name"; exit 1; }
           done
           [[ "$SIGN_IDENTITY" == 'Developer ID Application: '* ]] || { echo 'SIGN_IDENTITY must name a Developer ID Application certificate'; exit 1; }
-          xcodebuild -version
-          swift --version
 
       - name: Check packaging guardrails
         run: bash scripts/test-package.sh
