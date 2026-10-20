@@ -344,6 +344,72 @@ public final class NavigationState {
         }
     }
 
+    // MARK: - Keyboard Item Navigation (Windows Explorer / Finder style)
+
+    public func selectPreviousItem() {
+        let items = filteredAndSortedItems
+        guard !items.isEmpty else { return }
+
+        if let firstSelectedID = selectedItemIDs.first,
+           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
+            let prevIndex = max(0, currentIndex - 1)
+            selectedItemIDs = [items[prevIndex].id]
+        } else {
+            selectedItemIDs = [items[0].id]
+        }
+    }
+
+    public func selectNextItem() {
+        let items = filteredAndSortedItems
+        guard !items.isEmpty else { return }
+
+        if let firstSelectedID = selectedItemIDs.first,
+           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
+            let nextIndex = min(items.count - 1, currentIndex + 1)
+            selectedItemIDs = [items[nextIndex].id]
+        } else {
+            selectedItemIDs = [items[0].id]
+        }
+    }
+
+    public func selectAboveItem(approximateColumns: Int = 4) {
+        let items = filteredAndSortedItems
+        guard !items.isEmpty else { return }
+
+        if let firstSelectedID = selectedItemIDs.first,
+           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
+            let targetIndex = max(0, currentIndex - max(1, approximateColumns))
+            selectedItemIDs = [items[targetIndex].id]
+        } else {
+            selectedItemIDs = [items[0].id]
+        }
+    }
+
+    public func selectBelowItem(approximateColumns: Int = 4) {
+        let items = filteredAndSortedItems
+        guard !items.isEmpty else { return }
+
+        if let firstSelectedID = selectedItemIDs.first,
+           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
+            let targetIndex = min(items.count - 1, currentIndex + max(1, approximateColumns))
+            selectedItemIDs = [items[targetIndex].id]
+        } else {
+            selectedItemIDs = [items[0].id]
+        }
+    }
+
+    public func selectFirstItem() {
+        if let first = filteredAndSortedItems.first {
+            selectedItemIDs = [first.id]
+        }
+    }
+
+    public func selectLastItem() {
+        if let last = filteredAndSortedItems.last {
+            selectedItemIDs = [last.id]
+        }
+    }
+
     public func trashSelected() async {
         let urls = selectedItems.map(\.url)
         guard !urls.isEmpty else { return }

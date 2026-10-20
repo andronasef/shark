@@ -60,4 +60,24 @@ final class NavigationStateTests: XCTestCase {
         XCTAssertEqual(state.filteredAndSortedItems.count, 1)
         XCTAssertEqual(state.filteredAndSortedItems.first?.name, "FolderC")
     }
+    func testArrowKeyNavigation() async {
+        let state = NavigationState()
+        await state.reloadCurrentDirectory()
+
+        XCTAssertTrue(state.selectedItemIDs.isEmpty)
+        state.selectNextItem()
+        if !state.filteredAndSortedItems.isEmpty {
+            XCTAssertEqual(state.selectedItemIDs.count, 1)
+            let firstID = state.selectedItemIDs.first
+            XCTAssertEqual(firstID, state.filteredAndSortedItems.first?.id)
+
+            state.selectNextItem()
+            if state.filteredAndSortedItems.count > 1 {
+                XCTAssertEqual(state.selectedItemIDs.first, state.filteredAndSortedItems[1].id)
+            }
+
+            state.selectPreviousItem()
+            XCTAssertEqual(state.selectedItemIDs.first, firstID)
+        }
+    }
 }

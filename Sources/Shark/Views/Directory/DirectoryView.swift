@@ -92,6 +92,48 @@ public struct DirectoryView: View {
                     .keyboardShortcut(.upArrow, modifiers: .option)
                 Button("") { navigationState.isEditingPath = true }
                     .keyboardShortcut("d", modifiers: .option)
+
+                // Arrow Key Item Navigation (Windows Explorer & Finder)
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    if navigationState.viewMode == .grid {
+                        navigationState.selectPreviousItem()
+                    } else {
+                        navigationState.selectAboveItem(approximateColumns: 1)
+                    }
+                }
+                .keyboardShortcut(.upArrow, modifiers: [])
+
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    if navigationState.viewMode == .grid {
+                        navigationState.selectNextItem()
+                    } else {
+                        navigationState.selectBelowItem(approximateColumns: 1)
+                    }
+                }
+                .keyboardShortcut(.downArrow, modifiers: [])
+
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    navigationState.selectPreviousItem()
+                }
+                .keyboardShortcut(.leftArrow, modifiers: [])
+
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    navigationState.selectNextItem()
+                }
+                .keyboardShortcut(.rightArrow, modifiers: [])
+
+                // Enter / Return to open selected item (Windows Explorer style)
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    if let firstSelected = navigationState.selectedItems.first {
+                        handleActivate(firstSelected)
+                    }
+                }
+                .keyboardShortcut(.return, modifiers: [])
             }
             .opacity(0)
             .allowsHitTesting(false)
