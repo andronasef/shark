@@ -94,11 +94,11 @@ public struct BottomPathBarView: View {
                             }
                         }) {
                             HStack(spacing: 3) {
-                                if !inToolbar || seg.isRoot || seg.isLast {
+                                if !inToolbar || seg.isRoot {
                                     Image(systemName: seg.isRoot ? "internaldrive" : (seg.isLast ? "folder.fill" : "folder"))
                                         .font(.system(size: 11))
                                         .frame(width: 14)
-                                        .foregroundStyle(seg.isLast ? Color.accentColor : Color.secondary)
+                                        .foregroundStyle(inToolbar ? Color.secondary : (seg.isLast ? Color.accentColor : Color.secondary))
                                 }
                                 Text(seg.title)
                                     .font(.system(size: inToolbar ? 12 : 11, weight: seg.isLast ? .semibold : .regular))
@@ -137,7 +137,10 @@ public struct BottomPathBarView: View {
                         }
 
                         // Cascading Subfolder Chevron Menu (QT-01)
-                        CascadingFolderChevronButton(url: seg.url, symbol: inToolbar && !seg.isLast ? "chevron.right" : "chevron.down") { targetURL, inNewTab in
+                        CascadingFolderChevronButton(url: seg.url, symbol: inToolbar && !seg.isLast ? "chevron.right" : "chevron.down",
+                                                    pointSize: inToolbar ? 7 : 8,
+                                                    weight: inToolbar ? .medium : .bold,
+                                                    tint: inToolbar ? .tertiaryLabelColor : .labelColor) { targetURL, inNewTab in
                             if inNewTab, let workspace {
                                 workspace.open(targetURL, from: navigationState, newTab: true)
                             } else {

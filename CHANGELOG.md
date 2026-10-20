@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Changed
+- Calmer Location breadcrumbs: lighter, thinner separator chevrons, and the current folder is marked once (bold label on a neutral capsule) instead of also getting a blue folder icon.
 - The sidebar hides iCloud Drive when it is switched off, as Finder does, instead of showing an item that fails with "Unable to open directory".
 - `scripts/run.sh` builds with the InjectionIII flags (`-enable-implicit-dynamic`, `-interposable`) and signs with a stable `Shark Dev` certificate when present, so permission grants survive rebuilds.
 - The toolbar Location capsule now starts directly beside Navigation and grows or shrinks with the window to fill the free toolbar space (minimum 160 pt) instead of stopping at 360 pt, so long paths are shown in full.
@@ -22,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Matched the Places sidebar to the supplied reference with an inset rounded panel, larger monochrome icons, 32 pt rows, explicit section spacing, and brighter tag colors. Standard places now appear immediately while mounted volumes load.
 
 ### Fixed
+- Fixed the toolbar pushing Back/Forward/Up (sidebar hidden) or Terminal/Action/Search (narrower windows) into the `»` overflow menu: the Location capsule is now sized with the real width the other toolbar items use, plus the traffic-light inset when the sidebar is collapsed.
 - Fixed Shark freezing and consuming tens of GB of memory when navigating to the disk root (e.g. clicking "Macintosh HD" in the path bar). The path bar now builds its folder chain from path components, which always ends at `/`.
 - Back, Forward, Up, and the tab close button now respond to clicks anywhere on the button, not only on the icon.
 - Hover previews now show the whole image instead of a zoomed crop, and very tall or wide images (page screenshots, banners) show a square view of their start rather than a thin sliver.

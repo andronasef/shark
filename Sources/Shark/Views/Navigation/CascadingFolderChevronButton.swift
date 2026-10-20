@@ -5,22 +5,26 @@ public struct CascadingFolderChevronButton: NSViewRepresentable {
     public let url: URL
     public var symbol: String
     public var pointSize: CGFloat
+    public var weight: NSFont.Weight
+    public var tint: NSColor
     public let onNavigate: (URL, Bool) -> Void
 
-    public init(url: URL, symbol: String = "chevron.down", pointSize: CGFloat = 8, onNavigate: @escaping (URL, Bool) -> Void) {
+    public init(url: URL, symbol: String = "chevron.down", pointSize: CGFloat = 8, weight: NSFont.Weight = .bold, tint: NSColor = .labelColor, onNavigate: @escaping (URL, Bool) -> Void) {
         self.url = url
         self.symbol = symbol
         self.pointSize = pointSize
+        self.weight = weight
+        self.tint = tint
         self.onNavigate = onNavigate
     }
 
     public func makeNSView(context: Context) -> NSButton {
         let button = NSButton()
-        let config = NSImage.SymbolConfiguration(pointSize: pointSize, weight: .bold)
+        let config = NSImage.SymbolConfiguration(pointSize: pointSize, weight: weight)
         button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Browse subfolders")?.withSymbolConfiguration(config)
         button.bezelStyle = .inline
         button.isBordered = false
-        button.contentTintColor = .labelColor
+        button.contentTintColor = tint
         button.target = context.coordinator
         button.action = #selector(Coordinator.buttonClicked(_:))
         button.toolTip = "Browse Subfolders"
@@ -31,7 +35,8 @@ public struct CascadingFolderChevronButton: NSViewRepresentable {
 
     public func updateNSView(_ nsView: NSButton, context: Context) {
         nsView.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Browse subfolders")?
-            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: pointSize, weight: .bold))
+            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: pointSize, weight: weight))
+        nsView.contentTintColor = tint
         nsView.toolTip = "Browse subfolders of \(url.lastPathComponent.isEmpty ? "Macintosh HD" : url.lastPathComponent)"
         context.coordinator.url = url
         context.coordinator.onNavigate = onNavigate
