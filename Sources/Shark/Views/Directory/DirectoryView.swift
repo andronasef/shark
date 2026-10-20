@@ -403,8 +403,15 @@ public struct DirectoryView: View {
 
     private func handleDrop(urls: [URL]) {
         let destination = navigationState.currentURL
+        // macOS Finder & Windows File Explorer standard:
+        // Dragging normally MOVES items. Holding Alt / Option copies them (shows the green + badge).
+        let isAltHeld = NSEvent.modifierFlags.contains(.option)
         Task {
-            try? await FileOperationsService.shared.copy(items: urls, to: destination)
+            if isAltHeld {
+                try? await FileOperationsService.shared.copy(items: urls, to: destination)
+            } else {
+                try? await FileOperationsService.shared.move(items: urls, to: destination)
+            }
             await navigationState.reloadCurrentDirectory()
         }
     }

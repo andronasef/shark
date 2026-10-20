@@ -239,8 +239,13 @@ public struct PlacesSidebarView: View {
             }
         }
         .dropDestination(for: URL.self) { urls, _ in
+            let isAltHeld = NSEvent.modifierFlags.contains(.option)
             Task {
-                try? await FileOperationsService.shared.copy(items: urls, to: url)
+                if isAltHeld {
+                    try? await FileOperationsService.shared.copy(items: urls, to: url)
+                } else {
+                    try? await FileOperationsService.shared.move(items: urls, to: url)
+                }
                 if navigationState.currentURL.standardizedFileURL.path == url.standardizedFileURL.path {
                     await navigationState.reloadCurrentDirectory()
                 }

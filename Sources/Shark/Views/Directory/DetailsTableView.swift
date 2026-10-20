@@ -65,6 +65,19 @@ public struct DetailsTableView: View {
                 .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                 .contentShape(Rectangle())
                 .draggable(item.url)
+                .dropDestination(for: URL.self) { droppedURLs, _ in
+                    guard item.isNavigableDirectory else { return false }
+                    let isAltHeld = NSEvent.modifierFlags.contains(.option)
+                    Task {
+                        if isAltHeld {
+                            try? await FileOperationsService.shared.copy(items: droppedURLs, to: item.url)
+                        } else {
+                            try? await FileOperationsService.shared.move(items: droppedURLs, to: item.url)
+                        }
+                        await navigationState.reloadCurrentDirectory()
+                    }
+                    return true
+                }
                 .onTapGesture {
                     let now = Date().timeIntervalSince1970
                     if lastClickedURL == item.url && (now - lastClickTime < 0.4) {
