@@ -43,43 +43,43 @@
 - [x] **OPS-01**: User can perform non-blocking file operations: Copy, Move, Duplicate, Move to Trash, and Delete.
 - [x] **OPS-02**: User can create new folders (`Cmd+Shift+N`) and new empty files.
 - [x] **OPS-03**: User can rename files inline and perform multi-file batch renames.
-- [x] **OPS-04**: Directory views automatically refresh in real-time when external changes happen using macOS `FSEvents`.
+- [x] **OPS-04**: Directory views automatically refresh in real-time when external changes happen using macOS `FSEvents``.
 - [x] **OPS-05**: User can drag and drop items between panes, to/from Finder, and to the sidebar.
 
 ## v2.0 Requirements — Finder look, QTTabBar + Explorer power
 
 ### Pro Tabs (TAB)
-- [ ] **TAB-01**: Full-width tab strip always visible, Finder/Safari style, equal-width tabs with hover close button and tooltip showing full path.
-- [ ] **TAB-02**: Drag tabs to reorder; middle-click closes a tab; double-click empty strip opens a new tab.
-- [ ] **TAB-03**: Reopen closed tab (⇧⌘T) from a closed-tab history (last 20), and a "Recently Closed" menu.
-- [ ] **TAB-04**: Tab context menu: Duplicate, Pin/Unpin, Lock (navigation opens new tab), Close Others, Close Tabs to the Right, Colour (tint dot), Copy Path.
-- [ ] **TAB-05**: Pinned tabs render compact (icon only) at the left and survive Close Others.
-- [ ] **TAB-06**: Session restore: tabs, pins, locks, colours, paths, split state and view mode persist across relaunch.
-- [ ] **TAB-07**: Open folder in new tab via ⌘-double-click, ⌘-click on sidebar/breadcrumb, or middle-click; ⌥⌘1–9 select tabs (⌘1–4 stay Finder view modes); ⌃Tab / ⌃⇧Tab cycle.
+- [x] **TAB-01**: Full-width tab strip always visible, Finder/Safari style, equal-width tabs with hover close button and tooltip showing full path.
+- [x] **TAB-02**: Drag tabs to reorder; middle-click closes a tab; double-click empty strip opens a new tab.
+- [x] **TAB-03**: Reopen closed tab (⇧⌘T) from a closed-tab history (last 20), and a "Recently Closed" menu.
+- [x] **TAB-04**: Tab context menu: Duplicate, Pin/Unpin, Lock (navigation opens new tab), Close Others, Close Tabs to the Right, Colour (tint dot), Copy Path.
+- [x] **TAB-05**: Pinned tabs render compact (icon only) at the left and survive Close Others.
+- [x] **TAB-06**: Session restore: tabs, pins, locks, colours, paths, split state and view mode persist across relaunch.
+- [x] **TAB-07**: Open folder in new tab via ⌘-double-click, ⌘-click on sidebar/breadcrumb, or middle-click; ⌥⌘1–9 select tabs (⌘1–4 stay Finder view modes); ⌃Tab / ⌃⇧Tab cycle.
 
 ### Explorer Ergonomics (EXP)
-- [ ] **EXP-01**: Cut / Copy / Paste of files (⌘X, ⌘C, ⌘V; ⌥⌘V moves), works across tabs, panes and with Finder pasteboard; cut items render dimmed until pasted.
-- [ ] **EXP-02**: Undo/Redo (⌘Z/⇧⌘Z) for rename, move, copy, trash, new folder.
-- [ ] **EXP-03**: Inline rename with Return/F2 that selects the name without extension; validation errors inline.
-- [ ] **EXP-04**: Copy Path / Copy Name / Copy as Pathname (⌥⌘C) for one or many items.
-- [ ] **EXP-05**: Rich status bar: item count, selection count and total size, free space on volume, background job progress with cancel.
-- [ ] **EXP-06**: Optional Finder-style path bar at the bottom (⌥⌘P) with clickable segments.
-- [ ] **EXP-07**: Folder size calculation on demand (Calculate All Sizes) shown in list view and inspector, computed off main thread.
-- [ ] **EXP-08**: "Open in Terminal", "Open With ▸", "New Folder with Selection", "Compress", "Show Hidden Files" (⇧⌘.) toggle, all in context menus and menu bar.
-- [ ] **EXP-09**: Address bar: click empty area or ⌘L to edit path, Tab autocompletion of path segments, ~ expansion, error state on bad path.
+- [x] **EXP-01**: Cut / Copy / Paste of files (⌘X, ⌘C, ⌘V; ⌥⌘V moves), works across tabs, panes and with Finder pasteboard; cut items render dimmed until pasted.
+- [x] **EXP-02**: Undo/Redo (⌘Z/⇧⌘Z) for rename, move, copy, trash, new folder.
+- [x] **EXP-03**: Inline rename with Return/F2 that selects the name without extension; validation errors inline.
+- [x] **EXP-04**: Copy Path / Copy Name / Copy as Pathname (⌥⌘C) for one or many items.
+- [x] **EXP-05**: Rich status bar: item count, selection count and total size, free space on volume, background job progress with cancel.
+- [x] **EXP-06**: Optional Finder-style path bar at the bottom (⌥⌘P) with clickable segments.
+- [x] **EXP-07**: Folder size calculation on demand (Calculate All Sizes) shown in list view and inspector, computed off main thread.
+- [x] **EXP-08**: "Open in Terminal", "Open With ▸", "New Folder with Selection", "Compress", "Show Hidden Files" (⇧⌘.) toggle, all in context menus and menu bar.
+- [x] **EXP-09**: Address bar: click empty area or ⌘L to edit path, Tab autocompletion of path segments, ~ expansion, error state on bad path.
 
 ### QTTabBar Folder Power (QT)
-- [ ] **QT-01**: Each breadcrumb segment has a chevron that opens a cascading subfolder menu; menus nest on hover to any depth; selecting navigates (⌘ opens in new tab).
-- [ ] **QT-02**: Folder rows/icons in list view expose a subfolder menu on hover of a disclosure chevron or via context menu "Browse ▸".
-- [ ] **QT-03**: Hover previews: images show a thumbnail popover, text/code files show the first lines, after a short hover delay; can be disabled in settings.
-- [ ] **QT-04**: Recent folders (last 30) and Frequent folders (ranked by visits) available in sidebar section, Go menu and palette.
-- [ ] **QT-05**: Tab groups: save current tabs as a named group, reopen a group from sidebar/menu/palette.
+- [x] **QT-01**: Each breadcrumb segment has a chevron that opens a cascading subfolder menu; menus nest on hover to any depth; selecting navigates (⌘ opens in new tab).
+- [x] **QT-02**: Folder rows/icons in list view expose a subfolder menu on hover of a disclosure chevron or via context menu "Browse ▸".
+- [x] **QT-03**: Hover previews: images show a thumbnail popover, text/code files show the first lines, after a short hover delay; can be disabled in settings.
+- [x] **QT-04**: Recent folders (last 30) and Frequent folders (ranked by visits) available in sidebar section, Go menu and palette.
+- [x] **QT-05**: Tab groups: save current tabs as a named group, reopen a group from sidebar/menu/palette.
 
 ### Command Palette & Keys (CMD)
-- [ ] **CMD-01**: ⌘K / ⇧⌘P command palette with fuzzy search across every action, recent/frequent folders, pinned favorites, tab groups and typed absolute paths.
-- [ ] **CMD-02**: Every action exists in the menu bar with its shortcut (File, Edit, View, Go, Tab, Window); F3 split, F4 terminal, F11 inspector, Space Quick Look work.
-- [ ] **CMD-03**: Type-to-select in all views; arrow-key navigation, Return to rename, ⌘↓ open, ⌘↑ enclosing folder.
-- [ ] **CMD-04**: Settings window (⌘,) for tab behaviour, hover preview, default view, show hidden, start location.
+- [x] **CMD-01**: ⌘K / ⇧⌘P command palette with fuzzy search across every action, recent/frequent folders, pinned favorites, tab groups and typed absolute paths.
+- [x] **CMD-02**: Every action exists in the menu bar with its shortcut (File, Edit, View, Go, Tab, Window); F3 split, F4 terminal, F11 inspector, Space Quick Look work.
+- [x] **CMD-03**: Type-to-select in all views; arrow-key navigation, Return to rename, ⌘↓ open, ⌘↑ enclosing folder.
+- [x] **CMD-04**: Settings window (⌘,) for tab behaviour, hover preview, default view, show hidden, start location.
 
 ### Finder Polish (POL)
 - [ ] **POL-01**: Visual fidelity to Finder in light and dark: toolbar, sidebar, list/icon/column/gallery, selection, focus rings, spacing.
@@ -98,48 +98,8 @@
 - **REMT-03**: Integrated file diff tool between left and right split panes.
 - **REMT-04**: Archive extraction and compression with zip/tar/7z support.
 
-## Out of Scope
-
-| Feature | Reason |
-|---------|--------|
-| Qt / C++ KDE runtime emulation | Anti-pattern on macOS. Shark uses 100% native Swift, SwiftUI, and AppKit for optimal performance and native feel. |
-| Cloud storage proprietary sync engines | Use standard mounted directories; Shark will not implement cloud sync clients. |
-| System file write without authorization | Sandboxed / macOS permission guidelines respected; system files protected. |
-
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| CORE-01 | Phase 1 | Complete |
-| CORE-02 | Phase 1 | Complete |
-| CORE-03 | Phase 1 | Complete |
-| CORE-04 | Phase 1 | Complete |
-| CORE-05 | Phase 1 | Complete |
-| SPLIT-01 | Phase 2 | Complete |
-| SPLIT-02 | Phase 2 | Complete |
-| SPLIT-03 | Phase 2 | Complete |
-| VIEW-01 | Phase 3 | Complete |
-| VIEW-02 | Phase 3 | Complete |
-| VIEW-03 | Phase 3 | Complete |
-| VIEW-04 | Phase 3 | Complete |
-| VIEW-05 | Phase 3 | Complete |
-| TERM-01 | Phase 4 | Complete |
-| TERM-02 | Phase 4 | Complete |
-| TERM-03 | Phase 4 | Complete |
-| INSP-01 | Phase 5 | Complete |
-| INSP-02 | Phase 5 | Complete |
-| OPS-01 | Phase 6 | Complete |
-| OPS-02 | Phase 6 | Complete |
-| OPS-03 | Phase 6 | Complete |
-| OPS-04 | Phase 6 | Complete |
-| OPS-05 | Phase 6 | Complete |
-
-**Coverage:**
-- v1 requirements: 23 total
-- Completed: 23
-- Mapped to phases: 23
-- Unmapped: 0 ✓
-
----
-*Requirements defined: 2026-10-13*
-*Last updated: 2026-10-13 after Phase 6 completion*
+- Shipped in v1.0: CORE-01..05, SPLIT-01..03, VIEW-01..05, TERM-01..03, INSP-01..02, OPS-01..05 (22 total)
+- Shipped in v2.0: TAB-01..07, EXP-01..09, QT-01..05, CMD-01..04 (25 total)
+- In progress v2.0: POL-01..06 (6 total)

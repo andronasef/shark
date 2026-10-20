@@ -12,6 +12,7 @@ public struct DirectoryView: View {
     @State private var previewItem: FileItem? = nil
     @State private var lastClickedURL: URL? = nil
     @State private var lastClickTime: TimeInterval = 0
+    @State private var typeToSelectMonitor: Any? = nil
 
     public init(
         navigationState: NavigationState,
@@ -43,8 +44,41 @@ public struct DirectoryView: View {
             await navigationState.reloadCurrentDirectory()
             setupFSEventsWatcher()
         }
+        .onAppear {
+            if typeToSelectMonitor == nil {
+                typeToSelectMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                    if let ws = workspace, ws.activeNavigationState !== navigationState {
+                        return event
+                    }
+                    guard let window = event.window,
+                          !(window.firstResponder is NSTextView),
+                          !(window.firstResponder is NSTextField) else {
+                        return event
+                    }
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else {
+                        return event
+                    }
+                    if let ws = workspace, ws.isCommandPalettePresented {
+                        return event
+                    }
+
+                    let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+                    if flags.isEmpty || flags == .shift {
+                        if let chars = event.characters, let firstChar = chars.first, !firstChar.isWhitespace && !firstChar.isNewline {
+                            TypeToSelectCoordinator.shared.appendCharacter(firstChar, in: navigationState)
+                            return nil
+                        }
+                    }
+                    return event
+                }
+            }
+        }
         .onDisappear {
             fseventsWatcher.stop()
+            if let monitor = typeToSelectMonitor {
+                NSEvent.removeMonitor(monitor)
+                typeToSelectMonitor = nil
+            }
         }
         .popover(item: $previewItem, arrowEdge: .trailing) { item in
             HoverPreviewCard(item: item)
@@ -127,14 +161,48 @@ public struct DirectoryView: View {
                 }
                 .keyboardShortcut(.rightArrow, modifiers: [])
 
-                // Enter / Return to open selected item (Windows Explorer style)
+                // Return starts inline rename (Finder standard, CMD-03)
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    if let firstSelected = navigationState.selectedItems.first {
+                        navigationState.startRenaming(url: firstSelected.url)
+                    }
+                }
+                .keyboardShortcut(.return, modifiers: [])
+
+                // F2 starts inline rename (Windows Explorer standard, CMD-03)
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    if let firstSelected = navigationState.selectedItems.first {
+                        navigationState.startRenaming(url: firstSelected.url)
+                    }
+                }
+                .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF2FunctionKey)!)), modifiers: [])
+
+                // Cmd+Down to open selected item (Finder standard, CMD-03)
                 Button("") {
                     guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
                     if let firstSelected = navigationState.selectedItems.first {
                         handleActivate(firstSelected)
                     }
                 }
-                .keyboardShortcut(.return, modifiers: [])
+                .keyboardShortcut(.downArrow, modifiers: .command)
+
+                // Cmd+O to open selected item
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    if let firstSelected = navigationState.selectedItems.first {
+                        handleActivate(firstSelected)
+                    }
+                }
+                .keyboardShortcut("o", modifiers: .command)
+
+                // Cmd+Up to navigate to enclosing folder (Finder standard, CMD-03)
+                Button("") {
+                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                    navigationState.goUp()
+                }
+                .keyboardShortcut(.upArrow, modifiers: .command)
             }
             .opacity(0)
             .allowsHitTesting(false)

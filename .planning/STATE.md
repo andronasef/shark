@@ -5,10 +5,10 @@ milestone_name: Finder Look, QTTabBar Power
 status: in_progress
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 40
+  completed_phases: 4
+  total_plans: 8
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -18,31 +18,34 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** A file manager that looks like native macOS Finder but has the power of QTTabBar and the ease of Windows File Explorer.
-**Current focus:** Phase 8 complete; ready for Phase 9 (QTTabBar Folder Power: cascading subfolder menus & hover previews)
+**Current focus:** Phase 10 complete; starting Phase 11 (Finder Fidelity Polish & Liquid Glass) (Command Palette, Menus & Keyboard: ⌘K palette, full menu bar, type-to-select, and Settings window)
 
 ## Current Position
 
-Phase: 8 of 11 (Explorer Ergonomics) — COMPLETE
-Plan: 2 of 2 completed (08-01 and 08-02)
-Status: Completed
-Last activity: 2026-10-20 — Phase 8 fully implemented and verified via unit tests and cua-driver
+Phase: 11 of 11 (Finder Fidelity Polish & Liquid Glass) — NEXT
+Status: In progress
+Last activity: 2026-10-20 — Phase 10 completed (⌘K Command Palette, full native menu bar, type-to-select, Finder keyboard navigation, Settings window)
 
-Progress: [████░░░░░░] 40%
+Progress: [████████░░] 80%
 
 ## Accumulated Context
 
 - Design authority: PRODUCT.md (standing preference: Finder look) and .impeccable/surfaces/sources-shark-views-contentview-swift.md (direction contract).
 - Build & run: `scripts/run.sh` builds, copies into Shark.app and relaunches. Tests: `swift test`.
-- Verification: live test verified via cua-driver with Shark running.
+- Verification: 54 unit tests passing with 0 failures; live native test verified via cua-driver.
 - Invariants verified:
-  - Clipboard operations: Cut/Copy/Paste with visual cut-item dimming (`opacity(0.45)`).
-  - Symmetric Undo/Redo stack for Move, Copy, Rename, and Trash actions.
-  - Inline rename with pre-selection of stem excluding extension.
-  - Bottom path bar with interactive breadcrumb segments and menu toggling.
-  - Rich status bar displaying items count, selection count, total selected size, and available volume disk space.
-  - Extended context menus (Compress, Terminal, Copy Path variants, Calculate Size).
-  - 46 unit tests passing with 0 failures.
+  - Pro tab strip with reordering, pinning, locking, coloring, session restore across restarts.
+  - Explorer clipboard operations (Cut/Copy/Paste) with cut item dimming, symmetric Undo/Redo stack.
+  - Inline rename with stem pre-selection excluding extension.
+  - Rich status bar and bottom path bar.
+  - Cascading subfolder menus from breadcrumbs and bottom path bar with recursive nesting.
+  - Hover quick-previews for images and text files.
+  - Saved tab groups persistence and restoration.
+  - Drag-and-drop moves by default and copies only when Alt/Option is held.
 
-## Blockers/Concerns
-
-None.
+## Next Steps
+- Execute Phase 10:
+  - 10-01: Command Palette Model & Engine (⌘K fuzzy search across commands, paths, favorites, tab groups, recents).
+  - 10-02: Complete Menu Bar & Keyboard shortcuts (File, Edit, View, Go, Tab, Window menus with standard macOS shortcuts, F3, F4, F11, Space).
+  - 10-03: Type-to-select in all views, ⌘↓ to open, ⌘↑ for enclosing folder.
+  - 10-04: Settings Window (⌘,) for tab behavior, hover preview, default view, start location.

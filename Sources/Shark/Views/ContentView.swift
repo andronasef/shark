@@ -360,7 +360,13 @@ public struct ContentView: View {
                 terminalSession.syncDirectory(to: activeState.currentURL)
             }
         }
-        .sheet(item: $showingNewItemSheet) { itemType in
+        .sheet(item: Binding(
+            get: { showingNewItemSheet ?? activeState.requestedNewItemType },
+            set: {
+                showingNewItemSheet = $0
+                activeState.requestedNewItemType = $0
+            }
+        )) { itemType in
             NewItemSheet(
                 type: itemType,
                 parentURL: activeState.currentURL,
@@ -368,6 +374,11 @@ public struct ContentView: View {
                     Task { await activeState.reloadCurrentDirectory() }
                 }
             )
+        }
+        .overlay {
+            if workspaceState.isCommandPalettePresented {
+                CommandPaletteView(workspace: workspaceState)
+            }
         }
         .sheet(isPresented: $showingBatchRenameSheet) {
             let selectedItems = activeState.items.filter { activeState.selectedItemIDs.contains($0.id) }
@@ -393,6 +404,12 @@ public struct ContentView: View {
                 Button("") { workspaceState.previousTab() }.keyboardShortcut("[", modifiers: [.command, .shift])
                 Button("") { workspaceState.nextTab() }.keyboardShortcut("]", modifiers: [.command, .shift])
                 Button("") { isInspectorVisible.toggle() }.keyboardShortcut("i", modifiers: [.command, .option])
+                Button("") { workspaceState.toggleCommandPalette() }.keyboardShortcut("k", modifiers: .command)
+                Button("") { workspaceState.toggleCommandPalette() }.keyboardShortcut("p", modifiers: [.command, .shift])
+                Button("") { workspaceState.toggleSplit() }.keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!)), modifiers: [])
+                Button("") { toggleTerminalDrawer() }.keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!)), modifiers: [])
+                Button("") { isInspectorVisible.toggle() }.keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF11FunctionKey)!)), modifiers: [])
+                Button("") { activeState.requestedNewItemType = .folder }.keyboardShortcut("n", modifiers: [.command, .shift])
             }
             .opacity(0)
             .allowsHitTesting(false)

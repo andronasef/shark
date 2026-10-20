@@ -13,6 +13,7 @@ public final class WorkspaceState {
     public var activeTabID: UUID
     public var closedTabs: [ClosedTab] = []
     @ObservationIgnored public var isTerminalVisible: Bool = false
+    public var isCommandPalettePresented: Bool = false
 
     public init(initialURL: URL? = nil) {
         let firstTab = WorkspaceTab(initialURL: initialURL)
@@ -326,6 +327,10 @@ public final class WorkspaceState {
 
     public func toggleActivePane() {
         activeTab.toggleActivePane()
+    }
+
+    public func toggleCommandPalette() {
+        isCommandPalettePresented.toggle()
     }
 
     public func snapshot() -> WorkspaceSnapshot {

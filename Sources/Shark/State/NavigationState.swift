@@ -62,6 +62,7 @@ public final class NavigationState {
 
     // Explorer Ergonomics additions
     public var renamingItemURL: URL? = nil
+    public var requestedNewItemType: NewItemType? = nil
     public var isBottomPathBarVisible: Bool = true
     public var activeOperationProgress: Double? = nil
     public var activeOperationTitle: String? = nil

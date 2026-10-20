@@ -48,6 +48,10 @@ struct SharkApp: App {
             TabCommands(workspace: appDelegate.workspace)
             ExplorerCommands(workspace: appDelegate.workspace)
         }
+
+        Settings {
+            SettingsView()
+        }
     }
 }
 
@@ -59,6 +63,54 @@ struct ExplorerCommands: Commands {
     }
 
     var body: some Commands {
+        CommandGroup(replacing: .newItem) {
+            Button("New Tab") {
+                workspace.newTab(placement: .end)
+            }
+            .keyboardShortcut("t")
+
+            Button("New Window") {
+                NSApp.sendAction(Selector(("newWindowForTab:")), to: nil, from: nil)
+            }
+            .keyboardShortcut("n", modifiers: .command)
+
+            Button("New Folder") {
+                nav.requestedNewItemType = .folder
+            }
+            .keyboardShortcut("n", modifiers: [.command, .shift])
+
+            Button("New File") {
+                nav.requestedNewItemType = .file
+            }
+
+            Divider()
+
+            Button("Open Selected") {
+                if let first = nav.selectedItems.first {
+                    if first.isDirectory {
+                        nav.navigateTo(first.url)
+                    } else {
+                        NSWorkspace.shared.open(first.url)
+                    }
+                }
+            }
+            .keyboardShortcut("o", modifiers: .command)
+            .disabled(nav.selectedItemIDs.isEmpty)
+
+            Button("Move to Trash") {
+                let urls = nav.selectedItems.map(\.url)
+                guard !urls.isEmpty else { return }
+                Task {
+                    do {
+                        try await FileOperationsService.shared.trash(items: urls)
+                        await nav.reloadCurrentDirectory()
+                    } catch {}
+                }
+            }
+            .keyboardShortcut(.delete, modifiers: .command)
+            .disabled(nav.selectedItemIDs.isEmpty)
+        }
+
         CommandGroup(replacing: .undoRedo) {
             Button("Undo \(FileUndoService.shared.currentUndoDescription ?? "")") {
                 Task { await nav.undo() }
@@ -96,6 +148,16 @@ struct ExplorerCommands: Commands {
                 nav.selectedItemIDs = Set(nav.items.map(\.url))
             }
             .keyboardShortcut("a", modifiers: .command)
+
+            Divider()
+
+            Button("Rename") {
+                if let first = nav.selectedItems.first {
+                    nav.startRenaming(url: first.url)
+                }
+            }
+            .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF2FunctionKey)!)), modifiers: [])
+            .disabled(nav.selectedItemIDs.isEmpty)
         }
 
         CommandMenu("Go") {
@@ -111,28 +173,57 @@ struct ExplorerCommands: Commands {
             .keyboardShortcut(.rightArrow, modifiers: .option)
             .disabled(!nav.canGoForward)
 
-            Button("Up (Enclosing Folder)") {
+            Button("Enclosing Folder") {
                 nav.goUp()
             }
-            .keyboardShortcut(.upArrow, modifiers: .option)
+            .keyboardShortcut(.upArrow, modifiers: .command)
             .disabled(!nav.canGoUp)
 
-            Button("Focus Address Bar (Alt+D)") {
+            Button("Focus Address Bar") {
                 nav.isEditingPath = true
             }
-            .keyboardShortcut("d", modifiers: .option)
-
-            Divider()
+            .keyboardShortcut("l", modifiers: .command)
 
             Button("Go to Folder...") {
                 nav.isEditingPath = true
             }
             .keyboardShortcut("g", modifiers: [.command, .shift])
 
-            Button("Focus Address Bar (Cmd+L)") {
-                nav.isEditingPath = true
+            Divider()
+
+            let home = FileManager.default.homeDirectoryForCurrentUser
+            Button("Home") {
+                nav.navigateTo(home)
             }
-            .keyboardShortcut("l", modifiers: .command)
+            .keyboardShortcut("h", modifiers: [.command, .shift])
+
+            Button("Desktop") {
+                let url = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first ?? home.appendingPathComponent("Desktop")
+                nav.navigateTo(url)
+            }
+            .keyboardShortcut("d", modifiers: [.command, .option])
+
+            Button("Documents") {
+                let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first ?? home.appendingPathComponent("Documents")
+                nav.navigateTo(url)
+            }
+            .keyboardShortcut("o", modifiers: [.command, .option])
+
+            Button("Downloads") {
+                let url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first ?? home.appendingPathComponent("Downloads")
+                nav.navigateTo(url)
+            }
+            .keyboardShortcut("l", modifiers: [.command, .option])
+
+            Button("Applications") {
+                nav.navigateTo(URL(fileURLWithPath: "/Applications"))
+            }
+            .keyboardShortcut("a", modifiers: [.command, .shift])
+
+            Button("Computer") {
+                nav.navigateTo(URL(fileURLWithPath: "/"))
+            }
+            .keyboardShortcut("c", modifiers: [.command, .shift])
 
             Divider()
 
@@ -158,10 +249,54 @@ struct ExplorerCommands: Commands {
         }
 
         CommandGroup(after: .sidebar) {
+            Button("Command Palette...") {
+                workspace.toggleCommandPalette()
+            }
+            .keyboardShortcut("k", modifiers: .command)
+
+            Divider()
+
+            Button("as Icons") {
+                nav.viewMode = .grid
+            }
+            .keyboardShortcut("1", modifiers: .command)
+
+            Button("as List") {
+                nav.viewMode = .details
+            }
+            .keyboardShortcut("2", modifiers: .command)
+
+            Button("as Columns") {
+                nav.viewMode = .compact
+            }
+            .keyboardShortcut("3", modifiers: .command)
+
+            Button("as Gallery") {
+                nav.viewMode = .gallery
+            }
+            .keyboardShortcut("4", modifiers: .command)
+
+            Divider()
+
             Button(nav.isBottomPathBarVisible ? "Hide Path Bar" : "Show Path Bar") {
                 nav.isBottomPathBarVisible.toggle()
             }
             .keyboardShortcut("p", modifiers: [.command, .option])
+
+            Button("Toggle Dual Split View") {
+                workspace.toggleSplit()
+            }
+            .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!)), modifiers: [])
+
+            Button("Toggle Terminal Drawer") {
+                workspace.isTerminalVisible.toggle()
+            }
+            .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!)), modifiers: [])
+
+            Button(nav.showHiddenFiles ? "Hide Hidden Files" : "Show Hidden Files") {
+                nav.showHiddenFiles.toggle()
+            }
+            .keyboardShortcut(".", modifiers: [.command, .shift])
 
             Divider()
 
@@ -169,11 +304,6 @@ struct ExplorerCommands: Commands {
                 nav.zoomIn()
             }
             .keyboardShortcut("+", modifiers: .command)
-
-            Button("Zoom In (Equals)") {
-                nav.zoomIn()
-            }
-            .keyboardShortcut("=", modifiers: .command)
 
             Button("Zoom Out") {
                 nav.zoomOut()
@@ -192,8 +322,6 @@ struct TabCommands: Commands {
     let workspace: WorkspaceState
 
     var body: some Commands {
-        CommandGroup(replacing: .newItem) {}
-
         CommandGroup(replacing: .saveItem) {
             Button("Close Tab") {
                 workspace.closeTab(id: workspace.activeTabID)
@@ -282,23 +410,24 @@ struct TabCommands: Commands {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(workspace.activeNavigationState.currentURL.path, forType: .string)
             }
-        }
 
-        CommandGroup(after: .toolbar) {
-            Button("Toggle Split View") {
-                workspace.toggleSplit()
-            }
-            .keyboardShortcut("s", modifiers: [.command, .option])
+            Divider()
 
-            Button("Show/Hide Hidden Files") {
-                workspace.activeNavigationState.showHiddenFiles.toggle()
-            }
-            .keyboardShortcut(".", modifiers: [.command, .shift])
+            Menu("Tab Groups") {
+                Button("Save Tabs as Group...") {
+                    let groupName = "Group \(TabGroupService.shared.groups.count + 1)"
+                    _ = TabGroupService.shared.saveGroup(name: groupName, tabs: workspace.tabs)
+                }
 
-            Button("Toggle Terminal") {
-                workspace.isTerminalVisible.toggle()
+                if !TabGroupService.shared.groups.isEmpty {
+                    Divider()
+                    ForEach(TabGroupService.shared.groups) { group in
+                        Button(group.name) {
+                            TabGroupService.shared.restore(group: group, into: workspace, replace: false)
+                        }
+                    }
+                }
             }
-            .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!)), modifiers: [])
         }
     }
 }

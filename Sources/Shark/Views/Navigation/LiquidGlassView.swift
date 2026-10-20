@@ -74,3 +74,17 @@ public extension View {
         background(VisualEffectBlur(material: material, blendingMode: blendingMode))
     }
 }
+
+public struct LiquidGlassView: View {
+    public var material: NSVisualEffectView.Material
+    public var blendingMode: NSVisualEffectView.BlendingMode
+
+    public init(material: NSVisualEffectView.Material = .popover, blendingMode: NSVisualEffectView.BlendingMode = .withinWindow) {
+        self.material = material
+        self.blendingMode = blendingMode
+    }
+
+    public var body: some View {
+        VisualEffectBlur(material: material, blendingMode: blendingMode)
+    }
+}

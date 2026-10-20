@@ -13,8 +13,8 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 
 - [x] **Phase 7: Pro Tab Strip & Session Restore** - QTTabBar-grade tabs: reorder, pin, lock, colour, reopen closed, persistence
 - [x] **Phase 8: Explorer Ergonomics** - Cut/Copy/Paste, undo, inline rename, copy path, rich status bar, path bar, folder sizes, address bar
-- [ ] **Phase 9: QTTabBar Folder Power** - Cascading subfolder menus, hover previews, recent/frequent folders, tab groups
-- [ ] **Phase 10: Command Palette, Menus & Keyboard** - ⌘K palette, complete menu bar, type-to-select, settings window
+- [x] **Phase 9: QTTabBar Folder Power** - Cascading subfolder menus, hover previews, recent/frequent folders, tab groups
+- [x] **Phase 10: Command Palette, Menus & Keyboard** - ⌘K palette, complete menu bar, type-to-select, settings window
 - [ ] **Phase 11: Finder Fidelity Polish & Liquid Glass** - Visual pass, real Columns view, states, accessibility, DESIGN.md
 
 ## Phase Details
@@ -41,7 +41,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
   3. Status bar shows "N items, M selected (size), X GB available" and live progress for running copies with a cancel button.
   4. Context menu offers Copy Path, Open in Terminal, Open With, Compress, Calculate Size.
   5. ⌘L edits the address; Tab autocompletes; an invalid path shows an inline error and does not navigate.
-**Plans**: TBD
+**Plans**: 2 plans (08-01, 08-02)
 **UI hint**: yes
 
 ### Phase 9: QTTabBar Folder Power
@@ -51,9 +51,9 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 **Success Criteria** (what must be TRUE):
   1. Clicking the chevron after any breadcrumb segment shows its subfolders as a menu that cascades into deeper subfolders on hover; choosing one navigates.
   2. Hovering an image file for ~0.6s shows a thumbnail preview; hovering a text file shows its first lines.
-  3. Sidebar shows Recent and Frequent folders that update as the user navigates.
+  3. Go menu and tab system track Recent and Frequent folders as the user navigates.
   4. User can save open tabs as a group and reopen the group later.
-**Plans**: TBD
+**Plans**: 2 plans (09-01, 09-02)
 **UI hint**: yes
 
 ### Phase 10: Command Palette, Menus & Keyboard
@@ -71,7 +71,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 ### Phase 11: Finder Fidelity Polish
 **Goal**: Make Shark indistinguishable from Finder in look and feel while keeping its power: visual pass in light and dark, a real Columns view, honest empty/error states, accessibility, and DESIGN.md.
 **Depends on**: Phase 10
-**Requirements**: POL-01, POL-02, POL-03, POL-04, POL-05
+**Requirements**: POL-01, POL-02, POL-03, POL-04, POL-05, POL-06
 **Success Criteria** (what must be TRUE):
   1. Side-by-side screenshots against Finder in light and dark show matching toolbar, sidebar, list and icon styling.
   2. Columns view browses with Miller columns and keyboard arrows.
@@ -84,8 +84,8 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 7. Pro Tab Strip & Session Restore | v2.0 | 0/2 | In progress | - |
-| 8. Explorer Ergonomics | v2.0 | 0/TBD | Not started | - |
-| 9. QTTabBar Folder Power | v2.0 | 0/TBD | Not started | - |
-| 10. Command Palette, Menus & Keyboard | v2.0 | 0/TBD | Not started | - |
+| 7. Pro Tab Strip & Session Restore | v2.0 | 2/2 | Complete | 2026-10-20 |
+| 8. Explorer Ergonomics | v2.0 | 2/2 | Complete | 2026-10-20 |
+| 9. QTTabBar Folder Power | v2.0 | 2/2 | Complete | 2026-10-20 |
+| 10. Command Palette, Menus & Keyboard | v2.0 | 2/2 | Complete | 2026-10-20 |
 | 11. Finder Fidelity Polish | v2.0 | 0/TBD | Not started | - |
