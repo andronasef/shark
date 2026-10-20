@@ -6,7 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- Refined sidebar headings with hover feedback, keyboard focus outlines, arrow-key navigation, and temporary expansion during folder drags. Sidebar focus no longer triggers directory navigation shortcuts.
+- Favorites now persist custom folders and order, support adding/reordering shortcuts with insertion guides, and offer Show in Finder, Locate Folder, and Remove from Favorites. Missing folders remain visible; removing a shortcut leaves its folder untouched. Ancestor indicators follow the active pane.
+- Made sidebar sections collapsible with disclosure arrows, animated expansion, and remembered state; Reduce Motion disables transitions.
+- Refined the top path capsule to fit short paths, use one menu chevron per segment, and show a neutral current-folder highlight. Long paths remain scrollable and editable.
+- Moved Action after Split and Terminal, immediately before Search.
+- Enlarged tabs to 28 pt within a 34 pt strip, increased label and close-button sizes, and added 200 ms open/close transitions with smooth width redistribution. Reduce Motion keeps changes immediate.
+- Moved the breadcrumb path from the bottom of each directory pane into a glass Location capsule beside Back/Forward. Ancestor navigation, subfolder menus, path copying, and ⌘L editing remain available for the active pane.
+- Corrected the tab strip to use equal-width, centered text tabs across the full available strip; removed unpinned folder icons and the inline Tab Groups control. Tab Groups remain on the add button’s context menu.
+- Matched the toolbar and tabs to the supplied reference: capsule controls, captioned groups, a wider search field, and a full-width single-tab pill. Custom chrome uses native Liquid Glass on macOS 26+, with accessibility and older-system fallbacks; Split and Terminal buttons sit beside Action and highlight their active state.
+- Matched the Places sidebar to the supplied reference with an inset rounded panel, larger monochrome icons, 32 pt rows, explicit section spacing, and brighter tag colors. Standard places now appear immediately while mounted volumes load.
+
+### Fixed
+- Text hover previews no longer fail when the first read ends mid-character, binary files are no longer previewed as text, and edited files no longer show a stale cached preview.
+- Folders blocked by macOS privacy protection (e.g. Trash) now explain why and offer a button that opens Full Disk Access settings, instead of only "Try Again".
+
 ### Added
+- **Deeper hover previews**: previews now appear in a non-activating floating panel so keyboard focus stays where it was, and the pointer can move into the panel to use its controls. Video and audio play inline with a seek bar (auto-play is optional), animated GIFs animate, images show at full resolution, text shows up to 40 lines with its detected encoding, and Office/iWork/RTF/PDF documents show a thumbnail. New settings: preview only while holding Shift, and auto-play media.
+- **Liquid Glass adoption plan**: Documented proposed native Finder-style chrome, macOS 14/15 fallback, accessibility behavior, and visual acceptance checks. Implementation is pending.
 - **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **Native Finder Design Alignment**:
   - Authentically aligned window layout, navigation bar, and icon grid with macOS Finder.
@@ -26,6 +44,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - Added standalone development runner [`scripts/dev.sh`](scripts/dev.sh) and python file watcher [`scripts/hot_reload.py`](scripts/hot_reload.py).
 
 ### Fixed
+- Connected the hover-preview setting and delay to file items in grid, list, column, and gallery views. Leaving an item, renaming, or disabling previews cancels pending previews.
+- Stopped directory type-to-select and column navigation from consuming keystrokes while the embedded terminal has focus.
+- Restored a visible Up button beside Back and Forward, navigating to the active pane’s parent folder.
+- Fixed “Open in Terminal” on folder, background, and breadcrumb menus to explicitly launch Terminal.app rather than Finder. Added “Open in Embedded Terminal” at the clicked directory; files use their parent folder.
+- Fixed the Terminal button and F4 failing to redraw the drawer by restoring observation of terminal visibility.
+- Fixed split-pane focus: clicking or scrolling either pane now activates it before child controls handle input. Only the active pane registers navigation shortcuts, and inactive column views no longer intercept arrow keys.
+- Made middle-click tab closing use the actual pointer position instead of a stale global hover target, scoped to the clicked window and visible tab region.
 - Fixed Command + scroll wheel icon resizing by intercepting scroll events within the hovered directory pane without blocking normal clicks or scrolling.
 - Fixed top bar overlap where the View segmented control collided with the Path button.
 - Fixed duplicated button titles and unwanted `⌵` chevrons drawn by AppKit's `NSMenuToolbarItem`.
