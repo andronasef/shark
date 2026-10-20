@@ -1,7 +1,7 @@
 ---
 phase: "7"
 slug: "pro-tab-strip-session-restore"
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: "2026-10-20"
@@ -284,7 +284,7 @@ Reopen Closed Tab
 
 ## UI Considerations
 
-Applicable state considerations resolved: 10 covered, 2 backstop, 0 unresolved.
+Applicable state considerations resolved: 11 covered, 2 backstop, 0 unresolved (probe engine: empty, loading, error, populated, partial, overflow, zero-one-many, long-text, all addressed).
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
@@ -297,6 +297,7 @@ Applicable state considerations resolved: 10 covered, 2 backstop, 0 unresolved.
 | partial | Restored tab whose path was deleted or its volume unmounted | ✅ covered | Falls back to the nearest existing ancestor, then Home; the tab keeps its pin, lock and colour |
 | overflow | Closed history beyond 20 | ✅ covered | The oldest entry is dropped first |
 | populated | Tab with colour + lock + split | ✅ covered | Order: dot, icon, title, lock; tooltip shows both paths and "Locked" |
+| loading | Session restore and tab directory load | ✅ covered | The session is read synchronously before the first window draw, so no placeholder tab is shown. Tab title and icon come from the URL and do not wait for the directory listing, so a tab whose folder is still loading already shows its final title |
 | edge | ⌥⌘N where N > tab count | ✅ covered | No-op, except ⌥⌘9, which always selects the last tab |
 | visual | Light and dark mode, Increase Contrast, Reduce Motion rendering of the strip | 🧪 backstop | Verified by screenshots of the running app via cua-driver (scripts/run.sh) in both appearances, with Reduce Motion on |
 | visual | Active-tab fill reads as contiguous with the toolbar, matching Finder | 🧪 backstop | Side-by-side screenshot comparison with a real Finder window that has two or more tabs |
@@ -313,12 +314,12 @@ Applicable state considerations resolved: 10 covered, 2 backstop, 0 unresolved.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-10-20 (gsd-ui-checker: 6 PASS, 1 FLAG non-blocking on spacing token table)
