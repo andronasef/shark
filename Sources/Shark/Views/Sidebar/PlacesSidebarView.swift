@@ -1,9 +1,11 @@
 import SwiftUI
+import AppKit
 import Inject
 
 public struct PlacesSidebarView: View {
     @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
+    @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     @State private var favorites: [SidebarItem] = []
     @State private var locations: [SidebarItem] = []
 
@@ -119,7 +121,12 @@ public struct PlacesSidebarView: View {
         let isSelected = navigationState.currentURL.standardizedFileURL.path == url.standardizedFileURL.path
 
         Button(action: {
-            navigationState.navigateTo(url)
+            let isCmd = NSEvent.modifierFlags.contains(.command)
+            if let workspace {
+                workspace.open(url, from: navigationState, newTab: isCmd)
+            } else {
+                navigationState.navigateTo(url)
+            }
         }) {
             HStack(spacing: 10) {
                 Image(systemName: iconName)
@@ -141,6 +148,14 @@ public struct PlacesSidebarView: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isSelected ? Color.accentColor : Color.clear)
         )
+        .onMiddleClick {
+            workspace?.open(url, from: navigationState, newTab: true)
+        }
+        .contextMenu {
+            Button("Open in New Tab") {
+                workspace?.open(url, from: navigationState, newTab: true)
+            }
+        }
         .dropDestination(for: URL.self) { urls, _ in
             Task {
                 try? await FileOperationsService.shared.copy(items: urls, to: url)

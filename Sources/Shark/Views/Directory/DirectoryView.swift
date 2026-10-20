@@ -5,13 +5,16 @@ import Inject
 public struct DirectoryView: View {
     @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
+    @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
+    let pane: PaneIdentifier
 
     @State private var fseventsWatcher = FSEventsWatcher()
     @State private var showingNewItemSheet: NewItemType?
     @State private var showingBatchRenameSheet = false
 
-    public init(navigationState: NavigationState) {
+    public init(navigationState: NavigationState, pane: PaneIdentifier = .primary) {
         self.navigationState = navigationState
+        self.pane = pane
     }
 
     public var body: some View {
@@ -161,6 +164,11 @@ public struct DirectoryView: View {
                     .onTapGesture(count: 2) {
                         handleActivate(item)
                     }
+                    .onMiddleClick {
+                        if item.isNavigableDirectory {
+                            workspace?.open(item.url, from: navigationState, newTab: true)
+                        }
+                    }
                     .contextMenu {
                         contextMenu(for: item)
                     }
@@ -231,6 +239,11 @@ public struct DirectoryView: View {
                         .onTapGesture(count: 2) {
                             handleActivate(item)
                         }
+                        .onMiddleClick {
+                            if item.isNavigableDirectory {
+                                workspace?.open(item.url, from: navigationState, newTab: true)
+                            }
+                        }
                         .contextMenu {
                             contextMenu(for: item)
                         }
@@ -290,7 +303,12 @@ public struct DirectoryView: View {
     // MARK: - Actions
     private func handleActivate(_ item: FileItem) {
         if item.isNavigableDirectory {
-            navigationState.navigateTo(item.url)
+            let isCmd = NSEvent.modifierFlags.contains(.command)
+            if let workspace {
+                workspace.open(item.url, from: navigationState, newTab: isCmd)
+            } else {
+                navigationState.navigateTo(item.url)
+            }
         } else {
             NSWorkspace.shared.open(item.url)
         }
@@ -308,6 +326,12 @@ public struct DirectoryView: View {
     private func contextMenu(for item: FileItem) -> some View {
         Button("Open") {
             handleActivate(item)
+        }
+
+        if item.isNavigableDirectory {
+            Button("Open in New Tab") {
+                workspace?.open(item.url, from: navigationState, newTab: true)
+            }
         }
 
         Button("Quick Look") {

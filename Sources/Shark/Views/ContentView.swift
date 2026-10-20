@@ -5,9 +5,8 @@ import Inject
 public struct ContentView: View {
     @ObserveInjection var inject
 
-    @State private var workspaceState = WorkspaceState()
+    @Bindable var workspaceState: WorkspaceState
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    @State private var isTerminalVisible = false
     @State private var isInspectorVisible = false
     @State private var terminalSession = PTYSession()
 
@@ -18,7 +17,9 @@ public struct ContentView: View {
     @State private var isShowingGroupPopover = false
     @State private var isShowingActionPopover = false
 
-    public init() {}
+    public init(workspaceState: WorkspaceState = WorkspaceState()) {
+        self.workspaceState = workspaceState
+    }
 
     private var activeState: NavigationState {
         workspaceState.activeNavigationState
@@ -31,14 +32,21 @@ public struct ContentView: View {
         return activeState.currentURL
     }
 
+    private var terminalVisibleBinding: Binding<Bool> {
+        Binding(
+            get: { workspaceState.isTerminalVisible },
+            set: { workspaceState.isTerminalVisible = $0 }
+        )
+    }
+
     public var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             PlacesSidebarView(navigationState: activeState)
                 .navigationSplitViewColumnWidth(min: 170, ideal: 210, max: 280)
         } detail: {
             VStack(spacing: 0) {
-                // Tab Bar matching Finder's sub-toolbar
-                TabBarView(workspaceState: workspaceState)
+                // Pro Tab Strip (QTTabBar / Finder look)
+                TabStripView(workspace: workspaceState)
 
                 // Filter Bar (Cmd+I)
                 if activeState.isFilterBarVisible {
@@ -48,6 +56,7 @@ public struct ContentView: View {
                 // Middle Area: Dual Pane + optional Right Inspector
                 HStack(spacing: 0) {
                     DualPaneContainerView(tab: workspaceState.activeTab)
+                        .id(workspaceState.activeTabID)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                     if isInspectorVisible {
@@ -61,10 +70,10 @@ public struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 // Bottom Embedded Terminal Drawer (F4)
-                if isTerminalVisible {
+                if workspaceState.isTerminalVisible {
                     TerminalDrawerContainerView(
                         session: terminalSession,
-                        isPresented: $isTerminalVisible
+                        isPresented: terminalVisibleBinding
                     )
                 }
             }
@@ -145,7 +154,11 @@ public struct ContentView: View {
                     .buttonStyle(.plain)
                     .help("Show Path Hierarchy")
                     .popover(isPresented: $isShowingPathPopover, arrowEdge: .bottom) {
-                        BreadcrumbPopoverView(navigationState: activeState, isPresented: $isShowingPathPopover)
+                        BreadcrumbPopoverView(
+                            navigationState: activeState,
+                            workspaceState: workspaceState,
+                            isPresented: $isShowingPathPopover
+                        )
                     }
 
                     // View Segmented Picker
@@ -249,7 +262,7 @@ public struct ContentView: View {
                         )
                     }
 
-                    // Dolphin Features: Split & Terminal
+                    // Split & Terminal
                     Button(action: { workspaceState.toggleSplit() }) {
                         VStack(spacing: 2) {
                             Image(systemName: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
@@ -267,7 +280,7 @@ public struct ContentView: View {
 
                     Button(action: { toggleTerminalDrawer() }) {
                         VStack(spacing: 2) {
-                            Image(systemName: isTerminalVisible ? "terminal.fill" : "terminal")
+                            Image(systemName: workspaceState.isTerminalVisible ? "terminal.fill" : "terminal")
                                 .font(.system(size: 13))
                                 .frame(height: 18)
                             Text("Terminal")
@@ -278,7 +291,7 @@ public struct ContentView: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .help("Toggle Terminal")
+                    .help("Toggle Terminal (F4)")
 
                     // Search Field
                     VStack(spacing: 2) {
@@ -319,9 +332,15 @@ public struct ContentView: View {
                 }
             }
         }
+        .environment(workspaceState)
         .onChange(of: activeState.currentURL) { _, newURL in
-            if isTerminalVisible {
+            if workspaceState.isTerminalVisible {
                 terminalSession.syncDirectory(to: newURL)
+            }
+        }
+        .onChange(of: workspaceState.isTerminalVisible) { _, visible in
+            if visible {
+                terminalSession.syncDirectory(to: activeState.currentURL)
             }
         }
         .sheet(item: $showingNewItemSheet) { itemType in
@@ -354,7 +373,8 @@ public struct ContentView: View {
                 Button("") { activeState.viewMode = .compact }.keyboardShortcut("3", modifiers: .command)
                 Button("") { activeState.viewMode = .gallery }.keyboardShortcut("4", modifiers: .command)
                 Button("") { workspaceState.toggleSplit() }.keyboardShortcut("s", modifiers: [.command, .shift])
-                Button("") { toggleTerminalDrawer() }.keyboardShortcut("t", modifiers: [.command, .shift])
+                Button("") { workspaceState.previousTab() }.keyboardShortcut("[", modifiers: [.command, .shift])
+                Button("") { workspaceState.nextTab() }.keyboardShortcut("]", modifiers: [.command, .shift])
                 Button("") { isInspectorVisible.toggle() }.keyboardShortcut("i", modifiers: [.command, .option])
             }
             .opacity(0)
@@ -389,8 +409,8 @@ public struct ContentView: View {
     }
 
     private func toggleTerminalDrawer() {
-        isTerminalVisible.toggle()
-        if isTerminalVisible {
+        workspaceState.isTerminalVisible.toggle()
+        if workspaceState.isTerminalVisible {
             terminalSession.syncDirectory(to: activeState.currentURL)
         }
     }
@@ -431,6 +451,7 @@ public struct ContentView: View {
 // MARK: - Breadcrumb Popover
 private struct BreadcrumbPopoverView: View {
     @Bindable var navigationState: NavigationState
+    let workspaceState: WorkspaceState
     @Binding var isPresented: Bool
 
     var body: some View {
@@ -448,7 +469,8 @@ private struct BreadcrumbPopoverView: View {
             ForEach(segments, id: \.self) { url in
                 let isCurrent = (url.standardizedFileURL.path == navigationState.currentURL.standardizedFileURL.path)
                 Button(action: {
-                    navigationState.navigateTo(url)
+                    let isCmd = NSEvent.modifierFlags.contains(.command)
+                    workspaceState.open(url, from: navigationState, newTab: isCmd)
                     isPresented = false
                 }) {
                     HStack(spacing: 8) {
@@ -465,6 +487,10 @@ private struct BreadcrumbPopoverView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .onMiddleClick {
+                    workspaceState.open(url, from: navigationState, newTab: true)
+                    isPresented = false
+                }
             }
         }
         .padding(.bottom, 6)

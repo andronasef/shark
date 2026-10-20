@@ -11,7 +11,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 
 ## Phases
 
-- [ ] **Phase 7: Pro Tab Strip & Session Restore** - QTTabBar-grade tabs: reorder, pin, lock, colour, reopen closed, persistence
+- [x] **Phase 7: Pro Tab Strip & Session Restore** - QTTabBar-grade tabs: reorder, pin, lock, colour, reopen closed, persistence
 - [ ] **Phase 8: Explorer Ergonomics** - Cut/Copy/Paste, undo, inline rename, copy path, rich status bar, path bar, folder sizes, address bar
 - [ ] **Phase 9: QTTabBar Folder Power** - Cascading subfolder menus, hover previews, recent/frequent folders, tab groups
 - [ ] **Phase 10: Command Palette, Menus & Keyboard** - ⌘K palette, complete menu bar, type-to-select, settings window
@@ -28,7 +28,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
   2. Tab context menu offers Duplicate, Pin, Lock, Close Others, Close to the Right, Colour, Copy Path, and each works.
   3. Quitting and relaunching Shark restores the same tabs, pins, colours, paths, split state and view modes.
   4. ⌘-double-click on a folder opens it in a new background tab; ⌥⌘1–9 jump to tabs.
-**Plans**: TBD
+**Plans**: 2 plans (07-01 State & Persistence, 07-02 UI, Commands & Integration)
 **UI hint**: yes
 
 ### Phase 8: Explorer Ergonomics
@@ -84,7 +84,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 7. Pro Tab Strip & Session Restore | v2.0 | 0/TBD | Not started | - |
+| 7. Pro Tab Strip & Session Restore | v2.0 | 0/2 | In progress | - |
 | 8. Explorer Ergonomics | v2.0 | 0/TBD | Not started | - |
 | 9. QTTabBar Folder Power | v2.0 | 0/TBD | Not started | - |
 | 10. Command Palette, Menus & Keyboard | v2.0 | 0/TBD | Not started | - |

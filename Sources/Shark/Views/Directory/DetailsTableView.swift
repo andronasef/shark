@@ -3,6 +3,7 @@ import AppKit
 
 public struct DetailsTableView: View {
     @Bindable var navigationState: NavigationState
+    @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let onActivate: (FileItem) -> Void
     let contextMenuBuilder: (FileItem) -> AnyView
 
@@ -40,6 +41,11 @@ public struct DetailsTableView: View {
                 .onTapGesture(count: 2) {
                     onActivate(item)
                 }
+                .onMiddleClick {
+                    if item.isNavigableDirectory {
+                        workspace?.open(item.url, from: navigationState, newTab: true)
+                    }
+                }
                 .contextMenu {
                     contextMenuBuilder(item)
                 }
@@ -63,45 +69,39 @@ public struct DetailsTableView: View {
                 Text(item.kindDescription)
                     .foregroundColor(.secondary)
             }
-            .width(min: 100, ideal: 140)
-
-            TableColumn("Permissions", value: \.permissionsString) { item in
-                Text(item.permissionsString)
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundColor(.secondary)
-            }
-            .width(min: 90, ideal: 110)
+            .width(min: 120, ideal: 150)
         }
     }
 
     private var keyPathComparator: KeyPathComparator<FileItem> {
+        let order: SortOrder = navigationState.sortAscending ? .forward : .reverse
         switch navigationState.sortField {
         case .name:
-            return KeyPathComparator(\.name, order: navigationState.sortAscending ? .forward : .reverse)
+            return KeyPathComparator(\FileItem.name, order: order)
         case .size:
-            return KeyPathComparator(\.fileSize, order: navigationState.sortAscending ? .forward : .reverse)
+            return KeyPathComparator(\FileItem.fileSize, order: order)
         case .dateModified:
-            return KeyPathComparator(\.dateModified, order: navigationState.sortAscending ? .forward : .reverse)
+            return KeyPathComparator(\FileItem.dateModified, order: order)
         case .kind:
-            return KeyPathComparator(\.kindDescription, order: navigationState.sortAscending ? .forward : .reverse)
+            return KeyPathComparator(\FileItem.kindDescription, order: order)
         case .permissions:
-            return KeyPathComparator(\.permissionsString, order: navigationState.sortAscending ? .forward : .reverse)
+            return KeyPathComparator(\FileItem.posixPermissions, order: order)
         }
     }
 
-    private func handleSortChange(_ order: [KeyPathComparator<FileItem>]) {
-        guard let first = order.first else { return }
-        navigationState.sortAscending = (first.order == .forward)
+    private func handleSortChange(_ newOrder: [KeyPathComparator<FileItem>]) {
+        guard let primary = newOrder.first else { return }
+        navigationState.sortAscending = (primary.order == .forward)
 
-        if first.keyPath == \FileItem.name {
+        if primary.keyPath == \FileItem.name {
             navigationState.sortField = .name
-        } else if first.keyPath == \FileItem.fileSize {
+        } else if primary.keyPath == \FileItem.fileSize {
             navigationState.sortField = .size
-        } else if first.keyPath == \FileItem.dateModified {
+        } else if primary.keyPath == \FileItem.dateModified {
             navigationState.sortField = .dateModified
-        } else if first.keyPath == \FileItem.kindDescription {
+        } else if primary.keyPath == \FileItem.kindDescription {
             navigationState.sortField = .kind
-        } else if first.keyPath == \FileItem.permissionsString {
+        } else if primary.keyPath == \FileItem.posixPermissions {
             navigationState.sortField = .permissions
         }
     }

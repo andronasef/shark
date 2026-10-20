@@ -5,6 +5,7 @@ import Inject
 public struct IconsGridView: View {
     @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
+    @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let onActivate: (FileItem) -> Void
     let contextMenuBuilder: (FileItem) -> AnyView
 
@@ -39,6 +40,11 @@ public struct IconsGridView: View {
                     .onTapGesture(count: 2) {
                         onActivate(item)
                     }
+                    .onMiddleClick {
+                        if item.isNavigableDirectory {
+                            workspace?.open(item.url, from: navigationState, newTab: true)
+                        }
+                    }
                     .contextMenu {
                         contextMenuBuilder(item)
                     }
@@ -59,46 +65,44 @@ private struct IconGridItemView: View {
     let iconSize: CGFloat
     let isSelected: Bool
 
-    @State private var thumbnailImage: NSImage?
+    @State private var thumbnail: NSImage? = nil
 
     var body: some View {
-        VStack(spacing: 5) {
-            // Icon presentation matching native macOS Finder
-            Group {
-                if let thumb = thumbnailImage {
+        VStack(spacing: 6) {
+            ZStack {
+                if let thumb = thumbnail {
                     Image(nsImage: thumb)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
+                        .frame(width: iconSize, height: iconSize)
+                        .cornerRadius(4)
+                        .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
                 } else {
-                    Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+                    Image(systemName: item.systemIconName)
+                        .font(.system(size: iconSize * 0.7))
+                        .foregroundColor(item.isDirectory ? .accentColor : .secondary)
+                        .frame(width: iconSize, height: iconSize)
                 }
             }
             .frame(width: iconSize, height: iconSize)
-            .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
 
-            // Finder-authentic selection label
             Text(item.name)
-                .font(.system(size: 11, weight: isSelected ? .medium : .regular))
+                .font(.system(size: 11))
                 .foregroundColor(isSelected ? .white : .primary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 6)
+                .padding(.horizontal, 4)
                 .padding(.vertical, 2)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(isSelected ? Color(nsColor: .controlAccentColor) : Color.clear)
+                        .fill(isSelected ? Color.accentColor : Color.clear)
                 )
         }
-        .frame(width: 96, alignment: .top)
-        .contentShape(Rectangle())
-        .task(id: item.url) {
-            let thumb = await ThumbnailService.shared.thumbnail(
-                for: item.url,
-                size: CGSize(width: iconSize * 2, height: iconSize * 2)
-            )
-            self.thumbnailImage = thumb
+        .frame(width: max(iconSize + 16, 96))
+        .task {
+            if !item.isDirectory {
+                thumbnail = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: iconSize * 2, height: iconSize * 2))
+            }
         }
     }
 }

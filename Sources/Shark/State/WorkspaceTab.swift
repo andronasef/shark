@@ -1,9 +1,19 @@
 import Foundation
 import Observation
 
-public enum PaneIdentifier: String, CaseIterable, Sendable {
+public enum PaneIdentifier: String, CaseIterable, Codable, Sendable {
     case primary
     case secondary
+}
+
+public enum TabColor: String, Codable, CaseIterable, Sendable {
+    case red
+    case orange
+    case yellow
+    case green
+    case blue
+    case purple
+    case gray
 }
 
 @Observable
@@ -11,6 +21,9 @@ public enum PaneIdentifier: String, CaseIterable, Sendable {
 public final class WorkspaceTab: Identifiable {
     public let id: UUID
     public var isSplit: Bool
+    public var isPinned: Bool
+    public var isLocked: Bool
+    public var color: TabColor?
     public var activePane: PaneIdentifier
     public let primaryPane: NavigationState
     public let secondaryPane: NavigationState
@@ -18,10 +31,16 @@ public final class WorkspaceTab: Identifiable {
     public init(
         id: UUID = UUID(),
         initialURL: URL? = nil,
-        isSplit: Bool = false
+        isSplit: Bool = false,
+        isPinned: Bool = false,
+        isLocked: Bool = false,
+        color: TabColor? = nil
     ) {
         self.id = id
         self.isSplit = isSplit
+        self.isPinned = isPinned
+        self.isLocked = isLocked
+        self.color = color
         self.activePane = .primary
         self.primaryPane = NavigationState(initialURL: initialURL)
         self.secondaryPane = NavigationState(initialURL: initialURL)
@@ -41,6 +60,25 @@ public final class WorkspaceTab: Identifiable {
             return "\(pName) | \(sName)"
         }
         return pName
+    }
+
+    public var tooltipText: String {
+        var lines: [String]
+        if isSplit {
+            lines = [
+                "Left: \(primaryPane.currentURL.path)",
+                "Right: \(secondaryPane.currentURL.path)"
+            ]
+        } else {
+            lines = [activeNavigationState.currentURL.path]
+        }
+        if isPinned {
+            lines.insert(title, at: 0)
+        }
+        if isLocked {
+            lines.append("Locked")
+        }
+        return lines.joined(separator: "\n")
     }
 
     public func toggleSplit() {

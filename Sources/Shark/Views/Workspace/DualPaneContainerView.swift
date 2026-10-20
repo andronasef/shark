@@ -25,7 +25,7 @@ public struct DualPaneContainerView: View {
 
     @ViewBuilder
     private func singlePaneView(for state: NavigationState, identifier: PaneIdentifier) -> some View {
-        DirectoryView(navigationState: state)
+        DirectoryView(navigationState: state, pane: identifier)
             .contentShape(Rectangle())
             .onTapGesture {
                 tab.activePane = identifier
@@ -49,17 +49,20 @@ public struct DualPaneContainerView: View {
 
                 Spacer()
 
-                if identifier == .secondary {
-                    Button(action: {
-                        tab.toggleSplit()
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Close Split View (F3)")
+                Text(title)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                Button(action: {
+                    tab.isSplit = false
+                    tab.activePane = .primary
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.secondary)
                 }
+                .buttonStyle(.plain)
+                .help("Close Split View (F3)")
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
@@ -71,7 +74,7 @@ public struct DualPaneContainerView: View {
 
             Divider()
 
-            DirectoryView(navigationState: state)
+            DirectoryView(navigationState: state, pane: identifier)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     tab.activePane = identifier
