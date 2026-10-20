@@ -356,13 +356,21 @@ public final class WorkspaceState {
     }
 
     private func snapshotForTab(_ tab: WorkspaceTab) -> TabSnapshot {
+        var primaryBookmark: Data? = nil
+        var secondaryBookmark: Data? = nil
+        if SecurityScopedBookmarkManager.shared.isSandboxed {
+            primaryBookmark = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: tab.primaryPane.currentURL)
+            secondaryBookmark = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: tab.secondaryPane.currentURL)
+        }
+
         let primarySnap = PaneSnapshot(
             url: tab.primaryPane.currentURL,
             viewMode: String(describing: tab.primaryPane.viewMode),
             sortField: String(describing: tab.primaryPane.sortField),
             sortAscending: tab.primaryPane.sortAscending,
             showHidden: tab.primaryPane.showHiddenFiles,
-            iconSize: tab.primaryPane.iconSize
+            iconSize: tab.primaryPane.iconSize,
+            bookmarkData: primaryBookmark
         )
         let secondarySnap = PaneSnapshot(
             url: tab.secondaryPane.currentURL,
@@ -370,7 +378,8 @@ public final class WorkspaceState {
             sortField: String(describing: tab.secondaryPane.sortField),
             sortAscending: tab.secondaryPane.sortAscending,
             showHidden: tab.secondaryPane.showHiddenFiles,
-            iconSize: tab.secondaryPane.iconSize
+            iconSize: tab.secondaryPane.iconSize,
+            bookmarkData: secondaryBookmark
         )
         return TabSnapshot(
             id: tab.id,
@@ -385,6 +394,13 @@ public final class WorkspaceState {
     }
 
     private static func buildTab(from snap: TabSnapshot) -> WorkspaceTab {
+        if let data = snap.primary.bookmarkData {
+            _ = SecurityScopedBookmarkManager.shared.resolveBookmark(data: data)
+        }
+        if let data = snap.secondary.bookmarkData {
+            _ = SecurityScopedBookmarkManager.shared.resolveBookmark(data: data)
+        }
+
         let validPrimaryURL = existingAncestor(snap.primary.url)
         let validSecondaryURL = existingAncestor(snap.secondary.url)
 

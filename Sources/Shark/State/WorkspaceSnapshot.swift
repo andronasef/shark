@@ -19,6 +19,7 @@ public struct PaneSnapshot: Codable, Equatable, Sendable {
     public var sortAscending: Bool
     public var showHidden: Bool
     public var iconSize: CGFloat
+    public var bookmarkData: Data?
 
     public init(
         url: URL,
@@ -26,7 +27,8 @@ public struct PaneSnapshot: Codable, Equatable, Sendable {
         sortField: String,
         sortAscending: Bool,
         showHidden: Bool,
-        iconSize: CGFloat
+        iconSize: CGFloat,
+        bookmarkData: Data? = nil
     ) {
         self.url = url
         self.viewMode = viewMode
@@ -34,6 +36,7 @@ public struct PaneSnapshot: Codable, Equatable, Sendable {
         self.sortAscending = sortAscending
         self.showHidden = showHidden
         self.iconSize = iconSize
+        self.bookmarkData = bookmarkData
     }
 
     public var decodedViewMode: ViewMode {

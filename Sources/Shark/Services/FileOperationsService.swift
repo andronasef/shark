@@ -212,11 +212,19 @@ public actor FileOperationsService {
         arguments.append(destination.path)
         process.arguments = arguments
 
-        try process.run()
-        process.waitUntilExit()
+        do {
+            try process.run()
+            process.waitUntilExit()
 
-        guard process.terminationStatus == 0 else {
-            throw NSError(domain: "FileOperationsError", code: Int(process.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "Compression failed with status \(process.terminationStatus)"])
+            guard process.terminationStatus == 0 else {
+                throw NSError(domain: "FileOperationsError", code: Int(process.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "Compression failed with status \(process.terminationStatus)"])
+            }
+        } catch {
+            let isSandboxed = ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil || NSHomeDirectory().contains("/Library/Containers/")
+            if isSandboxed {
+                throw NSError(domain: "FileOperationsError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Archive helper execution is restricted under App Sandbox. Ensure directory permissions are granted or export uncompressed."])
+            }
+            throw error
         }
         return destination
     }

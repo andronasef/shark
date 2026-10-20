@@ -247,19 +247,33 @@ public struct DirectoryView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                 if navigationState.isPermissionError {
-                    Text("macOS restricts this folder. Allow Shark in Privacy & Security › Full Disk Access, then reopen Shark.")
+                    Text("Shark requires authorization to browse this folder.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
-                    Button("Open Full Disk Access Settings") {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
+                    HStack(spacing: 8) {
+                        Button("Grant Access...") {
+                            Task { await navigationState.requestFolderAccess() }
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button("Privacy Settings") {
+                            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
+                        }
                     }
                 }
-                Button("Try Again") {
-                    Task { await navigationState.reloadCurrentDirectory() }
+                if navigationState.isPermissionError {
+                    Button("Try Again") {
+                        Task { await navigationState.reloadCurrentDirectory() }
+                    }
+                    .buttonStyle(.bordered)
+                } else {
+                    Button("Try Again") {
+                        Task { await navigationState.reloadCurrentDirectory() }
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
-                .buttonStyle(.borderedProminent)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if navigationState.filteredAndSortedItems.isEmpty {

@@ -64,15 +64,18 @@ public struct DirectoryErrorStateView: View {
     let errorMessage: String
     let onRetry: () -> Void
     let onGoHome: () -> Void
+    let onGrantAccess: (() -> Void)?
 
     public init(
         errorMessage: String,
         onRetry: @escaping () -> Void,
-        onGoHome: @escaping () -> Void
+        onGoHome: @escaping () -> Void,
+        onGrantAccess: (() -> Void)? = nil
     ) {
         self.errorMessage = errorMessage
         self.onRetry = onRetry
         self.onGoHome = onGoHome
+        self.onGrantAccess = onGrantAccess
     }
 
     private var isPermissionError: Bool {
@@ -101,13 +104,29 @@ public struct DirectoryErrorStateView: View {
 
             HStack(spacing: 12) {
                 if isPermissionError {
-                    Button("Open Privacy Settings") {
-                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
-                            NSWorkspace.shared.open(url)
-                        }
+                    if let onGrantAccess {
+                        Button("Grant Access...", action: onGrantAccess)
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
+
+                    if onGrantAccess == nil {
+                        Button("Open Privacy Settings") {
+                            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    } else {
+                        Button("Open Privacy Settings") {
+                            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
 
                     Button("Go to Home", action: onGoHome)
                         .buttonStyle(.bordered)

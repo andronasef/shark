@@ -18,6 +18,19 @@ public struct TerminalDrawerContainerView: View {
             // Terminal Header Bar
             headerBar
 
+            if SecurityScopedBookmarkManager.shared.isSandboxed {
+                HStack(spacing: 6) {
+                    Image(systemName: "lock.shield")
+                    Text("App Sandbox Active: Terminal interactive shell is restricted by macOS App Store sandbox policy.")
+                }
+                .font(.system(size: 11))
+                .foregroundColor(.orange)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.orange.opacity(0.12))
+            }
+
             // Terminal NSView
             TerminalView(session: session)
                 .frame(height: drawerHeight)

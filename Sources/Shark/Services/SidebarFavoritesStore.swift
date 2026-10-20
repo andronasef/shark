@@ -44,6 +44,9 @@ final class SidebarFavoritesStore {
 
     @discardableResult
     func insert(_ urls: [URL], at index: Int) -> Bool {
+        for u in urls {
+            _ = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: u)
+        }
         let valid = urls.map(\.standardizedFileURL).filter { url in
             items.contains(where: { $0.url.standardizedFileURL.path == url.path }) || SidebarFavorite(name: "", url: url).isAvailable
         }

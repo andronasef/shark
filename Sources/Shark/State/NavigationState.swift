@@ -180,6 +180,8 @@ public final class NavigationState {
         errorMessage = nil
         isPermissionError = false
 
+        SecurityScopedBookmarkManager.shared.ensureAccess(to: currentURL)
+
         do {
             let fetchedItems = try await fileSystemService.contentsOfDirectory(
                 at: currentURL,
@@ -196,6 +198,15 @@ public final class NavigationState {
             self.items = []
         }
         self.isLoading = false
+    }
+
+    /// Requests user authorization to browse the current directory via NSOpenPanel.
+    /// Under App Sandbox, this allows the user to grant read-write access and persists a security-scoped bookmark.
+    public func requestFolderAccess() async {
+        let granted = await SecurityScopedBookmarkManager.shared.promptUserForAccess(to: currentURL)
+        if granted {
+            await reloadCurrentDirectory()
+        }
     }
 
     public func commitPathInput() {

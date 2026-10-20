@@ -34,10 +34,17 @@ cp "$bin/Shark" "$app/Contents/MacOS/"
 cp -R Assets/Icons "$app/Contents/Resources/Icons"
 scripts/make-icon.sh "$app"
 
+entitlements_args=()
+if [[ "${APP_SANDBOX:-0}" == 1 ]]; then
+  entitlements_args=(--entitlements Entitlements/Shark.entitlements)
+elif [[ -f "Entitlements/Shark-Direct.entitlements" ]]; then
+  entitlements_args=(--entitlements Entitlements/Shark-Direct.entitlements)
+fi
+
 if [[ "$identity" == - ]]; then
-  codesign --force --sign - "$app"
+  codesign --force "${entitlements_args[@]}" --sign - "$app"
 else
-  codesign --force --options runtime --timestamp --sign "$identity" "$app"
+  codesign --force --options runtime --timestamp "${entitlements_args[@]}" --sign "$identity" "$app"
 fi
 codesign --verify --strict "$app"
 ditto -c -k --keepParent "$app" "$archive"
