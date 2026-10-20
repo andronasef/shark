@@ -13,6 +13,10 @@ public struct IconsGridView: View {
     @State private var initialSelectionBeforeDrag: Set<URL> = []
     @State private var itemFrames: [URL: CGRect] = [:]
 
+    // Track click timestamp and target for double-click detection
+    @State private var lastClickedURL: URL? = nil
+    @State private var lastClickTime: TimeInterval = 0
+
     public init(
         navigationState: NavigationState,
         onActivate: @escaping (FileItem) -> Void,
@@ -36,6 +40,38 @@ public struct IconsGridView: View {
         GeometryReader { containerGeo in
             ScrollView {
                 ZStack(alignment: .topLeading) {
+                    // Empty background for canvas drag and canvas click
+                    Color.clear
+                        .frame(maxWidth: .infinity, minHeight: containerGeo.size.height)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
+                            if !isShiftOrCmd {
+                                navigationState.selectedItemIDs.removeAll()
+                            }
+                            navigationState.cancelRenaming()
+                        }
+                        .gesture(
+                            DragGesture(minimumDistance: 4, coordinateSpace: .named("IconGridCoordinateSpace"))
+                                .onChanged { value in
+                                    if dragStart == nil {
+                                        dragStart = value.startLocation
+                                        let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
+                                        initialSelectionBeforeDrag = isShiftOrCmd ? navigationState.selectedItemIDs : []
+                                    }
+                                    dragCurrent = value.location
+
+                                    if let rect = marqueeRect {
+                                        updateMarqueeSelection(rect: rect)
+                                    }
+                                }
+                                .onEnded { _ in
+                                    dragStart = nil
+                                    dragCurrent = nil
+                                    initialSelectionBeforeDrag = []
+                                }
+                        )
+
                     LazyVGrid(
                         columns: [GridItem(.adaptive(minimum: 104, maximum: 128), spacing: 20)],
                         spacing: 24
@@ -61,10 +97,7 @@ public struct IconsGridView: View {
                             .draggable(item.url)
                             .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                             .onTapGesture {
-                                handleItemClick(item)
-                            }
-                            .onTapGesture(count: 2) {
-                                onActivate(item)
+                                handleItemTap(item)
                             }
                             .onMiddleClick {
                                 if item.isNavigableDirectory {
@@ -96,41 +129,26 @@ public struct IconsGridView: View {
                 .onPreferenceChange(ItemFramePreferenceKey.self) { frames in
                     itemFrames = frames
                 }
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 3, coordinateSpace: .named("IconGridCoordinateSpace"))
-                        .onChanged { value in
-                            if dragStart == nil {
-                                dragStart = value.startLocation
-                                let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
-                                initialSelectionBeforeDrag = isShiftOrCmd ? navigationState.selectedItemIDs : []
-                            }
-                            dragCurrent = value.location
-
-                            if let rect = marqueeRect {
-                                updateMarqueeSelection(rect: rect)
-                            }
-                        }
-                        .onEnded { _ in
-                            dragStart = nil
-                            dragCurrent = nil
-                            initialSelectionBeforeDrag = []
-                        }
-                )
-                .onTapGesture {
-                    // Clicking empty canvas clears selection
-                    let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
-                    if !isShiftOrCmd {
-                        navigationState.selectedItemIDs.removeAll()
-                    }
-                    navigationState.cancelRenaming()
-                }
             }
         }
         .enableInjection()
     }
 
-    private func handleItemClick(_ item: FileItem) {
+    private func handleItemTap(_ item: FileItem) {
+        let now = Date().timeIntervalSince1970
+        let isDoubleTap = (lastClickedURL == item.url) && (now - lastClickTime < 0.4)
+
+        if isDoubleTap {
+            // Immediate folder / file open on double-click
+            lastClickedURL = nil
+            lastClickTime = 0
+            onActivate(item)
+            return
+        }
+
+        lastClickedURL = item.url
+        lastClickTime = now
+
         let isCmd = NSEvent.modifierFlags.contains(.command)
         let isShift = NSEvent.modifierFlags.contains(.shift)
 

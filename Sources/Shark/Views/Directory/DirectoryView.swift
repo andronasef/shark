@@ -10,6 +10,8 @@ public struct DirectoryView: View {
     @State private var showingNewItemSheet: NewItemType? = nil
     @State private var showingBatchRenameSheet: Bool = false
     @State private var previewItem: FileItem? = nil
+    @State private var lastClickedURL: URL? = nil
+    @State private var lastClickTime: TimeInterval = 0
 
     public init(
         navigationState: NavigationState,
@@ -168,6 +170,16 @@ public struct DirectoryView: View {
                     .contentShape(Rectangle())
                     .draggable(item.url)
                     .onTapGesture {
+                        let now = Date().timeIntervalSince1970
+                        if lastClickedURL == item.url && (now - lastClickTime < 0.4) {
+                            lastClickedURL = nil
+                            lastClickTime = 0
+                            handleActivate(item)
+                            return
+                        }
+                        lastClickedURL = item.url
+                        lastClickTime = now
+
                         let isCmd = NSEvent.modifierFlags.contains(.command)
                         let isShift = NSEvent.modifierFlags.contains(.shift)
                         if isCmd {
@@ -188,9 +200,6 @@ public struct DirectoryView: View {
                         } else {
                             navigationState.selectedItemIDs = [item.id]
                         }
-                    }
-                    .onTapGesture(count: 2) {
-                        handleActivate(item)
                     }
                     .onMiddleClick {
                         if item.isNavigableDirectory {

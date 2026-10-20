@@ -5,6 +5,8 @@ public struct DetailsTableView: View {
     @Bindable var navigationState: NavigationState
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let onActivate: (FileItem) -> Void
+    @State private var lastClickedURL: URL? = nil
+    @State private var lastClickTime: TimeInterval = 0
     let contextMenuBuilder: (FileItem) -> AnyView
 
     public init(
@@ -63,8 +65,17 @@ public struct DetailsTableView: View {
                 .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                 .contentShape(Rectangle())
                 .draggable(item.url)
-                .onTapGesture(count: 2) {
-                    onActivate(item)
+                .onTapGesture {
+                    let now = Date().timeIntervalSince1970
+                    if lastClickedURL == item.url && (now - lastClickTime < 0.4) {
+                        lastClickedURL = nil
+                        lastClickTime = 0
+                        onActivate(item)
+                        return
+                    }
+                    lastClickedURL = item.url
+                    lastClickTime = now
+                    navigationState.selectedItemIDs = [item.id]
                 }
                 .onMiddleClick {
                     if item.isNavigableDirectory {
