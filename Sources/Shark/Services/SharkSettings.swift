@@ -51,6 +51,8 @@ public final class SharkSettings: ObservableObject {
     @AppStorage("showHiddenFilesByDefault") public var showHiddenFilesByDefault: Bool = false
     @AppStorage("hoverPreviewEnabled") public var hoverPreviewEnabled: Bool = true
     @AppStorage("hoverPreviewDelayMs") public var hoverPreviewDelayMs: Double = 350.0
+    @AppStorage("hoverPreviewRequiresShift") public var hoverPreviewRequiresShift: Bool = false
+    @AppStorage("hoverPreviewAutoplay") public var hoverPreviewAutoplay: Bool = true
     @AppStorage("openNewTabsAtEnd") public var openNewTabsAtEnd: Bool = true
     @AppStorage("confirmBeforeClosingMultipleTabs") public var confirmBeforeClosingMultipleTabs: Bool = false
     @AppStorage("liquidGlassTranslucency") public var liquidGlassTranslucency: Bool = true

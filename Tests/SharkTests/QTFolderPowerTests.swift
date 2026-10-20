@@ -123,7 +123,7 @@ final class QTFolderPowerTests: XCTestCase {
 
         let preview = await HoverPreviewService.shared.fetchPreview(for: codeFile)
         switch preview {
-        case .text(let lines, let totalLines, _, _):
+        case .text(let lines, let totalLines, _, _, _):
             XCTAssertGreaterThanOrEqual(lines.count, 5)
             XCTAssertTrue(lines[0].contains("def main"))
             XCTAssertEqual(totalLines, sampleCode.components(separatedBy: .newlines).count)

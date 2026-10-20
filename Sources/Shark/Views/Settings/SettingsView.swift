@@ -64,9 +64,11 @@ public struct SettingsView: View {
     private var previewsTab: some View {
         Form {
             Section {
-                Toggle("Enable hover quick-previews for images and text", isOn: $settings.hoverPreviewEnabled)
+                Toggle("Enable hover quick-previews for images, text, video, and audio", isOn: $settings.hoverPreviewEnabled)
 
                 if settings.hoverPreviewEnabled {
+                    Toggle("Only preview while holding Shift", isOn: $settings.hoverPreviewRequiresShift)
+                    Toggle("Auto-play video and audio previews", isOn: $settings.hoverPreviewAutoplay)
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Hover Delay:")

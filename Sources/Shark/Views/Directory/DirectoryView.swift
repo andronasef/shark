@@ -436,6 +436,7 @@ public struct DirectoryView: View {
                         .contextMenu {
                             contextMenu(for: item)
                         }
+                        .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
                     }
                 }
                 .padding(10)

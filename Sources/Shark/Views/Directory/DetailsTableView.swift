@@ -103,6 +103,7 @@ public struct DetailsTableView: View {
                 .contextMenu {
                     contextMenuBuilder(item)
                 }
+                .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
             }
             .width(min: 200, ideal: 320)
 

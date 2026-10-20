@@ -142,6 +142,7 @@ public struct MillerColumnsView: View {
                             .contextMenu {
                                 contextMenuBuilder(item)
                             }
+                            .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
                         }
                     }
                     .padding(4)

@@ -1,10 +1,52 @@
 import SwiftUI
 import AppKit
+import AVKit
+
+/// Plays animated formats (GIF, APNG) that SwiftUI's `Image` renders as a still frame.
+private struct AnimatedImageView: NSViewRepresentable {
+    let image: NSImage
+
+    func makeNSView(context: Context) -> NSImageView {
+        let view = NSImageView(image: image)
+        view.animates = true
+        view.imageScaling = .scaleProportionallyUpOrDown
+        return view
+    }
+
+    func updateNSView(_ view: NSImageView, context: Context) {
+        view.image = image
+    }
+}
+
+/// Inline AVKit player: seek bar, play/pause and volume, with no window of its own.
+private struct MediaPlayerView: NSViewRepresentable {
+    let url: URL
+    let autoplay: Bool
+
+    func makeNSView(context: Context) -> AVPlayerView {
+        let view = AVPlayerView()
+        view.controlsStyle = .inline
+        view.showsFullScreenToggleButton = false
+        view.player = AVPlayer(url: url)
+        if autoplay { view.player?.play() }
+        return view
+    }
+
+    func updateNSView(_ view: AVPlayerView, context: Context) {}
+
+    static func dismantleNSView(_ view: AVPlayerView, coordinator: ()) {
+        view.player?.pause()
+        view.player = nil
+    }
+}
 
 public struct HoverPreviewCard: View {
     public let item: FileItem
     @State private var previewData: HoverPreviewData = .unsupported
     @State private var isLoading = true
+    @AppStorage("hoverPreviewAutoplay") private var autoplay = true
+
+    private static let maxImageSize = CGSize(width: 480, height: 360)
 
     public init(item: FileItem) {
         self.item = item
@@ -35,33 +77,34 @@ public struct HoverPreviewCard: View {
                             .scaleEffect(0.7)
                         Spacer()
                     }
-                    .frame(height: 120)
+                    .frame(width: 240, height: 120)
                 } else {
                     switch previewData {
                     case .image(let image, let dimensions, let sizeFormatted):
+                        let size = fitted(image.size)
                         VStack(alignment: .leading, spacing: 6) {
-                            Image(nsImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(maxWidth: 280, maxHeight: 180)
+                            AnimatedImageView(image: image)
+                                .frame(width: size.width, height: size.height)
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .shadow(radius: 2)
 
                             HStack {
-                                Text("\(Int(dimensions.width)) × \(Int(dimensions.height)) px")
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundColor(.secondary)
+                                if dimensions != .zero {
+                                    Text("\(Int(dimensions.width)) × \(Int(dimensions.height)) px")
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundColor(.secondary)
+                                }
                                 Spacer()
                                 Text(sizeFormatted)
                                     .font(.system(size: 10, design: .monospaced))
                                     .foregroundColor(.secondary)
                             }
                         }
+                        .frame(width: max(size.width, 160))
 
-                    case .text(let lines, let totalLines, _, let sizeFormatted):
+                    case .text(let lines, let totalLines, let encoding, let sizeFormatted, let truncated):
                         VStack(alignment: .leading, spacing: 4) {
                             VStack(alignment: .leading, spacing: 2) {
-                                ForEach(Array(lines.prefix(10).enumerated()), id: \.offset) { _, line in
+                                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
                                     Text(line.isEmpty ? " " : line)
                                         .font(.system(size: 10, design: .monospaced))
                                         .foregroundColor(.primary.opacity(0.9))
@@ -69,12 +112,12 @@ public struct HoverPreviewCard: View {
                                 }
                             }
                             .padding(8)
-                            .frame(maxWidth: 320, alignment: .leading)
+                            .frame(width: 440, alignment: .leading)
                             .background(Color.black.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 6))
 
                             HStack {
-                                Text("\(totalLines) lines")
+                                Text("\(totalLines)\(truncated ? "+" : "") lines · \(encoding)")
                                     .font(.system(size: 10))
                                     .foregroundColor(.secondary)
                                 Spacer()
@@ -82,6 +125,16 @@ public struct HoverPreviewCard: View {
                                     .font(.system(size: 10))
                                     .foregroundColor(.secondary)
                             }
+                        }
+
+                    case .media(let url, let isVideo, let sizeFormatted):
+                        VStack(alignment: .leading, spacing: 6) {
+                            MediaPlayerView(url: url, autoplay: autoplay)
+                                .frame(width: isVideo ? 400 : 320, height: isVideo ? 240 : 64)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                            Text(sizeFormatted)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(.secondary)
                         }
 
                     case .unsupported:
@@ -105,5 +158,12 @@ public struct HoverPreviewCard: View {
             previewData = await HoverPreviewService.shared.fetchPreview(for: item.url)
             isLoading = false
         }
+    }
+
+    /// Scales down to fit the preview bounds; small images stay at their natural size.
+    private func fitted(_ size: CGSize) -> CGSize {
+        guard size.width > 0, size.height > 0 else { return CGSize(width: 160, height: 120) }
+        let scale = min(1, Self.maxImageSize.width / size.width, Self.maxImageSize.height / size.height)
+        return CGSize(width: size.width * scale, height: size.height * scale)
     }
 }
