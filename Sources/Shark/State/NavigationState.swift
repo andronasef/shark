@@ -146,6 +146,18 @@ public final class NavigationState {
         navigateTo(parent)
     }
 
+    public func zoomIn() {
+        iconSize = min(192.0, iconSize + 16.0)
+    }
+
+    public func zoomOut() {
+        iconSize = max(48.0, iconSize - 16.0)
+    }
+
+    public func resetZoom() {
+        iconSize = 80.0
+    }
+
     public func reloadCurrentDirectory() async {
         isLoading = true
         errorMessage = nil

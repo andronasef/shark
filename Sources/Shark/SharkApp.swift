@@ -141,6 +141,28 @@ struct ExplorerCommands: Commands {
                 nav.isBottomPathBarVisible.toggle()
             }
             .keyboardShortcut("p", modifiers: [.command, .option])
+
+            Divider()
+
+            Button("Zoom In") {
+                nav.zoomIn()
+            }
+            .keyboardShortcut("+", modifiers: .command)
+
+            Button("Zoom In (Equals)") {
+                nav.zoomIn()
+            }
+            .keyboardShortcut("=", modifiers: .command)
+
+            Button("Zoom Out") {
+                nav.zoomOut()
+            }
+            .keyboardShortcut("-", modifiers: .command)
+
+            Button("Actual Size") {
+                nav.resetZoom()
+            }
+            .keyboardShortcut("0", modifiers: .command)
         }
     }
 }

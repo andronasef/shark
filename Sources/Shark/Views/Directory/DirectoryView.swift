@@ -68,6 +68,21 @@ public struct DirectoryView: View {
         .contextMenu {
             directoryBackgroundContextMenu
         }
+        .background {
+            // Local fallback keyboard shortcuts for instant responsiveness
+            Group {
+                Button("") { navigationState.zoomIn() }
+                    .keyboardShortcut("+", modifiers: .command)
+                Button("") { navigationState.zoomIn() }
+                    .keyboardShortcut("=", modifiers: .command)
+                Button("") { navigationState.zoomOut() }
+                    .keyboardShortcut("-", modifiers: .command)
+                Button("") { navigationState.resetZoom() }
+                    .keyboardShortcut("0", modifiers: .command)
+            }
+            .opacity(0)
+            .allowsHitTesting(false)
+        }
         .enableInjection()
     }
 

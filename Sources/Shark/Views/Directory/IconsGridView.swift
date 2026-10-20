@@ -72,15 +72,19 @@ public struct IconsGridView: View {
                                 }
                         )
 
+                    let currentIconSize = navigationState.iconSize
+                    let cellMinWidth = max(currentIconSize + 28, 96)
+                    let cellMaxWidth = cellMinWidth + 32
+
                     LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: 104, maximum: 128), spacing: 20)],
+                        columns: [GridItem(.adaptive(minimum: cellMinWidth, maximum: cellMaxWidth), spacing: 20)],
                         spacing: 24
                     ) {
                         ForEach(navigationState.filteredAndSortedItems) { item in
                             let isSelected = navigationState.selectedItemIDs.contains(item.id)
                             IconGridItemView(
                                 item: item,
-                                iconSize: 76,
+                                iconSize: currentIconSize,
                                 isSelected: isSelected,
                                 navigationState: navigationState
                             )
