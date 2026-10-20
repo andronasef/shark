@@ -58,7 +58,6 @@ final class HoverPreviewPanel {
         isMouseInside = false
 
         let view = TrackingHostingView(rootView: HoverPreviewPanelRoot(item: item) { [weak self] in self?.fit($0) })
-        view.sizingOptions = []
         view.onHoverChange = { [weak self] inside in
             self?.isMouseInside = inside
             if !inside { self?.onDismiss?() }
