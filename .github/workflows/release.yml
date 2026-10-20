@@ -1,0 +1,88 @@
+# Developer ID distribution outside the Mac App Store. See docs/RELEASING.md.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26 # Includes the SDK required by native Liquid Glass.
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate release configuration
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+          SIGN_IDENTITY: ${{ secrets.SIGN_IDENTITY }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Use a tag such as v0.7.0'; exit 1; }
+          for name in P12_BASE64 P12_PASSWORD SIGN_IDENTITY NOTARY_APPLE_ID NOTARY_TEAM_ID NOTARY_PASSWORD; do
+            [[ -n "${!name}" ]] || { echo "Missing release secret: $name"; exit 1; }
+          done
+          [[ "$SIGN_IDENTITY" == 'Developer ID Application: '* ]] || { echo 'SIGN_IDENTITY must name a Developer ID Application certificate'; exit 1; }
+          xcodebuild -version
+          swift --version
+
+      - name: Check packaging guardrails
+        run: bash scripts/test-package.sh
+
+      - name: Run tests
+        run: swift test
+
+      - name: Import Developer ID certificate
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+        run: |
+          set -euo pipefail
+          kc="$RUNNER_TEMP/shark-build.keychain-db"
+          password=$(openssl rand -hex 24)
+          echo "::add-mask::$password"
+          trap 'rm -f "$RUNNER_TEMP/shark-cert.p12"' EXIT
+          printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/shark-cert.p12"
+          security create-keychain -p "$password" "$kc"
+          security set-keychain-settings -lut 3600 "$kc"
+          security unlock-keychain -p "$password" "$kc"
+          security import "$RUNNER_TEMP/shark-cert.p12" -k "$kc" -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -k "$password" "$kc"
+          security list-keychains -d user -s "$kc" login.keychain-db
+
+      - name: Build, sign and notarize
+        env:
+          SIGN_IDENTITY: ${{ secrets.SIGN_IDENTITY }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+          REQUIRE_NOTARIZATION: "1"
+        run: scripts/package.sh "${GITHUB_REF_NAME#v}"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/Shark-$version.zip" "dist/Shark-$version.zip.sha256" \
+            --verify-tag --title "Shark $version" --generate-notes
+
+      - name: Remove signing material
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/shark-build.keychain-db" || true
+          rm -f "$RUNNER_TEMP/shark-cert.p12"

@@ -4,6 +4,8 @@ set -e
 cd "$(dirname "$0")/.."
 # -interposable + implicit-dynamic let InjectionIII swap code into the running app.
 swift build -Xswiftc -Xfrontend -Xswiftc -enable-implicit-dynamic -Xlinker -interposable "$@"
+mkdir -p Shark.app/Contents/MacOS
+[ -f Shark.app/Contents/Info.plist ] || cp Resources/Info.plist Shark.app/Contents/
 scripts/make-icon.sh
 mkdir -p Shark.app/Contents/Resources/Icons
 cp -R Assets/Icons/ Shark.app/Contents/Resources/Icons/
