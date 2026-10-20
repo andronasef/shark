@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Folders blocked by macOS privacy protection (e.g. Trash) now explain why and offer a button that opens Full Disk Access settings, instead of only "Try Again".
 
 ### Added
+- A getting-started README with screenshots of tabs and split panes, the terminal drawer, hover previews, and cascading subfolder menus.
 - Release preparation: universal app packaging, a tag-triggered Developer ID signing and notarization workflow with checksums, and publishing guidance covering GitHub setup and Mac App Store sandbox prerequisites.
 - **Mouse actions** (each can be turned off in Settings › Mouse): double-click empty space in a folder to go up one level (icon and details views); double-click a tab to pin or unpin it; scroll the wheel over the tab strip to cycle tabs; mouse side buttons go back and forward, and ⌃ + side button switches tabs.
 - **Shark Help** window (Help › Shark Help, ⌘?) listing what the mouse does in each zone: folder empty space, items, tabs, the tab strip, sidebar and path bar, and anywhere.
