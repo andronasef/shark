@@ -274,7 +274,11 @@ public struct DirectoryView: View {
                     contextMenu: contextMenu
                 )
             case .compact:
-                compactList
+                MillerColumnsView(
+                    navigationState: navigationState,
+                    onActivate: handleActivate,
+                    contextMenu: contextMenu
+                )
             case .gallery:
                 galleryView
             }

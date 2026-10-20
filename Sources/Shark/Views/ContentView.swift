@@ -93,6 +93,7 @@ public struct ContentView: View {
                                 .disabled(!activeState.canGoBack)
                                 .buttonStyle(.plain)
                                 .help("Back (Alt + ←)")
+                                .accessibilityLabel("Navigate Back")
 
                                 Divider()
                                     .frame(height: 14)
@@ -106,6 +107,7 @@ public struct ContentView: View {
                                 .disabled(!activeState.canGoForward)
                                 .buttonStyle(.plain)
                                 .help("Forward (Alt + →)")
+                                .accessibilityLabel("Navigate Forward")
 
                                 Divider()
                                     .frame(height: 14)
@@ -170,6 +172,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Show Path Hierarchy")
+                    .accessibilityLabel("Path Hierarchy")
                     .popover(isPresented: $isShowingPathPopover, arrowEdge: .bottom) {
                         BreadcrumbPopoverView(
                             navigationState: activeState,
@@ -188,6 +191,7 @@ public struct ContentView: View {
                         }
                         .pickerStyle(.segmented)
                         .labelsHidden()
+                        .accessibilityLabel("View Mode")
                         .frame(width: 176)
 
                         Text("View")
@@ -211,6 +215,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Group & Sort")
+                    .accessibilityLabel("Group and Sort")
                     .popover(isPresented: $isShowingGroupPopover, arrowEdge: .bottom) {
                         GroupPopoverView(navigationState: activeState, isPresented: $isShowingGroupPopover)
                     }
@@ -230,6 +235,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Share Selection")
+                    .accessibilityLabel("Share Selection")
 
                     // Add Tags
                     Button(action: {}) {
@@ -246,6 +252,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Add Tags")
+                    .accessibilityLabel("Add Tags")
 
                     // Action
                     Button(action: { isShowingActionPopover.toggle() }) {
@@ -262,6 +269,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Action Menu")
+                    .accessibilityLabel("Action Menu")
                     .popover(isPresented: $isShowingActionPopover, arrowEdge: .bottom) {
                         ActionPopoverView(
                             activeState: activeState,
@@ -294,6 +302,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Toggle Split View")
+                    .accessibilityLabel("Toggle Split View")
 
                     Button(action: { toggleTerminalDrawer() }) {
                         VStack(spacing: 2) {
@@ -309,6 +318,7 @@ public struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Toggle Terminal (F4)")
+                    .accessibilityLabel("Toggle Terminal")
 
                     // Search Field
                     VStack(spacing: 2) {

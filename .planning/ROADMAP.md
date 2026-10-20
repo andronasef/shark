@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Dolphin Core** - Phases 1-6 (shipped 2026-10-13) — see milestones/v1.0-ROADMAP.md
-- 🚧 **v2.0 Finder Look, QTTabBar Power** - Phases 7-11 (in progress)
+- ✅ **v2.0 Finder Look, QTTabBar Power** - Phases 7-11 (shipped 2026-10-20)
 
 ## Overview
 
@@ -15,7 +15,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 - [x] **Phase 8: Explorer Ergonomics** - Cut/Copy/Paste, undo, inline rename, copy path, rich status bar, path bar, folder sizes, address bar
 - [x] **Phase 9: QTTabBar Folder Power** - Cascading subfolder menus, hover previews, recent/frequent folders, tab groups
 - [x] **Phase 10: Command Palette, Menus & Keyboard** - ⌘K palette, complete menu bar, type-to-select, settings window
-- [ ] **Phase 11: Finder Fidelity Polish & Liquid Glass** - Visual pass, real Columns view, states, accessibility, DESIGN.md
+- [x] **Phase 11: Finder Fidelity Polish & Liquid Glass** - Visual pass, real Columns view, states, accessibility, DESIGN.md
 
 ## Phase Details
 
@@ -88,4 +88,4 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 | 8. Explorer Ergonomics | v2.0 | 2/2 | Complete | 2026-10-20 |
 | 9. QTTabBar Folder Power | v2.0 | 2/2 | Complete | 2026-10-20 |
 | 10. Command Palette, Menus & Keyboard | v2.0 | 2/2 | Complete | 2026-10-20 |
-| 11. Finder Fidelity Polish | v2.0 | 0/TBD | Not started | - |
+| 11. Finder Fidelity Polish | v2.0 | 2/2 | Complete | 2026-10-20 |

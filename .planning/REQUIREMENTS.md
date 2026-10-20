@@ -82,12 +82,12 @@
 - [x] **CMD-04**: Settings window (⌘,) for tab behaviour, hover preview, default view, show hidden, start location.
 
 ### Finder Polish (POL)
-- [ ] **POL-01**: Visual fidelity to Finder in light and dark: toolbar, sidebar, list/icon/column/gallery, selection, focus rings, spacing.
-- [ ] **POL-02**: A real Columns (Miller) view.
-- [ ] **POL-03**: Empty, loading, error and permission-denied states that tell the user what to do.
-- [ ] **POL-04**: VoiceOver labels, keyboard focus, Reduce Motion respected.
-- [ ] **POL-05**: DESIGN.md documents the shipped system.
-- [ ] **POL-06**: **Liquid Glass & Translucent Vibrancy**: Native macOS translucent materials (NSVisualEffectView / SwiftUI materials) across the window backdrop, unified toolbar, sidebar, tab strip, and floating preview cards, matching original Finder's liquid glass vibrancy with desktop wallpaper bleed-through in both light and dark modes.
+- [x] **POL-01**: Visual fidelity to Finder in light and dark: toolbar, sidebar, list/icon/column/gallery, selection, focus rings, spacing.
+- [x] **POL-02**: A real Columns (Miller) view.
+- [x] **POL-03**: Empty, loading, error and permission-denied states that tell the user what to do.
+- [x] **POL-04**: VoiceOver labels, keyboard focus, Reduce Motion respected.
+- [x] **POL-05**: DESIGN.md documents the shipped system.
+- [x] **POL-06**: **Liquid Glass & Translucent Vibrancy**: Native macOS translucent materials (NSVisualEffectView / SwiftUI materials) across the window backdrop, unified toolbar, sidebar, tab strip, and floating preview cards, matching original Finder's liquid glass vibrancy with desktop wallpaper bleed-through in both light and dark modes.
 
 ## Later Requirements
 
@@ -101,5 +101,5 @@
 ## Traceability
 
 - Shipped in v1.0: CORE-01..05, SPLIT-01..03, VIEW-01..05, TERM-01..03, INSP-01..02, OPS-01..05 (22 total)
-- Shipped in v2.0: TAB-01..07, EXP-01..09, QT-01..05, CMD-01..04 (25 total)
-- In progress v2.0: POL-01..06 (6 total)
+- Shipped in v2.0: TAB-01..07, EXP-01..09, QT-01..05, CMD-01..04, POL-01..06 (31 total)
+- Milestone v2.0 Complete! All 31 requirements satisfied.

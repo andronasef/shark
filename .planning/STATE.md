@@ -2,13 +2,13 @@
 gsd_state_version: '1.0'
 milestone: v2.0
 milestone_name: Finder Look, QTTabBar Power
-status: in_progress
+status: complete
 progress:
   total_phases: 5
-  completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
-  percent: 80
+  completed_phases: 5
+  total_plans: 10
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -18,21 +18,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-20)
 
 **Core value:** A file manager that looks like native macOS Finder but has the power of QTTabBar and the ease of Windows File Explorer.
-**Current focus:** Phase 10 complete; starting Phase 11 (Finder Fidelity Polish & Liquid Glass) (Command Palette, Menus & Keyboard: ⌘K palette, full menu bar, type-to-select, and Settings window)
+**Current focus:** Milestone v2.0 Complete! All 11 phases finished and verified.
 
 ## Current Position
 
-Phase: 11 of 11 (Finder Fidelity Polish & Liquid Glass) — NEXT
-Status: In progress
-Last activity: 2026-10-20 — Phase 10 completed (⌘K Command Palette, full native menu bar, type-to-select, Finder keyboard navigation, Settings window)
+Phase: 11 of 11 (Finder Fidelity Polish & Liquid Glass) — COMPLETE
+Status: Complete
+Last activity: 2026-10-20 — Phase 11 completed (Real Miller Columns View, Polish States, Liquid Glass Materials, Accessibility, DESIGN.md)
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Accumulated Context
 
-- Design authority: PRODUCT.md (standing preference: Finder look) and .impeccable/surfaces/sources-shark-views-contentview-swift.md (direction contract).
+- Design authority: PRODUCT.md (standing preference: Finder look), DESIGN.md, and .impeccable/surfaces/sources-shark-views-contentview-swift.md.
 - Build & run: `scripts/run.sh` builds, copies into Shark.app and relaunches. Tests: `swift test`.
-- Verification: 54 unit tests passing with 0 failures; live native test verified via cua-driver.
+- Verification: 68 unit tests passing with 0 failures; live native test verified via cua-driver.
 - Invariants verified:
   - Pro tab strip with reordering, pinning, locking, coloring, session restore across restarts.
   - Explorer clipboard operations (Cut/Copy/Paste) with cut item dimming, symmetric Undo/Redo stack.
@@ -42,10 +42,8 @@ Progress: [████████░░] 80%
   - Hover quick-previews for images and text files.
   - Saved tab groups persistence and restoration.
   - Drag-and-drop moves by default and copies only when Alt/Option is held.
-
-## Next Steps
-- Execute Phase 10:
-  - 10-01: Command Palette Model & Engine (⌘K fuzzy search across commands, paths, favorites, tab groups, recents).
-  - 10-02: Complete Menu Bar & Keyboard shortcuts (File, Edit, View, Go, Tab, Window menus with standard macOS shortcuts, F3, F4, F11, Space).
-  - 10-03: Type-to-select in all views, ⌘↓ to open, ⌘↑ for enclosing folder.
-  - 10-04: Settings Window (⌘,) for tab behavior, hover preview, default view, start location.
+  - ⌘K Command Palette fuzzy searching actions, places, and tab groups with keyboard execution.
+  - Comprehensive native menu bar (File, Edit, View, Tab, Go, Window, Help) with standard macOS shortcuts.
+  - Real Miller Columns view (⌘3) cascading horizontally with keyboard navigation (←/→/↑/↓) and leaf file preview pane.
+  - Polished empty, loading, and permission-denied feedback states with Full Disk Access direct link.
+  - Liquid glass translucency across window backdrop, tab strip, sidebar, and floating modals.
