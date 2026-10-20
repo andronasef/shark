@@ -35,10 +35,6 @@ public struct DirectoryView: View {
                     navigationState.adjustZoom(delta: delta)
                 }
 
-            if navigationState.isBottomPathBarVisible {
-                BottomPathBarView(navigationState: navigationState, workspace: workspace)
-            }
-
             statusBar
         }
         .task(id: navigationState.currentURL) {

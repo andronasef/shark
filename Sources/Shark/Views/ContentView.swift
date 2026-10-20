@@ -9,6 +9,7 @@ public struct ContentView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var isInspectorVisible = false
     @State private var terminalSession = PTYSession()
+    @State private var lastHandledTerminalRequestID: UUID?
 
     @State private var showingNewItemSheet: NewItemType?
     @State private var showingBatchRenameSheet = false
@@ -19,6 +20,225 @@ public struct ContentView: View {
 
     public init(workspaceState: WorkspaceState = WorkspaceState()) {
         self.workspaceState = workspaceState
+    }
+
+    @ToolbarContentBuilder
+    private var finderToolbar: some ToolbarContent {
+        ToolbarItem(id: "nav-history", placement: .navigation) {
+            HStack(alignment: .top, spacing: 14) {
+                FinderToolbarCaption("Navigation") {
+                    HStack(spacing: 0) {
+                        Button { activeState.goBack() } label: {
+                            Image(systemName: "chevron.left").frame(width: 27, height: 28)
+                        }
+                        .disabled(!activeState.canGoBack)
+                        .help("Back (⌘[)")
+                        .accessibilityLabel("Navigate Back")
+                        Divider().frame(height: 14)
+                        Button { activeState.goForward() } label: {
+                            Image(systemName: "chevron.right").frame(width: 27, height: 28)
+                        }
+                        .disabled(!activeState.canGoForward)
+                        .help("Forward (⌘])")
+                        .accessibilityLabel("Navigate Forward")
+                        Divider().frame(height: 14)
+                        Button { activeState.goUp() } label: {
+                            Image(systemName: "chevron.up").frame(width: 27, height: 28)
+                        }
+                        .disabled(!activeState.canGoUp)
+                        .help("Enclosing Folder (⌘↑)")
+                        .accessibilityLabel("Navigate Up")
+                    }
+                    .font(.system(size: 13, weight: .medium))
+                    .buttonStyle(.plain)
+                    .finderGlass()
+                    .contextMenu {
+                        Button("Enclosing Folder") { activeState.goUp() }
+                            .disabled(!activeState.canGoUp)
+                    }
+                }
+                if activeState.isBottomPathBarVisible || activeState.isEditingPath {
+                    FinderToolbarCaption("Location") {
+                        BottomPathBarView(navigationState: activeState, workspace: workspaceState, inToolbar: true)
+                    }
+                } else {
+                    Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
+                        .font(.system(size: 13, weight: .semibold))
+                        .lineLimit(1)
+                        .frame(maxWidth: 160, alignment: .leading)
+                        .frame(height: 28)
+                }
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(placement: .principal) { Spacer() }
+            .finderChromeItem()
+
+        ToolbarItem(id: "path", placement: .primaryAction) {
+            FinderToolbarCaption("Path") {
+                Button { isShowingPathPopover.toggle() } label: {
+                    FinderToolbarSymbol(symbol: "list.bullet", disclosure: true)
+                }
+                .buttonStyle(.plain)
+                .finderGlass()
+                .accessibilityLabel("Path Hierarchy")
+                .help("Show Path Hierarchy")
+                .popover(isPresented: $isShowingPathPopover, arrowEdge: .bottom) {
+                    BreadcrumbPopoverView(navigationState: activeState, workspaceState: workspaceState, isPresented: $isShowingPathPopover)
+                }
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "view-mode", placement: .primaryAction) {
+            FinderToolbarCaption("View") {
+                HStack(spacing: 0) {
+                    viewModeButton(.grid, symbol: "square.grid.2x2", label: "Icons")
+                    viewModeButton(.details, symbol: "list.bullet", label: "List")
+                    Divider().frame(height: 16)
+                    viewModeButton(.compact, symbol: "rectangle.split.3x1", label: "Columns")
+                    Divider().frame(height: 16)
+                    viewModeButton(.gallery, symbol: "rectangle.bottomthird.inset.filled", label: "Gallery")
+                }
+                .padding(.horizontal, 3)
+                .frame(height: 28)
+                .finderGlass()
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("View Mode")
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "group-sort", placement: .primaryAction) {
+            FinderToolbarCaption("Group") {
+                Button { isShowingGroupPopover.toggle() } label: {
+                    FinderToolbarSymbol(symbol: "square.grid.3x3", disclosure: true)
+                }
+                .buttonStyle(.plain)
+                .finderGlass()
+                .accessibilityLabel("Group and Sort")
+                .help("Group & Sort")
+                .popover(isPresented: $isShowingGroupPopover, arrowEdge: .bottom) {
+                    GroupPopoverView(navigationState: activeState, isPresented: $isShowingGroupPopover)
+                }
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "share", placement: .primaryAction) {
+            FinderToolbarCaption("Share") {
+                Button { shareCurrentSelection() } label: {
+                    FinderToolbarSymbol(symbol: "square.and.arrow.up")
+                }
+                .buttonStyle(.plain)
+                .finderGlass()
+                .disabled(activeState.selectedItemIDs.isEmpty)
+                .help("Share Selection")
+                .accessibilityLabel("Share Selection")
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "tags", placement: .primaryAction) {
+            FinderToolbarCaption("Edit Tags") {
+                Button {} label: { FinderToolbarSymbol(symbol: "tag") }
+                    .buttonStyle(.plain)
+                    .finderGlass()
+                    .disabled(true)
+                    .help("Tag editing is not yet available")
+                    .accessibilityLabel("Edit Tags")
+            }
+        }
+        .finderChromeItem()
+
+
+        utilityToolbar
+    }
+
+    @ToolbarContentBuilder
+    private var utilityToolbar: some ToolbarContent {
+        ToolbarItem(id: "split", placement: .primaryAction) {
+            FinderToolbarCaption("Split") {
+                Button { workspaceState.toggleSplit() } label: {
+                    FinderToolbarSymbol(symbol: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
+                }
+                .buttonStyle(.plain)
+                .finderGlass(isSelected: workspaceState.activeTab.isSplit)
+                .help("Toggle Split View (F3)")
+                .accessibilityLabel("Toggle Split View")
+                .accessibilityValue(workspaceState.activeTab.isSplit ? "On" : "Off")
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "terminal", placement: .primaryAction) {
+            FinderToolbarCaption("Terminal") {
+                Button { toggleTerminalDrawer() } label: {
+                    FinderToolbarSymbol(symbol: workspaceState.isTerminalVisible ? "terminal.fill" : "terminal")
+                }
+                .buttonStyle(.plain)
+                .finderGlass(isSelected: workspaceState.isTerminalVisible)
+                .help("Toggle Terminal (F4)")
+                .accessibilityLabel("Toggle Terminal")
+                .accessibilityValue(workspaceState.isTerminalVisible ? "On" : "Off")
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "actions", placement: .primaryAction) {
+            FinderToolbarCaption("Action") {
+                Button { isShowingActionPopover.toggle() } label: {
+                    FinderToolbarSymbol(symbol: "ellipsis")
+                }
+                .buttonStyle(.plain)
+                .finderGlass()
+                .help("Action Menu")
+                .accessibilityLabel("Action Menu")
+                .popover(isPresented: $isShowingActionPopover, arrowEdge: .bottom) {
+                    ActionPopoverView(
+                        activeState: activeState,
+                        isPresented: $isShowingActionPopover,
+                        onNewFolder: { showingNewItemSheet = .folder },
+                        onNewFile: { showingNewItemSheet = .file },
+                        onGetInfo: { isInspectorVisible.toggle() },
+                        onDuplicate: { duplicateSelected() },
+                        onRename: {
+                            if activeState.selectedItemIDs.count > 1 { showingBatchRenameSheet = true }
+                        },
+                        onTrash: { trashSelectedItems() },
+                        onToggleSplit: { workspaceState.toggleSplit() },
+                        onToggleTerminal: { toggleTerminalDrawer() }
+                    )
+                }
+            }
+        }
+        .finderChromeItem()
+
+        ToolbarItem(id: "search", placement: .primaryAction) {
+            FinderToolbarCaption("Search") {
+                FinderSearchField(text: Bindable(activeState).filterText)
+            }
+        }
+        .finderChromeItem()
+    }
+
+    private func viewModeButton(_ mode: ViewMode, symbol: String, label: String) -> some View {
+        Button { activeState.viewMode = mode } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 15))
+                .frame(width: 27, height: 24)
+                .background {
+                    if activeState.viewMode == mode {
+                        Capsule().fill(Color.primary.opacity(0.15))
+                    }
+                }
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .help(label)
+        .accessibilityLabel(label + " View")
+        .accessibilityAddTraits(activeState.viewMode == mode ? .isSelected : [])
     }
 
     private var activeState: NavigationState {
@@ -78,296 +298,32 @@ public struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .toolbar {
-                // MARK: - Left: Back / Forward & Current Title
-                ToolbarItem(id: "nav-history", placement: .navigation) {
-                    HStack(spacing: 8) {
-                        VStack(spacing: 2) {
-                            HStack(spacing: 0) {
-                                // Windows Explorer style Back (Alt+Left)
-                                Button(action: { activeState.goBack() }) {
-                                    Image(systemName: "arrow.left")
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .frame(width: 24, height: 22)
-                                }
-                                .disabled(!activeState.canGoBack)
-                                .buttonStyle(.plain)
-                                .help("Back (Alt + ←)")
-                                .accessibilityLabel("Navigate Back")
-
-                                Divider()
-                                    .frame(height: 14)
-
-                                // Windows Explorer style Forward (Alt+Right)
-                                Button(action: { activeState.goForward() }) {
-                                    Image(systemName: "arrow.right")
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .frame(width: 24, height: 22)
-                                }
-                                .disabled(!activeState.canGoForward)
-                                .buttonStyle(.plain)
-                                .help("Forward (Alt + →)")
-                                .accessibilityLabel("Navigate Forward")
-
-                                Divider()
-                                    .frame(height: 14)
-
-                                // Windows Explorer style Up to Parent (Alt+Up)
-                                Button(action: { activeState.goUp() }) {
-                                    Image(systemName: "arrow.up")
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .frame(width: 24, height: 22)
-                                }
-                                .disabled(!activeState.canGoUp)
-                                .buttonStyle(.plain)
-                                .help("Up (Alt + ↑)")
-                            }
-                            .padding(.horizontal, 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.8))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
-                            )
-
-                            Text("Navigation")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-
-                        HStack(spacing: 6) {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: activeState.currentURL.path))
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 16, height: 16)
-                            Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
-                                .font(.system(size: 13, weight: .semibold))
-                                .lineLimit(1)
-                        }
-                    }
-                    .help("Navigation History (⌘[ / ⌘])")
-                }
-
-                // MARK: - Center Flexible Space (Pushes Actions to Trailing)
-                ToolbarItem(placement: .principal) {
-                    Spacer()
-                }
-
-                // MARK: - Right: Action Tools Grouped Trailing (Finder Layout)
-                ToolbarItemGroup(placement: .primaryAction) {
-                    // Path Button + Popover
-                    Button(action: { isShowingPathPopover.toggle() }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "list.bullet.below.rectangle")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Path")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 32)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Show Path Hierarchy")
-                    .accessibilityLabel("Path Hierarchy")
-                    .popover(isPresented: $isShowingPathPopover, arrowEdge: .bottom) {
-                        BreadcrumbPopoverView(
-                            navigationState: activeState,
-                            workspaceState: workspaceState,
-                            isPresented: $isShowingPathPopover
-                        )
-                    }
-
-                    // View Segmented Picker
-                    VStack(spacing: 2) {
-                        Picker("View", selection: Bindable(activeState).viewMode) {
-                            Image(systemName: "square.grid.2x2").tag(ViewMode.grid)
-                            Image(systemName: "list.bullet").tag(ViewMode.details)
-                            Image(systemName: "rectangle.split.3x1").tag(ViewMode.compact)
-                            Image(systemName: "macwindow").tag(ViewMode.gallery)
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-                        .accessibilityLabel("View Mode")
-                        .frame(width: 176)
-
-                        Text("View")
-                            .font(.system(size: 9))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.horizontal, 4)
-
-                    // Group Button + Popover
-                    Button(action: { isShowingGroupPopover.toggle() }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "square.grid.3x1.below.line.grid.1x2")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Group")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 34)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Group & Sort")
-                    .accessibilityLabel("Group and Sort")
-                    .popover(isPresented: $isShowingGroupPopover, arrowEdge: .bottom) {
-                        GroupPopoverView(navigationState: activeState, isPresented: $isShowingGroupPopover)
-                    }
-
-                    // Share
-                    Button(action: { shareCurrentSelection() }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Share")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 32)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Share Selection")
-                    .accessibilityLabel("Share Selection")
-
-                    // Add Tags
-                    Button(action: {}) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "tag")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Add Tags")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 44)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Add Tags")
-                    .accessibilityLabel("Add Tags")
-
-                    // Action
-                    Button(action: { isShowingActionPopover.toggle() }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "ellipsis.circle")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Action")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 34)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Action Menu")
-                    .accessibilityLabel("Action Menu")
-                    .popover(isPresented: $isShowingActionPopover, arrowEdge: .bottom) {
-                        ActionPopoverView(
-                            activeState: activeState,
-                            isPresented: $isShowingActionPopover,
-                            onNewFolder: { showingNewItemSheet = .folder },
-                            onNewFile: { showingNewItemSheet = .file },
-                            onGetInfo: { isInspectorVisible.toggle() },
-                            onDuplicate: { duplicateSelected() },
-                            onRename: {
-                                if activeState.selectedItemIDs.count > 1 {
-                                    showingBatchRenameSheet = true
-                                }
-                            },
-                            onTrash: { trashSelectedItems() }
-                        )
-                    }
-
-                    // Split & Terminal
-                    Button(action: { workspaceState.toggleSplit() }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: workspaceState.activeTab.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Split")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 30)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Toggle Split View")
-                    .accessibilityLabel("Toggle Split View")
-
-                    Button(action: { toggleTerminalDrawer() }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: workspaceState.isTerminalVisible ? "terminal.fill" : "terminal")
-                                .font(.system(size: 13))
-                                .frame(height: 18)
-                            Text("Terminal")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(width: 44)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help("Toggle Terminal (F4)")
-                    .accessibilityLabel("Toggle Terminal")
-
-                    // Search Field
-                    VStack(spacing: 2) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.secondary)
-                                .font(.system(size: 10))
-
-                            TextField("Search", text: Bindable(activeState).filterText)
-                                .textFieldStyle(.plain)
-                                .font(.system(size: 11))
-                                .frame(width: 90)
-
-                            if !activeState.filterText.isEmpty {
-                                Button(action: { activeState.filterText = "" }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.secondary)
-                                        .font(.system(size: 10))
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(nsColor: .controlBackgroundColor).opacity(0.8))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
-                        )
-
-                        Text("Search")
-                            .font(.system(size: 9))
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
+            .toolbar { finderToolbar }
         }
         .environment(workspaceState)
         .onChange(of: activeState.currentURL) { _, newURL in
             if workspaceState.isTerminalVisible {
+                // A new terminal request may activate another pane in this same
+                // update. Let its target win over the pane's current directory.
+                if let request = workspaceState.embeddedTerminalRequest,
+                   request.id != lastHandledTerminalRequestID { return }
+                workspaceState.embeddedTerminalRequest = nil
                 terminalSession.syncDirectory(to: newURL)
             }
         }
         .onChange(of: workspaceState.isTerminalVisible) { _, visible in
             if visible {
-                terminalSession.syncDirectory(to: activeState.currentURL)
+                if workspaceState.embeddedTerminalRequest == nil {
+                    terminalSession.syncDirectory(to: activeState.currentURL)
+                }
+            } else {
+                workspaceState.embeddedTerminalRequest = nil
+            }
+        }
+        .onChange(of: workspaceState.embeddedTerminalRequest) { _, request in
+            if let request {
+                terminalSession.syncDirectory(to: request.directory)
+                lastHandledTerminalRequestID = request.id
             }
         }
         .sheet(item: Binding(
@@ -454,9 +410,6 @@ public struct ContentView: View {
 
     private func toggleTerminalDrawer() {
         workspaceState.isTerminalVisible.toggle()
-        if workspaceState.isTerminalVisible {
-            terminalSession.syncDirectory(to: activeState.currentURL)
-        }
     }
 
     private func triggerQuickLook() {
@@ -626,6 +579,8 @@ private struct ActionPopoverView: View {
     let onDuplicate: () -> Void
     let onRename: () -> Void
     let onTrash: () -> Void
+    let onToggleSplit: () -> Void
+    let onToggleTerminal: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -655,6 +610,19 @@ private struct ActionPopoverView: View {
                 isPresented = false
                 onTrash()
             }
+            Divider()
+            popoverItem("Enclosing Folder", icon: "arrow.up") {
+                isPresented = false
+                activeState.goUp()
+            }
+            popoverItem("Toggle Split View (F3)", icon: "rectangle.split.2x1", action: {
+                isPresented = false
+                onToggleSplit()
+            })
+            popoverItem("Toggle Terminal (F4)", icon: "terminal", action: {
+                isPresented = false
+                onToggleTerminal()
+            })
             Divider()
             popoverItem("Show Hidden Files (⇧⌘.)", icon: activeState.showHiddenFiles ? "eye.slash" : "eye") {
                 activeState.showHiddenFiles.toggle()

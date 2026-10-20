@@ -3,13 +3,83 @@ import SwiftUI
 public struct BottomPathBarView: View {
     @Bindable var navigationState: NavigationState
     var workspace: WorkspaceState?
+    var inToolbar: Bool
+    @FocusState private var isPathFocused: Bool
 
-    public init(navigationState: NavigationState, workspace: WorkspaceState? = nil) {
+    public init(navigationState: NavigationState, workspace: WorkspaceState? = nil, inToolbar: Bool = false) {
         self.navigationState = navigationState
         self.workspace = workspace
+        self.inToolbar = inToolbar
     }
 
     public var body: some View {
+        Group {
+            if inToolbar {
+                pathContent
+                    .frame(width: toolbarWidth, height: 28)
+                    .finderGlass(interactive: false)
+            } else {
+                pathContent
+                    .frame(height: 22)
+                    .liquidGlassBackground(material: .headerView)
+                    .overlay(Divider(), alignment: .top)
+            }
+        }
+        .onChange(of: navigationState.isEditingPath) { _, editing in
+            if editing { isPathFocused = true }
+        }
+        .onAppear {
+            if navigationState.isEditingPath { isPathFocused = true }
+        }
+    }
+
+    @ViewBuilder
+    private var pathContent: some View {
+        if navigationState.isEditingPath {
+            HStack(spacing: 6) {
+                Image(systemName: "folder").foregroundStyle(.secondary)
+                TextField("Go to folder", text: $navigationState.pathInputText)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 12))
+                    .focused($isPathFocused)
+                    .onAppear { isPathFocused = true }
+                    .onSubmit { navigationState.commitPathInput() }
+                    .onExitCommand { cancelEditing() }
+                    .accessibilityLabel("Folder Path")
+                Button { cancelEditing() } label: {
+                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Cancel Path Editing")
+            }
+            .padding(.horizontal, 10)
+        } else {
+            ScrollViewReader { proxy in
+                breadcrumbs
+                    .onAppear { proxy.scrollTo(navigationState.currentURL.standardizedFileURL, anchor: .trailing) }
+                    .onChange(of: navigationState.currentURL) { _, url in
+                        proxy.scrollTo(url.standardizedFileURL, anchor: .trailing)
+                    }
+            }
+            .contextMenu {
+                Button("Edit Path (⌘L)") {
+                    navigationState.pathInputText = navigationState.currentURL.path
+                    navigationState.isEditingPath = true
+                }
+                Button("Copy Path") {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
+                }
+            }
+        }
+    }
+
+    private func cancelEditing() {
+        navigationState.isEditingPath = false
+        navigationState.pathInputText = navigationState.currentURL.path
+    }
+
+    private var breadcrumbs: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
                 ForEach(segments, id: \.url) { seg in
@@ -23,21 +93,37 @@ public struct BottomPathBarView: View {
                             }
                         }) {
                             HStack(spacing: 3) {
-                                Image(systemName: seg.isRoot ? "internaldrive" : (seg.isLast ? "folder.fill" : "folder"))
-                                    .font(.system(size: 11))
-                                    .foregroundColor(seg.isLast ? .accentColor : .secondary)
+                                if !inToolbar || seg.isRoot || seg.isLast {
+                                    Image(systemName: seg.isRoot ? "internaldrive" : (seg.isLast ? "folder.fill" : "folder"))
+                                        .font(.system(size: 11))
+                                        .frame(width: 14)
+                                        .foregroundStyle(seg.isLast ? Color.accentColor : Color.secondary)
+                                }
                                 Text(seg.title)
-                                    .font(.system(size: 11, weight: seg.isLast ? .semibold : .regular))
-                                    .foregroundColor(seg.isLast ? .primary : .secondary)
+                                    .font(.system(size: inToolbar ? 12 : 11, weight: seg.isLast ? .semibold : .regular))
+                                    .foregroundStyle(seg.isLast ? Color.primary : Color.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                    .frame(maxWidth: inToolbar ? 180 : nil)
+                                    .fixedSize(horizontal: true, vertical: false)
                             }
                             .padding(.horizontal, 4)
                             .padding(.vertical, 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 3)
-                                    .fill(seg.isLast ? Color.accentColor.opacity(0.12) : Color.clear)
-                            )
+                            .background {
+                                if seg.isLast {
+                                    if inToolbar {
+                                        Capsule().fill(Color.primary.opacity(0.08))
+                                    } else {
+                                        RoundedRectangle(cornerRadius: 3).fill(Color.accentColor.opacity(0.12))
+                                    }
+                                }
+                            }
                         }
                         .buttonStyle(.plain)
+                        .help(seg.url.path)
+                        .onMiddleClick {
+                            workspace?.open(seg.url, from: navigationState, newTab: true)
+                        }
                         .contextMenu {
                             Button("Open in New Tab") {
                                 workspace?.open(seg.url, from: navigationState, newTab: true)
@@ -46,23 +132,22 @@ public struct BottomPathBarView: View {
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(seg.url.path, forType: .string)
                             }
-                            Button("Open in Terminal") {
-                                NSWorkspace.shared.open(seg.url)
-                            }
+                            TerminalMenuItems(url: seg.url, workspace: workspace, source: navigationState)
                         }
 
                         // Cascading Subfolder Chevron Menu (QT-01)
-                        CascadingFolderChevronButton(url: seg.url) { targetURL, inNewTab in
+                        CascadingFolderChevronButton(url: seg.url, symbol: inToolbar && !seg.isLast ? "chevron.right" : "chevron.down") { targetURL, inNewTab in
                             if inNewTab, let workspace {
                                 workspace.open(targetURL, from: navigationState, newTab: true)
                             } else {
                                 navigationState.navigateTo(targetURL)
                             }
                         }
-                        .frame(width: 10, height: 14)
+                        .frame(width: inToolbar ? 16 : 10, height: inToolbar ? 22 : 14)
                     }
+                    .id(seg.url)
 
-                    if !seg.isLast {
+                    if !inToolbar && !seg.isLast {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 8, weight: .semibold))
                             .foregroundColor(.secondary.opacity(0.5))
@@ -72,9 +157,19 @@ public struct BottomPathBarView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
         }
-        .frame(height: 22)
-        .liquidGlassBackground(material: .headerView)
-        .overlay(Divider(), alignment: .top)
+    }
+
+    /// Measure the system-font labels so short paths don't reserve a long empty capsule.
+    private var toolbarWidth: CGFloat {
+        if navigationState.isEditingPath { return 360 }
+        let items = segments
+        let labels = items.reduce(CGFloat.zero) { width, segment in
+            let font = NSFont.systemFont(ofSize: 12, weight: segment.isLast ? .semibold : .regular)
+            let textWidth = min(180, ceil((segment.title as NSString).size(withAttributes: [.font: font]).width))
+            let iconWidth: CGFloat = segment.isRoot || segment.isLast ? 17 : 0
+            return width + textWidth + iconWidth + 8 + 2 + 16
+        }
+        return min(360, max(160, labels + CGFloat(max(0, items.count - 1)) * 4 + 16))
     }
 
     private struct PathSeg {
