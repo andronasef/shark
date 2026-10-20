@@ -246,6 +246,16 @@ public struct DirectoryView: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
+                if navigationState.isPermissionError {
+                    Text("macOS restricts this folder. Allow Shark in Privacy & Security › Full Disk Access, then reopen Shark.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    Button("Open Full Disk Access Settings") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
+                    }
+                }
                 Button("Try Again") {
                     Task { await navigationState.reloadCurrentDirectory() }
                 }

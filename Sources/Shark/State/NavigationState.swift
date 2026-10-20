@@ -40,6 +40,8 @@ public final class NavigationState {
     public var selectedItemIDs: Set<URL> = []
     public var isLoading: Bool = false
     public var errorMessage: String? = nil
+    /// True when the last directory load failed because macOS privacy protection (TCC) denied access.
+    public var isPermissionError = false
 
     public var showHiddenFiles: Bool = false {
         didSet {
@@ -176,6 +178,7 @@ public final class NavigationState {
     public func reloadCurrentDirectory() async {
         isLoading = true
         errorMessage = nil
+        isPermissionError = false
 
         do {
             let fetchedItems = try await fileSystemService.contentsOfDirectory(
@@ -186,6 +189,10 @@ public final class NavigationState {
             RecentFoldersService.shared.recordVisit(to: self.currentURL)
         } catch {
             self.errorMessage = error.localizedDescription
+            let ns = error as NSError
+            let underlying = ns.userInfo[NSUnderlyingErrorKey] as? NSError
+            self.isPermissionError = ns.code == NSFileReadNoPermissionError
+                || [ns, underlying].contains { $0?.domain == NSPOSIXErrorDomain && [EPERM, EACCES].contains(Int32($0!.code)) }
             self.items = []
         }
         self.isLoading = false
