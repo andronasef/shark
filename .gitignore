@@ -14,3 +14,6 @@ DerivedData/
 # Firebase configuration
 GoogleService-Info.plist
 **/GoogleService-Info.plist
+
+# Provisioning profiles
+*.provisionprofile
