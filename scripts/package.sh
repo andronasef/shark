@@ -1,32 +1,22 @@
-#!/bin/bash
-# Build a universal app and ZIP. Public downloads require Developer ID notarization.
-# Usage: scripts/package.sh MAJOR.MINOR.PATCH[-PRERELEASE]
+#!/usr/bin/env bash
 set -euo pipefail
+
 cd "$(dirname "$0")/.."
-version=${1:?usage: scripts/package.sh <version>}
-[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "Version must be MAJOR.MINOR.PATCH or semver prerelease (e.g. 1.0.0-alpha)" >&2; exit 1; }
-identity=${SIGN_IDENTITY:--}
-notarize=0
-if [[ "${REQUIRE_NOTARIZATION:-0}" == 1 || -n "${NOTARY_APPLE_ID:-}${NOTARY_TEAM_ID:-}${NOTARY_PASSWORD:-}" ]]; then
-  [[ "$identity" != - && -n "$identity" ]] || { echo "Notarization requires SIGN_IDENTITY." >&2; exit 1; }
-  : "${NOTARY_APPLE_ID:?Set NOTARY_APPLE_ID}"
-  : "${NOTARY_TEAM_ID:?Set NOTARY_TEAM_ID}"
-  : "${NOTARY_PASSWORD:?Set NOTARY_PASSWORD}"
-  notarize=1
-fi
 
-# Keep release products separate from the development app and hot reload flags.
-build_args=(-c release --arch arm64 --arch x86_64 --scratch-path "${SHARK_BUILD_PATH:-.build/package}")
-swift build "${build_args[@]}"
-bin=$(swift build "${build_args[@]}" --show-bin-path)
-architectures=" $(lipo -archs "$bin/Shark") "
-[[ "$architectures" == *" arm64 "* && "$architectures" == *" x86_64 "* ]] || { echo "Expected an arm64 + x86_64 executable" >&2; exit 1; }
+version="${1:-1.0.0}"
+notarize="${NOTARIZE:-0}"
+identity="${SIGN_IDENTITY:--}"
 
-mkdir -p dist
-staging=$(mktemp -d "$PWD/dist/.package.XXXXXX")
+echo "Packaging Shark v$version..."
+scripts/build-release.sh
+
+bin=".build/apple/Products/Release"
+staging="$(mktemp -d)"
 trap 'rm -rf "$staging"' EXIT
+
 app="$staging/Shark.app"
 archive="$staging/Shark-$version.zip"
+
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp Resources/Info.plist "$app/Contents/"
 [ -f Resources/GoogleService-Info.plist ] && cp Resources/GoogleService-Info.plist "$app/Contents/Resources/"
@@ -37,6 +27,15 @@ scripts/make-icon.sh "$app"
 
 # Extract release dSYM debug symbols for crash reporting
 dsymutil "$bin/Shark" -o "$staging/Shark.app.dSYM"
+
+# Embed provisioning profile if provided (required for TestFlight on macOS)
+if [[ -n "${PROVISIONING_PROFILE:-}" && -f "${PROVISIONING_PROFILE}" ]]; then
+  echo "==> Embedding provisioning profile: $PROVISIONING_PROFILE"
+  cp "$PROVISIONING_PROFILE" "$app/Contents/embedded.provisionprofile"
+elif [[ -f "Entitlements/Shark.provisionprofile" ]]; then
+  echo "==> Embedding provisioning profile: Entitlements/Shark.provisionprofile"
+  cp "Entitlements/Shark.provisionprofile" "$app/Contents/embedded.provisionprofile"
+fi
 
 entitlements_args=()
 if [[ "${APP_SANDBOX:-0}" == 1 ]]; then
