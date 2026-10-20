@@ -84,3 +84,15 @@ For a local universal package:
 ```sh
 scripts/package.sh 0.7.0
 ```
+
+## Contributing
+
+Bug reports, small fixes, documentation improvements, and feature ideas are welcome.
+
+- **Found a bug?** Open an issue with your macOS version, steps to reproduce, what you expected, and what happened. Screenshots help; hide any personal file names or paths.
+- **Have a bigger idea?** Open an issue to discuss it before starting a large change.
+- **Want to send a fix?** Fork the repository, create a branch, and follow the build instructions above. Keep each pull request focused on one change.
+
+Before opening a pull request, run `swift test` and check the app itself if you changed the UI. Add tests for non-trivial logic and a changelog entry for meaningful changes. Include a short description of the change and how you tested it; add screenshots for visual changes.
+
+Keep the interface native to macOS. Update the design guide when changing layout or interaction rules, and the in-app Help when changing mouse gestures.
