@@ -16,17 +16,32 @@ struct FinderGlassModifier: ViewModifier {
             content
                 .background(Color(nsColor: isSelected ? .selectedControlColor : .controlBackgroundColor), in: Capsule())
                 .overlay(Capsule().strokeBorder(Color.primary.opacity(0.25), lineWidth: 0.75))
-        } else if #available(macOS 26, *) {
+        } else {
+            glassOrMaterial(content)
+        }
+    }
+
+    @ViewBuilder
+    private func glassOrMaterial(_ content: Content) -> some View {
+#if compiler(>=6.2)
+        if #available(macOS 26, *) {
             content.glassEffect(
                 .regular.tint(isSelected ? Color.primary.opacity(0.14) : nil).interactive(interactive),
                 in: Capsule()
             )
         } else {
-            content
-                .background(.thinMaterial, in: Capsule())
-                .background(isSelected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
-                .overlay(Capsule().strokeBorder(Color.primary.opacity(0.14), lineWidth: 0.75))
+            fallbackMaterial(content)
         }
+#else
+        fallbackMaterial(content)
+#endif
+    }
+
+    private func fallbackMaterial(_ content: Content) -> some View {
+        content
+            .background(.thinMaterial, in: Capsule())
+            .background(isSelected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
+            .overlay(Capsule().strokeBorder(Color.primary.opacity(0.14), lineWidth: 0.75))
     }
 }
 
@@ -37,28 +52,36 @@ extension View {
 
     @ViewBuilder
     func finderGlassContainer() -> some View {
+#if compiler(>=6.2)
         if #available(macOS 26, *) {
             GlassEffectContainer(spacing: 6) { self }
         } else {
             self
         }
+#else
+        self
+#endif
     }
 }
 
 extension ToolbarContent {
     @ToolbarContentBuilder
     func finderChromeItem() -> some ToolbarContent {
+#if compiler(>=6.2)
         if #available(macOS 26, *) {
             sharedBackgroundVisibility(.hidden)
         } else {
             self
         }
+#else
+        self
+#endif
     }
 }
 
 struct FinderToolbarCaption<Content: View>: View {
     let title: String
-    @ViewBuilder var content: Content
+    @ViewBuilder let content: Content
 
     init(_ title: String, @ViewBuilder content: () -> Content) {
         self.title = title
@@ -66,58 +89,12 @@ struct FinderToolbarCaption<Content: View>: View {
     }
 
     var body: some View {
-        VStack(spacing: 3) {
+        VStack(alignment: .leading, spacing: 2) {
             content
             Text(title)
-                .font(.system(size: 9, weight: .medium))
+                .font(.system(size: 9, weight: .regular))
                 .foregroundStyle(.secondary)
-                .fixedSize()
-                .accessibilityHidden(true)
+                .lineLimit(1)
         }
-    }
-}
-
-struct FinderToolbarSymbol: View {
-    let symbol: String
-    var disclosure = false
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: symbol)
-                .font(.system(size: 15, weight: .regular))
-            if disclosure {
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 7, weight: .semibold))
-            }
-        }
-        .frame(width: disclosure ? 42 : 30, height: 28)
-        .contentShape(Capsule())
-    }
-}
-
-struct FinderSearchField: View {
-    @Binding var text: String
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-            TextField("Search", text: $text)
-                .textFieldStyle(.plain)
-                .font(.system(size: 12))
-                .accessibilityLabel("Search files in current folder")
-            if !text.isEmpty {
-                Button { text = "" } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Clear Search")
-            }
-        }
-        .padding(.horizontal, 10)
-        .frame(width: 200, height: 28)
-        .finderGlass(interactive: false)
     }
 }
