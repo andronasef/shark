@@ -60,6 +60,13 @@ public struct ContentView: View {
                             .disabled(!activeState.canGoUp)
                     }
                 }
+            }
+        }
+        .finderChromeItem()
+
+        // The location grows with the window; the toolbar gives it whatever the other items leave.
+        ToolbarItem(id: "location", placement: .principal) {
+            Group {
                 if activeState.isBottomPathBarVisible || activeState.isEditingPath {
                     FinderToolbarCaption("Location") {
                         BottomPathBarView(navigationState: activeState, workspace: workspaceState, inToolbar: true)
@@ -68,15 +75,12 @@ public struct ContentView: View {
                     Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
-                        .frame(maxWidth: 160, alignment: .leading)
                         .frame(height: 28)
                 }
             }
+            .frame(minWidth: 160, maxWidth: .infinity)
         }
         .finderChromeItem()
-
-        ToolbarItem(placement: .principal) { Spacer() }
-            .finderChromeItem()
 
         ToolbarItem(id: "path", placement: .primaryAction) {
             FinderToolbarCaption("Path") {

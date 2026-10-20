@@ -16,7 +16,8 @@ public struct BottomPathBarView: View {
         Group {
             if inToolbar {
                 pathContent
-                    .frame(width: toolbarWidth, height: 28)
+                    .frame(minWidth: 160, maxWidth: .infinity)
+                    .frame(height: 28)
                     .finderGlass(interactive: false)
             } else {
                 pathContent

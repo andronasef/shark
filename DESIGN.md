@@ -33,7 +33,7 @@ Shark strictly adheres to macOS Human Interface Guidelines (HIG) with an 8pt-bas
 - **Toolbar Path Bar**:
   - Located beside Back/Forward in a `28` pt glass capsule, showing the active pane’s path.
   - Ancestors support navigation and subfolder menus; `⌘L` edits the path.
-  - Capsule width follows measured label widths (160–360 pt); one menu chevron per segment and a neutral current-folder highlight keep the path compact.
+  - The capsule is a flexible toolbar item: at least `160` pt, growing to fill all space the other toolbar items leave, so long paths stay readable. One menu chevron per segment and a neutral current-folder highlight keep the path compact.
   - Segment spacing: `2` pt with `8pt` chevron indicators.
 - **Inspector Panel**:
   - Width: `280` pt.
