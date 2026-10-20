@@ -16,52 +16,42 @@ let configs: [ScreenshotConfig] = [
     ScreenshotConfig(
         filename: "01-tabs-and-split.png",
         headline: "Browse two folders side by side.<br>With infinite tabs.",
-        textColor: "#0A1938",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #E6F1FE 0%, #C8E0FB 38%, #93BFF6 72%, #5D9DEE 100%)",
-        glowTL: "rgba(134, 172, 211, 0.8)",
-        glowBR: "rgba(1, 16, 133, 0.45)",
-        shadowAmbient: "rgba(10, 50, 120, 0.38)",
+        textColor: "#0C4A6E",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #E0F2FE 0%, #BAE6FD 38%, #7DD3FC 72%, #38BDF8 100%)",
+        glowTL: "rgba(56, 189, 248, 0.8)",
+        glowBR: "rgba(2, 132, 199, 0.45)",
+        shadowAmbient: "rgba(3, 105, 161, 0.38)",
         sourceImage: "docs/screenshots/tabs-and-split.png"
     ),
     ScreenshotConfig(
         filename: "02-hover-preview.png",
         headline: "Preview documents, code, and media<br>without opening them.",
-        textColor: "#42141A",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #FFF0ED 0%, #FDD7D1 38%, #FCAFA5 72%, #F88A7D 100%)",
-        glowTL: "rgba(253, 197, 198, 0.85)",
-        glowBR: "rgba(245, 90, 85, 0.45)",
-        shadowAmbient: "rgba(140, 30, 40, 0.35)",
+        textColor: "#45131A",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #FFF1EE 0%, #FED7D0 38%, #FCAFA2 72%, #F88779 100%)",
+        glowTL: "rgba(251, 146, 60, 0.8)",
+        glowBR: "rgba(239, 68, 68, 0.45)",
+        shadowAmbient: "rgba(153, 27, 27, 0.35)",
         sourceImage: "docs/screenshots/hover-preview.png"
     ),
     ScreenshotConfig(
         filename: "03-subfolder-navigation.png",
         headline: "Fly through nested folders<br>at the speed of thought.",
-        textColor: "#082C24",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #E8FAF6 0%, #C7F4EC 38%, #8EE5D8 72%, #4CCFBD 100%)",
-        glowTL: "rgba(175, 245, 235, 0.85)",
-        glowBR: "rgba(30, 180, 160, 0.45)",
-        shadowAmbient: "rgba(15, 90, 80, 0.35)",
+        textColor: "#1E1B4B",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #EEF2FF 0%, #DBE4FE 38%, #B2C5FD 72%, #819EFA 100%)",
+        glowTL: "rgba(129, 140, 248, 0.8)",
+        glowBR: "rgba(59, 130, 246, 0.45)",
+        shadowAmbient: "rgba(30, 58, 138, 0.38)",
         sourceImage: "docs/screenshots/subfolder-menu.png"
     ),
     ScreenshotConfig(
         filename: "04-integrated-terminal.png",
         headline: "A built-in terminal synced right<br>to your active folder.",
-        textColor: "#1F1142",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #F3EDFF 0%, #DFD3FE 38%, #BFA7FD 72%, #9570F8 100%)",
-        glowTL: "rgba(220, 205, 255, 0.85)",
-        glowBR: "rgba(125, 75, 230, 0.45)",
-        shadowAmbient: "rgba(70, 30, 130, 0.38)",
+        textColor: "#064E3B",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #ECFDF5 0%, #D1FAE5 38%, #A7F3D0 72%, #6EE7B7 100%)",
+        glowTL: "rgba(52, 211, 153, 0.8)",
+        glowBR: "rgba(16, 185, 129, 0.45)",
+        shadowAmbient: "rgba(6, 78, 59, 0.35)",
         sourceImage: "docs/screenshots/terminal.png"
-    ),
-    ScreenshotConfig(
-        filename: "05-native-mac-craft.png",
-        headline: "Fast, lightweight, and completely<br>private on your Mac.",
-        textColor: "#0E1B32",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #F0F4FA 0%, #DCE5F3 38%, #BDCEE5 72%, #8FAACC 100%)",
-        glowTL: "rgba(210, 225, 245, 0.85)",
-        glowBR: "rgba(50, 90, 160, 0.45)",
-        shadowAmbient: "rgba(25, 55, 105, 0.35)",
-        sourceImage: "docs/screenshots/tabs-and-split.png"
     )
 ]
 
@@ -185,7 +175,7 @@ class RenderDelegate: NSObject, WKNavigationDelegate {
                 if currentIndex < configs.count {
                     renderNext()
                 } else {
-                    print("ALL SCREENSHOTS SUCCESSFULLY GENERATED!")
+                    print("ALL 4 SCREENSHOTS SUCCESSFULLY GENERATED!")
                     exit(0)
                 }
             }
