@@ -23,6 +23,8 @@ Download buttons point to `https://github.com/andronasef/shark/releases/latest`;
 ## Editing
 
 - `src/pages/index.astro`: sections, feature copy, FAQ, and project links.
+- `src/pages/features.astro`: complete feature page; its maintained catalog is `src/data/features.ts` (`featureGroups`). Add or revise entries in the same change as app features, as required by the root `AGENTS.md`.
+- `src/components/SiteHeader.astro` and `SiteFooter.astro`: shared navigation for both pages.
 - `src/components/DownloadLink.astro`: shared download destination.
 - `src/styles/global.css`: responsive layout, materials, motion and accessibility.
 - `src/assets/`: optimized screenshots of the real app.

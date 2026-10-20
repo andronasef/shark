@@ -1,8 +1,11 @@
 ---
 import '../styles/global.css';
 const base = import.meta.env.BASE_URL;
-const title = 'Shark — Your files. More possibilities.';
-const description = 'A free, native Mac file manager with tabs, split panes, a built-in terminal, and quick previews. Familiar on the outside. More capable within.';
+interface Props { title?: string; description?: string; }
+const {
+  title = 'Shark — Your files. More possibilities.',
+  description = 'A free, native Mac file manager with tabs, split panes, a built-in terminal, and quick previews. Familiar on the outside. More capable within.',
+} = Astro.props;
 ---
 <!doctype html>
 <html lang="en">

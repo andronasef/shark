@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-20T21:35:18.248109+00:00",
+  "generatedAt": "2026-10-20T21:46:34.092254+00:00",
   "title": "Design System: Shark website",
   "extensions": {
     "colorMeta": {
@@ -179,6 +179,22 @@
       "label": {
         "displayName": "Action label",
         "purpose": "Primary download action."
+      },
+      "catalog-display": {
+        "displayName": "Catalog hero",
+        "purpose": "Compact split-hero title; mobile scale documented in DESIGN.md."
+      },
+      "catalog-heading": {
+        "displayName": "Catalog category",
+        "purpose": "Category headings in the read-oriented feature catalog."
+      },
+      "catalog-entry-title": {
+        "displayName": "Catalog entry title",
+        "purpose": "Semibold feature names with optional shortcut keys."
+      },
+      "catalog-entry-body": {
+        "displayName": "Catalog entry description",
+        "purpose": "Readable feature descriptions under each title."
       }
     },
     "shadows": [
@@ -267,8 +283,8 @@
       "name": "Floating navigation",
       "kind": "nav",
       "description": "Floating navigation as implemented on the Shark website.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a class=\"ds-brand\" href=\"#home\">Shark</a><a href=\"#features\">Features</a><a href=\"#faq\">FAQ</a></nav>",
-      "css": ".ds-nav { background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.95);box-shadow:0 8px 30px #24384e0c,inset 0 1px 0 white,inset 0 -1px 0 #b8c7d52b;backdrop-filter:blur(22px) saturate(145%); display:flex;align-items:center;gap:28px;border-radius:24px;padding:10px 16px;font:500 13px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-nav a { color:#3e4c5b;text-decoration:none;padding-block:9px; } .ds-nav .ds-brand { font-size:20px;font-weight:650;letter-spacing:-.025em;margin-right:auto;color:var(--ink,#18232e); } .ds-nav a:hover { color:var(--accent,#0069d4); } .ds-nav a:focus-visible { outline:3px solid var(--accent,#0069d4);outline-offset:5px;border-radius:5px; } @media (prefers-reduced-motion:reduce) { .ds-primary,.ds-compact,.ds-link,.ds-nav a,.ds-faq summary span { transition:none; } } @media (prefers-reduced-transparency:reduce),(prefers-contrast:more) { .ds-nav { background:#fff;backdrop-filter:none;border-color:#a5b3c1; } } @supports not (backdrop-filter:blur(1px)) { .ds-nav { background:#fff; } }"
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a class=\"ds-brand\" href=\"#home\">Shark</a><a href=\"/features/\" aria-current=\"page\">Features</a><a href=\"#faq\">FAQ</a></nav>",
+      "css": ".ds-nav { background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.95);box-shadow:0 8px 30px #24384e0c,inset 0 1px 0 white,inset 0 -1px 0 #b8c7d52b;backdrop-filter:blur(22px) saturate(145%); display:flex;align-items:center;gap:28px;border-radius:24px;padding:10px 16px;font:500 13px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-nav a { color:#3e4c5b;text-decoration:none;padding-block:9px; } .ds-nav .ds-brand { font-size:20px;font-weight:650;letter-spacing:-.025em;margin-right:auto;color:var(--ink,#18232e); } .ds-nav a:hover { color:var(--accent,#0069d4); } .ds-nav a:focus-visible { outline:3px solid var(--accent,#0069d4);outline-offset:5px;border-radius:5px; } @media (prefers-reduced-motion:reduce) { .ds-primary,.ds-compact,.ds-link,.ds-nav a,.ds-faq summary span { transition:none; } } @media (prefers-reduced-transparency:reduce),(prefers-contrast:more) { .ds-nav { background:#fff;backdrop-filter:none;border-color:#a5b3c1; } } @supports not (backdrop-filter:blur(1px)) { .ds-nav { background:#fff; } } .ds-nav a[aria-current=\"page\"] { color:var(--accent,#0069d4); }"
     },
     {
       "name": "Keyboard hint",
@@ -283,6 +299,14 @@
       "description": "FAQ disclosure as implemented on the Shark website.",
       "html": "<details class=\"ds-faq\"><summary>Is Shark free?<span aria-hidden=\"true\">+</span></summary><p>Yes. Shark is free to download and use.</p></details>",
       "css": ".ds-faq { border-block:1px solid var(--line,#dde3e9);font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:var(--ink,#18232e); } .ds-faq summary { cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:18px;font-size:15px;font-weight:550;padding-block:22px; } .ds-faq summary::-webkit-details-marker { display:none; } .ds-faq summary span { font-size:24px;font-weight:300;line-height:1;color:var(--secondary,#586674);transition:transform .2s cubic-bezier(.16,1,.3,1); } .ds-faq[open] summary span { transform:rotate(45deg); } .ds-faq summary:focus-visible { outline:3px solid var(--accent,#0069d4);outline-offset:5px;border-radius:5px; } .ds-faq p { font-size:14px;line-height:1.8;color:var(--secondary,#586674);margin:0;padding:0 28px 24px 0; } @media (prefers-reduced-motion:reduce) { .ds-primary,.ds-compact,.ds-link,.ds-nav a,.ds-faq summary span { transition:none; } }"
+    },
+    {
+      "name": "Catalog entry",
+      "kind": "custom",
+      "refersTo": "catalog-entry",
+      "description": "An open feature definition with an optional keyboard shortcut, reused throughout the catalog.",
+      "html": "<dl class=\"ds-catalog\"><div class=\"ds-catalog-entry\"><dt>Split panes<kbd>F3</kbd></dt><dd>Work with two folders side by side.</dd></div></dl>",
+      "css": ".ds-catalog { margin:0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color:var(--ink,#18232e); } .ds-catalog-entry { border-top:1px solid var(--line,#dde3e9);padding-block:22px 26px; } .ds-catalog-entry dt { font-size:15px;font-weight:600;line-height:1.5;display:flex;align-items:baseline;flex-wrap:wrap;gap:8px; } .ds-catalog-entry dd { margin:10px 0 0;font-size:14px;color:var(--secondary,#586674);line-height:1.8; } .ds-catalog-entry kbd { display:inline-flex;align-items:center;justify-content:center;background:#fff9;border:1px solid #bdc7d17a;border-radius:5px;color:#4a5a69;padding:0 5px;font:400 11px/1.8 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;box-shadow:0 1px 0 #b1bdc85c;white-space:nowrap;flex-shrink:0; } @media (max-width:540px) { .ds-catalog-entry { padding-block:20px 24px; } } @media (forced-colors:active) { .ds-catalog-entry kbd { border-color:ButtonText; } }"
     }
   ],
   "narrative": {

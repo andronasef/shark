@@ -1,0 +1,63 @@
+@layer components {
+  .catalog-hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 56px; padding-block: 88px 80px; }
+  .catalog-hero h1 { font-size: clamp(44px, 4.6vw, 64px); line-height: 1.06; }
+  .catalog-hero h1 span { color: #516f88; }
+  .catalog-hero-copy > p { margin-top: 24px; color: var(--secondary); font-size: 16px; line-height: 1.8; }
+  .catalog-hero-copy > a { margin-top: 24px; }
+  .catalog-preview { margin: 0; padding: 32px 24px 18px; border-radius: 16px; }
+  .catalog-preview img { width: 100%; border-radius: 7px; box-shadow: 0 16px 28px -12px #1d314f59; }
+  .catalog-preview figcaption { margin-top: 19px; color: #3d5d7a; text-align: center; font-size: 12px; }
+  .catalog-layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); gap: 70px; align-items: start; padding-bottom: 80px; }
+  .catalog-index { position: sticky; top: 120px; }
+  .catalog-index nav > p { font-size: 15px; font-weight: 600; margin-bottom: 17px; }
+  .catalog-index ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+  .catalog-index a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; font-size: 13px; color: var(--secondary); }
+  .catalog-index a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .catalog-index a svg { flex-shrink: 0; }
+  .catalog-note { font-size: 12px; line-height: 1.8; color: var(--secondary); margin-top: 29px; padding-top: 23px; border-top: 1px solid var(--line); }
+  .catalog-section + .catalog-section { margin-top: 70px; }
+  .catalog-section > header { margin-bottom: 29px; }
+  .catalog-section h2 { font-size: clamp(28px, 3vw, 38px); }
+  .catalog-section > header p { color: var(--secondary); font-size: 15px; margin-top: 12px; }
+  .catalog-entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 35px; }
+  .catalog-entry { border-top: 1px solid var(--line); padding-block: 22px 26px; }
+  .catalog-entry dt { font-size: 15px; font-weight: 600; line-height: 1.5; display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+  .catalog-entry kbd { font-weight: 400; flex-shrink: 0; }
+  .catalog-entry dd { margin-top: 10px; font-size: 14px; color: var(--secondary); line-height: 1.8; }
+  .catalog-feedback { border-top: 1px solid var(--line); margin-top: 35px; padding-top: 28px; font-size: 14px; color: var(--secondary); }
+  .catalog-feedback a { display: inline-flex; align-items: center; gap: 7px; color: var(--accent); text-underline-offset: 4px; }
+  .catalog-feedback a:hover { text-decoration: underline; }
+  .catalog-close { display: flex; align-items: center; justify-content: space-between; gap: 35px; padding: 44px 0 70px; }
+  .catalog-close h2 { font-size: clamp(30px, 3vw, 38px); }
+  .catalog-close p { font-size: 15px; margin-top: 13px; color: var(--secondary); }
+}
+
+@layer responsive {
+  @media (max-width: 1000px) { .catalog-hero { gap: 30px; } .catalog-layout { grid-template-columns: 200px minmax(0, 1fr); gap: 40px; } .catalog-entries { column-gap: 25px; } }
+  @media (max-width: 800px) {
+    .catalog-hero { grid-template-columns: 1fr; gap: 34px; padding-block: 58px 55px; }
+    .catalog-hero-copy { max-width: 60ch; }
+    .catalog-preview { padding: 28px 24px 18px; }
+    .catalog-layout { grid-template-columns: 1fr; gap: 48px; }
+    .catalog-index { position: static; }
+    .catalog-index ul { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+    .catalog-index a { border-bottom: 1px solid var(--line); padding-block: 12px; }
+    .catalog-note { border: 0; padding: 0; margin-top: 17px; }
+    .catalog-note br { display: none; }
+    .catalog-section + .catalog-section { margin-top: 50px; }
+    .catalog-close { padding-block: 10px 65px; }
+  }
+  @media (max-width: 540px) {
+    .catalog-hero h1 { font-size: clamp(40px, 9.5vw, 52px); }
+    .catalog-hero-copy > p { font-size: 15px; }
+    .catalog-preview { padding: 23px 15px 16px; border-radius: 12px; }
+    .catalog-index a { font-size: 12px; gap: 6px; }
+    .catalog-index a svg { width: 12px; }
+    .catalog-entries { grid-template-columns: 1fr; }
+    .catalog-entry { padding-block: 20px 24px; }
+    .catalog-section > header { margin-bottom: 24px; }
+    .catalog-layout { padding-bottom: 55px; }
+    .catalog-feedback a { margin-top: 6px; }
+    .catalog-close { align-items: flex-start; flex-direction: column; gap: 23px; }
+  }
+}

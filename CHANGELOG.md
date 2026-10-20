@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Folders blocked by macOS privacy protection (e.g. Trash) now explain why and offer a button that opens Full Disk Access settings, instead of only "Try Again".
 
 ### Added
+- A complete website Features page with a categorized app capability catalog, shared site navigation, and an `AGENTS.md` rule requiring feature changes to update the catalog in the same change.
 - An Astro landing page in `website/` with real product screenshots, restrained glass navigation, responsive feature stories, installation FAQs, and free macOS download links.
 - A getting-started README with screenshots of tabs and split panes, the terminal drawer, hover previews, and cascading subfolder menus.
 - Release preparation: universal app packaging, a tag-triggered Developer ID signing and notarization workflow with checksums, and publishing guidance covering GitHub setup and Mac App Store sandbox prerequisites.

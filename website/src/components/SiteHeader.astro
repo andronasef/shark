@@ -1,0 +1,18 @@
+---
+import DownloadLink from './DownloadLink.astro';
+interface Props { currentPage?: 'home' | 'features'; }
+const { currentPage = 'home' } = Astro.props;
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const icon = `${home}icon.png`;
+---
+<header class="site-header">
+  <nav class="nav glass" aria-label="Main navigation">
+    <a class="brand" href={home} aria-label="Shark home"><img src={icon} width="36" height="36" alt="" /><span>Shark</span></a>
+    <div class="nav-links">
+      <a href={`${home}features/`} aria-current={currentPage === 'features' ? 'page' : undefined}>Features</a>
+      <a href={`${home}#faq`}>FAQ</a>
+      <a href="https://github.com/andronasef/shark">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+    <DownloadLink compact />
+  </nav>
+</header>

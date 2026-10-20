@@ -1,0 +1,59 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import DownloadLink from '../components/DownloadLink.astro';
+import Icon from '../components/Icon.astro';
+import { featureGroups } from '../data/features';
+import split from '../assets/tabs-and-split.webp';
+import '../styles/features.css';
+---
+<Layout title="All features — Shark for macOS" description="Explore Shark’s complete feature set: folder tabs, split panes, four views, previews, file operations, an embedded terminal, mouse shortcuts, and Mac preferences.">
+  <SiteHeader currentPage="features" />
+  <main id="main">
+    <section class="catalog-hero container" aria-labelledby="catalog-title">
+      <div class="catalog-hero-copy">
+        <h1 id="catalog-title">A familiar Mac.<br /><span>A fuller toolbox.</span></h1>
+        <p>From the first folder you open to the last file you move.<br class="desktop-break" /> Explore everything Shark brings to your everyday work.</p>
+        <a class="text-link" href="#workspace">Browse all features <Icon name="arrow" size={17} /></a>
+      </div>
+      <figure class="catalog-preview blue">
+        <Image src={split} alt="Shark’s native Mac interface with folder tabs and two panes open side by side" widths={[640, 1000, 1440]} sizes="(max-width: 800px) 90vw, 50vw" loading="eager" />
+        <figcaption>Your folders, with a little more freedom.</figcaption>
+      </figure>
+    </section>
+
+    <div class="catalog-layout container">
+      <aside class="catalog-index">
+        <nav aria-label="Feature categories">
+          <p>Find your tools</p>
+          <ul>{featureGroups.map(group => <li><a href={`#${group.id}`}>{group.title}<Icon name="arrow" size={14} /></a></li>)}</ul>
+        </nav>
+        <p class="catalog-note">Current app capabilities.<br />Free on macOS 14 or later.</p>
+      </aside>
+      <div class="catalog-sections">
+        {featureGroups.map(group => (
+          <section id={group.id} class="catalog-section" aria-labelledby={`${group.id}-title`}>
+            <header><h2 id={`${group.id}-title`}>{group.title}</h2><p>{group.description}</p></header>
+            <dl class="catalog-entries">
+              {group.features.map(feature => (
+                <div id={feature.id} class="catalog-entry">
+                  <dt>{feature.title}{feature.shortcut && <kbd>{feature.shortcut}</kbd>}</dt>
+                  <dd>{feature.description}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+        <p class="catalog-feedback">Something you’d like to see next? <a href="https://github.com/andronasef/shark/issues">Share a feature idea <Icon name="arrow" size={16} /></a></p>
+      </div>
+    </div>
+
+    <section class="catalog-close container" aria-labelledby="catalog-close-title">
+      <div><h2 id="catalog-close-title">Put your tools to work.</h2><p>A free, native file manager for your Mac.</p></div>
+      <DownloadLink />
+    </section>
+  </main>
+  <SiteFooter />
+</Layout>

@@ -41,6 +41,27 @@ typography:
     fontSize: "15px"
     fontWeight: 600
     lineHeight: 1.4
+  catalog-display:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "clamp(44px, 4.6vw, 64px)"
+    fontWeight: 600
+    lineHeight: 1.06
+    letterSpacing: "-0.035em"
+  catalog-heading:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "clamp(28px, 3vw, 38px)"
+    fontWeight: 600
+    lineHeight: 1.08
+    letterSpacing: "-0.035em"
+  catalog-entry-title:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "15px"
+    fontWeight: 600
+    lineHeight: 1.5
+  catalog-entry-body:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontSize: "14px"
+    lineHeight: 1.8
 rounded:
   key: "5px"
   screenshot: "7px"
@@ -74,6 +95,9 @@ components:
   feature-panel:
     rounded: "{rounded.panel}"
     padding: "43px 27px"
+  catalog-entry:
+    textColor: "{colors.ink}"
+    padding: "22px 0 26px"
 ---
 
 # Design System: Shark website
@@ -123,6 +147,8 @@ The blue, mint, peach, and lavender grounds distinguish feature imagery and its 
 - **Body:** supporting copy ranges from 14px to 18px with line-height between 1.6 and 1.8. Feature descriptions measure up to 42ch on desktop and 60ch in the stacked layout.
 - **Label:** primary actions use the label role; compact actions use 13px type. Keyboard hints use 11px system text.
 
+**Catalog hierarchy:** the catalog-display role uses a more compact hero, changing to `clamp(40px, 9.5vw, 52px)` at 540px and below. Catalog category headings use catalog-heading. Entry titles and descriptions use catalog-entry-title and catalog-entry-body; shortcut keys keep their existing small system type.
+
 Headings balance their lines; prose uses pretty wrapping. Heading tracking stays at or above −0.04em.
 
 ## Layout
@@ -132,6 +158,8 @@ Content has a maximum width of 1180px, with desktop gutters from the spacing sca
 The header sticks 20px from the top, reducing to 12px on mobile; anchor targets clear it through scroll padding. Feature stories alternate copy and imagery in a two-column grid, with 64px gaps on desktop. At 800px and below, feature stories, the everyday-tools section, and FAQ become single-column; screenshots follow their copy. At 540px and below, hero actions stack, the GitHub header item is hidden while footer links remain, and the dock omits shortcut labels.
 
 Section spacing gives screenshots room: feature stories are separated by 94px on desktop and 70px in the stacked layout. Images keep their full aspect ratios.
+
+The complete Features page uses a split introductory hero, followed by a 235px category index and a flexible catalog column with a 70px gap. The index sticks below the site header at 120px; below 800px it becomes an in-flow two-column list. Catalog entries form two open columns with hairline separators, collapsing to one at 540px. At 1000px and below, the index narrows to 200px and the column gap reduces to 40px. Category headings and the hero retain the established system font and palette with the compact catalog scales recorded above. Footer links wrap as needed on both pages.
 
 ## Elevation & Depth
 
@@ -156,6 +184,12 @@ Download links lead to GitHub’s latest release page. Avoid an unverified versi
 ### Navigation and feature dock
 
 The sticky navigation combines the supplied app icon, wordmark, plain links, and a compact download action. The glass dock contains feature anchors, inline SVG symbols, and shortcut hints where space permits. Its hover state adds a subtle blue fill.
+
+`SiteHeader` and `SiteFooter` are shared across routes. The Features link opens the complete catalog and marks the current page with `aria-current="page"`; FAQ returns to the home-page section. Both routes honor the configured deployment base path. The catalog uses semantic section headings and definition lists, with stable category and feature anchors. Keep content in `src/data/features.ts` current alongside app implementation, as required by the root `AGENTS.md`.
+
+### Catalog entries
+
+Open definition-list entries use a fine top separator and the catalog-entry padding, reducing to 20px above and 24px below on mobile. Titles wrap alongside optional shortcut keys; descriptions sit 10px below. The two-column grid uses a 35px gap, reducing to 25px at 1000px and below. Category index links use secondary text, turning blue and underlined on hover; the current Features route uses the same blue in shared navigation.
 
 ### Feature panels and imagery
 
