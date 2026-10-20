@@ -74,6 +74,9 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
             )
             menuItem.target = self
             menuItem.representedObject = itemURL
+            menuItem.toolTip = isDir
+                ? "Click to open · ⌘-click opens in a new tab · ⌥-click copies"
+                : "Click to open · ⌥-click copies"
 
             // Icon
             let icon = NSWorkspace.shared.icon(forFile: itemURL.path)
@@ -100,11 +103,20 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
 
     @objc private func menuItemClicked(_ sender: NSMenuItem) {
         guard let url = sender.representedObject as? URL else { return }
-        let isCmdPressed = NSEvent.modifierFlags.contains(.command)
+        activate(url, modifiers: NSEvent.modifierFlags)
+    }
+
+    /// ⌥ copies the item to the file clipboard (⌘V in any pane pastes it), ⌘ opens a folder in a
+    /// new tab, and a plain click opens it.
+    func activate(_ url: URL, modifiers: NSEvent.ModifierFlags) {
+        if modifiers.contains(.option) {
+            FileClipboardService.shared.copy([url])
+            return
+        }
 
         var isDir: ObjCBool = false
         if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue {
-            navigationHandler(url, isCmdPressed)
+            navigationHandler(url, modifiers.contains(.command))
         } else {
             // It's a file: open with default app
             NSWorkspace.shared.open(url)

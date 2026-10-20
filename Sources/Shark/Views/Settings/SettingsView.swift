@@ -91,6 +91,13 @@ public struct SettingsView: View {
                     }
                 }
             }
+
+            Section("Subfolder Tip") {
+                Toggle("Show a drop-down arrow beside hovered folders", isOn: $settings.subfolderTipEnabled)
+                Text("Click the arrow to browse everything inside a folder, to any depth, without leaving the current folder. Click an item to open it, ⌘-click to open a folder in a new tab, or ⌥-click to copy it.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .formStyle(.grouped)
     }

@@ -31,35 +31,34 @@ public struct DetailsTableView: View {
             )
         ) {
             TableColumn("Name", value: \.name) { item in
-                HStack(spacing: 8) {
-                    FileItemIconView(item: item, size: 18)
-                        .frame(width: 18, height: 18)
+                HoverReveal { hovering in
+                    HStack(spacing: 8) {
+                        FileItemIconView(item: item, size: 18)
+                            .frame(width: 18, height: 18)
 
-                    if navigationState.renamingItemURL == item.url {
-                        InlineRenameField(
-                            initialName: item.name,
-                            onCommit: { newName in
-                                Task { await navigationState.commitRename(url: item.url, newName: newName) }
-                            },
-                            onCancel: {
-                                navigationState.cancelRenaming()
-                            }
-                        )
-                        .frame(height: 20)
-                    } else {
-                        Text(item.name)
-                            .lineLimit(1)
-                    }
+                        if navigationState.renamingItemURL == item.url {
+                            InlineRenameField(
+                                initialName: item.name,
+                                onCommit: { newName in
+                                    Task { await navigationState.commitRename(url: item.url, newName: newName) }
+                                },
+                                onCancel: {
+                                    navigationState.cancelRenaming()
+                                }
+                            )
+                            .frame(height: 20)
+                        } else {
+                            Text(item.name)
+                                .lineLimit(1)
+                        }
 
-                    if item.isNavigableDirectory {
-                        CascadingFolderChevronButton(url: item.url) { targetURL, inNewTab in
+                        SubfolderTip(item: item, isHovering: hovering) { targetURL, inNewTab in
                             if inNewTab, let workspace {
                                 workspace.open(targetURL, from: navigationState, newTab: true)
                             } else {
                                 navigationState.navigateTo(targetURL)
                             }
                         }
-                        .frame(width: 10, height: 14)
                     }
                 }
                 .opacity(navigationState.isCut(item) ? 0.45 : 1.0)

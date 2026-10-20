@@ -121,6 +121,7 @@ Shark uses the macOS San Francisco system font family with tabular figures where
 - **Subfolder Menus (QT-01 & QT-02)**:
   - Breadcrumb segment chevrons reveal cascading popover menus.
   - Subfolders open child menus on hover to arbitrary directory depths.
+  - Subfolder tip: a `16` pt circular drop-down arrow appears beside a hovered folder's name (list and icon views) and opens the cascading menu; ⌘-click opens in a new tab, ⌥-click copies. Toggle in Settings › Previews.
   - Hover previews (QT-03): a non-activating floating panel beside the pointer (never steals focus) after a configurable delay, optionally only while holding Shift. Shows full-resolution and animated images, up to 40 lines of text (UTF-8/UTF-16/Latin-1, binary rejected), document thumbnails, and inline video/audio players with a seek bar. The pointer can move into the panel to use the controls.
 
 ---

@@ -86,7 +86,14 @@ public struct IconsGridView: View {
                                 item: item,
                                 iconSize: currentIconSize,
                                 isSelected: isSelected,
-                                navigationState: navigationState
+                                navigationState: navigationState,
+                                onSubfolderNavigate: { targetURL, inNewTab in
+                                    if inNewTab, let workspace {
+                                        workspace.open(targetURL, from: navigationState, newTab: true)
+                                    } else {
+                                        navigationState.navigateTo(targetURL)
+                                    }
+                                }
                             )
                             .background(
                                 GeometryReader { itemGeo in
@@ -245,8 +252,10 @@ private struct IconGridItemView: View {
     let iconSize: CGFloat
     let isSelected: Bool
     @Bindable var navigationState: NavigationState
+    let onSubfolderNavigate: (URL, Bool) -> Void
 
     @State private var thumbnail: NSImage? = nil
+    @State private var isHovering = false
 
     var body: some View {
         VStack(spacing: 6) {
@@ -288,8 +297,12 @@ private struct IconGridItemView: View {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(isSelected ? Color.accentColor : Color.clear)
                     )
+                    .overlay(alignment: .trailing) {
+                        SubfolderTip(item: item, isHovering: isHovering, onNavigate: onSubfolderNavigate)
+                    }
             }
         }
+        .onHover { isHovering = $0 }
         .frame(width: max(iconSize + 28, 104))
         .task {
             if !item.isDirectory {
