@@ -27,10 +27,17 @@ public struct ContentView: View {
     /// Toolbar items never stretch on their own, so the Location capsule is sized from the detail
     /// width minus what the other items use (Navigation plus Path through Search, with gaps).
     /// ponytail: measured by eye; if toolbar items are added or removed, retune this constant.
-    private static let otherToolbarItemsWidth: CGFloat = 762
+    private static let otherToolbarItemsWidth: CGFloat = 930
+
+    /// With the sidebar hidden the detail column spans the whole window, so the traffic lights and
+    /// sidebar button also sit in the toolbar row. Without this the capsule is too wide and macOS
+    /// moves Back/Forward/Up into the overflow menu.
+    /// ponytail: measured by eye, like otherToolbarItemsWidth.
+    private static let collapsedSidebarInset: CGFloat = 144
 
     private var locationWidth: CGFloat {
-        max(160, detailWidth - Self.otherToolbarItemsWidth)
+        let inset = columnVisibility == .detailOnly ? Self.collapsedSidebarInset : 0
+        return max(160, detailWidth - Self.otherToolbarItemsWidth - inset)
     }
 
     @ToolbarContentBuilder
