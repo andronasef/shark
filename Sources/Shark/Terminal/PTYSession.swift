@@ -35,9 +35,14 @@ public final class PTYSession {
     public func syncDirectory(to directory: URL) {
         currentWorkingDirectory = directory
         if let terminalView {
-            let escapedPath = directory.path.replacingOccurrences(of: "\"", with: "\\\"")
-            terminalView.process.send(data: ArraySlice("\ncd \"\(escapedPath)\"\n".utf8))
+            let command = "\u{15}" + Self.directoryChangeCommand(to: directory)
+            terminalView.process.send(data: ArraySlice(command.utf8))
         }
+    }
+
+    static func directoryChangeCommand(to directory: URL) -> String {
+        let quoted = "'" + directory.path.replacingOccurrences(of: "'", with: "'\\''") + "'"
+        return "cd -- " + quoted + "\n"
     }
 
     public func clear() {

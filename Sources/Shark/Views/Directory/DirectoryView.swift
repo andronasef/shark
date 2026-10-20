@@ -571,10 +571,7 @@ public struct DirectoryView: View {
             }
         }
 
-        Button("Open in Terminal") {
-            let targetURL = isMultiple ? navigationState.currentURL : item.url
-            NSWorkspace.shared.open(targetURL)
-        }
+        TerminalMenuItems(url: isMultiple ? navigationState.currentURL : item.url, workspace: workspace, source: navigationState)
 
         Button("Quick Look") {
             let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
@@ -754,9 +751,7 @@ public struct DirectoryView: View {
 
         Divider()
 
-        Button("Open in Terminal") {
-            NSWorkspace.shared.open(navigationState.currentURL)
-        }
+        TerminalMenuItems(url: navigationState.currentURL, workspace: workspace, source: navigationState)
 
         Button("Reload") {
             Task {

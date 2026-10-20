@@ -1,4 +1,5 @@
 import XCTest
+import Observation
 @testable import Shark
 
 @MainActor
@@ -12,6 +13,20 @@ final class TerminalTests: XCTestCase {
 
     override func tearDown() async throws {
         session.terminate()
+    }
+
+    func testTerminalVisibilityNotifiesViewsOnOpenAndClose() {
+        let workspace = WorkspaceState()
+        for visible in [true, false] {
+            let changed = expectation(description: "Terminal visibility changes to \(visible)")
+            withObservationTracking {
+                _ = workspace.isTerminalVisible
+            } onChange: {
+                changed.fulfill()
+            }
+            workspace.isTerminalVisible = visible
+            wait(for: [changed], timeout: 0.2)
+        }
     }
 
     func testPTYSessionInit() {

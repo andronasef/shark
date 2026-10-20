@@ -6,14 +6,31 @@ public enum TabPlacement: Sendable {
     case afterActive
 }
 
+public struct EmbeddedTerminalRequest: Identifiable, Equatable {
+    public let id = UUID()
+    public let directory: URL
+}
+
 @Observable
 @MainActor
 public final class WorkspaceState {
     public var tabs: [WorkspaceTab] = []
     public var activeTabID: UUID
     public var closedTabs: [ClosedTab] = []
-    @ObservationIgnored public var isTerminalVisible: Bool = false
+    public var isTerminalVisible: Bool = false
+    public var sidebarHasKeyboardFocus: Bool = false
+    public var embeddedTerminalRequest: EmbeddedTerminalRequest?
     public var isCommandPalettePresented: Bool = false
+
+    public func openEmbeddedTerminal(at url: URL, from source: NavigationState) throws {
+        let directory = try TerminalOpener.directory(for: url)
+        if let owner = tabs.first(where: { $0.primaryPane === source || $0.secondaryPane === source }) {
+            activeTabID = owner.id
+            owner.activePane = owner.primaryPane === source ? .primary : .secondary
+        }
+        embeddedTerminalRequest = EmbeddedTerminalRequest(directory: directory)
+        isTerminalVisible = true
+    }
 
     public init(initialURL: URL? = nil) {
         let firstTab = WorkspaceTab(initialURL: initialURL)
