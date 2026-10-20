@@ -59,6 +59,12 @@ public final class NavigationState {
     public var sortField: SortField = .name
     public var sortAscending: Bool = true
 
+    // Explorer Ergonomics additions
+    public var renamingItemURL: URL? = nil
+    public var isBottomPathBarVisible: Bool = true
+    public var activeOperationProgress: Double? = nil
+    public var activeOperationTitle: String? = nil
+
     private let fileSystemService: FileSystemService
 
     public init(
@@ -83,6 +89,14 @@ public final class NavigationState {
         currentURL.path != "/" && currentURL.deletingLastPathComponent().path != currentURL.path
     }
 
+    public var selectedItems: [FileItem] {
+        items.filter { selectedItemIDs.contains($0.url) }
+    }
+
+    public var selectedTotalSize: Int64 {
+        selectedItems.reduce(0) { $0 + $1.fileSize }
+    }
+
     public func navigateTo(_ url: URL) {
         let standardized = url.standardizedFileURL
         guard standardized != currentURL else { return }
@@ -92,6 +106,7 @@ public final class NavigationState {
         currentURL = standardized
         pathInputText = standardized.path
         selectedItemIDs.removeAll()
+        renamingItemURL = nil
 
         Task {
             await reloadCurrentDirectory()
@@ -104,6 +119,7 @@ public final class NavigationState {
         currentURL = previous
         pathInputText = previous.path
         selectedItemIDs.removeAll()
+        renamingItemURL = nil
 
         Task {
             await reloadCurrentDirectory()
@@ -116,6 +132,7 @@ public final class NavigationState {
         currentURL = next
         pathInputText = next.path
         selectedItemIDs.removeAll()
+        renamingItemURL = nil
 
         Task {
             await reloadCurrentDirectory()
@@ -190,5 +207,126 @@ public final class NavigationState {
         }
 
         return result
+    }
+
+    // MARK: - Explorer Operations
+
+    public func isCut(_ item: FileItem) -> Bool {
+        FileClipboardService.shared.isCut(item.url)
+    }
+
+    public func cutSelected() {
+        let urls = selectedItems.map(\.url)
+        guard !urls.isEmpty else { return }
+        FileClipboardService.shared.cut(urls)
+    }
+
+    public func copySelected() {
+        let urls = selectedItems.map(\.url)
+        guard !urls.isEmpty else { return }
+        FileClipboardService.shared.copy(urls)
+    }
+
+    public func paste() async {
+        guard let (urls, mode) = FileClipboardService.shared.getPasteableURLs(), !urls.isEmpty else { return }
+        let targetDir = currentURL
+
+        do {
+            if mode == .cut {
+                var pairs: [(source: URL, destination: URL)] = []
+                for url in urls {
+                    let dest = targetDir.appendingPathComponent(url.lastPathComponent)
+                    if FileManager.default.fileExists(atPath: dest.path) {
+                        try? FileManager.default.removeItem(at: dest)
+                    }
+                    try FileManager.default.moveItem(at: url, to: dest)
+                    pairs.append((source: url, destination: dest))
+                }
+                FileUndoService.shared.record(.move(pairs: pairs))
+                FileClipboardService.shared.clear()
+            } else {
+                try await FileOperationsService.shared.copy(items: urls, to: targetDir)
+                let created = urls.map { targetDir.appendingPathComponent($0.lastPathComponent) }
+                FileUndoService.shared.record(.copy(createdURLs: created, originalSources: urls, destinationDir: targetDir))
+            }
+            await reloadCurrentDirectory()
+        } catch {
+            self.errorMessage = "Paste failed: \(error.localizedDescription)"
+        }
+    }
+
+    public func undo() async {
+        guard FileUndoService.shared.canUndo else { return }
+        do {
+            try await FileUndoService.shared.undo()
+            await reloadCurrentDirectory()
+        } catch {
+            self.errorMessage = "Undo failed: \(error.localizedDescription)"
+        }
+    }
+
+    public func redo() async {
+        guard FileUndoService.shared.canRedo else { return }
+        do {
+            try await FileUndoService.shared.redo()
+            await reloadCurrentDirectory()
+        } catch {
+            self.errorMessage = "Redo failed: \(error.localizedDescription)"
+        }
+    }
+
+    public func startRenaming(url: URL) {
+        renamingItemURL = url
+    }
+
+    public func commitRename(url: URL, newName: String) async {
+        guard !newName.isEmpty && newName != url.lastPathComponent else {
+            renamingItemURL = nil
+            return
+        }
+        do {
+            let newURL = try await FileOperationsService.shared.rename(item: url, to: newName)
+            FileUndoService.shared.record(.rename(original: url, current: newURL))
+            renamingItemURL = nil
+            await reloadCurrentDirectory()
+            selectedItemIDs = [newURL]
+        } catch {
+            self.errorMessage = "Rename failed: \(error.localizedDescription)"
+            renamingItemURL = nil
+        }
+    }
+
+    public func cancelRenaming() {
+        renamingItemURL = nil
+    }
+
+    public func compressSelected() async {
+        let urls = selectedItems.map(\.url)
+        guard !urls.isEmpty else { return }
+        activeOperationTitle = "Compressing..."
+        activeOperationProgress = 0.5
+        do {
+            let archiveURL = try await FileOperationsService.shared.compress(items: urls)
+            activeOperationTitle = nil
+            activeOperationProgress = nil
+            await reloadCurrentDirectory()
+            selectedItemIDs = [archiveURL]
+        } catch {
+            activeOperationTitle = nil
+            activeOperationProgress = nil
+            self.errorMessage = "Compress failed: \(error.localizedDescription)"
+        }
+    }
+
+    public func trashSelected() async {
+        let urls = selectedItems.map(\.url)
+        guard !urls.isEmpty else { return }
+        do {
+            try await FileOperationsService.shared.trash(items: urls)
+            await reloadCurrentDirectory()
+            selectedItemIDs.removeAll()
+        } catch {
+            self.errorMessage = "Trash failed: \(error.localizedDescription)"
+        }
     }
 }

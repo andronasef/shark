@@ -3,28 +3,30 @@ import AppKit
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let session = SessionStore()
-    lazy var workspace = session.restore() ?? WorkspaceState()
+    let workspace: WorkspaceState
+    private var sessionStore: SessionStore?
 
-    func applicationWillFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.regular)
-        NSWindow.allowsAutomaticWindowTabbing = false
+    override init() {
+        let store = SessionStore()
+        if let restored = store.restore() {
+            self.workspace = restored
+        } else {
+            self.workspace = WorkspaceState()
+        }
+        self.sessionStore = store
+        super.init()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.activate(ignoringOtherApps: true)
+        // Start debounced autosave
+        sessionStore?.startAutosave(workspace)
+        // Install global NSEvent monitor for middle-click tab operations
         MiddleClick.install()
-        session.startAutosave(workspace)
-
-        DispatchQueue.main.async {
-            for window in NSApp.windows {
-                window.makeKeyAndOrderFront(nil)
-            }
-        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        session.saveNow(workspace)
+        // Flush final snapshot immediately
+        sessionStore?.saveNow(workspace)
     }
 }
 
@@ -42,6 +44,81 @@ struct SharkApp: App {
         .commands {
             SidebarCommands()
             TabCommands(workspace: appDelegate.workspace)
+            ExplorerCommands(workspace: appDelegate.workspace)
+        }
+    }
+}
+
+struct ExplorerCommands: Commands {
+    let workspace: WorkspaceState
+
+    private var nav: NavigationState {
+        workspace.activeNavigationState
+    }
+
+    var body: some Commands {
+        CommandGroup(replacing: .undoRedo) {
+            Button("Undo \(FileUndoService.shared.currentUndoDescription ?? "")") {
+                Task { await nav.undo() }
+            }
+            .keyboardShortcut("z", modifiers: .command)
+            .disabled(!FileUndoService.shared.canUndo)
+
+            Button("Redo \(FileUndoService.shared.currentRedoDescription ?? "")") {
+                Task { await nav.redo() }
+            }
+            .keyboardShortcut("z", modifiers: [.command, .shift])
+            .disabled(!FileUndoService.shared.canRedo)
+        }
+
+        CommandGroup(replacing: .pasteboard) {
+            Button("Cut") {
+                nav.cutSelected()
+            }
+            .keyboardShortcut("x", modifiers: .command)
+            .disabled(nav.selectedItemIDs.isEmpty)
+
+            Button("Copy") {
+                nav.copySelected()
+            }
+            .keyboardShortcut("c", modifiers: .command)
+            .disabled(nav.selectedItemIDs.isEmpty)
+
+            Button("Paste") {
+                Task { await nav.paste() }
+            }
+            .keyboardShortcut("v", modifiers: .command)
+            .disabled(!FileClipboardService.shared.hasItemsToPaste)
+
+            Button("Select All") {
+                nav.selectedItemIDs = Set(nav.items.map(\.url))
+            }
+            .keyboardShortcut("a", modifiers: .command)
+        }
+
+        CommandMenu("Go") {
+            Button("Go to Folder...") {
+                nav.isEditingPath = true
+            }
+            .keyboardShortcut("g", modifiers: [.command, .shift])
+
+            Button("Focus Address Bar") {
+                nav.isEditingPath = true
+            }
+            .keyboardShortcut("l", modifiers: .command)
+
+            Button("Enclosing Folder") {
+                nav.goUp()
+            }
+            .keyboardShortcut(.upArrow, modifiers: .command)
+            .disabled(!nav.canGoUp)
+        }
+
+        CommandGroup(after: .sidebar) {
+            Button(nav.isBottomPathBarVisible ? "Hide Path Bar" : "Show Path Bar") {
+                nav.isBottomPathBarVisible.toggle()
+            }
+            .keyboardShortcut("p", modifiers: [.command, .option])
         }
     }
 }

@@ -1,9 +1,7 @@
 import SwiftUI
 import AppKit
-import Inject
 
 public struct IconsGridView: View {
-    @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let onActivate: (FileItem) -> Void
@@ -30,10 +28,12 @@ public struct IconsGridView: View {
                     IconGridItemView(
                         item: item,
                         iconSize: 76,
-                        isSelected: isSelected
+                        isSelected: isSelected,
+                        navigationState: navigationState
                     )
                     .contentShape(Rectangle())
                     .draggable(item.url)
+                    .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                     .onTapGesture {
                         navigationState.selectedItemIDs = [item.id]
                     }
@@ -55,6 +55,7 @@ public struct IconsGridView: View {
         .onTapGesture {
             // Clicking empty canvas clears selection
             navigationState.selectedItemIDs.removeAll()
+            navigationState.cancelRenaming()
         }
         .enableInjection()
     }
@@ -64,6 +65,7 @@ private struct IconGridItemView: View {
     let item: FileItem
     let iconSize: CGFloat
     let isSelected: Bool
+    @Bindable var navigationState: NavigationState
 
     @State private var thumbnail: NSImage? = nil
 
@@ -86,17 +88,30 @@ private struct IconGridItemView: View {
             }
             .frame(width: iconSize, height: iconSize)
 
-            Text(item.name)
-                .font(.system(size: 11))
-                .foregroundColor(isSelected ? .white : .primary)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 4)
-                .padding(.vertical, 2)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(isSelected ? Color.accentColor : Color.clear)
+            if navigationState.renamingItemURL == item.url {
+                InlineRenameField(
+                    initialName: item.name,
+                    onCommit: { newName in
+                        Task { await navigationState.commitRename(url: item.url, newName: newName) }
+                    },
+                    onCancel: {
+                        navigationState.cancelRenaming()
+                    }
                 )
+                .frame(width: 90, height: 20)
+            } else {
+                Text(item.name)
+                    .font(.system(size: 11))
+                    .foregroundColor(isSelected ? .white : .primary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(isSelected ? Color.accentColor : Color.clear)
+                    )
+            }
         }
         .frame(width: max(iconSize + 16, 96))
         .task {

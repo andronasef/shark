@@ -1,6 +1,12 @@
 import Foundation
 
 public struct RenameRule: Sendable, Equatable {
+    public enum PatternType: Sendable {
+        case replace
+        case addPrefixSuffix
+        case formatWithIndex
+    }
+
     public var findText: String
     public var replaceText: String
     public var prefix: String
@@ -95,6 +101,13 @@ public actor FileOperationsService {
         return destination
     }
 
+    public func move(items: [URL], to destinationDir: URL) throws {
+        for item in items {
+            let destination = destinationDir.appendingPathComponent(item.lastPathComponent)
+            try fileManager.moveItem(at: item, to: destination)
+        }
+    }
+
     public func copy(items: [URL], to destinationDir: URL) throws {
         for item in items {
             let filename = item.lastPathComponent
@@ -114,22 +127,31 @@ public actor FileOperationsService {
         }
     }
 
-    public func move(items: [URL], to destinationDir: URL) throws {
-        for item in items {
-            let filename = item.lastPathComponent
-            let target = destinationDir.appendingPathComponent(filename)
-            if item.standardizedFileURL.path == target.standardizedFileURL.path {
-                continue
-            }
-            try fileManager.moveItem(at: item, to: target)
-        }
-    }
-
     public func duplicate(items: [URL]) throws {
         for item in items {
             let parent = item.deletingLastPathComponent()
-            try copy(items: [item], to: parent)
+            let filename = item.lastPathComponent
+            let ext = (filename as NSString).pathExtension
+            let base = (filename as NSString).deletingPathExtension
+
+            var counter = 1
+            var destination: URL
+            repeat {
+                let newName = ext.isEmpty ? "\(base) copy \(counter)" : "\(base) copy \(counter).\(ext)"
+                destination = parent.appendingPathComponent(newName)
+                counter += 1
+            } while fileManager.fileExists(atPath: destination.path)
+
+            try fileManager.copyItem(at: item, to: destination)
         }
+    }
+
+    public func rename(item: URL, to newName: String) throws -> URL {
+        let parent = item.deletingLastPathComponent()
+        let destination = parent.appendingPathComponent(newName)
+        if item.path == destination.path { return item }
+        try fileManager.moveItem(at: item, to: destination)
+        return destination
     }
 
     public func trash(items: [URL]) throws {
@@ -159,5 +181,43 @@ public actor FileOperationsService {
             renamedURLs.append(destination)
         }
         return renamedURLs
+    }
+
+    public func compress(items: [URL]) async throws -> URL {
+        guard let first = items.first else {
+            throw NSError(domain: "FileOperationsError", code: 2, userInfo: [NSLocalizedDescriptionKey: "No items to compress"])
+        }
+        let parentDir = first.deletingLastPathComponent()
+        let archiveName: String
+        if items.count == 1 {
+            archiveName = first.deletingPathExtension().lastPathComponent + ".zip"
+        } else {
+            archiveName = "Archive.zip"
+        }
+
+        var destination = parentDir.appendingPathComponent(archiveName)
+        var counter = 1
+        let archiveBase = (archiveName as NSString).deletingPathExtension
+        while fileManager.fileExists(atPath: destination.path) {
+            destination = parentDir.appendingPathComponent("\(archiveBase) \(counter).zip")
+            counter += 1
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+        var arguments = ["-c", "-k", "--sequesterRsrc", "--keepParent"]
+        for item in items {
+            arguments.append(item.path)
+        }
+        arguments.append(destination.path)
+        process.arguments = arguments
+
+        try process.run()
+        process.waitUntilExit()
+
+        guard process.terminationStatus == 0 else {
+            throw NSError(domain: "FileOperationsError", code: Int(process.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "Compression failed with status \(process.terminationStatus)"])
+        }
+        return destination
     }
 }

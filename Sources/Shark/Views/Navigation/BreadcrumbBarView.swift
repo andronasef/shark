@@ -14,7 +14,7 @@ public struct BreadcrumbBarView: View {
                 HStack {
                     Image(systemName: "folder")
                         .foregroundColor(.secondary)
-                    
+
                     TextField("Path (e.g. ~/Documents or /Users)", text: $navigationState.pathInputText)
                         .textFieldStyle(.plain)
                         .font(.system(.body, design: .monospaced))
@@ -93,6 +93,10 @@ public struct BreadcrumbBarView: View {
                         .fill(Color(nsColor: .controlBackgroundColor).opacity(0.5))
                 )
                 .clipped()
+                .onTapGesture(count: 2) {
+                    navigationState.pathInputText = navigationState.currentURL.path
+                    navigationState.isEditingPath = true
+                }
 
                 Button(action: {
                     navigationState.pathInputText = navigationState.currentURL.path
@@ -109,6 +113,11 @@ public struct BreadcrumbBarView: View {
                 }
                 .buttonStyle(.plain)
                 .help("Edit Path (⌘L)")
+            }
+        }
+        .onChange(of: navigationState.isEditingPath) { _, isEditing in
+            if isEditing {
+                isFieldFocused = true
             }
         }
     }
@@ -128,24 +137,36 @@ public struct BreadcrumbBarView: View {
         var cursor = current
         while true {
             ancestry.append(cursor)
-            if cursor.path == "/" {
-                break
-            }
-            let parent = cursor.deletingLastPathComponent().standardizedFileURL
-            if parent.path == cursor.path || parent.path == "/.." {
+            let parent = cursor.deletingLastPathComponent()
+            if parent.path == cursor.path || parent.path == "/" {
+                if parent.path == "/" && cursor.path != "/" {
+                    ancestry.append(parent)
+                }
                 break
             }
             cursor = parent
         }
+        ancestry.reverse()
 
-        let orderedAncestors = ancestry.reversed()
-        let count = orderedAncestors.count
+        for (index, url) in ancestry.enumerated() {
+            let isRoot = index == 0
+            let isLast = index == ancestry.count - 1
 
-        for (index, url) in orderedAncestors.enumerated() {
-            let isRoot = (index == 0)
-            let isLast = (index == count - 1)
-            let title = isRoot ? "Macintosh HD" : url.lastPathComponent
-            segments.append(PathSegment(title: title, url: url, isRoot: isRoot, isLast: isLast))
+            let title: String
+            if url.path == "/" {
+                title = "Macintosh HD"
+            } else if url.path == FileManager.default.homeDirectoryForCurrentUser.path {
+                title = FileManager.default.homeDirectoryForCurrentUser.lastPathComponent
+            } else {
+                title = url.lastPathComponent
+            }
+
+            segments.append(PathSegment(
+                title: title,
+                url: url,
+                isRoot: isRoot,
+                isLast: isLast
+            ))
         }
 
         return segments

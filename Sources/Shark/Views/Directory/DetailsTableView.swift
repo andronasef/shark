@@ -33,9 +33,24 @@ public struct DetailsTableView: View {
                     Image(systemName: item.systemIconName)
                         .foregroundColor(item.isDirectory ? .accentColor : .primary)
                         .frame(width: 18)
-                    Text(item.name)
-                        .lineLimit(1)
+
+                    if navigationState.renamingItemURL == item.url {
+                        InlineRenameField(
+                            initialName: item.name,
+                            onCommit: { newName in
+                                Task { await navigationState.commitRename(url: item.url, newName: newName) }
+                            },
+                            onCancel: {
+                                navigationState.cancelRenaming()
+                            }
+                        )
+                        .frame(height: 20)
+                    } else {
+                        Text(item.name)
+                            .lineLimit(1)
+                    }
                 }
+                .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                 .contentShape(Rectangle())
                 .draggable(item.url)
                 .onTapGesture(count: 2) {
@@ -53,21 +68,37 @@ public struct DetailsTableView: View {
             .width(min: 200, ideal: 320)
 
             TableColumn("Size", value: \.fileSize) { item in
-                Text(item.formattedSize)
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(.secondary)
+                Group {
+                    if item.isDirectory {
+                        if let size = FolderSizeCalculator.shared.size(for: item.url) {
+                            Text(ByteCountFormatter.string(fromByteCount: size, countStyle: .file))
+                        } else if FolderSizeCalculator.shared.isCalculating(url: item.url) {
+                            ProgressView()
+                                .controlSize(.mini)
+                        } else {
+                            Text("--")
+                        }
+                    } else {
+                        Text(item.formattedSize)
+                    }
+                }
+                .font(.system(.body, design: .monospaced))
+                .foregroundColor(.secondary)
+                .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
             }
             .width(min: 80, ideal: 100)
 
             TableColumn("Date Modified", value: \.dateModified) { item in
                 Text(item.dateModified.formatted(date: .abbreviated, time: .shortened))
                     .foregroundColor(.secondary)
+                    .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
             }
             .width(min: 130, ideal: 160)
 
             TableColumn("Kind", value: \.kindDescription) { item in
                 Text(item.kindDescription)
                     .foregroundColor(.secondary)
+                    .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
             }
             .width(min: 120, ideal: 150)
         }

@@ -1,18 +1,19 @@
 import SwiftUI
 import AppKit
-import Inject
 
 public struct DirectoryView: View {
-    @ObserveInjection var inject
     @Bindable var navigationState: NavigationState
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let pane: PaneIdentifier
 
     @State private var fseventsWatcher = FSEventsWatcher()
-    @State private var showingNewItemSheet: NewItemType?
-    @State private var showingBatchRenameSheet = false
+    @State private var showingNewItemSheet: NewItemType? = nil
+    @State private var showingBatchRenameSheet: Bool = false
 
-    public init(navigationState: NavigationState, pane: PaneIdentifier = .primary) {
+    public init(
+        navigationState: NavigationState,
+        pane: PaneIdentifier = .primary
+    ) {
         self.navigationState = navigationState
         self.pane = pane
     }
@@ -25,6 +26,10 @@ public struct DirectoryView: View {
                     handleDrop(urls: urls)
                     return true
                 }
+
+            if navigationState.isBottomPathBarVisible {
+                BottomPathBarView(navigationState: navigationState, workspace: workspace)
+            }
 
             statusBar
         }
@@ -156,6 +161,7 @@ public struct DirectoryView: View {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(isSelected ? Color.accentColor : Color.clear)
                     )
+                    .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                     .contentShape(Rectangle())
                     .draggable(item.url)
                     .onTapGesture {
@@ -233,6 +239,7 @@ public struct DirectoryView: View {
                                 )
                         }
                         .contentShape(Rectangle())
+                        .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                         .onTapGesture {
                             navigationState.selectedItemIDs = [item.id]
                         }
@@ -255,12 +262,12 @@ public struct DirectoryView: View {
         }
     }
 
-    // MARK: - Dolphin Status Bar
+    // MARK: - Rich Status Bar
     private var statusBar: some View {
         HStack(spacing: 12) {
             let total = navigationState.items.count
             let filtered = navigationState.filteredAndSortedItems.count
-            let selected = navigationState.selectedItemIDs.count
+            let selectedCount = navigationState.selectedItemIDs.count
 
             HStack(spacing: 6) {
                 if !navigationState.filterText.isEmpty {
@@ -269,13 +276,29 @@ public struct DirectoryView: View {
                     Text("\(total) items")
                 }
 
-                if selected > 0 {
-                    Text("(\(selected) selected)")
-                        .foregroundColor(.accentColor)
+                if selectedCount > 0 {
+                    let sizeStr = ByteCountFormatter.string(fromByteCount: navigationState.selectedTotalSize, countStyle: .file)
+                    Text("• \(selectedCount) selected (\(sizeStr))")
+                        .foregroundColor(.primary)
+                }
+
+                if let diskInfo = DiskSpaceService.shared.getDiskSpace(for: navigationState.currentURL) {
+                    Text("• \(diskInfo.summary)")
+                        .foregroundColor(.secondary)
                 }
             }
             .font(.system(size: 11))
             .foregroundColor(.secondary)
+
+            if let title = navigationState.activeOperationTitle {
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.mini)
+                    Text(title)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+            }
 
             Spacer()
 
@@ -334,6 +357,10 @@ public struct DirectoryView: View {
             }
         }
 
+        Button("Open in Terminal") {
+            NSWorkspace.shared.open(item.url)
+        }
+
         Button("Quick Look") {
             QuickLookCoordinator.shared.toggleQuickLook(for: [item.url])
         }
@@ -344,10 +371,30 @@ public struct DirectoryView: View {
 
         Divider()
 
+        Button("Cut") {
+            navigationState.cutSelected()
+        }
+
+        Button("Copy") {
+            navigationState.copySelected()
+        }
+
+        Divider()
+
+        Button("Rename") {
+            navigationState.startRenaming(url: item.url)
+        }
+
         Button("Duplicate") {
             Task {
                 try? await FileOperationsService.shared.duplicate(items: [item.url])
                 await navigationState.reloadCurrentDirectory()
+            }
+        }
+
+        Button("Compress \"\(item.name)\"") {
+            Task {
+                await navigationState.compressSelected()
             }
         }
 
@@ -357,17 +404,32 @@ public struct DirectoryView: View {
             }
         }
 
-        Button("Copy Path") {
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(item.url.path, forType: .string)
+        Menu("Copy Path") {
+            Button("Full Path") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(item.url.path, forType: .string)
+            }
+            Button("Relative Path") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(item.name, forType: .string)
+            }
+            Button("POSIX Quoted Path") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString("\"\(item.url.path)\"", forType: .string)
+            }
+        }
+
+        if item.isDirectory {
+            Button("Calculate Size") {
+                FolderSizeCalculator.shared.requestSize(for: item.url)
+            }
         }
 
         Divider()
 
         Button("Move to Trash", role: .destructive) {
             Task {
-                try? await FileOperationsService.shared.trash(items: [item.url])
-                await navigationState.reloadCurrentDirectory()
+                await navigationState.trashSelected()
             }
         }
     }
@@ -382,7 +444,19 @@ public struct DirectoryView: View {
             showingNewItemSheet = .file
         }
 
+        if FileClipboardService.shared.hasItemsToPaste {
+            Button("Paste") {
+                Task {
+                    await navigationState.paste()
+                }
+            }
+        }
+
         Divider()
+
+        Button("Open in Terminal") {
+            NSWorkspace.shared.open(navigationState.currentURL)
+        }
 
         Button("Reload") {
             Task {
@@ -396,9 +470,15 @@ public struct DirectoryView: View {
 
         Divider()
 
-        Button("Copy Path") {
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
+        Menu("Copy Path") {
+            Button("Full Path") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
+            }
+            Button("POSIX Quoted Path") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString("\"\(navigationState.currentURL.path)\"", forType: .string)
+            }
         }
     }
 }
