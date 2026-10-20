@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - Added standalone development runner [`scripts/dev.sh`](scripts/dev.sh) and python file watcher [`scripts/hot_reload.py`](scripts/hot_reload.py).
 
 ### Fixed
+- Fixed Command + scroll wheel icon resizing by intercepting scroll events within the hovered directory pane without blocking normal clicks or scrolling.
 - Fixed top bar overlap where the View segmented control collided with the Path button.
 - Fixed duplicated button titles and unwanted `⌵` chevrons drawn by AppKit's `NSMenuToolbarItem`.
 - Fixed window toolbar layout packing all items against the left side rather than trailing right.

@@ -12,7 +12,6 @@ public struct CommandScrollZoomModifier: ViewModifier {
         content
             .overlay(
                 CommandScrollZoomRepresentable(onZoom: onZoom)
-                    .allowsHitTesting(true)
             )
     }
 }
@@ -29,33 +28,52 @@ private struct CommandScrollZoomRepresentable: NSViewRepresentable {
     func updateNSView(_ nsView: CommandScrollZoomNSView, context: Context) {
         nsView.onZoom = onZoom
     }
+
+    static func dismantleNSView(_ nsView: CommandScrollZoomNSView, coordinator: ()) {
+        nsView.stopMonitoring()
+    }
 }
 
 private class CommandScrollZoomNSView: NSView {
     var onZoom: ((CGFloat) -> Void)?
 
-    override func scrollWheel(with event: NSEvent) {
-        if event.modifierFlags.contains(.command) {
-            let delta = event.scrollingDeltaY
-            if abs(delta) > 0.05 {
-                onZoom?(delta)
-                return
-            }
+    private var monitor: Any?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        stopMonitoring()
+        guard window != nil else { return }
+
+        // Scroll views can retain the wheel-event target for a gesture, so an
+        // overlay's hitTest/scrollWheel is not a reliable interception point.
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
+            guard let self else { return event }
+            return self.handleScroll(event)
         }
-        // Forward ordinary scroll wheel event up the responder chain to the NSScrollView
-        nextResponder?.scrollWheel(with: event)
+    }
+
+    func stopMonitoring() {
+        if let monitor {
+            NSEvent.removeMonitor(monitor)
+            self.monitor = nil
+        }
+    }
+
+    private func handleScroll(_ event: NSEvent) -> NSEvent? {
+        guard event.window === window,
+              !isHiddenOrHasHiddenAncestor,
+              event.modifierFlags.contains(.command),
+              visibleRect.contains(convert(event.locationInWindow, from: nil)),
+              abs(event.scrollingDeltaY) > 0.05,
+              let onZoom else { return event }
+
+        onZoom(event.scrollingDeltaY)
+        return nil
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        // Intercept when Command is pressed during scroll, otherwise allow all mouse clicks & gestures to pass through
-        if let currentEvent = NSApp.currentEvent {
-            if currentEvent.type == .scrollWheel && currentEvent.modifierFlags.contains(.command) {
-                if bounds.contains(point) {
-                    return self
-                }
-            }
-        }
-        return nil
+        // Keep selection, context menus, and ordinary scrolling on the content.
+        nil
     }
 }
 

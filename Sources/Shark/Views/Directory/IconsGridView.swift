@@ -153,9 +153,6 @@ public struct IconsGridView: View {
                 }
             }
         }
-        .onCommandScrollZoom { delta in
-            navigationState.adjustZoom(delta: delta)
-        }
         .enableInjection()
     }
 
