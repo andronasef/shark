@@ -97,21 +97,40 @@ struct ExplorerCommands: Commands {
         }
 
         CommandMenu("Go") {
+            Button("Back") {
+                nav.goBack()
+            }
+            .keyboardShortcut(.leftArrow, modifiers: .option)
+            .disabled(!nav.canGoBack)
+
+            Button("Forward") {
+                nav.goForward()
+            }
+            .keyboardShortcut(.rightArrow, modifiers: .option)
+            .disabled(!nav.canGoForward)
+
+            Button("Up (Enclosing Folder)") {
+                nav.goUp()
+            }
+            .keyboardShortcut(.upArrow, modifiers: .option)
+            .disabled(!nav.canGoUp)
+
+            Button("Focus Address Bar (Alt+D)") {
+                nav.isEditingPath = true
+            }
+            .keyboardShortcut("d", modifiers: .option)
+
+            Divider()
+
             Button("Go to Folder...") {
                 nav.isEditingPath = true
             }
             .keyboardShortcut("g", modifiers: [.command, .shift])
 
-            Button("Focus Address Bar") {
+            Button("Focus Address Bar (Cmd+L)") {
                 nav.isEditingPath = true
             }
             .keyboardShortcut("l", modifiers: .command)
-
-            Button("Enclosing Folder") {
-                nav.goUp()
-            }
-            .keyboardShortcut(.upArrow, modifiers: .command)
-            .disabled(!nav.canGoUp)
 
             Divider()
 

@@ -84,24 +84,41 @@ public struct ContentView: View {
                     HStack(spacing: 8) {
                         VStack(spacing: 2) {
                             HStack(spacing: 0) {
+                                // Windows Explorer style Back (Alt+Left)
                                 Button(action: { activeState.goBack() }) {
-                                    Image(systemName: "chevron.backward")
+                                    Image(systemName: "arrow.left")
                                         .font(.system(size: 12, weight: .semibold))
-                                        .frame(width: 22, height: 20)
+                                        .frame(width: 24, height: 22)
                                 }
                                 .disabled(!activeState.canGoBack)
                                 .buttonStyle(.plain)
+                                .help("Back (Alt + ←)")
 
                                 Divider()
                                     .frame(height: 14)
 
+                                // Windows Explorer style Forward (Alt+Right)
                                 Button(action: { activeState.goForward() }) {
-                                    Image(systemName: "chevron.forward")
+                                    Image(systemName: "arrow.right")
                                         .font(.system(size: 12, weight: .semibold))
-                                        .frame(width: 22, height: 20)
+                                        .frame(width: 24, height: 22)
                                 }
                                 .disabled(!activeState.canGoForward)
                                 .buttonStyle(.plain)
+                                .help("Forward (Alt + →)")
+
+                                Divider()
+                                    .frame(height: 14)
+
+                                // Windows Explorer style Up to Parent (Alt+Up)
+                                Button(action: { activeState.goUp() }) {
+                                    Image(systemName: "arrow.up")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .frame(width: 24, height: 22)
+                                }
+                                .disabled(!activeState.canGoUp)
+                                .buttonStyle(.plain)
+                                .help("Up (Alt + ↑)")
                             }
                             .padding(.horizontal, 2)
                             .background(
@@ -113,7 +130,7 @@ public struct ContentView: View {
                                     .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
                             )
 
-                            Text("Back/Forward")
+                            Text("Navigation")
                                 .font(.system(size: 9))
                                 .foregroundColor(.secondary)
                         }

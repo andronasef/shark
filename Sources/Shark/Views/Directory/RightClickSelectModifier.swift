@@ -8,7 +8,6 @@ public struct RightClickSelectModifier: ViewModifier {
         content
             .overlay(
                 RightClickRepresentable(onRightClick: onRightClick)
-                    .allowsHitTesting(true)
             )
     }
 }
@@ -32,13 +31,16 @@ private class RightClickNSView: NSView {
 
     override func rightMouseDown(with event: NSEvent) {
         onRightClick?()
-        super.rightMouseDown(with: event)
+        // Forward the right-click to the next responder so SwiftUI .contextMenu receives it
+        nextResponder?.rightMouseDown(with: event)
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
-        // Only intercept right clicks so left clicks, double clicks, and drag gestures pass through unimpeded
+        // Only claim hit-test when the mouse event is explicitly rightMouseDown
         if let currentEvent = NSApp.currentEvent, currentEvent.type == .rightMouseDown {
-            return self
+            if bounds.contains(point) {
+                return self
+            }
         }
         return nil
     }

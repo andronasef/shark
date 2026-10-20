@@ -79,6 +79,16 @@ public struct DirectoryView: View {
                     .keyboardShortcut("-", modifiers: .command)
                 Button("") { navigationState.resetZoom() }
                     .keyboardShortcut("0", modifiers: .command)
+
+                // Windows Explorer Alt Navigation Shortcuts
+                Button("") { navigationState.goBack() }
+                    .keyboardShortcut(.leftArrow, modifiers: .option)
+                Button("") { navigationState.goForward() }
+                    .keyboardShortcut(.rightArrow, modifiers: .option)
+                Button("") { navigationState.goUp() }
+                    .keyboardShortcut(.upArrow, modifiers: .option)
+                Button("") { navigationState.isEditingPath = true }
+                    .keyboardShortcut("d", modifiers: .option)
             }
             .opacity(0)
             .allowsHitTesting(false)
@@ -398,13 +408,6 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
-        // Automatically select item when its context menu opens if not already selected
-        let _ = DispatchQueue.main.async {
-            if !navigationState.selectedItemIDs.contains(item.id) {
-                navigationState.selectedItemIDs = [item.id]
-            }
-        }
-
         Button("Open") {
             handleActivate(item)
         }
