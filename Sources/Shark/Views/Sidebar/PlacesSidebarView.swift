@@ -102,33 +102,7 @@ public struct PlacesSidebarView: View {
                 }
             }
 
-            // Recent Folders section (QT-04)
-            if !RecentFoldersService.shared.recentFolders.isEmpty {
-                Section("Recent Folders") {
-                    ForEach(Array(RecentFoldersService.shared.recentFolders.prefix(5)), id: \.self) { url in
-                        sidebarRow(
-                            name: url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent,
-                            iconName: "folder",
-                            url: url,
-                            iconColor: .secondary
-                        )
-                    }
-                }
-            }
 
-            // Frequent Folders section (QT-04)
-            if !RecentFoldersService.shared.frequentFolders.isEmpty {
-                Section("Frequent Folders") {
-                    ForEach(Array(RecentFoldersService.shared.frequentFolders.prefix(5)), id: \.self) { url in
-                        sidebarRow(
-                            name: url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent,
-                            iconName: "folder",
-                            url: url,
-                            iconColor: .secondary
-                        )
-                    }
-                }
-            }
 
             // Locations section
             Section("Locations") {
