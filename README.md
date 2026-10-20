@@ -36,7 +36,22 @@ Hover over a folder and click its little arrow to browse a cascading menu of its
 
 ## Get started
 
-Once a release is published, download `Shark-<version>.zip` from this repository's **Releases** page, unzip it, and move **Shark.app** to **Applications**. Public downloads built by the release action are Developer ID signed and notarized.
+### Install via Homebrew
+
+```bash
+brew install --cask andronasef/shark/shark
+```
+
+Or tap the official repository first:
+
+```bash
+brew tap andronasef/shark
+brew install --cask shark
+```
+
+### Direct download
+
+Once a release is published, download `Shark-<version>.zip` from this repository's **Releases** page, unzip it, and move **Shark.app** to **Applications**. Public downloads built by the release action are Developer ID signed and notarized by Apple.
 
 Open a folder from the sidebar, or press **⌘L**, type a path, and press Return. macOS may ask for access to protected folders such as Documents or Downloads; allow the folders you want to browse.
 
