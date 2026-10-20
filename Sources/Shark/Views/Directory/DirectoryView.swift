@@ -216,6 +216,11 @@ public struct DirectoryView: View {
                             navigationState.selectedItemIDs = [item.id]
                         }
                     }
+                    .onRightClickSelect {
+                        if !navigationState.selectedItemIDs.contains(item.id) {
+                            navigationState.selectedItemIDs = [item.id]
+                        }
+                    }
                     .onMiddleClick {
                         if item.isNavigableDirectory {
                             workspace?.open(item.url, from: navigationState, newTab: true)
@@ -393,6 +398,13 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
+        // Automatically select item when its context menu opens if not already selected
+        let _ = DispatchQueue.main.async {
+            if !navigationState.selectedItemIDs.contains(item.id) {
+                navigationState.selectedItemIDs = [item.id]
+            }
+        }
+
         Button("Open") {
             handleActivate(item)
         }

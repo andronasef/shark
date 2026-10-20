@@ -77,6 +77,11 @@ public struct DetailsTableView: View {
                     lastClickTime = now
                     navigationState.selectedItemIDs = [item.id]
                 }
+                .onRightClickSelect {
+                    if !navigationState.selectedItemIDs.contains(item.id) {
+                        navigationState.selectedItemIDs = [item.id]
+                    }
+                }
                 .onMiddleClick {
                     if item.isNavigableDirectory {
                         workspace?.open(item.url, from: navigationState, newTab: true)

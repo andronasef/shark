@@ -103,6 +103,11 @@ public struct IconsGridView: View {
                             .onTapGesture {
                                 handleItemTap(item)
                             }
+                            .onRightClickSelect {
+                                if !navigationState.selectedItemIDs.contains(item.id) {
+                                    navigationState.selectedItemIDs = [item.id]
+                                }
+                            }
                             .onMiddleClick {
                                 if item.isNavigableDirectory {
                                     workspace?.open(item.url, from: navigationState, newTab: true)
