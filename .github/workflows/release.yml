@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   release:
-    runs-on: macos-26 # Includes the SDK required by native Liquid Glass.
+    runs-on: macos-14 # Apple Silicon runner
     timeout-minutes: 45
     permissions:
       contents: write
@@ -84,6 +84,39 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             "dist/Shark-$version.zip" "dist/Shark-$version.zip.sha256" \
             --verify-tag --title "Shark $version" --generate-notes "${extra_args[@]}"
+
+      - name: Update Homebrew Cask Tap
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          if [[ -n "$TAP_TOKEN" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            sha=$(cat "dist/Shark-$version.zip.sha256" | awk '{print $1}')
+            
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git clone "https://x-access-token:${TAP_TOKEN}@github.com/andronasef/homebrew-shark.git" /tmp/homebrew-shark-tap
+            cd /tmp/homebrew-shark-tap
+            
+            python3 -c "
+            import re
+            path = 'Casks/shark.rb'
+            with open(path, 'r') as f:
+                content = f.read()
+            content = re.sub(r'version \".*?\"', f'version \"$version\"', content)
+            content = re.sub(r'sha256 .*', f'sha256 \"$sha\"', content)
+            with open(path, 'w') as f:
+                f.write(content)
+            "
+            
+            git add Casks/shark.rb
+            if ! git diff --staged --quiet; then
+              git commit -m "Update Shark cask to v$version"
+              git push origin main
+              echo "Successfully updated Homebrew Cask to v$version!"
+            fi
+          fi
 
       - name: Remove signing material
         if: always()

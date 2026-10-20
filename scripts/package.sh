@@ -44,26 +44,63 @@ scripts/make-icon.sh "$app"
 # Extract release dSYM debug symbols for crash reporting
 dsymutil "$bin/Shark" -o "$staging/Shark.app.dSYM"
 
-# Embed provisioning profile if provided (required for TestFlight on macOS)
+# Embed provisioning profile if provided or if packaging sandboxed app with Entitlements/Shark.provisionprofile
+profile_path=""
 if [[ -n "${PROVISIONING_PROFILE:-}" && -f "${PROVISIONING_PROFILE}" ]]; then
-  echo "==> Embedding provisioning profile: $PROVISIONING_PROFILE"
-  cp "$PROVISIONING_PROFILE" "$app/Contents/embedded.provisionprofile"
-elif [[ -f "Entitlements/Shark.provisionprofile" ]]; then
-  echo "==> Embedding provisioning profile: Entitlements/Shark.provisionprofile"
-  cp "Entitlements/Shark.provisionprofile" "$app/Contents/embedded.provisionprofile"
+  profile_path="${PROVISIONING_PROFILE}"
+elif [[ "${APP_SANDBOX:-0}" == 1 && -f "Entitlements/Shark.provisionprofile" ]]; then
+  profile_path="Entitlements/Shark.provisionprofile"
 fi
+
+if [[ -n "$profile_path" ]]; then
+  echo "==> Embedding provisioning profile: $profile_path"
+  cp "$profile_path" "$app/Contents/embedded.provisionprofile"
+fi
+
+# Strip all extended attributes (e.g. com.apple.quarantine) before codesigning.
+# App Store and TestFlight validation reject bundles with com.apple.quarantine (ITMS-91109).
+xattr -cr "$app"
 
 entitlements_args=()
 if [[ "${APP_SANDBOX:-0}" == 1 ]]; then
-  entitlements_args=(--entitlements Entitlements/Shark.entitlements)
+  entitlements_file="$staging/Shark.entitlements"
+  cp Entitlements/Shark.entitlements "$entitlements_file"
+
+  # Ensure application-identifier and developer team-identifier match embedded provisioning profile (ITMS-90886)
+  if [[ -f "$app/Contents/embedded.provisionprofile" ]]; then
+    profile_entitlements="$staging/profile-entitlements.plist"
+    if security cms -D -i "$app/Contents/embedded.provisionprofile" | plutil -extract "Entitlements" xml1 -o "$profile_entitlements" - 2>/dev/null; then
+      prof_app_id=$(/usr/libexec/PlistBuddy -c "Print :com.apple.application-identifier" "$profile_entitlements" 2>/dev/null || true)
+      prof_team_id=$(/usr/libexec/PlistBuddy -c "Print :com.apple.developer.team-identifier" "$profile_entitlements" 2>/dev/null || true)
+      if [[ -n "$prof_app_id" ]]; then
+        /usr/libexec/PlistBuddy -c "Delete :com.apple.application-identifier" "$entitlements_file" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Add :com.apple.application-identifier string $prof_app_id" "$entitlements_file"
+      fi
+      if [[ -n "$prof_team_id" ]]; then
+        /usr/libexec/PlistBuddy -c "Delete :com.apple.developer.team-identifier" "$entitlements_file" 2>/dev/null || true
+        /usr/libexec/PlistBuddy -c "Add :com.apple.developer.team-identifier string $prof_team_id" "$entitlements_file"
+      fi
+    fi
+  fi
+  entitlements_args=(--entitlements "$entitlements_file")
 elif [[ -f "Entitlements/Shark-Direct.entitlements" ]]; then
   entitlements_args=(--entitlements Entitlements/Shark-Direct.entitlements)
 fi
 
+# Remove any ad-hoc signature applied during compilation so codesign generates a clean signature
+codesign --remove-signature "$app/Contents/MacOS/Shark" 2>/dev/null || true
+
+timestamp_args=()
+if [[ "$notarize" == 1 || "${REQUIRE_TIMESTAMP:-0}" == 1 ]]; then
+  timestamp_args=(--timestamp)
+elif curl -s --connect-timeout 2 http://timestamp.apple.com/ts01 >/dev/null 2>&1; then
+  timestamp_args=(--timestamp)
+fi
+
 if [[ "$identity" == - ]]; then
-  codesign --force "${entitlements_args[@]}" --sign - "$app"
+  codesign --force ${entitlements_args[@]+"${entitlements_args[@]}"} --sign - "$app"
 else
-  codesign --force --options runtime --timestamp "${entitlements_args[@]}" --sign "$identity" "$app"
+  codesign --force --options runtime ${timestamp_args[@]+"${timestamp_args[@]}"} ${entitlements_args[@]+"${entitlements_args[@]}"} --sign "$identity" "$app"
 fi
 codesign --verify --strict "$app"
 ditto -c -k --keepParent "$app" "$archive"

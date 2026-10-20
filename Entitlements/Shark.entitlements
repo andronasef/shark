@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Application Identifier and Developer Team Identifier (required for TestFlight & App Store) -->
+    <key>com.apple.application-identifier</key>
+    <string>N4Z388PVQT.com.increasinglabs.shark</string>
+    <key>com.apple.developer.team-identifier</key>
+    <string>N4Z388PVQT</string>
+
     <!-- Core App Sandbox -->
     <key>com.apple.security.app-sandbox</key>
     <true/>

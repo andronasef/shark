@@ -39,7 +39,10 @@ if [[ ! -d "$APP_PATH" ]]; then
 fi
 
 echo "==> Creating signed macOS Installer Package (.pkg)..."
+# Strip any extended attributes on the app bundle and output package
+xattr -cr "$APP_PATH"
 productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_IDENTITY" "$PKG_PATH"
+xattr -c "$PKG_PATH" 2>/dev/null || true
 
 echo "==> Verifying package signature..."
 pkgutil --check-signature "$PKG_PATH"
