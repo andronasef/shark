@@ -87,7 +87,7 @@ struct ExplorerCommands: Commands {
             .keyboardShortcut("t")
 
             Button("New Window") {
-                NSApp.sendAction(Selector(("newWindowForTab:")), to: nil, from: nil)
+                NSApp.sendAction(#selector(NSWindow.newWindowForTab(_:)), to: nil, from: nil)
             }
             .keyboardShortcut("n", modifiers: .command)
 
