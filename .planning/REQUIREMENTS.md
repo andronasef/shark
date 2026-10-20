@@ -87,6 +87,7 @@
 - [ ] **POL-03**: Empty, loading, error and permission-denied states that tell the user what to do.
 - [ ] **POL-04**: VoiceOver labels, keyboard focus, Reduce Motion respected.
 - [ ] **POL-05**: DESIGN.md documents the shipped system.
+- [ ] **POL-06**: **Liquid Glass & Translucent Vibrancy**: Native macOS translucent materials (NSVisualEffectView / SwiftUI materials) across the window backdrop, unified toolbar, sidebar, tab strip, and floating preview cards, matching original Finder's liquid glass vibrancy with desktop wallpaper bleed-through in both light and dark modes.
 
 ## Later Requirements
 

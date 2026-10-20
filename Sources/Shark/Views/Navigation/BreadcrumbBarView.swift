@@ -2,10 +2,12 @@ import SwiftUI
 
 public struct BreadcrumbBarView: View {
     @Bindable var navigationState: NavigationState
+    var workspace: WorkspaceState?
     @FocusState private var isFieldFocused: Bool
 
-    public init(navigationState: NavigationState) {
+    public init(navigationState: NavigationState, workspace: WorkspaceState? = nil) {
         self.navigationState = navigationState
+        self.workspace = workspace
     }
 
     public var body: some View {
@@ -60,25 +62,37 @@ public struct BreadcrumbBarView: View {
             } else {
                 HStack(spacing: 2) {
                     ForEach(pathSegments, id: \.url) { segment in
-                        Button(action: {
-                            navigationState.navigateTo(segment.url)
-                        }) {
-                            HStack(spacing: 2) {
-                                if segment.isRoot {
-                                    Image(systemName: "internaldrive")
-                                        .font(.caption)
+                        HStack(spacing: 2) {
+                            Button(action: {
+                                navigationState.navigateTo(segment.url)
+                            }) {
+                                HStack(spacing: 2) {
+                                    if segment.isRoot {
+                                        Image(systemName: "internaldrive")
+                                            .font(.caption)
+                                    }
+                                    Text(segment.title)
+                                        .font(.system(size: 12, weight: segment.isLast ? .semibold : .regular))
                                 }
-                                Text(segment.title)
-                                    .font(.system(size: 12, weight: segment.isLast ? .semibold : .regular))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(segment.isLast ? Color.accentColor.opacity(0.15) : Color.clear)
+                                    )
                             }
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 4)
-                            .background(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(segment.isLast ? Color.accentColor.opacity(0.15) : Color.clear)
-                            )
+                            .buttonStyle(.plain)
+
+                            // Cascading Subfolder Chevron Menu (QT-01)
+                            CascadingFolderChevronButton(url: segment.url) { targetURL, inNewTab in
+                                if inNewTab, let workspace {
+                                    workspace.open(targetURL, from: navigationState, newTab: true)
+                                } else {
+                                    navigationState.navigateTo(targetURL)
+                                }
+                            }
+                            .frame(width: 10, height: 14)
                         }
-                        .buttonStyle(.plain)
 
                         if !segment.isLast {
                             Image(systemName: "chevron.right")
@@ -133,24 +147,25 @@ public struct BreadcrumbBarView: View {
         var segments: [PathSegment] = []
         let current = navigationState.currentURL.standardizedFileURL
 
-        var ancestry: [URL] = []
-        var cursor = current
+        var hierarchy: [URL] = []
+        var walker = current
         while true {
-            ancestry.append(cursor)
-            let parent = cursor.deletingLastPathComponent()
-            if parent.path == cursor.path || parent.path == "/" {
-                if parent.path == "/" && cursor.path != "/" {
-                    ancestry.append(parent)
+            hierarchy.append(walker)
+            let parent = walker.deletingLastPathComponent()
+            if parent.path == walker.path || parent.path == "/" {
+                if parent.path == "/" && walker.path != "/" {
+                    hierarchy.append(parent)
                 }
                 break
             }
-            cursor = parent
+            walker = parent
         }
-        ancestry.reverse()
 
-        for (index, url) in ancestry.enumerated() {
+        hierarchy.reverse()
+
+        for (index, url) in hierarchy.enumerated() {
             let isRoot = index == 0
-            let isLast = index == ancestry.count - 1
+            let isLast = index == hierarchy.count - 1
 
             let title: String
             if url.path == "/" {
@@ -161,12 +176,7 @@ public struct BreadcrumbBarView: View {
                 title = url.lastPathComponent
             }
 
-            segments.append(PathSegment(
-                title: title,
-                url: url,
-                isRoot: isRoot,
-                isLast: isLast
-            ))
+            segments.append(PathSegment(title: title, url: url, isRoot: isRoot, isLast: isLast))
         }
 
         return segments

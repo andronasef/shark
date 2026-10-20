@@ -55,6 +55,81 @@ public struct PlacesSidebarView: View {
                 }
             }
 
+            // Tab Groups section
+            if !TabGroupService.shared.groups.isEmpty {
+                Section("Tab Groups") {
+                    ForEach(TabGroupService.shared.groups) { group in
+                        Button(action: {
+                            if let ws = workspace {
+                                TabGroupService.shared.restore(group: group, into: ws, replace: false)
+                            }
+                        }) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "square.grid.2x2")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.purple)
+                                    .frame(width: 18)
+                                Text(group.name)
+                                    .font(.system(size: 13))
+                                    .lineLimit(1)
+                                Spacer()
+                                Text("\(group.tabs.count)")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 8)
+                        .contextMenu {
+                            Button("Restore (Replace All)") {
+                                if let ws = workspace {
+                                    TabGroupService.shared.restore(group: group, into: ws, replace: true)
+                                }
+                            }
+                            Button("Append Tabs") {
+                                if let ws = workspace {
+                                    TabGroupService.shared.restore(group: group, into: ws, replace: false)
+                                }
+                            }
+                            Divider()
+                            Button("Delete Group", role: .destructive) {
+                                TabGroupService.shared.deleteGroup(id: group.id)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Recent Folders section (QT-04)
+            if !RecentFoldersService.shared.recentFolders.isEmpty {
+                Section("Recent Folders") {
+                    ForEach(Array(RecentFoldersService.shared.recentFolders.prefix(5)), id: \.self) { url in
+                        sidebarRow(
+                            name: url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent,
+                            iconName: "folder",
+                            url: url,
+                            iconColor: .secondary
+                        )
+                    }
+                }
+            }
+
+            // Frequent Folders section (QT-04)
+            if !RecentFoldersService.shared.frequentFolders.isEmpty {
+                Section("Frequent Folders") {
+                    ForEach(Array(RecentFoldersService.shared.frequentFolders.prefix(5)), id: \.self) { url in
+                        sidebarRow(
+                            name: url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent,
+                            iconName: "folder.fill",
+                            url: url,
+                            iconColor: .orange
+                        )
+                    }
+                }
+            }
+
             // Locations section
             Section("Locations") {
                 ForEach(locations) { item in
@@ -129,10 +204,17 @@ public struct PlacesSidebarView: View {
             }
         }) {
             HStack(spacing: 10) {
-                Image(systemName: iconName)
-                    .font(.system(size: 14))
-                    .foregroundColor(isSelected ? .white : iconColor)
-                    .frame(width: 18)
+                if iconName.hasPrefix("folder") && FolderIconService.shared.folderIcon(color: iconColor == .orange ? .orange : .blue) != nil {
+                    Image(nsImage: FolderIconService.shared.folderIcon(color: iconColor == .orange ? .orange : .blue)!)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 18, height: 18)
+                } else {
+                    Image(systemName: iconName)
+                        .font(.system(size: 14))
+                        .foregroundColor(isSelected ? .white : iconColor)
+                        .frame(width: 18)
+                }
                 Text(name)
                     .font(.system(size: 13))
                     .foregroundColor(isSelected ? .white : .primary)

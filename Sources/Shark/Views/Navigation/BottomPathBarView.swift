@@ -13,41 +13,53 @@ public struct BottomPathBarView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 4) {
                 ForEach(segments, id: \.url) { seg in
-                    Button(action: {
-                        let isCmd = NSEvent.modifierFlags.contains(.command)
-                        if isCmd, let workspace {
-                            workspace.open(seg.url, from: navigationState, newTab: true)
-                        } else {
-                            navigationState.navigateTo(seg.url)
+                    HStack(spacing: 2) {
+                        Button(action: {
+                            let isCmd = NSEvent.modifierFlags.contains(.command)
+                            if isCmd, let workspace {
+                                workspace.open(seg.url, from: navigationState, newTab: true)
+                            } else {
+                                navigationState.navigateTo(seg.url)
+                            }
+                        }) {
+                            HStack(spacing: 3) {
+                                Image(systemName: seg.isRoot ? "internaldrive" : (seg.isLast ? "folder.fill" : "folder"))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(seg.isLast ? .accentColor : .secondary)
+                                Text(seg.title)
+                                    .font(.system(size: 11, weight: seg.isLast ? .semibold : .regular))
+                                    .foregroundColor(seg.isLast ? .primary : .secondary)
+                            }
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 2)
+                            .background(
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(seg.isLast ? Color.accentColor.opacity(0.12) : Color.clear)
+                            )
                         }
-                    }) {
-                        HStack(spacing: 3) {
-                            Image(systemName: seg.isRoot ? "internaldrive" : (seg.isLast ? "folder.fill" : "folder"))
-                                .font(.system(size: 11))
-                                .foregroundColor(seg.isLast ? .accentColor : .secondary)
-                            Text(seg.title)
-                                .font(.system(size: 11, weight: seg.isLast ? .semibold : .regular))
-                                .foregroundColor(seg.isLast ? .primary : .secondary)
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Open in New Tab") {
+                                workspace?.open(seg.url, from: navigationState, newTab: true)
+                            }
+                            Button("Copy Path") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(seg.url.path, forType: .string)
+                            }
+                            Button("Open in Terminal") {
+                                NSWorkspace.shared.open(seg.url)
+                            }
                         }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(seg.isLast ? Color.accentColor.opacity(0.12) : Color.clear)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .contextMenu {
-                        Button("Open in New Tab") {
-                            workspace?.open(seg.url, from: navigationState, newTab: true)
+
+                        // Cascading Subfolder Chevron Menu (QT-01)
+                        CascadingFolderChevronButton(url: seg.url) { targetURL, inNewTab in
+                            if inNewTab, let workspace {
+                                workspace.open(targetURL, from: navigationState, newTab: true)
+                            } else {
+                                navigationState.navigateTo(targetURL)
+                            }
                         }
-                        Button("Copy Path") {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(seg.url.path, forType: .string)
-                        }
-                        Button("Open in Terminal") {
-                            NSWorkspace.shared.open(seg.url)
-                        }
+                        .frame(width: 10, height: 14)
                     }
 
                     if !seg.isLast {
@@ -61,7 +73,7 @@ public struct BottomPathBarView: View {
             .padding(.vertical, 2)
         }
         .frame(height: 22)
-        .background(Color(nsColor: .windowBackgroundColor).opacity(0.4))
+        .liquidGlassBackground(material: .headerView)
         .overlay(Divider(), alignment: .top)
     }
 

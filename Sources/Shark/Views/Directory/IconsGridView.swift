@@ -80,9 +80,7 @@ private struct IconGridItemView: View {
                         .cornerRadius(4)
                         .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
                 } else {
-                    Image(systemName: item.systemIconName)
-                        .font(.system(size: iconSize * 0.7))
-                        .foregroundColor(item.isDirectory ? .accentColor : .secondary)
+                    FileItemIconView(item: item, size: iconSize)
                         .frame(width: iconSize, height: iconSize)
                 }
             }

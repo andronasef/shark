@@ -30,9 +30,8 @@ public struct DetailsTableView: View {
         ) {
             TableColumn("Name", value: \.name) { item in
                 HStack(spacing: 8) {
-                    Image(systemName: item.systemIconName)
-                        .foregroundColor(item.isDirectory ? .accentColor : .primary)
-                        .frame(width: 18)
+                    FileItemIconView(item: item, size: 18)
+                        .frame(width: 18, height: 18)
 
                     if navigationState.renamingItemURL == item.url {
                         InlineRenameField(
@@ -48,6 +47,17 @@ public struct DetailsTableView: View {
                     } else {
                         Text(item.name)
                             .lineLimit(1)
+                    }
+
+                    if item.isNavigableDirectory {
+                        CascadingFolderChevronButton(url: item.url) { targetURL, inNewTab in
+                            if inNewTab, let workspace {
+                                workspace.open(targetURL, from: navigationState, newTab: true)
+                            } else {
+                                navigationState.navigateTo(targetURL)
+                            }
+                        }
+                        .frame(width: 10, height: 14)
                     }
                 }
                 .opacity(navigationState.isCut(item) ? 0.45 : 1.0)

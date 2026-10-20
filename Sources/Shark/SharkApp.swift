@@ -112,6 +112,28 @@ struct ExplorerCommands: Commands {
             }
             .keyboardShortcut(.upArrow, modifiers: .command)
             .disabled(!nav.canGoUp)
+
+            Divider()
+
+            if !RecentFoldersService.shared.recentFolders.isEmpty {
+                Menu("Recent Folders") {
+                    ForEach(Array(RecentFoldersService.shared.recentFolders.prefix(10)), id: \.self) { url in
+                        Button(url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent) {
+                            nav.navigateTo(url)
+                        }
+                    }
+                }
+            }
+
+            if !RecentFoldersService.shared.frequentFolders.isEmpty {
+                Menu("Frequent Folders") {
+                    ForEach(Array(RecentFoldersService.shared.frequentFolders.prefix(10)), id: \.self) { url in
+                        Button(url.lastPathComponent.isEmpty ? "/" : url.lastPathComponent) {
+                            nav.navigateTo(url)
+                        }
+                    }
+                }
+            }
         }
 
         CommandGroup(after: .sidebar) {

@@ -156,6 +156,7 @@ public final class NavigationState {
                 showHidden: showHiddenFiles
             )
             self.items = fetchedItems
+            RecentFoldersService.shared.recordVisit(to: self.currentURL)
         } catch {
             self.errorMessage = error.localizedDescription
             self.items = []

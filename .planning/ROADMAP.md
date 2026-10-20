@@ -15,7 +15,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
 - [x] **Phase 8: Explorer Ergonomics** - Cut/Copy/Paste, undo, inline rename, copy path, rich status bar, path bar, folder sizes, address bar
 - [ ] **Phase 9: QTTabBar Folder Power** - Cascading subfolder menus, hover previews, recent/frequent folders, tab groups
 - [ ] **Phase 10: Command Palette, Menus & Keyboard** - ⌘K palette, complete menu bar, type-to-select, settings window
-- [ ] **Phase 11: Finder Fidelity Polish** - Visual pass, real Columns view, states, accessibility, DESIGN.md
+- [ ] **Phase 11: Finder Fidelity Polish & Liquid Glass** - Visual pass, real Columns view, states, accessibility, DESIGN.md
 
 ## Phase Details
 

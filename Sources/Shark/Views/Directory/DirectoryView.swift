@@ -9,6 +9,7 @@ public struct DirectoryView: View {
     @State private var fseventsWatcher = FSEventsWatcher()
     @State private var showingNewItemSheet: NewItemType? = nil
     @State private var showingBatchRenameSheet: Bool = false
+    @State private var previewItem: FileItem? = nil
 
     public init(
         navigationState: NavigationState,
@@ -39,6 +40,10 @@ public struct DirectoryView: View {
         }
         .onDisappear {
             fseventsWatcher.stop()
+        }
+        .popover(item: $previewItem, arrowEdge: .trailing) { item in
+            HoverPreviewCard(item: item)
+                .padding(4)
         }
         .sheet(item: $showingNewItemSheet) { itemType in
             NewItemSheet(
@@ -142,9 +147,7 @@ public struct DirectoryView: View {
                 ForEach(navigationState.filteredAndSortedItems) { item in
                     let isSelected = navigationState.selectedItemIDs.contains(item.id)
                     HStack(spacing: 8) {
-                        Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
+                        FileItemIconView(item: item, size: 16)
                             .frame(width: 16, height: 16)
                         Text(item.name)
                             .font(.system(size: 12))
@@ -319,7 +322,7 @@ public struct DirectoryView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4)
-        .background(Color(nsColor: .controlBackgroundColor).opacity(0.6))
+        .liquidGlassBackground(material: .headerView)
         .overlay(Divider(), alignment: .top)
     }
 
@@ -354,6 +357,23 @@ public struct DirectoryView: View {
         if item.isNavigableDirectory {
             Button("Open in New Tab") {
                 workspace?.open(item.url, from: navigationState, newTab: true)
+            }
+            Button("Browse Subfolders...") {
+                let builder = SubfolderMenuBuilder { targetURL, inNewTab in
+                    if inNewTab, let workspace {
+                        workspace.open(targetURL, from: navigationState, newTab: true)
+                    } else {
+                        navigationState.navigateTo(targetURL)
+                    }
+                }
+                let menu = builder.buildMenu(for: item.url)
+                if let event = NSApp.currentEvent {
+                    NSMenu.popUpContextMenu(menu, with: event, for: NSApp.keyWindow?.contentView ?? NSView())
+                }
+            }
+        } else {
+            Button("Quick Preview (QT-03)") {
+                previewItem = item
             }
         }
 
