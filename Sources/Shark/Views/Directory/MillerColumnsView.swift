@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftTerm
 import AppKit
 
 public struct MillerColumnsView: View {
+    @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let navigationState: NavigationState
     let onActivate: (FileItem) -> Void
     let contextMenuBuilder: (FileItem) -> AnyView
@@ -236,9 +238,12 @@ public struct MillerColumnsView: View {
     private func setupKeyMonitor() {
         guard eventMonitor == nil else { return }
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [self] event in
+            guard workspace?.sidebarHasKeyboardFocus != true else { return event }
+            guard workspace == nil || workspace?.activeNavigationState === navigationState,
+                  event.modifierFlags.intersection([.command, .option, .control]).isEmpty else { return event }
             // Don't intercept if user is typing in a text field
             if let responder = NSApp.keyWindow?.firstResponder,
-               responder is NSTextView || responder is NSTextField {
+               responder is NSTextView || responder is NSTextField || responder is SwiftTerm.TerminalView {
                 return event
             }
 

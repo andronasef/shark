@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct DualPaneContainerView: View {
     @Bindable var tab: WorkspaceTab
+    @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
 
     public init(tab: WorkspaceTab) {
         self.tab = tab
@@ -27,7 +28,8 @@ public struct DualPaneContainerView: View {
     private func singlePaneView(for state: NavigationState, identifier: PaneIdentifier) -> some View {
         DirectoryView(navigationState: state, pane: identifier)
             .contentShape(Rectangle())
-            .onTapGesture {
+            .onPaneInteraction(isActive: tab.activePane == identifier && workspace?.sidebarHasKeyboardFocus != true) {
+                workspace?.sidebarHasKeyboardFocus = false
                 tab.activePane = identifier
             }
     }
@@ -76,9 +78,10 @@ public struct DualPaneContainerView: View {
 
             DirectoryView(navigationState: state, pane: identifier)
                 .contentShape(Rectangle())
-                .onTapGesture {
-                    tab.activePane = identifier
-                }
+        }
+        .onPaneInteraction(isActive: isActive && workspace?.sidebarHasKeyboardFocus != true) {
+            workspace?.sidebarHasKeyboardFocus = false
+            tab.activePane = identifier
         }
         .overlay(
             RoundedRectangle(cornerRadius: 0)

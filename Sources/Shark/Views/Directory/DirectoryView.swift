@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import SwiftTerm
 
 public struct DirectoryView: View {
     @Bindable var navigationState: NavigationState
@@ -47,12 +48,14 @@ public struct DirectoryView: View {
         .onAppear {
             if typeToSelectMonitor == nil {
                 typeToSelectMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                    if workspace?.sidebarHasKeyboardFocus == true { return event }
                     if let ws = workspace, ws.activeNavigationState !== navigationState {
                         return event
                     }
                     guard let window = event.window,
                           !(window.firstResponder is NSTextView),
-                          !(window.firstResponder is NSTextField) else {
+                          !(window.firstResponder is NSTextField),
+                          !(window.firstResponder is SwiftTerm.TerminalView) else {
                         return event
                     }
                     guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else {
@@ -106,106 +109,110 @@ public struct DirectoryView: View {
             directoryBackgroundContextMenu
         }
         .background {
-            // Local fallback keyboard shortcuts for instant responsiveness
-            Group {
-                Button("") { navigationState.zoomIn() }
-                    .keyboardShortcut("+", modifiers: .command)
-                Button("") { navigationState.zoomIn() }
-                    .keyboardShortcut("=", modifiers: .command)
-                Button("") { navigationState.zoomOut() }
-                    .keyboardShortcut("-", modifiers: .command)
-                Button("") { navigationState.resetZoom() }
-                    .keyboardShortcut("0", modifiers: .command)
+            // Only the active pane registers shortcuts. An inactive pane must
+            // not win SwiftUI's duplicate-key-equivalent lookup.
+            if workspace?.sidebarHasKeyboardFocus != true && (workspace == nil || workspace?.activeNavigationState === navigationState) {
+                // Local fallback keyboard shortcuts for instant responsiveness
+                Group {
+                    Button("") { navigationState.zoomIn() }
+                        .keyboardShortcut("+", modifiers: .command)
+                    Button("") { navigationState.zoomIn() }
+                        .keyboardShortcut("=", modifiers: .command)
+                    Button("") { navigationState.zoomOut() }
+                        .keyboardShortcut("-", modifiers: .command)
+                    Button("") { navigationState.resetZoom() }
+                        .keyboardShortcut("0", modifiers: .command)
 
-                // Windows Explorer Alt Navigation Shortcuts
-                Button("") { navigationState.goBack() }
-                    .keyboardShortcut(.leftArrow, modifiers: .option)
-                Button("") { navigationState.goForward() }
-                    .keyboardShortcut(.rightArrow, modifiers: .option)
-                Button("") { navigationState.goUp() }
-                    .keyboardShortcut(.upArrow, modifiers: .option)
-                Button("") { navigationState.isEditingPath = true }
-                    .keyboardShortcut("d", modifiers: .option)
+                    // Windows Explorer Alt Navigation Shortcuts
+                    Button("") { navigationState.goBack() }
+                        .keyboardShortcut(.leftArrow, modifiers: .option)
+                    Button("") { navigationState.goForward() }
+                        .keyboardShortcut(.rightArrow, modifiers: .option)
+                    Button("") { navigationState.goUp() }
+                        .keyboardShortcut(.upArrow, modifiers: .option)
+                    Button("") { navigationState.isEditingPath = true }
+                        .keyboardShortcut("d", modifiers: .option)
 
-                // Arrow Key Item Navigation (Windows Explorer & Finder)
-                // Up / Down moves up and down row-by-row in both Grid and List views
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    if navigationState.viewMode == .grid {
-                        navigationState.selectAboveItem()
-                    } else {
-                        navigationState.selectAboveItem(approximateColumns: 1)
+                    // Arrow Key Item Navigation (Windows Explorer & Finder)
+                    // Up / Down moves up and down row-by-row in both Grid and List views
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        if navigationState.viewMode == .grid {
+                            navigationState.selectAboveItem()
+                        } else {
+                            navigationState.selectAboveItem(approximateColumns: 1)
+                        }
                     }
-                }
-                .keyboardShortcut(.upArrow, modifiers: [])
+                    .keyboardShortcut(.upArrow, modifiers: [])
 
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    if navigationState.viewMode == .grid {
-                        navigationState.selectBelowItem()
-                    } else {
-                        navigationState.selectBelowItem(approximateColumns: 1)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        if navigationState.viewMode == .grid {
+                            navigationState.selectBelowItem()
+                        } else {
+                            navigationState.selectBelowItem(approximateColumns: 1)
+                        }
                     }
-                }
-                .keyboardShortcut(.downArrow, modifiers: [])
+                    .keyboardShortcut(.downArrow, modifiers: [])
 
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    navigationState.selectPreviousItem()
-                }
-                .keyboardShortcut(.leftArrow, modifiers: [])
-
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    navigationState.selectNextItem()
-                }
-                .keyboardShortcut(.rightArrow, modifiers: [])
-
-                // Return starts inline rename (Finder standard, CMD-03)
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    if let firstSelected = navigationState.selectedItems.first {
-                        navigationState.startRenaming(url: firstSelected.url)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        navigationState.selectPreviousItem()
                     }
-                }
-                .keyboardShortcut(.return, modifiers: [])
+                    .keyboardShortcut(.leftArrow, modifiers: [])
 
-                // F2 starts inline rename (Windows Explorer standard, CMD-03)
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    if let firstSelected = navigationState.selectedItems.first {
-                        navigationState.startRenaming(url: firstSelected.url)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        navigationState.selectNextItem()
                     }
-                }
-                .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF2FunctionKey)!)), modifiers: [])
+                    .keyboardShortcut(.rightArrow, modifiers: [])
 
-                // Cmd+Down to open selected item (Finder standard, CMD-03)
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    if let firstSelected = navigationState.selectedItems.first {
-                        handleActivate(firstSelected)
+                    // Return starts inline rename (Finder standard, CMD-03)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        if let firstSelected = navigationState.selectedItems.first {
+                            navigationState.startRenaming(url: firstSelected.url)
+                        }
                     }
-                }
-                .keyboardShortcut(.downArrow, modifiers: .command)
+                    .keyboardShortcut(.return, modifiers: [])
 
-                // Cmd+O to open selected item
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    if let firstSelected = navigationState.selectedItems.first {
-                        handleActivate(firstSelected)
+                    // F2 starts inline rename (Windows Explorer standard, CMD-03)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        if let firstSelected = navigationState.selectedItems.first {
+                            navigationState.startRenaming(url: firstSelected.url)
+                        }
                     }
-                }
-                .keyboardShortcut("o", modifiers: .command)
+                    .keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF2FunctionKey)!)), modifiers: [])
 
-                // Cmd+Up to navigate to enclosing folder (Finder standard, CMD-03)
-                Button("") {
-                    guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                    navigationState.goUp()
+                    // Cmd+Down to open selected item (Finder standard, CMD-03)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        if let firstSelected = navigationState.selectedItems.first {
+                            handleActivate(firstSelected)
+                        }
+                    }
+                    .keyboardShortcut(.downArrow, modifiers: .command)
+
+                    // Cmd+O to open selected item
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        if let firstSelected = navigationState.selectedItems.first {
+                            handleActivate(firstSelected)
+                        }
+                    }
+                    .keyboardShortcut("o", modifiers: .command)
+
+                    // Cmd+Up to navigate to enclosing folder (Finder standard, CMD-03)
+                    Button("") {
+                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
+                        navigationState.goUp()
+                    }
+                    .keyboardShortcut(.upArrow, modifiers: .command)
                 }
-                .keyboardShortcut(.upArrow, modifiers: .command)
+                .opacity(0)
+                .allowsHitTesting(false)
             }
-            .opacity(0)
-            .allowsHitTesting(false)
         }
         .enableInjection()
     }
