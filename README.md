@@ -84,7 +84,3 @@ For a local universal package:
 ```sh
 scripts/package.sh 0.7.0
 ```
-
-See [Releasing Shark](docs/RELEASING.md) for GitHub secrets, signing, notarization, and version tags. **Mac App Store distribution needs additional sandbox work**; the current release action publishes direct downloads.
-
-Read the [changelog](CHANGELOG.md) for changes, [product direction](PRODUCT.md) for scope, and [design guide](DESIGN.md) for interface conventions.
