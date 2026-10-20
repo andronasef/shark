@@ -6,8 +6,7 @@ struct ScreenshotConfig {
     let headline: String
     let textColor: String
     let bgGradient: String
-    let glowTL: String
-    let glowBR: String
+    let glowColor: String
     let shadowAmbient: String
     let sourceImage: String
 }
@@ -15,42 +14,38 @@ struct ScreenshotConfig {
 let configs: [ScreenshotConfig] = [
     ScreenshotConfig(
         filename: "01-tabs-and-split.png",
-        headline: "Browse two folders side by side.<br>With infinite tabs.",
-        textColor: "#0C4A6E",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #E0F2FE 0%, #BAE6FD 38%, #7DD3FC 72%, #38BDF8 100%)",
-        glowTL: "rgba(56, 189, 248, 0.8)",
-        glowBR: "rgba(2, 132, 199, 0.45)",
-        shadowAmbient: "rgba(3, 105, 161, 0.38)",
+        headline: "Browse two folders side by side<br>with infinite tabs",
+        textColor: "#0F1D36",
+        bgGradient: "radial-gradient(100% 85% at 50% -10%, #F6FAFF 0%, #E5F0FF 35%, #C7DDF8 70%, #9BC6F7 100%)",
+        glowColor: "rgba(185, 218, 255, 0.65)",
+        shadowAmbient: "rgba(12, 45, 95, 0.32)",
         sourceImage: "docs/screenshots/tabs-and-split.png"
     ),
     ScreenshotConfig(
         filename: "02-hover-preview.png",
-        headline: "Preview documents, code, and media<br>without opening them.",
-        textColor: "#45131A",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #FFF1EE 0%, #FED7D0 38%, #FCAFA2 72%, #F88779 100%)",
-        glowTL: "rgba(251, 146, 60, 0.8)",
-        glowBR: "rgba(239, 68, 68, 0.45)",
-        shadowAmbient: "rgba(153, 27, 27, 0.35)",
+        headline: "Preview documents, code, and media<br>without opening them",
+        textColor: "#2E1418",
+        bgGradient: "radial-gradient(100% 85% at 50% -10%, #FFF8F6 0%, #FEECE8 35%, #FED3C9 70%, #FBAFA3 100%)",
+        glowColor: "rgba(254, 215, 205, 0.65)",
+        shadowAmbient: "rgba(120, 30, 40, 0.30)",
         sourceImage: "docs/screenshots/hover-preview.png"
     ),
     ScreenshotConfig(
         filename: "03-subfolder-navigation.png",
-        headline: "Fly through nested folders<br>at the speed of thought.",
-        textColor: "#1E1B4B",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #EEF2FF 0%, #DBE4FE 38%, #B2C5FD 72%, #819EFA 100%)",
-        glowTL: "rgba(129, 140, 248, 0.8)",
-        glowBR: "rgba(59, 130, 246, 0.45)",
-        shadowAmbient: "rgba(30, 58, 138, 0.38)",
+        headline: "Fly through nested folders<br>at the speed of thought",
+        textColor: "#141738",
+        bgGradient: "radial-gradient(100% 85% at 50% -10%, #F7F9FF 0%, #ECEFFE 35%, #D4DCFC 70%, #ADC0F9 100%)",
+        glowColor: "rgba(205, 215, 255, 0.65)",
+        shadowAmbient: "rgba(25, 45, 115, 0.32)",
         sourceImage: "docs/screenshots/subfolder-menu.png"
     ),
     ScreenshotConfig(
         filename: "04-integrated-terminal.png",
-        headline: "A built-in terminal synced right<br>to your active folder.",
-        textColor: "#064E3B",
-        bgGradient: "radial-gradient(85% 75% at 50% 0%, #ECFDF5 0%, #D1FAE5 38%, #A7F3D0 72%, #6EE7B7 100%)",
-        glowTL: "rgba(52, 211, 153, 0.8)",
-        glowBR: "rgba(16, 185, 129, 0.45)",
-        shadowAmbient: "rgba(6, 78, 59, 0.35)",
+        headline: "An integrated terminal<br>synced to your active folder",
+        textColor: "#0D2B20",
+        bgGradient: "radial-gradient(100% 85% at 50% -10%, #F4FBF7 0%, #E4F7ED 35%, #C2EEDB 70%, #94DFBE 100%)",
+        glowColor: "rgba(185, 238, 215, 0.65)",
+        shadowAmbient: "rgba(8, 65, 48, 0.30)",
         sourceImage: "docs/screenshots/terminal.png"
     )
 ]
@@ -71,54 +66,46 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding-top: 64px;
+        padding-top: 68px;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", sans-serif;
         -webkit-font-smoothing: antialiased;
         background: \(config.bgGradient);
       }
-      .mesh-glow-tl {
+      .ambient-glow {
         position: absolute;
-        top: -120px;
-        left: 5%;
-        width: 750px;
+        top: -160px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 1000px;
         height: 600px;
-        background: \(config.glowTL);
-        filter: blur(85px);
-        pointer-events: none;
-      }
-      .mesh-glow-br {
-        position: absolute;
-        bottom: -120px;
-        right: 5%;
-        width: 700px;
-        height: 550px;
-        background: \(config.glowBR);
-        filter: blur(95px);
+        background: radial-gradient(ellipse at center, \(config.glowColor) 0%, transparent 70%);
+        filter: blur(100px);
         pointer-events: none;
       }
       .headline {
         position: relative;
         z-index: 10;
-        font-size: 56px;
-        font-weight: 700;
-        letter-spacing: -0.038em;
-        line-height: 1.12;
+        font-size: 52px;
+        font-weight: 650;
+        letter-spacing: -0.028em;
+        line-height: 1.2;
         text-align: center;
-        max-width: 980px;
+        max-width: 960px;
         color: \(config.textColor);
-        margin-bottom: 42px;
+        margin-bottom: 46px;
+        text-rendering: optimizeLegibility;
       }
       .window-stage {
         position: relative;
         z-index: 10;
         width: 1200px;
-        height: 625px;
+        height: 620px;
         border-radius: 18px;
         box-shadow: 
           0 45px 110px -20px \(config.shadowAmbient),
-          0 25px 50px -15px rgba(0, 0, 0, 0.40),
-          0 10px 20px -5px rgba(0, 0, 0, 0.20),
-          0 0 0 1px rgba(255, 255, 255, 0.50),
+          0 20px 45px -12px rgba(0, 0, 0, 0.38),
+          0 8px 18px -4px rgba(0, 0, 0, 0.20),
+          0 0 0 1px rgba(255, 255, 255, 0.60),
           0 0 0 1.5px rgba(0, 0, 0, 0.12);
         overflow: hidden;
         background: #14181f;
@@ -133,8 +120,7 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
     </style>
     </head>
     <body>
-      <div class="mesh-glow-tl"></div>
-      <div class="mesh-glow-br"></div>
+      <div class="ambient-glow"></div>
       <h1 class="headline">\(config.headline)</h1>
       <div class="window-stage">
         <img src="\(base64Image)" />
