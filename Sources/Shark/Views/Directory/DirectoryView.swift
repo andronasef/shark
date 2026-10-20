@@ -460,11 +460,22 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
-        Button("Open") {
-            handleActivate(item)
+        let isMultiple = navigationState.selectedItemIDs.count > 1 && navigationState.selectedItemIDs.contains(item.id)
+        let selectedCount = navigationState.selectedItemIDs.count
+
+        if isMultiple {
+            Button("Open (\(selectedCount) items)") {
+                for selItem in navigationState.selectedItems {
+                    handleActivate(selItem)
+                }
+            }
+        } else {
+            Button("Open") {
+                handleActivate(item)
+            }
         }
 
-        if item.isNavigableDirectory {
+        if !isMultiple && item.isNavigableDirectory {
             Button("Open in New Tab") {
                 workspace?.open(item.url, from: navigationState, newTab: true)
             }
@@ -481,22 +492,25 @@ public struct DirectoryView: View {
                     NSMenu.popUpContextMenu(menu, with: event, for: NSApp.keyWindow?.contentView ?? NSView())
                 }
             }
-        } else {
+        } else if !isMultiple {
             Button("Quick Preview (QT-03)") {
                 previewItem = item
             }
         }
 
         Button("Open in Terminal") {
-            NSWorkspace.shared.open(item.url)
+            let targetURL = isMultiple ? navigationState.currentURL : item.url
+            NSWorkspace.shared.open(targetURL)
         }
 
         Button("Quick Look") {
-            QuickLookCoordinator.shared.toggleQuickLook(for: [item.url])
+            let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
+            QuickLookCoordinator.shared.toggleQuickLook(for: urls)
         }
 
         Button("Show in Finder") {
-            NSWorkspace.shared.activateFileViewerSelecting([item.url])
+            let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
+            NSWorkspace.shared.activateFileViewerSelecting(urls)
         }
 
         Divider()
@@ -511,45 +525,63 @@ public struct DirectoryView: View {
 
         Divider()
 
-        Button("Rename") {
-            navigationState.startRenaming(url: item.url)
+        if !isMultiple {
+            Button("Rename") {
+                navigationState.startRenaming(url: item.url)
+            }
+        } else {
+            Button("Batch Rename...") {
+                showingBatchRenameSheet = true
+            }
         }
 
         Button("Duplicate") {
+            let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
             Task {
-                try? await FileOperationsService.shared.duplicate(items: [item.url])
+                try? await FileOperationsService.shared.duplicate(items: urls)
                 await navigationState.reloadCurrentDirectory()
             }
         }
 
-        Button("Compress \"\(item.name)\"") {
-            Task {
-                await navigationState.compressSelected()
+        if isMultiple {
+            Button("Compress \(selectedCount) Items") {
+                Task {
+                    await navigationState.compressSelected()
+                }
             }
-        }
-
-        if navigationState.selectedItemIDs.count > 1 {
-            Button("Batch Rename...") {
-                showingBatchRenameSheet = true
+        } else {
+            Button("Compress \"\(item.name)\"") {
+                Task {
+                    await navigationState.compressSelected()
+                }
             }
         }
 
         Menu("Copy Path") {
             Button("Full Path") {
                 NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(item.url.path, forType: .string)
+                let paths = isMultiple
+                    ? navigationState.selectedItems.map(\.url.path).joined(separator: "\n")
+                    : item.url.path
+                NSPasteboard.general.setString(paths, forType: .string)
             }
             Button("Relative Path") {
                 NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(item.name, forType: .string)
+                let names = isMultiple
+                    ? navigationState.selectedItems.map(\.name).joined(separator: "\n")
+                    : item.name
+                NSPasteboard.general.setString(names, forType: .string)
             }
             Button("POSIX Quoted Path") {
                 NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString("\"\(item.url.path)\"", forType: .string)
+                let quoted = isMultiple
+                    ? navigationState.selectedItems.map { "\"\($0.url.path)\"" }.joined(separator: " ")
+                    : "\"\(item.url.path)\""
+                NSPasteboard.general.setString(quoted, forType: .string)
             }
         }
 
-        if item.isDirectory {
+        if !isMultiple && item.isDirectory {
             Button("Calculate Size") {
                 FolderSizeCalculator.shared.requestSize(for: item.url)
             }
@@ -557,7 +589,7 @@ public struct DirectoryView: View {
 
         Divider()
 
-        Button("Move to Trash", role: .destructive) {
+        Button(isMultiple ? "Move \(selectedCount) Items to Trash" : "Move to Trash", role: .destructive) {
             Task {
                 await navigationState.trashSelected()
             }
@@ -566,6 +598,71 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private var directoryBackgroundContextMenu: some View {
+        let hasSelection = !navigationState.selectedItemIDs.isEmpty
+        let selectedCount = navigationState.selectedItemIDs.count
+
+        if hasSelection {
+            Button(selectedCount == 1 ? "Open" : "Open (\(selectedCount) items)") {
+                for item in navigationState.selectedItems {
+                    handleActivate(item)
+                }
+            }
+
+            Button("Quick Look") {
+                QuickLookCoordinator.shared.toggleQuickLook(for: navigationState.selectedItems.map(\.url))
+            }
+
+            Button("Show in Finder") {
+                NSWorkspace.shared.activateFileViewerSelecting(navigationState.selectedItems.map(\.url))
+            }
+
+            Divider()
+
+            Button("Cut") {
+                navigationState.cutSelected()
+            }
+
+            Button("Copy") {
+                navigationState.copySelected()
+            }
+
+            Divider()
+
+            if selectedCount == 1, let singleItem = navigationState.selectedItems.first {
+                Button("Rename") {
+                    navigationState.startRenaming(url: singleItem.url)
+                }
+            } else {
+                Button("Batch Rename...") {
+                    showingBatchRenameSheet = true
+                }
+            }
+
+            Button("Duplicate") {
+                let urls = navigationState.selectedItems.map(\.url)
+                Task {
+                    try? await FileOperationsService.shared.duplicate(items: urls)
+                    await navigationState.reloadCurrentDirectory()
+                }
+            }
+
+            Button(selectedCount == 1 ? "Compress" : "Compress \(selectedCount) Items") {
+                Task {
+                    await navigationState.compressSelected()
+                }
+            }
+
+            Divider()
+
+            Button(selectedCount == 1 ? "Move to Trash" : "Move \(selectedCount) Items to Trash", role: .destructive) {
+                Task {
+                    await navigationState.trashSelected()
+                }
+            }
+
+            Divider()
+        }
+
         Button("New Folder") {
             showingNewItemSheet = .folder
         }
@@ -603,11 +700,17 @@ public struct DirectoryView: View {
         Menu("Copy Path") {
             Button("Full Path") {
                 NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
+                let paths = hasSelection
+                    ? navigationState.selectedItems.map(\.url.path).joined(separator: "\n")
+                    : navigationState.currentURL.path
+                NSPasteboard.general.setString(paths, forType: .string)
             }
             Button("POSIX Quoted Path") {
                 NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString("\"\(navigationState.currentURL.path)\"", forType: .string)
+                let quoted = hasSelection
+                    ? navigationState.selectedItems.map { "\"\($0.url.path)\"" }.joined(separator: " ")
+                    : "\"\(navigationState.currentURL.path)\""
+                NSPasteboard.general.setString(quoted, forType: .string)
             }
         }
     }
