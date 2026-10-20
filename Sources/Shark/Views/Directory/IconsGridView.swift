@@ -258,30 +258,17 @@ private struct IconGridItemView: View {
                 )
                 .frame(width: 90, height: 20)
             } else {
-                VStack(spacing: 1) {
-                    Text(item.name)
-                        .font(.system(size: 11, weight: isSelected ? .medium : .regular))
-                        .foregroundColor(isSelected ? .white : .primary)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(isSelected ? Color.accentColor : Color.clear)
-                        )
-
-                    // Secondary size / item count badge below label
-                    if item.isDirectory {
-                        Text("folder")
-                            .font(.system(size: 9))
-                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
-                    } else {
-                        Text(item.formattedSize)
-                            .font(.system(size: 9))
-                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
-                    }
-                }
+                Text(item.name)
+                    .font(.system(size: 11, weight: isSelected ? .medium : .regular))
+                    .foregroundColor(isSelected ? .white : .primary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(isSelected ? Color.accentColor : Color.clear)
+                    )
             }
         }
         .frame(width: max(iconSize + 28, 104))
