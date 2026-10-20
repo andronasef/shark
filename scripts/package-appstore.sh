@@ -4,8 +4,24 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="${1:-1.0.0}"
-APP_IDENTITY="${APP_IDENTITY:-Apple Distribution: Andrew Nasef (B9P7Y6B9F5)}"
-INSTALLER_IDENTITY="${INSTALLER_IDENTITY:-Mac Installer Distribution: Andrew Nasef (B9P7Y6B9F5)}"
+
+# Auto-detect Apple Distribution certificate if not explicitly provided
+DETECTED_APP_ID=$(security find-identity -v | grep -o 'Apple Distribution: [^"]*' | head -n 1 || true)
+APP_IDENTITY="${APP_IDENTITY:-${DETECTED_APP_ID}}"
+
+# Auto-detect Mac Installer certificate if not explicitly provided
+DETECTED_INST_ID=$(security find-identity -v | grep -o '\(3rd Party Mac Developer Installer\|Mac Installer Distribution\): [^"]*' | head -n 1 || true)
+INSTALLER_IDENTITY="${INSTALLER_IDENTITY:-${DETECTED_INST_ID}}"
+
+if [[ -z "$APP_IDENTITY" ]]; then
+    echo "Error: Could not find an 'Apple Distribution' certificate in Keychain." >&2
+    exit 1
+fi
+
+if [[ -z "$INSTALLER_IDENTITY" ]]; then
+    echo "Error: Could not find a 'Mac Installer Distribution' or '3rd Party Mac Developer Installer' certificate in Keychain." >&2
+    exit 1
+fi
 
 echo "==> Packaging Shark v${VERSION} for Mac App Store..."
 echo "==> App Signing Identity: ${APP_IDENTITY}"
