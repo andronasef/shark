@@ -300,13 +300,14 @@ private struct IconGridItemView: View {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(isSelected ? Color.accentColor : Color.clear)
                     )
-                    .overlay(alignment: .trailing) {
-                        SubfolderTip(item: item, isHovering: isHovering, onNavigate: onSubfolderNavigate)
-                    }
             }
         }
         .onHover { isHovering = $0 }
         .frame(width: max(iconSize + 28, 104))
+        .overlay(alignment: .topTrailing) {
+            SubfolderTip(item: item, isHovering: isHovering, size: 26, onNavigate: onSubfolderNavigate)
+                .padding(2)
+        }
         .task {
             if !item.isDirectory {
                 thumbnail = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: iconSize * 2, height: iconSize * 2))

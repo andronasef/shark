@@ -16,14 +16,17 @@ struct HoverReveal<Content: View>: View {
 struct SubfolderTip: View {
     let item: FileItem
     let isHovering: Bool
+    var size: CGFloat = 18
     let onNavigate: (URL, Bool) -> Void
     @AppStorage("subfolderTipEnabled") private var enabled = true
 
     var body: some View {
         if enabled, isHovering, item.isNavigableDirectory {
-            CascadingFolderChevronButton(url: item.url, onNavigate: onNavigate)
-                .frame(width: 16, height: 16)
-                .background(Circle().fill(Color.primary.opacity(0.12)))
+            CascadingFolderChevronButton(url: item.url, pointSize: size * 0.5, onNavigate: onNavigate)
+                .frame(width: size, height: size)
+                .background(Circle().fill(.regularMaterial))
+                .overlay(Circle().strokeBorder(Color.primary.opacity(0.25), lineWidth: 0.5))
+                .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
         }
     }
 }

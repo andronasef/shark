@@ -4,20 +4,23 @@ import SwiftUI
 public struct CascadingFolderChevronButton: NSViewRepresentable {
     public let url: URL
     public var symbol: String
+    public var pointSize: CGFloat
     public let onNavigate: (URL, Bool) -> Void
 
-    public init(url: URL, symbol: String = "chevron.down", onNavigate: @escaping (URL, Bool) -> Void) {
+    public init(url: URL, symbol: String = "chevron.down", pointSize: CGFloat = 8, onNavigate: @escaping (URL, Bool) -> Void) {
         self.url = url
         self.symbol = symbol
+        self.pointSize = pointSize
         self.onNavigate = onNavigate
     }
 
     public func makeNSView(context: Context) -> NSButton {
         let button = NSButton()
-        let config = NSImage.SymbolConfiguration(pointSize: 8, weight: .bold)
+        let config = NSImage.SymbolConfiguration(pointSize: pointSize, weight: .bold)
         button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Browse subfolders")?.withSymbolConfiguration(config)
         button.bezelStyle = .inline
         button.isBordered = false
+        button.contentTintColor = .labelColor
         button.target = context.coordinator
         button.action = #selector(Coordinator.buttonClicked(_:))
         button.toolTip = "Browse Subfolders"
@@ -28,7 +31,7 @@ public struct CascadingFolderChevronButton: NSViewRepresentable {
 
     public func updateNSView(_ nsView: NSButton, context: Context) {
         nsView.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Browse subfolders")?
-            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: 8, weight: .bold))
+            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: pointSize, weight: .bold))
         nsView.toolTip = "Browse subfolders of \(url.lastPathComponent.isEmpty ? "Macintosh HD" : url.lastPathComponent)"
         context.coordinator.url = url
         context.coordinator.onNavigate = onNavigate

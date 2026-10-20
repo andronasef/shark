@@ -52,7 +52,7 @@ public struct DetailsTableView: View {
                                 .lineLimit(1)
                         }
 
-                        SubfolderTip(item: item, isHovering: hovering) { targetURL, inNewTab in
+                        SubfolderTip(item: item, isHovering: hovering, size: 20) { targetURL, inNewTab in
                             if inNewTab, let workspace {
                                 workspace.open(targetURL, from: navigationState, newTab: true)
                             } else {
