@@ -10,3 +10,7 @@ DerivedData/
 *.app
 /dist/
 /.impeccable/review/
+
+# Firebase configuration
+GoogleService-Info.plist
+**/GoogleService-Info.plist
