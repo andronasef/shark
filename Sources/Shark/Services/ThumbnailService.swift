@@ -1,5 +1,5 @@
 import AppKit
-import QuickLookThumbnailing
+@preconcurrency import QuickLookThumbnailing
 
 @MainActor
 public final class ThumbnailService {
@@ -25,15 +25,14 @@ public final class ThumbnailService {
             representationTypes: .thumbnail
         )
 
-        do {
-            let representation = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
-            let image = representation.nsImage
-            cache.setObject(image, forKey: key)
-            return image
-        } catch {
-            let fallback = NSWorkspace.shared.icon(forFile: url.path)
-            cache.setObject(fallback, forKey: key)
-            return fallback
+        return await withCheckedContinuation { continuation in
+            QLThumbnailGenerator.shared.generateBestRepresentation(for: request) { [weak self] representation, _ in
+                let image = representation?.nsImage ?? NSWorkspace.shared.icon(forFile: url.path)
+                Task { @MainActor [weak self] in
+                    self?.cache.setObject(image, forKey: key)
+                    continuation.resume(returning: image)
+                }
+            }
         }
     }
 }

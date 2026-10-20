@@ -98,3 +98,48 @@ struct FinderToolbarCaption<Content: View>: View {
         }
     }
 }
+
+struct FinderToolbarSymbol: View {
+    let symbol: String
+    var disclosure = false
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: symbol)
+                .font(.system(size: 15, weight: .regular))
+            if disclosure {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 7, weight: .semibold))
+            }
+        }
+        .frame(width: disclosure ? 42 : 30, height: 28)
+        .contentShape(Capsule())
+    }
+}
+
+struct FinderSearchField: View {
+    @Binding var text: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+            TextField("Search", text: $text)
+                .textFieldStyle(.plain)
+                .font(.system(size: 12))
+                .accessibilityLabel("Search files in current folder")
+            if !text.isEmpty {
+                Button { text = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear Search")
+            }
+        }
+        .padding(.horizontal, 10)
+        .frame(width: 200, height: 28)
+        .finderGlass(interactive: false)
+    }
+}
