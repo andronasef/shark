@@ -465,8 +465,11 @@ public struct PlacesSidebarView: View {
 
     private static var standardLocations: [SidebarItem] {
         let home = FileManager.default.homeDirectoryForCurrentUser
-        return [
-            SidebarItem(name: "iCloud Drive", url: home.appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs"), iconName: "icloud", section: .places),
+        let iCloud = home.appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs")
+        // Like Finder, hide iCloud Drive when it is switched off (the folder does not exist).
+        let iCloudItem = FileManager.default.fileExists(atPath: iCloud.path)
+            ? [SidebarItem(name: "iCloud Drive", url: iCloud, iconName: "icloud", section: .places)] : []
+        return iCloudItem + [
             SidebarItem(name: home.lastPathComponent, url: home, iconName: "house", section: .places),
             SidebarItem(name: "Macintosh HD", url: URL(fileURLWithPath: "/"), iconName: "internaldrive", section: .places),
             SidebarItem(name: "AirDrop", url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "airdrop", section: .places),

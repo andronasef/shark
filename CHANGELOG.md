@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Changed
+- The sidebar hides iCloud Drive when it is switched off, as Finder does, instead of showing an item that fails with "Unable to open directory".
+- `scripts/run.sh` builds with the InjectionIII flags (`-enable-implicit-dynamic`, `-interposable`) and signs with a stable `Shark Dev` certificate when present, so permission grants survive rebuilds.
 - The toolbar Location capsule now starts directly beside Navigation and grows or shrinks with the window to fill the free toolbar space (minimum 160 pt) instead of stopping at 360 pt, so long paths are shown in full.
 - Refined sidebar headings with hover feedback, keyboard focus outlines, arrow-key navigation, and temporary expansion during folder drags. Sidebar focus no longer triggers directory navigation shortcuts.
 - Favorites now persist custom folders and order, support adding/reordering shortcuts with insertion guides, and offer Show in Finder, Locate Folder, and Remove from Favorites. Missing folders remain visible; removing a shortcut leaves its folder untouched. Ancestor indicators follow the active pane.
