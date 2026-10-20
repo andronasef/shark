@@ -2,12 +2,17 @@ import SwiftUI
 import AppKit
 import AVKit
 
+/// NSImageView that never imposes its image size on layout, so SwiftUI's frame decides.
+private final class FlexibleImageView: NSImageView {
+    override var intrinsicContentSize: NSSize { NSSize(width: NSView.noIntrinsicMetric, height: NSView.noIntrinsicMetric) }
+}
+
 /// Plays animated formats (GIF, APNG) that SwiftUI's `Image` renders as a still frame.
 private struct AnimatedImageView: NSViewRepresentable {
     let image: NSImage
 
     func makeNSView(context: Context) -> NSImageView {
-        let view = NSImageView(image: image)
+        let view = FlexibleImageView(image: image)
         view.animates = true
         view.imageScaling = .scaleProportionallyUpOrDown
         return view
@@ -15,6 +20,12 @@ private struct AnimatedImageView: NSViewRepresentable {
 
     func updateNSView(_ view: NSImageView, context: Context) {
         view.image = image
+    }
+}
+
+private extension NSImage {
+    var isAnimated: Bool {
+        ((representations.first as? NSBitmapImageRep)?.value(forProperty: .frameCount) as? Int ?? 1) > 1
     }
 }
 
@@ -83,7 +94,7 @@ public struct HoverPreviewCard: View {
                     case .image(let image, let dimensions, let sizeFormatted):
                         let size = fitted(image.size)
                         VStack(alignment: .leading, spacing: 6) {
-                            AnimatedImageView(image: image)
+                            imageView(image, size: size)
                                 .frame(width: size.width, height: size.height)
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
 
@@ -160,10 +171,32 @@ public struct HoverPreviewCard: View {
         }
     }
 
-    /// Scales down to fit the preview bounds; small images stay at their natural size.
+    /// Scales down to fit the preview bounds; small images stay at their natural size. Extreme
+    /// aspect ratios (long page screenshots, banners) get a square window onto the image instead
+    /// of an unreadable sliver.
     private func fitted(_ size: CGSize) -> CGSize {
         guard size.width > 0, size.height > 0 else { return CGSize(width: 160, height: 120) }
+        if Self.isExtreme(size) { return CGSize(width: 360, height: 360) }
         let scale = min(1, Self.maxImageSize.width / size.width, Self.maxImageSize.height / size.height)
         return CGSize(width: size.width * scale, height: size.height * scale)
+    }
+
+    private static func isExtreme(_ size: CGSize) -> Bool {
+        let ratio = size.width / size.height
+        return ratio < 1.0 / 3 || ratio > 3
+    }
+
+    @ViewBuilder
+    private func imageView(_ image: NSImage, size: CGSize) -> some View {
+        if image.isAnimated {
+            AnimatedImageView(image: image)
+        } else if Self.isExtreme(image.size) {
+            // Fill the window and show the start of the image (top of a page, left of a banner).
+            Image(nsImage: image).resizable().scaledToFill()
+                .frame(width: size.width, height: size.height, alignment: image.size.height > image.size.width ? .top : .leading)
+                .clipped()
+        } else {
+            Image(nsImage: image).resizable().aspectRatio(contentMode: .fit)
+        }
     }
 }
