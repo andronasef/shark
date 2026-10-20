@@ -63,7 +63,7 @@ private class CommandScrollZoomNSView: NSView {
         guard event.window === window,
               !isHiddenOrHasHiddenAncestor,
               event.modifierFlags.contains(.command),
-              visibleRect.contains(convert(event.locationInWindow, from: nil)),
+              bounds.intersection(visibleRect).contains(convert(event.locationInWindow, from: nil)),
               abs(event.scrollingDeltaY) > 0.05,
               let onZoom else { return event }
 
