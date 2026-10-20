@@ -3,58 +3,64 @@ import WebKit
 
 struct ScreenshotConfig {
     let filename: String
-    let badge: String
-    let badgeColor: String
     let headline: String
-    let subheadline: String
-    let glowColor: String
+    let textColor: String
+    let bgGradient: String
+    let glowTL: String
+    let glowBR: String
+    let shadowAmbient: String
     let sourceImage: String
 }
 
 let configs: [ScreenshotConfig] = [
     ScreenshotConfig(
         filename: "01-tabs-and-split.png",
-        badge: "Workspace Freedom",
-        badgeColor: "#60a5fa",
-        headline: "Two locations side by side. Infinite tabs.",
-        subheadline: "Compare folders, drag files across workspaces, and restore your session whenever you return.",
-        glowColor: "rgba(56, 138, 255, 0.22)",
+        headline: "Browse two folders side by side.<br>With infinite tabs.",
+        textColor: "#0A1938",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #E6F1FE 0%, #C8E0FB 38%, #93BFF6 72%, #5D9DEE 100%)",
+        glowTL: "rgba(134, 172, 211, 0.8)",
+        glowBR: "rgba(1, 16, 133, 0.45)",
+        shadowAmbient: "rgba(10, 50, 120, 0.38)",
         sourceImage: "docs/screenshots/tabs-and-split.png"
     ),
     ScreenshotConfig(
         filename: "02-hover-preview.png",
-        badge: "Instant Previews",
-        badgeColor: "#a78bfa",
-        headline: "Preview anything without losing your place.",
-        subheadline: "Inspect images, video, code, and documents with rich floating cards, metadata, and Quick Look.",
-        glowColor: "rgba(167, 139, 250, 0.24)",
+        headline: "Preview documents, code, and media<br>without opening them.",
+        textColor: "#42141A",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #FFF0ED 0%, #FDD7D1 38%, #FCAFA5 72%, #F88A7D 100%)",
+        glowTL: "rgba(253, 197, 198, 0.85)",
+        glowBR: "rgba(245, 90, 85, 0.45)",
+        shadowAmbient: "rgba(140, 30, 40, 0.35)",
         sourceImage: "docs/screenshots/hover-preview.png"
     ),
     ScreenshotConfig(
         filename: "03-subfolder-navigation.png",
-        badge: "Lightning Navigation",
-        badgeColor: "#38bdf8",
-        headline: "Traverse nested folders at the speed of thought.",
-        subheadline: "Cascading popups let you dive straight into deep directories without opening cluttered windows.",
-        glowColor: "rgba(56, 189, 248, 0.22)",
+        headline: "Fly through nested folders<br>at the speed of thought.",
+        textColor: "#082C24",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #E8FAF6 0%, #C7F4EC 38%, #8EE5D8 72%, #4CCFBD 100%)",
+        glowTL: "rgba(175, 245, 235, 0.85)",
+        glowBR: "rgba(30, 180, 160, 0.45)",
+        shadowAmbient: "rgba(15, 90, 80, 0.35)",
         sourceImage: "docs/screenshots/subfolder-menu.png"
     ),
     ScreenshotConfig(
         filename: "04-integrated-terminal.png",
-        badge: "Developer Tools",
-        badgeColor: "#34d399",
-        headline: "An integrated terminal right where your files live.",
-        subheadline: "Toggle an embedded zsh drawer with ⌘` automatically synced to your active directory.",
-        glowColor: "rgba(52, 211, 153, 0.20)",
+        headline: "A built-in terminal synced right<br>to your active folder.",
+        textColor: "#1F1142",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #F3EDFF 0%, #DFD3FE 38%, #BFA7FD 72%, #9570F8 100%)",
+        glowTL: "rgba(220, 205, 255, 0.85)",
+        glowBR: "rgba(125, 75, 230, 0.45)",
+        shadowAmbient: "rgba(70, 30, 130, 0.38)",
         sourceImage: "docs/screenshots/terminal.png"
     ),
     ScreenshotConfig(
         filename: "05-native-mac-craft.png",
-        badge: "Native macOS Craft",
-        badgeColor: "#38bdf8",
-        headline: "Fast, sandboxed, and 100% private.",
-        subheadline: "Pure Swift performance, familiar keyboard shortcuts, dark mode, and zero cloud tracking.",
-        glowColor: "rgba(56, 189, 248, 0.20)",
+        headline: "Fast, lightweight, and completely<br>private on your Mac.",
+        textColor: "#0E1B32",
+        bgGradient: "radial-gradient(85% 75% at 50% 0%, #F0F4FA 0%, #DCE5F3 38%, #BDCEE5 72%, #8FAACC 100%)",
+        glowTL: "rgba(210, 225, 245, 0.85)",
+        glowBR: "rgba(50, 90, 160, 0.45)",
+        shadowAmbient: "rgba(25, 55, 105, 0.35)",
         sourceImage: "docs/screenshots/tabs-and-split.png"
     )
 ]
@@ -71,74 +77,59 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
         width: 1440px;
         height: 900px;
         overflow: hidden;
-        background: radial-gradient(120% 100% at 50% 0%, #151d2a 0%, #0c1017 50%, #06080d 100%);
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-        color: #ffffff;
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        position: relative;
-        padding-top: 50px;
+        padding-top: 64px;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", sans-serif;
         -webkit-font-smoothing: antialiased;
+        background: \(config.bgGradient);
       }
-      .ambient-glow {
+      .mesh-glow-tl {
         position: absolute;
         top: -120px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 860px;
-        height: 480px;
-        background: radial-gradient(circle, \(config.glowColor) 0%, rgba(20, 30, 50, 0.05) 55%, transparent 75%);
-        filter: blur(65px);
+        left: 5%;
+        width: 750px;
+        height: 600px;
+        background: \(config.glowTL);
+        filter: blur(85px);
         pointer-events: none;
       }
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 15px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 999px;
-        font-size: 11.5px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: \(config.badgeColor);
-        margin-bottom: 12px;
-        backdrop-filter: blur(14px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      .mesh-glow-br {
+        position: absolute;
+        bottom: -120px;
+        right: 5%;
+        width: 700px;
+        height: 550px;
+        background: \(config.glowBR);
+        filter: blur(95px);
+        pointer-events: none;
       }
       .headline {
-        font-size: 42px;
+        position: relative;
+        z-index: 10;
+        font-size: 56px;
         font-weight: 700;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.038em;
         line-height: 1.12;
         text-align: center;
         max-width: 980px;
-        background: linear-gradient(180deg, #ffffff 45%, #cbd5e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 10px;
-      }
-      .subheadline {
-        font-size: 16.5px;
-        font-weight: 400;
-        color: #94a3b8;
-        text-align: center;
-        max-width: 820px;
-        line-height: 1.45;
-        margin-bottom: 30px;
+        color: \(config.textColor);
+        margin-bottom: 42px;
       }
       .window-stage {
         position: relative;
+        z-index: 10;
         width: 1200px;
-        height: 615px;
-        border-radius: 12px;
+        height: 625px;
+        border-radius: 18px;
         box-shadow: 
-          0 40px 90px -15px rgba(0, 0, 0, 0.9),
-          0 18px 35px -10px rgba(0, 0, 0, 0.65),
-          0 0 0 1px rgba(255, 255, 255, 0.12);
+          0 45px 110px -20px \(config.shadowAmbient),
+          0 25px 50px -15px rgba(0, 0, 0, 0.40),
+          0 10px 20px -5px rgba(0, 0, 0, 0.20),
+          0 0 0 1px rgba(255, 255, 255, 0.50),
+          0 0 0 1.5px rgba(0, 0, 0, 0.12);
         overflow: hidden;
         background: #14181f;
       }
@@ -152,10 +143,9 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
     </style>
     </head>
     <body>
-      <div class="ambient-glow"></div>
-      <div class="badge">✦ \(config.badge)</div>
+      <div class="mesh-glow-tl"></div>
+      <div class="mesh-glow-br"></div>
       <h1 class="headline">\(config.headline)</h1>
-      <p class="subheadline">\(config.subheadline)</p>
       <div class="window-stage">
         <img src="\(base64Image)" />
       </div>
