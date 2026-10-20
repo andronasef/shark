@@ -634,7 +634,7 @@ public struct DirectoryView: View {
                 }
             }
         } else {
-            Button("Compress \"\(item.name)\"") {
+            Button("Compress \"\(item.name.middleTruncated(to: 24))\"") {
                 Task {
                     await navigationState.compressSelected()
                 }
@@ -795,5 +795,14 @@ public struct DirectoryView: View {
                 NSPasteboard.general.setString(quoted, forType: .string)
             }
         }
+    }
+}
+
+extension String {
+    /// Elides the middle so long names keep their start and ending (e.g. the extension) in compact menus.
+    func middleTruncated(to limit: Int) -> String {
+        guard limit > 1, count > limit else { return self }
+        let head = limit / 2
+        return prefix(head) + "…" + suffix(limit - 1 - head)
     }
 }

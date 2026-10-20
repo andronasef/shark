@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Matched the Places sidebar to the supplied reference with an inset rounded panel, larger monochrome icons, 32 pt rows, explicit section spacing, and brighter tag colors. Standard places now appear immediately while mounted volumes load.
 
 ### Fixed
+- Long file names in the "Compress" context-menu item are now shortened in the middle, keeping the start and extension, so the menu stays compact.
 - Text hover previews no longer fail when the first read ends mid-character, binary files are no longer previewed as text, and edited files no longer show a stale cached preview.
 - Folders blocked by macOS privacy protection (e.g. Trash) now explain why and offer a button that opens Full Disk Access settings, instead of only "Try Again".
 
