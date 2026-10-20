@@ -151,9 +151,27 @@ public struct IconsGridView: View {
                 .onPreferenceChange(ItemFramePreferenceKey.self) { frames in
                     itemFrames = frames
                 }
+                .onAppear {
+                    updateGridColumnCount(width: containerGeo.size.width)
+                }
+                .onChange(of: containerGeo.size.width) {
+                    updateGridColumnCount(width: containerGeo.size.width)
+                }
+                .onChange(of: navigationState.iconSize) {
+                    updateGridColumnCount(width: containerGeo.size.width)
+                }
             }
         }
         .enableInjection()
+    }
+
+    private func updateGridColumnCount(width: CGFloat) {
+        let currentIconSize = navigationState.iconSize
+        let cellMinWidth = max(currentIconSize + 28, 96)
+        let availableWidth = max(0, width - 40)
+        let colWidth = cellMinWidth + 20
+        let cols = max(1, Int(availableWidth / colWidth))
+        navigationState.gridColumnCount = cols
     }
 
     private func handleItemTap(_ item: FileItem) {

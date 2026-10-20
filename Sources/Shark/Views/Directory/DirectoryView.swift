@@ -94,10 +94,11 @@ public struct DirectoryView: View {
                     .keyboardShortcut("d", modifiers: .option)
 
                 // Arrow Key Item Navigation (Windows Explorer & Finder)
+                // Up / Down moves up and down row-by-row in both Grid and List views
                 Button("") {
                     guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
                     if navigationState.viewMode == .grid {
-                        navigationState.selectPreviousItem()
+                        navigationState.selectAboveItem()
                     } else {
                         navigationState.selectAboveItem(approximateColumns: 1)
                     }
@@ -107,7 +108,7 @@ public struct DirectoryView: View {
                 Button("") {
                     guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
                     if navigationState.viewMode == .grid {
-                        navigationState.selectNextItem()
+                        navigationState.selectBelowItem()
                     } else {
                         navigationState.selectBelowItem(approximateColumns: 1)
                     }

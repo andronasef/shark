@@ -60,24 +60,36 @@ final class NavigationStateTests: XCTestCase {
         XCTAssertEqual(state.filteredAndSortedItems.count, 1)
         XCTAssertEqual(state.filteredAndSortedItems.first?.name, "FolderC")
     }
-    func testArrowKeyNavigation() async {
+    func testArrowKeyNavigation() {
         let state = NavigationState()
-        await state.reloadCurrentDirectory()
+        let items = (0..<8).map { i in
+            FileItem(url: URL(fileURLWithPath: "/test/item\(i)"), name: "item\(i)", isDirectory: false)
+        }
+        state.items = items
+        state.gridColumnCount = 4
 
         XCTAssertTrue(state.selectedItemIDs.isEmpty)
         state.selectNextItem()
-        if !state.filteredAndSortedItems.isEmpty {
-            XCTAssertEqual(state.selectedItemIDs.count, 1)
-            let firstID = state.selectedItemIDs.first
-            XCTAssertEqual(firstID, state.filteredAndSortedItems.first?.id)
+        XCTAssertEqual(state.selectedItemIDs.first, items[0].id)
 
-            state.selectNextItem()
-            if state.filteredAndSortedItems.count > 1 {
-                XCTAssertEqual(state.selectedItemIDs.first, state.filteredAndSortedItems[1].id)
-            }
+        // Right arrow moves to item 1
+        state.selectNextItem()
+        XCTAssertEqual(state.selectedItemIDs.first, items[1].id)
 
-            state.selectPreviousItem()
-            XCTAssertEqual(state.selectedItemIDs.first, firstID)
-        }
+        // Down arrow moves 1 row down (col count 4: index 1 + 4 = 5)
+        state.selectBelowItem()
+        XCTAssertEqual(state.selectedItemIDs.first, items[5].id)
+
+        // Up arrow moves 1 row up (index 5 - 4 = 1)
+        state.selectAboveItem()
+        XCTAssertEqual(state.selectedItemIDs.first, items[1].id)
+
+        // Left arrow moves to item 0
+        state.selectPreviousItem()
+        XCTAssertEqual(state.selectedItemIDs.first, items[0].id)
+
+        // Moving up from top row stays at item 0 (does not loop or crash)
+        state.selectAboveItem()
+        XCTAssertEqual(state.selectedItemIDs.first, items[0].id)
     }
 }

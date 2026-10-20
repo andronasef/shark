@@ -58,6 +58,7 @@ public final class NavigationState {
 
     public var sortField: SortField = .name
     public var sortAscending: Bool = true
+    public var gridColumnCount: Int = 1
 
     // Explorer Ergonomics additions
     public var renamingItemURL: URL? = nil
@@ -372,27 +373,33 @@ public final class NavigationState {
         }
     }
 
-    public func selectAboveItem(approximateColumns: Int = 4) {
+    public func selectAboveItem(approximateColumns: Int? = nil) {
         let items = filteredAndSortedItems
         guard !items.isEmpty else { return }
 
+        let cols = max(1, approximateColumns ?? gridColumnCount)
         if let firstSelectedID = selectedItemIDs.first,
            let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
-            let targetIndex = max(0, currentIndex - max(1, approximateColumns))
-            selectedItemIDs = [items[targetIndex].id]
+            let targetIndex = currentIndex - cols
+            if targetIndex >= 0 {
+                selectedItemIDs = [items[targetIndex].id]
+            }
         } else {
             selectedItemIDs = [items[0].id]
         }
     }
 
-    public func selectBelowItem(approximateColumns: Int = 4) {
+    public func selectBelowItem(approximateColumns: Int? = nil) {
         let items = filteredAndSortedItems
         guard !items.isEmpty else { return }
 
+        let cols = max(1, approximateColumns ?? gridColumnCount)
         if let firstSelectedID = selectedItemIDs.first,
            let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
-            let targetIndex = min(items.count - 1, currentIndex + max(1, approximateColumns))
-            selectedItemIDs = [items[targetIndex].id]
+            let targetIndex = currentIndex + cols
+            if targetIndex < items.count {
+                selectedItemIDs = [items[targetIndex].id]
+            }
         } else {
             selectedItemIDs = [items[0].id]
         }
