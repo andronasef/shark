@@ -22,6 +22,7 @@ extension TabColor {
 public struct TabDropDelegate: DropDelegate {
     let targetTab: WorkspaceTab
     let workspace: WorkspaceState
+    let targetWidth: CGFloat
     @Binding var draggedTabID: UUID?
     @Binding var dropTargetID: UUID?
     @Binding var dropBefore: Bool
@@ -31,8 +32,10 @@ public struct TabDropDelegate: DropDelegate {
         workspace: WorkspaceState,
         draggedTabID: Binding<UUID?>,
         dropTargetID: Binding<UUID?>,
-        dropBefore: Binding<Bool>
+        dropBefore: Binding<Bool>,
+        targetWidth: CGFloat = 120
     ) {
+        self.targetWidth = targetWidth
         self.targetTab = targetTab
         self.workspace = workspace
         self._draggedTabID = draggedTabID
@@ -45,7 +48,7 @@ public struct TabDropDelegate: DropDelegate {
     }
 
     public func dropUpdated(info: DropInfo) -> DropProposal? {
-        let isLeading = info.location.x < 60
+        let isLeading = info.location.x < targetWidth / 2
         dropBefore = isLeading
         return DropProposal(operation: .move)
     }
@@ -143,7 +146,8 @@ public struct TabItemView: View {
                 workspace: workspace,
                 draggedTabID: $draggedTabID,
                 dropTargetID: $dropTargetID,
-                dropBefore: $dropBefore
+                dropBefore: $dropBefore,
+                targetWidth: tab.isPinned ? 40 : (width ?? 120)
             )
         )
         .overlay(alignment: .leading) {
@@ -166,9 +170,6 @@ public struct TabItemView: View {
 
     private var pinnedTabBody: some View {
         ZStack {
-            Rectangle()
-                .fill(isActive ? Color(nsColor: .windowBackgroundColor) : Color(nsColor: .controlBackgroundColor))
-
             ZStack(alignment: .bottomTrailing) {
                 Image(nsImage: folderIcon)
                     .resizable()
@@ -187,7 +188,8 @@ public struct TabItemView: View {
                 }
             }
         }
-        .frame(width: 40)
+        .frame(width: 40, height: 28)
+        .finderGlass(isSelected: isActive, interactive: false)
         .overlay(alignment: .trailing) {
             Rectangle()
                 .fill(Color(nsColor: .separatorColor))
@@ -199,16 +201,16 @@ public struct TabItemView: View {
 
     private var unpinnedTabBody: some View {
         HStack(spacing: 0) {
-            // Leading Close Slot (16pt)
+            // Leading Close Slot (20pt)
             ZStack {
                 if isHovered || isCloseHovered {
                     Button {
                         workspace.closeTab(id: tab.id)
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 9, weight: .semibold))
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(isCloseHovered ? Color.primary : Color.secondary)
-                            .frame(width: 16, height: 16)
+                            .frame(width: 20, height: 20)
                             .background(
                                 Circle()
                                     .fill(isCloseHovered ? Color.primary.opacity(0.12) : Color.clear)
@@ -218,7 +220,7 @@ public struct TabItemView: View {
                     .onHover { isCloseHovered = $0 }
                 }
             }
-            .frame(width: 16, height: 16)
+            .frame(width: 20, height: 20)
             .padding(.leading, 8)
 
             Spacer(minLength: 4)
@@ -231,13 +233,8 @@ public struct TabItemView: View {
                         .frame(width: 8, height: 8)
                 }
 
-                Image(nsImage: folderIcon)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 14, height: 14)
-
                 Text(tab.title)
-                    .font(.system(size: 11, weight: .regular))
+                    .font(.system(size: 12, weight: isActive ? .semibold : .regular))
                     .foregroundStyle(isActive ? Color.primary : Color.secondary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -251,18 +248,13 @@ public struct TabItemView: View {
 
             Spacer(minLength: 4)
 
-            // Trailing Balance Slot (16pt) to optically center title
+            // Trailing Balance Slot (20pt) to optically center title
             Color.clear
-                .frame(width: 16, height: 16)
+                .frame(width: 20, height: 20)
                 .padding(.trailing, 8)
         }
-        .frame(width: width)
-        .background(isActive ? Color(nsColor: .windowBackgroundColor) : Color(nsColor: .controlBackgroundColor))
-        .overlay(alignment: .trailing) {
-            Rectangle()
-                .fill(Color(nsColor: .separatorColor))
-                .frame(width: 0.5)
-        }
+        .frame(width: width, height: 28)
+        .finderGlass(isSelected: true, interactive: false, enabled: isActive)
     }
 
     // MARK: - Context Menu

@@ -20,8 +20,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Start debounced autosave
         sessionStore?.startAutosave(workspace)
-        // Install global NSEvent monitor for middle-click tab operations
-        MiddleClick.install()
         // Install drag operation patcher (move by default, copy with + only when holding Alt)
         DragOperationPatcher.install()
     }

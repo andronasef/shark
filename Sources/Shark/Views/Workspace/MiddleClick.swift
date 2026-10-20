@@ -1,36 +1,64 @@
 import SwiftUI
 import AppKit
 
-@MainActor
-public enum MiddleClick {
-    public static var target: (id: UUID, action: () -> Void)?
-    private static var monitor: Any?
+public struct MiddleClickModifier: ViewModifier {
+    let action: () -> Void
 
-    public static func install() {
-        guard monitor == nil else { return }
-        monitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { event in
-            if event.buttonNumber == 2, let t = MiddleClick.target {
-                t.action()
-                return nil
-            }
-            return event
-        }
+    public func body(content: Content) -> some View {
+        content.overlay(MiddleClickRegion(action: action))
     }
 }
 
-public struct MiddleClickModifier: ViewModifier {
+private struct MiddleClickRegion: NSViewRepresentable {
     let action: () -> Void
-    @State private var id = UUID()
 
-    public func body(content: Content) -> some View {
-        content
-            .onHover { isHovered in
-                if isHovered {
-                    MiddleClick.target = (id, action)
-                } else if MiddleClick.target?.id == id {
-                    MiddleClick.target = nil
-                }
-            }
+    func makeNSView(context: Context) -> MiddleClickNSView {
+        let view = MiddleClickNSView()
+        view.action = action
+        return view
+    }
+
+    func updateNSView(_ nsView: MiddleClickNSView, context: Context) {
+        nsView.action = action
+    }
+
+    static func dismantleNSView(_ nsView: MiddleClickNSView, coordinator: ()) {
+        nsView.stopMonitoring()
+    }
+}
+
+private final class MiddleClickNSView: NSView {
+    var action: (() -> Void)?
+    private var monitor: Any?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        stopMonitoring()
+        guard window != nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
+            guard let self,
+                  event.buttonNumber == 2,
+                  event.window === self.window,
+                  !self.isHiddenOrHasHiddenAncestor,
+                  self.bounds.intersection(self.visibleRect).contains(self.convert(event.locationInWindow, from: nil)),
+                  let action = self.action else { return event }
+            // Use the actual click position, including after a tab closes under
+            // a stationary pointer. No global hover target can go stale.
+            action()
+            return nil
+        }
+    }
+
+    func stopMonitoring() {
+        if let monitor {
+            NSEvent.removeMonitor(monitor)
+            self.monitor = nil
+        }
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        // Leave selection, context menus, and drag gestures with the content.
+        nil
     }
 }
 
