@@ -23,6 +23,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         SideButtonNavigation.install(workspace: workspace)
         // Install drag operation patcher (move by default, copy with + only when holding Alt)
         DragOperationPatcher.install()
+        // Initialize Firebase Analytics & Crashlytics
+        TelemetryService.shared.initialize()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

@@ -30,6 +30,12 @@ public struct SettingsView: View {
                     Label("Mouse", systemImage: "computermouse")
                 }
                 .tag(3)
+
+            privacyTab
+                .tabItem {
+                    Label("Privacy", systemImage: "hand.raised")
+                }
+                .tag(4)
         }
         .frame(width: 480, height: 360)
         .padding(20)
@@ -101,6 +107,29 @@ public struct SettingsView: View {
             Section("Subfolder Tip") {
                 Toggle("Show a drop-down arrow beside hovered folders", isOn: $settings.subfolderTipEnabled)
                 Text("Click the arrow to browse everything inside a folder, to any depth, without leaving the current folder. Click an item to open it, ⌘-click to open a folder in a new tab, or ⌥-click to copy it.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    private var privacyTab: some View {
+        Form {
+            Section("Analytics & Crash Reporting") {
+                Toggle("Share anonymous usage statistics", isOn: $settings.isAnalyticsEnabled)
+                    .onChange(of: settings.isAnalyticsEnabled) { _, newValue in
+                        TelemetryService.shared.setAnalyticsEnabled(newValue)
+                    }
+                Text("Helps us improve Shark by sharing anonymous feature usage data. File names, folder paths, and terminal commands are never collected.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Toggle("Send crash reports", isOn: $settings.isCrashReportingEnabled)
+                    .onChange(of: settings.isCrashReportingEnabled) { _, newValue in
+                        TelemetryService.shared.setCrashReportingEnabled(newValue)
+                    }
+                Text("Automatically sends crash diagnostics to Firebase Crashlytics to help us diagnose and fix issues.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

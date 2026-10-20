@@ -33,6 +33,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Folders blocked by macOS privacy protection (e.g. Trash) now explain why and offer a button that opens Full Disk Access settings, instead of only "Try Again".
 
 ### Added
+- **Firebase Analytics & Crashlytics Telemetry**:
+  - Integrated `FirebaseAnalytics` and `FirebaseCrashlytics` from `firebase-ios-sdk` (11.0.0+).
+  - Telemetry is enabled by default with independent user controls in Settings › Privacy (`Share anonymous usage statistics` and `Send crash reports`).
+  - Privacy-preserving architecture: safe anonymous events only (`app_launch`, `tab_opened`, `tab_closed`, `view_mode_changed`, `split_view_toggled`, `terminal_toggled`). Absolutely no filenames, folder paths, file contents, or shell command arguments are captured.
+  - Safe headless and test initialization verifying bundle plist presence before configuring.
+  - Automated release `dSYM` symbol extraction via `dsymutil` into `dist/Shark.app.dSYM` during packaging, with optional Crashlytics upload via `scripts/upload-symbols.sh` (`UPLOAD_CRASHLYTICS_SYMBOLS=1`).
 - A complete website Features page with a categorized app capability catalog, shared site navigation, and an `AGENTS.md` rule requiring feature changes to update the catalog in the same change.
 - An Astro landing page in `website/` with real product screenshots, restrained glass navigation, responsive feature stories, installation FAQs, and free macOS download links.
 - A getting-started README with screenshots of tabs and split panes, the terminal drawer, hover previews, and cascading subfolder menus.

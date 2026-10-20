@@ -57,6 +57,8 @@ public final class SharkSettings: ObservableObject {
     @AppStorage("openNewTabsAtEnd") public var openNewTabsAtEnd: Bool = true
     @AppStorage("confirmBeforeClosingMultipleTabs") public var confirmBeforeClosingMultipleTabs: Bool = false
     @AppStorage("liquidGlassTranslucency") public var liquidGlassTranslucency: Bool = true
+    @AppStorage("isAnalyticsEnabled") public var isAnalyticsEnabled: Bool = true
+    @AppStorage("isCrashReportingEnabled") public var isCrashReportingEnabled: Bool = true
 
     private init() {}
 }

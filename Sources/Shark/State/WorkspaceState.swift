@@ -118,6 +118,7 @@ public final class WorkspaceState {
         if select {
             activeTabID = tab.id
         }
+        TelemetryService.shared.logTabOpened(totalTabs: tabs.count)
     }
 
     public func togglePin(id: UUID) {
@@ -195,6 +196,7 @@ public final class WorkspaceState {
             let homeTab = WorkspaceTab(initialURL: FileManager.default.homeDirectoryForCurrentUser)
             tabs = [homeTab]
             activeTabID = homeTab.id
+            TelemetryService.shared.logTabClosed(totalTabs: tabs.count)
             return
         }
 
@@ -204,6 +206,7 @@ public final class WorkspaceState {
             let nextIndex = min(index, tabs.count - 1)
             activeTabID = tabs[nextIndex].id
         }
+        TelemetryService.shared.logTabClosed(totalTabs: tabs.count)
     }
 
     public func closeOtherTabs(id: UUID) {
@@ -340,6 +343,7 @@ public final class WorkspaceState {
 
     public func toggleSplit() {
         activeTab.toggleSplit()
+        TelemetryService.shared.logSplitViewToggled(isSplit: activeTab.isSplit)
     }
 
     public func toggleActivePane() {

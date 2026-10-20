@@ -344,6 +344,7 @@ public struct ContentView: View {
             }
         }
         .onChange(of: workspaceState.isTerminalVisible) { _, visible in
+            TelemetryService.shared.logTerminalToggled(isVisible: visible)
             if visible {
                 if workspaceState.embeddedTerminalRequest == nil {
                     terminalSession.syncDirectory(to: activeState.currentURL)
@@ -351,6 +352,9 @@ public struct ContentView: View {
             } else {
                 workspaceState.embeddedTerminalRequest = nil
             }
+        }
+        .onChange(of: activeState.viewMode) { _, newMode in
+            TelemetryService.shared.logViewModeChanged(mode: newMode.rawValue)
         }
         .onChange(of: workspaceState.embeddedTerminalRequest) { _, request in
             if let request {

@@ -29,10 +29,14 @@ app="$staging/Shark.app"
 archive="$staging/Shark-$version.zip"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp Resources/Info.plist "$app/Contents/"
+[ -f Resources/GoogleService-Info.plist ] && cp Resources/GoogleService-Info.plist "$app/Contents/Resources/"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $version" -c "Set :CFBundleVersion $version" "$app/Contents/Info.plist"
 cp "$bin/Shark" "$app/Contents/MacOS/"
 cp -R Assets/Icons "$app/Contents/Resources/Icons"
 scripts/make-icon.sh "$app"
+
+# Extract release dSYM debug symbols for crash reporting
+dsymutil "$bin/Shark" -o "$staging/Shark.app.dSYM"
 
 entitlements_args=()
 if [[ "${APP_SANDBOX:-0}" == 1 ]]; then
@@ -62,8 +66,14 @@ if [[ "$notarize" == 1 ]]; then
   ditto -c -k --keepParent "$app" "$archive"
 fi
 # Replace only this package, leaving other release artifacts intact.
-rm -rf dist/Shark.app
+rm -rf dist/Shark.app dist/Shark.app.dSYM
 mv "$app" dist/Shark.app
+mv "$staging/Shark.app.dSYM" dist/Shark.app.dSYM
 mv "$archive" "dist/Shark-$version.zip"
 (cd dist && shasum -a 256 "Shark-$version.zip" > "Shark-$version.zip.sha256")
+
+if [[ "${UPLOAD_CRASHLYTICS_SYMBOLS:-0}" == 1 ]]; then
+  scripts/upload-symbols.sh "dist/Shark.app.dSYM"
+fi
+
 echo "dist/Shark-$version.zip"

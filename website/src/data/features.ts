@@ -137,6 +137,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'appearance', title: 'Light & dark appearance', description: 'The app follows your Mac’s appearance and uses native controls and system colors.' },
       { id: 'accessibility', title: 'Accessible controls & motion', description: 'Labeled controls, keyboard navigation, and support for Reduce Motion, Reduce Transparency, and increased contrast.' },
       { id: 'folder-permissions', title: 'macOS folder access', description: 'Grant access to protected folders when macOS asks. When privacy settings block a location, Shark offers guidance and a route to the relevant settings.' },
+      { id: 'privacy-telemetry', title: 'Privacy & diagnostics', description: 'Anonymous usage statistics and crash reporting are on by default and can be independently turned off in Settings › Privacy. File names, folder paths, and terminal commands are never collected.' },
     ],
   },
 ];

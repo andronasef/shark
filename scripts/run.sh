@@ -9,6 +9,7 @@ mkdir -p Shark.app/Contents/MacOS
 scripts/make-icon.sh
 mkdir -p Shark.app/Contents/Resources/Icons
 cp -R Assets/Icons/ Shark.app/Contents/Resources/Icons/
+[ -f Resources/GoogleService-Info.plist ] && cp Resources/GoogleService-Info.plist Shark.app/Contents/Resources/
 cp .build/debug/Shark Shark.app/Contents/MacOS/Shark
 # Stable "Shark Dev" cert keeps macOS permission grants across builds; ad hoc if absent.
 security find-identity -v -p codesigning | grep -q "Shark Dev" && id="Shark Dev" || id=-
