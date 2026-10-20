@@ -125,6 +125,9 @@ public struct TabItemView: View {
         .onTapGesture {
             workspace.selectTab(id: tab.id)
         }
+        .simultaneousGesture(TapGesture(count: 2).onEnded {
+            if MouseSetting.tabDoubleClickPin.isEnabled { workspace.togglePin(id: tab.id) }
+        })
         .onMiddleClick {
             workspace.closeTab(id: tab.id)
         }

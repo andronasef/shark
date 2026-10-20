@@ -73,6 +73,9 @@ public struct TabStripView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 3)
         .frame(height: 34)
+        .onTabScroll { steps in
+            for _ in 0..<abs(steps) { steps > 0 ? workspace.nextTab() : workspace.previousTab() }
+        }
         .overlay(alignment: .bottom) {
             Rectangle().fill(Color(nsColor: .separatorColor)).frame(height: 0.5)
         }

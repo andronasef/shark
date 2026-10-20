@@ -141,6 +141,7 @@ public struct DetailsTableView: View {
             }
             .width(min: 120, ideal: 150)
         }
+        .onTableMarginDoubleClick { navigationState.goUp() }
     }
 
     private var keyPathComparator: KeyPathComparator<FileItem> {

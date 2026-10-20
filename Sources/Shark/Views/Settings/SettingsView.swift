@@ -24,8 +24,14 @@ public struct SettingsView: View {
                     Label("Previews", systemImage: "eye")
                 }
                 .tag(2)
+
+            MouseSettingsTab()
+                .tabItem {
+                    Label("Mouse", systemImage: "computermouse")
+                }
+                .tag(3)
         }
-        .frame(width: 480, height: 320)
+        .frame(width: 480, height: 360)
         .padding(20)
     }
 
@@ -98,6 +104,32 @@ public struct SettingsView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+private struct MouseSettingsTab: View {
+    @AppStorage(MouseSetting.marginDoubleClickUp.key) private var marginUp = true
+    @AppStorage(MouseSetting.tabDoubleClickPin.key) private var tabPin = true
+    @AppStorage(MouseSetting.sideButtons.key) private var sideButtons = true
+    @AppStorage(MouseSetting.tabStripScroll.key) private var tabScroll = true
+
+    var body: some View {
+        Form {
+            Section("Folders") {
+                Toggle("Double-click empty space to go up one level", isOn: $marginUp)
+            }
+            Section("Tabs") {
+                Toggle("Double-click a tab to pin or unpin it", isOn: $tabPin)
+                Toggle("Scroll over the tab strip to switch tabs", isOn: $tabScroll)
+            }
+            Section("Mouse buttons") {
+                Toggle("Side buttons go back and forward (⌃ + side button switches tabs)", isOn: $sideButtons)
+            }
+            Text("All mouse actions are listed in Help › Shark Help.")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .formStyle(.grouped)
     }

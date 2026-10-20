@@ -44,6 +44,9 @@ public struct IconsGridView: View {
                     Color.clear
                         .frame(maxWidth: .infinity, minHeight: containerGeo.size.height)
                         .contentShape(Rectangle())
+                        .simultaneousGesture(TapGesture(count: 2).onEnded {
+                            if MouseSetting.marginDoubleClickUp.isEnabled { navigationState.goUp() }
+                        })
                         .onTapGesture {
                             let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
                             if !isShiftOrCmd {

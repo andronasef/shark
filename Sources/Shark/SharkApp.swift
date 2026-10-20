@@ -20,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Start debounced autosave
         sessionStore?.startAutosave(workspace)
+        SideButtonNavigation.install(workspace: workspace)
         // Install drag operation patcher (move by default, copy with + only when holding Alt)
         DragOperationPatcher.install()
     }
@@ -45,10 +46,26 @@ struct SharkApp: App {
             SidebarCommands()
             TabCommands(workspace: appDelegate.workspace)
             ExplorerCommands(workspace: appDelegate.workspace)
+            HelpCommands()
+        }
+
+        Window("Shark Help", id: "help") {
+            HelpView()
         }
 
         Settings {
             SettingsView()
+        }
+    }
+}
+
+struct HelpCommands: Commands {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some Commands {
+        CommandGroup(replacing: .help) {
+            Button("Shark Help") { openWindow(id: "help") }
+                .keyboardShortcut("?", modifiers: .command)
         }
     }
 }
