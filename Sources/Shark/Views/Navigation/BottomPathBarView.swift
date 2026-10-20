@@ -16,7 +16,7 @@ public struct BottomPathBarView: View {
         Group {
             if inToolbar {
                 pathContent
-                    .frame(minWidth: 160, maxWidth: .infinity)
+                    .frame(maxWidth: .infinity)
                     .frame(height: 28)
                     .finderGlass(interactive: false)
             } else {
@@ -158,19 +158,6 @@ public struct BottomPathBarView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
         }
-    }
-
-    /// Measure the system-font labels so short paths don't reserve a long empty capsule.
-    private var toolbarWidth: CGFloat {
-        if navigationState.isEditingPath { return 360 }
-        let items = segments
-        let labels = items.reduce(CGFloat.zero) { width, segment in
-            let font = NSFont.systemFont(ofSize: 12, weight: segment.isLast ? .semibold : .regular)
-            let textWidth = min(180, ceil((segment.title as NSString).size(withAttributes: [.font: font]).width))
-            let iconWidth: CGFloat = segment.isRoot || segment.isLast ? 17 : 0
-            return width + textWidth + iconWidth + 8 + 2 + 16
-        }
-        return min(360, max(160, labels + CGFloat(max(0, items.count - 1)) * 4 + 16))
     }
 
     private struct PathSeg {

@@ -7,6 +7,8 @@ public struct ContentView: View {
 
     @Bindable var workspaceState: WorkspaceState
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    /// Width of the detail column, which is the width the toolbar items share.
+    @State private var detailWidth: CGFloat = 1000
     @State private var isInspectorVisible = false
     @State private var terminalSession = PTYSession()
     @State private var lastHandledTerminalRequestID: UUID?
@@ -20,6 +22,15 @@ public struct ContentView: View {
 
     public init(workspaceState: WorkspaceState = WorkspaceState()) {
         self.workspaceState = workspaceState
+    }
+
+    /// Toolbar items never stretch on their own, so the Location capsule is sized from the detail
+    /// width minus what the other items use (Navigation plus Path through Search, with gaps).
+    /// ponytail: measured by eye; if toolbar items are added or removed, retune this constant.
+    private static let otherToolbarItemsWidth: CGFloat = 762
+
+    private var locationWidth: CGFloat {
+        max(160, detailWidth - Self.otherToolbarItemsWidth)
     }
 
     @ToolbarContentBuilder
@@ -64,8 +75,8 @@ public struct ContentView: View {
         }
         .finderChromeItem()
 
-        // The location grows with the window; the toolbar gives it whatever the other items leave.
-        ToolbarItem(id: "location", placement: .principal) {
+        // Left-aligned beside Navigation, taking all the width the other toolbar items leave.
+        ToolbarItem(id: "location", placement: .navigation) {
             Group {
                 if activeState.isBottomPathBarVisible || activeState.isEditingPath {
                     FinderToolbarCaption("Location") {
@@ -78,9 +89,13 @@ public struct ContentView: View {
                         .frame(height: 28)
                 }
             }
-            .frame(minWidth: 160, maxWidth: .infinity)
+            .frame(width: locationWidth)
         }
         .finderChromeItem()
+
+        // Keeps the right-hand controls at the trailing edge if the location ends early.
+        ToolbarItem(placement: .principal) { Spacer() }
+            .finderChromeItem()
 
         ToolbarItem(id: "path", placement: .primaryAction) {
             FinderToolbarCaption("Path") {
@@ -305,6 +320,9 @@ public struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(GeometryReader { geometry in
+                Color.clear.onChange(of: geometry.size.width, initial: true) { _, width in detailWidth = width }
+            })
             .toolbar { finderToolbar }
         }
         .environment(workspaceState)
