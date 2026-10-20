@@ -4,10 +4,9 @@ import WebKit
 struct ScreenshotConfig {
     let filename: String
     let headline: String
-    let textColor: String
-    let bgGradient: String
-    let glowColor: String
-    let shadowAmbient: String
+    let glowColor1: String
+    let glowColor2: String
+    let shadowGlow: String
     let sourceImage: String
 }
 
@@ -15,37 +14,33 @@ let configs: [ScreenshotConfig] = [
     ScreenshotConfig(
         filename: "01-tabs-and-split.png",
         headline: "Browse two folders side by side<br>with infinite tabs",
-        textColor: "#0F1D36",
-        bgGradient: "radial-gradient(100% 85% at 50% -10%, #F6FAFF 0%, #E5F0FF 35%, #C7DDF8 70%, #9BC6F7 100%)",
-        glowColor: "rgba(185, 218, 255, 0.65)",
-        shadowAmbient: "rgba(12, 45, 95, 0.32)",
+        glowColor1: "rgba(38, 140, 255, 0.40)",
+        glowColor2: "rgba(14, 165, 233, 0.22)",
+        shadowGlow: "rgba(14, 165, 233, 0.28)",
         sourceImage: "docs/screenshots/tabs-and-split.png"
     ),
     ScreenshotConfig(
         filename: "02-hover-preview.png",
         headline: "Preview documents, code, and media<br>without opening them",
-        textColor: "#2E1418",
-        bgGradient: "radial-gradient(100% 85% at 50% -10%, #FFF8F6 0%, #FEECE8 35%, #FED3C9 70%, #FBAFA3 100%)",
-        glowColor: "rgba(254, 215, 205, 0.65)",
-        shadowAmbient: "rgba(120, 30, 40, 0.30)",
+        glowColor1: "rgba(251, 113, 133, 0.40)",
+        glowColor2: "rgba(249, 115, 22, 0.22)",
+        shadowGlow: "rgba(244, 63, 94, 0.28)",
         sourceImage: "docs/screenshots/hover-preview.png"
     ),
     ScreenshotConfig(
         filename: "03-subfolder-navigation.png",
         headline: "Fly through nested folders<br>at the speed of thought",
-        textColor: "#141738",
-        bgGradient: "radial-gradient(100% 85% at 50% -10%, #F7F9FF 0%, #ECEFFE 35%, #D4DCFC 70%, #ADC0F9 100%)",
-        glowColor: "rgba(205, 215, 255, 0.65)",
-        shadowAmbient: "rgba(25, 45, 115, 0.32)",
+        glowColor1: "rgba(168, 85, 247, 0.40)",
+        glowColor2: "rgba(99, 102, 241, 0.22)",
+        shadowGlow: "rgba(147, 51, 234, 0.28)",
         sourceImage: "docs/screenshots/subfolder-menu.png"
     ),
     ScreenshotConfig(
         filename: "04-integrated-terminal.png",
         headline: "An integrated terminal<br>synced to your active folder",
-        textColor: "#0D2B20",
-        bgGradient: "radial-gradient(100% 85% at 50% -10%, #F4FBF7 0%, #E4F7ED 35%, #C2EEDB 70%, #94DFBE 100%)",
-        glowColor: "rgba(185, 238, 215, 0.65)",
-        shadowAmbient: "rgba(8, 65, 48, 0.30)",
+        glowColor1: "rgba(16, 185, 129, 0.40)",
+        glowColor2: "rgba(52, 211, 153, 0.22)",
+        shadowGlow: "rgba(16, 185, 129, 0.28)",
         sourceImage: "docs/screenshots/terminal.png"
     )
 ]
@@ -69,31 +64,43 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
         padding-top: 68px;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", sans-serif;
         -webkit-font-smoothing: antialiased;
-        background: \(config.bgGradient);
+        background: #06080D;
       }
-      .ambient-glow {
+      .grid-pattern {
         position: absolute;
-        top: -160px;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 80%);
+        pointer-events: none;
+      }
+      .aurora-glow {
+        position: absolute;
+        top: 140px;
         left: 50%;
         transform: translateX(-50%);
-        width: 1000px;
-        height: 600px;
-        background: radial-gradient(ellipse at center, \(config.glowColor) 0%, transparent 70%);
-        filter: blur(100px);
+        width: 1150px;
+        height: 520px;
+        background: radial-gradient(ellipse at 50% 30%, \(config.glowColor1) 0%, \(config.glowColor2) 45%, transparent 75%);
+        filter: blur(85px);
         pointer-events: none;
       }
       .headline {
         position: relative;
         z-index: 10;
-        font-size: 52px;
-        font-weight: 650;
-        letter-spacing: -0.028em;
-        line-height: 1.2;
+        font-size: 50px;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.15;
         text-align: center;
         max-width: 960px;
-        color: \(config.textColor);
+        background: linear-gradient(180deg, #FFFFFF 20%, #CBD5E1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 46px;
-        text-rendering: optimizeLegibility;
+        filter: drop-shadow(0 2px 20px rgba(255, 255, 255, 0.15));
       }
       .window-stage {
         position: relative;
@@ -102,13 +109,12 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
         height: 620px;
         border-radius: 18px;
         box-shadow: 
-          0 45px 110px -20px \(config.shadowAmbient),
-          0 20px 45px -12px rgba(0, 0, 0, 0.38),
-          0 8px 18px -4px rgba(0, 0, 0, 0.20),
-          0 0 0 1px rgba(255, 255, 255, 0.60),
-          0 0 0 1.5px rgba(0, 0, 0, 0.12);
+          0 50px 140px -20px rgba(0, 0, 0, 0.95),
+          0 30px 60px -15px \(config.shadowGlow),
+          0 0 0 1px rgba(255, 255, 255, 0.18),
+          0 1px 0 0 rgba(255, 255, 255, 0.35) inset;
         overflow: hidden;
-        background: #14181f;
+        background: #0f141c;
       }
       .window-stage img {
         width: 100%;
@@ -120,7 +126,8 @@ func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
     </style>
     </head>
     <body>
-      <div class="ambient-glow"></div>
+      <div class="grid-pattern"></div>
+      <div class="aurora-glow"></div>
       <h1 class="headline">\(config.headline)</h1>
       <div class="window-stage">
         <img src="\(base64Image)" />
@@ -161,7 +168,7 @@ class RenderDelegate: NSObject, WKNavigationDelegate {
                 if currentIndex < configs.count {
                     renderNext()
                 } else {
-                    print("ALL 4 SCREENSHOTS SUCCESSFULLY GENERATED!")
+                    print("ALL 4 OBSIDIAN SCREENSHOTS SUCCESSFULLY GENERATED!")
                     exit(0)
                 }
             }
