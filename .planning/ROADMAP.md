@@ -27,7 +27,7 @@ v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar
   1. User can drag a tab to a new position, middle-click to close it, and ⇧⌘T reopens the last closed tab at its path.
   2. Tab context menu offers Duplicate, Pin, Lock, Close Others, Close to the Right, Colour, Copy Path, and each works.
   3. Quitting and relaunching Shark restores the same tabs, pins, colours, paths, split state and view modes.
-  4. ⌘-double-click on a folder opens it in a new background tab; ⌘1–9 jump to tabs.
+  4. ⌘-double-click on a folder opens it in a new background tab; ⌥⌘1–9 jump to tabs.
 **Plans**: TBD
 **UI hint**: yes
 

@@ -55,7 +55,7 @@
 - [ ] **TAB-04**: Tab context menu: Duplicate, Pin/Unpin, Lock (navigation opens new tab), Close Others, Close Tabs to the Right, Colour (tint dot), Copy Path.
 - [ ] **TAB-05**: Pinned tabs render compact (icon only) at the left and survive Close Others.
 - [ ] **TAB-06**: Session restore: tabs, pins, locks, colours, paths, split state and view mode persist across relaunch.
-- [ ] **TAB-07**: Open folder in new tab via ⌘-double-click, ⌘-click on sidebar/breadcrumb, or middle-click; ⌘1–9 select tabs; ⌃Tab / ⌃⇧Tab cycle.
+- [ ] **TAB-07**: Open folder in new tab via ⌘-double-click, ⌘-click on sidebar/breadcrumb, or middle-click; ⌥⌘1–9 select tabs (⌘1–4 stay Finder view modes); ⌃Tab / ⌃⇧Tab cycle.
 
 ### Explorer Ergonomics (EXP)
 - [ ] **EXP-01**: Cut / Copy / Paste of files (⌘X, ⌘C, ⌘V; ⌥⌘V moves), works across tabs, panes and with Finder pasteboard; cut items render dimmed until pasted.
