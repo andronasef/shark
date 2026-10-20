@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Matched the Places sidebar to the supplied reference with an inset rounded panel, larger monochrome icons, 32 pt rows, explicit section spacing, and brighter tag colors. Standard places now appear immediately while mounted volumes load.
 
 ### Fixed
+- Corrected the Location capsule width allowance so it uses the available toolbar space with the sidebar shown or hidden, without pushing navigation into overflow at standard window widths.
 - Fixed the toolbar pushing Back/Forward/Up (sidebar hidden) or Terminal/Action/Search (narrower windows) into the `»` overflow menu: the Location capsule is now sized with the real width the other toolbar items use, plus the traffic-light inset when the sidebar is collapsed.
 - Fixed Shark freezing and consuming tens of GB of memory when navigating to the disk root (e.g. clicking "Macintosh HD" in the path bar). The path bar now builds its folder chain from path components, which always ends at `/`.
 - Back, Forward, Up, and the tab close button now respond to clicks anywhere on the button, not only on the icon.
