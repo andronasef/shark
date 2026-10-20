@@ -302,8 +302,11 @@ private struct IconGridItemView: View {
                     )
             }
         }
-        .onHover { isHovering = $0 }
         .frame(width: max(iconSize + 28, 104))
+        // Hover covers the whole cell, including the corner the arrow sits in. Tracking only the
+        // icon and name would count moving onto the arrow as leaving the folder.
+        .contentShape(Rectangle())
+        .onHover { isHovering = $0 }
         .overlay(alignment: .topTrailing) {
             SubfolderTip(item: item, isHovering: isHovering, size: 26, onNavigate: onSubfolderNavigate)
                 .padding(2)
