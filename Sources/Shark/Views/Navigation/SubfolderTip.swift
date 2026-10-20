@@ -22,11 +22,27 @@ struct SubfolderTip: View {
 
     var body: some View {
         if enabled, isHovering, item.isNavigableDirectory {
-            CascadingFolderChevronButton(url: item.url, pointSize: size * 0.5, onNavigate: onNavigate)
-                .frame(width: size, height: size)
-                .background(Circle().fill(.regularMaterial))
-                .overlay(Circle().strokeBorder(Color.primary.opacity(0.25), lineWidth: 0.5))
-                .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+            // A SwiftUI button, not the AppKit chevron: an embedded NSView takes the pointer away
+            // from the cell's hover tracking and the arrow would vanish as soon as it is reached.
+            Button(action: showMenu) {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: size * 0.5, weight: .bold))
+                    .frame(width: size, height: size)
+                    .background(Circle().fill(.regularMaterial))
+                    .overlay(Circle().strokeBorder(Color.primary.opacity(0.25), lineWidth: 0.5))
+                    .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .help("Browse subfolders of \(item.name)")
+            .accessibilityLabel("Browse subfolders of \(item.name)")
         }
+    }
+
+    private func showMenu() {
+        guard let event = NSApp.currentEvent, let view = event.window?.contentView else { return }
+        // popUpContextMenu runs until the menu closes, so the builder (the menu's delegate) lives long enough.
+        let builder = SubfolderMenuBuilder(onNavigate: onNavigate)
+        NSMenu.popUpContextMenu(builder.buildMenu(for: item.url), with: event, for: view)
     }
 }
