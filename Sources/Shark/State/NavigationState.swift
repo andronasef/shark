@@ -146,12 +146,19 @@ public final class NavigationState {
         navigateTo(parent)
     }
 
-    public func zoomIn() {
-        iconSize = min(192.0, iconSize + 16.0)
+    public func zoomIn(by amount: CGFloat = 16.0) {
+        iconSize = min(192.0, iconSize + amount)
     }
 
-    public func zoomOut() {
-        iconSize = max(48.0, iconSize - 16.0)
+    public func zoomOut(by amount: CGFloat = 16.0) {
+        iconSize = max(48.0, iconSize - amount)
+    }
+
+    public func adjustZoom(delta: CGFloat) {
+        // Positive delta means scroll up / gesture zoom in
+        let step = delta * 2.0
+        let newSize = max(48.0, min(192.0, iconSize + step))
+        iconSize = newSize
     }
 
     public func resetZoom() {
