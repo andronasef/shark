@@ -12,13 +12,13 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:4321/shark/`. Build with `npm run build`, then use `npm run preview` to inspect the production output.
+Open `http://localhost:4321/`. Build with `npm run build`, then use `npm run preview` to inspect the production output.
 
 ## Publish
 
-The site is configured for `https://andronasef.github.io/shark/` in `astro.config.mjs`. Upload the contents of `website/dist/` to your static host, or configure GitHub Pages to deploy that directory through Actions. For a custom domain, update `site` and set `base` to `/` before building. No deployment has been performed.
+The site is configured for `https://shark.andronasef.com/` in `astro.config.mjs` with root `base: '/'`. Deploy by connecting the repository to Cloudflare Pages (or another static host) with root directory `website`, build command `npm run build`, and output directory `dist`.
 
-Download buttons point to `https://github.com/andronasef/shark/releases/latest`; source and issue links use the same repository. The owner will publish that repository later. Publish a release containing a ZIP of the app before promoting the download page. The website intentionally makes no claims about a currently available version, signing status, or download count.
+Download buttons point to `https://github.com/andronasef/shark/releases/latest`; source and issue links use the same repository. Publish a release containing a ZIP of the app before promoting the download page. The website intentionally makes no claims about a currently available version, signing status, or download count.
 
 ## Editing
 

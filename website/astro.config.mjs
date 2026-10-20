@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://andronasef.github.io',
-  base: '/shark',
+  site: 'https://shark.andronasef.com',
+  base: '/',
   output: 'static',
 });
