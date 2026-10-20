@@ -4,7 +4,7 @@ import Foundation
 import QuickLookThumbnailing
 import UniformTypeIdentifiers
 
-public enum HoverPreviewData: Sendable {
+public enum HoverPreviewData: @unchecked Sendable {
     /// `dimensions` is `.zero` when the pixel size is unknown (e.g. a document thumbnail).
     case image(NSImage, dimensions: CGSize, fileSizeFormatted: String)
     case text(lines: [String], totalLines: Int, encoding: String, fileSizeFormatted: String, truncated: Bool)
