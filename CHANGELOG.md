@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **Native Finder Design Alignment**:
   - Authentically aligned window layout, navigation bar, and icon grid with macOS Finder.
   - Leading navigation group featuring Back/Forward navigation history buttons alongside the active folder's system icon and title.
@@ -35,6 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.6.0] - 2026-10-13
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **File Operations Engine**:
   - New Folder and New File creation with automatic naming collision resolution (`Folder`, `Folder 2`, etc.).
   - Duplicate item functionality (`⌘D`) appending "copy" or incrementing counters.
@@ -48,6 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.5.0] - 2026-10-13
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **Information & Metadata Inspector**:
   - Right-side collapsible Inspector panel (`⌥⌘I`).
   - POSIX file permissions display and octal representation (e.g. `0755` / `rwxr-xr-x`).
@@ -59,6 +62,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.4.0] - 2026-10-13
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **Embedded Terminal Drawer**:
   - Collapsible bottom terminal drawer toggled via `F4` or toolbar button.
   - PTY pseudo-terminal session running user shell (`$SHELL`).
@@ -69,6 +73,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.3.0] - 2026-10-13
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **View Modes & Quick Look**:
   - Icons grid view (`⌘1`), Details list view (`⌘2`), Compact columns (`⌘3`), and Gallery (`⌘4`).
   - Instant live filename filtering (`⌘I`).
@@ -79,6 +84,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.2.0] - 2026-10-13
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - **Dual-Pane Split & Tabbed Browsing**:
   - Split view support (`⇧⌘S`) for dual-pane file management inspired by KDE Dolphin.
   - Tab management (`⌘T` new tab, `⌘W` close tab).
@@ -88,6 +94,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.1.0] - 2026-10-13
 
 ### Added
+- **App Icon**: Shark mascot icon (`Resources/AppIcon.png`), compiled to `AppIcon.icns` into the bundle by `scripts/make-icon.sh` (run automatically by `scripts/run.sh`).
 - Initial project foundation in native Swift and SwiftUI.
 - Filesystem enumeration, volume detection, and navigation state.
 - Standard macOS sidebar places and directory listing.

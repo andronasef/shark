@@ -1,0 +1,67 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;overflow:hidden;font:13px -apple-system,"SF Pro Text",system-ui;background:#ffffff;color:#1c2024}
+.win{display:grid;grid-template-columns:232px 1fr;grid-template-rows:44px 34px 38px 1fr 30px;height:900px}
+.title{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:#ffffff;border-bottom:1px solid #c9cdd0}
+.dots i{display:inline-block;width:12px;height:12px;border-radius:50%;background:#c9cdd0;margin-right:6px}
+.tabs{grid-column:1/3;display:flex;align-items:flex-end;gap:2px;padding:0 12px;background:#ffffff;border-bottom:1px solid #b9bec2}
+.tab{display:flex;align-items:center;gap:8px;height:30px;padding:0 14px 0 0;background:#f2f2f2;font:600 12px/1 -apple-system;letter-spacing:.02em;color:#4a5157}
+.tab b{width:8px;height:30px;display:block}
+.tab.on{background:#fff;color:#1c2024}
+.tab .pin{font-size:10px;color:#8a9196}
+.addr{grid-column:1/3;display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff;border-bottom:1px solid #c9cdd0}
+.nb{width:28px;height:26px;border-radius:5px;display:grid;place-items:center;color:#4a5157;font-size:15px}
+.crumbs{flex:1;height:26px;border:1px solid #c9cdd0;border-radius:5px;display:flex;align-items:center;padding:0 8px;gap:6px;font-size:13px}
+.crumbs span{color:#111;letter-spacing:-2px}.crumbs em{font-style:normal;padding:2px 6px;border-radius:4px}
+.crumbs em.last{background:#111111;color:#fff}
+.search{width:240px;height:26px;border:1px solid #c9cdd0;border-radius:5px;padding:0 10px;color:#8a9196;display:flex;align-items:center}
+.side{background:#f3f4f5;border-right:1px solid #c9cdd0;padding:14px 10px}
+.side h6{font:700 10px -apple-system;letter-spacing:.12em;color:#7a8187;margin:14px 8px 6px;text-transform:uppercase}
+.place{display:flex;align-items:center;gap:10px;height:26px;padding:0 8px;border-radius:5px}
+.place i{width:6px;height:16px;display:block}
+.place.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.main{background:#fff;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{font:600 11px -apple-system;letter-spacing:.06em;color:#7a8187;text-align:left;padding:7px 12px;border-bottom:1px solid #ffffff;background:#fafbfb}
+td{height:22px;padding:0 12px;border-bottom:1px solid #f0f1f2;white-space:nowrap}
+td.n{font-variant-numeric:tabular-nums;font-family:"SF Mono",ui-monospace;font-size:11.5px;color:#4a5157}
+.ic{display:inline-block;width:14px;height:12px;border-radius:2px;background:#6aa6d8;margin-right:8px;vertical-align:-1px}
+.ic.f{background:#cfd4d8;height:14px;width:11px}
+.mag{display:inline-block;height:6px;background:#111111;border-radius:1px;vertical-align:1px;margin-right:8px}
+tr.sel td{background:#111111;color:#fff}tr.sel td.n{color:#d6e4f0}tr.sel .mag{background:#0068b4}
+.status{grid-column:1/3;display:flex;align-items:center;gap:18px;padding:0 14px;background:#1c2024;color:#c9cdd0;font-size:11.5px;font-variant-numeric:tabular-nums}
+.status b{color:#fff;font-weight:600}
+.manifest{margin-left:auto;display:flex;align-items:center;gap:10px}
+.code{font:700 11px "SF Mono",ui-monospace;color:#1c2024;background:#0068b4;padding:2px 6px;border-radius:2px}
+.bar{width:180px;height:6px;background:#3a4147;border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;width:62%;background:#0068b4}
+</style></head><body><div class="win">
+<div class="title"><span class="dots"><i></i><i></i><i></i></span><b style="letter-spacing:.08em">SHARK</b></div>
+<div class="tabs">
+<div class="tab"><b style="background:#e2001a"></b>Projects <span class="pin">PIN</span></div>
+<div class="tab on"><b style="background:#111111"></b>shark / Sources</div>
+<div class="tab"><b style="background:#00965e"></b>Downloads</div>
+<div class="tab"><b style="background:#0068b4"></b>Screenshots</div>
+<div class="tab" style="background:none;padding-left:10px">+</div></div>
+<div class="addr"><span class="nb">‹</span><span class="nb">›</span><span class="nb">↑</span>
+<div class="crumbs" style="gap:0;border:none"><em>● andrew</em><span>━━</span><em>● Documents</em><span>━━</span><em>● Projects</em><span>━━</span><em>● shark</em><span>━━</span><em class="last" style="background:#e2001a">◉ Sources</em></div>
+<div class="search">Filter Sources</div></div>
+<div class="side"><h6>Pinned</h6>
+<div class="place"><i style="background:#e2001a"></i>Projects</div><div class="place on"><i style="background:#111111"></i>shark</div><div class="place"><i style="background:#00965e"></i>Downloads</div><div class="place"><i style="background:#0068b4"></i>Screenshots</div>
+<h6>This Mac</h6><div class="place"><i></i>Home</div><div class="place"><i></i>Desktop</div><div class="place"><i></i>Documents</div><div class="place"><i></i>Applications</div>
+<h6>Drives</h6><div class="place"><i></i>Macintosh HD <span style="margin-left:auto;color:#7a8187;font-size:11px">212 GB free</span></div><div class="place"><i></i>Backup SSD</div>
+<h6>Recent</h6><div class="place"><i></i>~/Library/Logs</div><div class="place"><i></i>/usr/local/bin</div></div>
+<div class="main"><table><tr><th style="width:44%">Name</th><th>Modified</th><th>Kind</th><th style="width:22%">Size</th></tr>
+<tr><td><span class="ic"></span>Models</td><td class="n">Oct 13 16:05</td><td>Folder</td><td class="n">—</td></tr>
+<tr><td><span class="ic"></span>Services</td><td class="n">Oct 13 16:09</td><td>Folder</td><td class="n">—</td></tr>
+<tr><td><span class="ic"></span>State</td><td class="n">Oct 13 15:55</td><td>Folder</td><td class="n">—</td></tr>
+<tr><td><span class="ic"></span>Terminal</td><td class="n">Oct 13 16:20</td><td>Folder</td><td class="n">—</td></tr>
+<tr class="sel"><td><span class="ic"></span>Views</td><td class="n">Oct 20 09:41</td><td>Folder</td><td class="n"><span class="mag" style="width:96px"></span>148 KB</td></tr>
+<tr><td><span class="ic f"></span>SharkApp.swift</td><td class="n">Oct 13 16:33</td><td>Swift source</td><td class="n"><span class="mag" style="width:22px"></span>1.4 KB</td></tr>
+<tr><td><span class="ic f"></span>ContentView.swift</td><td class="n">Oct 13 16:33</td><td>Swift source</td><td class="n"><span class="mag" style="width:58px"></span>24 KB</td></tr>
+<tr><td><span class="ic f"></span>Assets.xcassets</td><td class="n">Oct 12 11:02</td><td>Asset catalog</td><td class="n"><span class="mag" style="width:120px"></span>2.1 MB</td></tr>
+<tr><td><span class="ic f"></span>Info.plist</td><td class="n">Oct 13 15:59</td><td>Property list</td><td class="n"><span class="mag" style="width:18px"></span>812 B</td></tr>
+<tr><td><span class="ic f"></span>README.md</td><td class="n">Oct 13 13:09</td><td>Markdown</td><td class="n"><span class="mag" style="width:30px"></span>3.2 KB</td></tr>
+<tr><td><span class="ic f"></span>Package.resolved</td><td class="n">Oct 13 16:20</td><td>JSON</td><td class="n"><span class="mag" style="width:26px"></span>1.5 KB</td></tr>
+</table></div>
+<div class="status"><span><b>11</b> items</span><span><b>1</b> selected · 148 KB</span><span>212 GB free</span>
+<div class="manifest"><span class="code">S12</span>Copying 38 files → Backup SSD<div class="bar"><i></i></div>62% · 14 s</div></div>
+</div></body></html>

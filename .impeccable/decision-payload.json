@@ -1,0 +1,107 @@
+{
+  "title": "Choose Shark's visual world",
+  "question": "The roll assigned Freight Manifest. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "kind": "assigned",
+      "label": "Freight Manifest",
+      "kicker": "THE ROLL",
+      "lineage": "ISO shipping containers, port yard codes, bills of lading",
+      "thesis": "Every location is a coded container; every copy or move is cargo in transit.",
+      "palette": ["#1f4e79", "#b4532a", "#f2c230", "#2e6b4f", "#e9ebec", "#1c2024"],
+      "materials": ["corrugated steel colour fields", "stencilled condensed caps", "manifest tables"],
+      "viewport": "Standard sidebar, tab strip, address bar and details list; each tab and pinned place carries a container colour block, and a docked manifest strip in the status bar tracks transfers.",
+      "risk": "Turns into a costume if the stencil type or rust leaks past tab codes and the manifest.",
+      "raised": [
+        {"from": "challenger-star-atlas", "raise": "Size column draws a fixed log-scale magnitude bar, so big files read before you read numbers."},
+        {"from": "challenger-saville", "raise": "Nothing labelled twice: toolbar icons drop their captions; names live in tooltips and the command palette."},
+        {"from": "challenger-doujin", "raise": "Density courage: 22pt rows by default, more files per screen than Finder."},
+        {"from": "challenger-type-specimen", "raise": "Live readout: status bar counts selection, size and free space as you click."},
+        {"from": "challenger-botanical", "raise": "Fixed scale: both split panes share identical row and icon metrics."}
+      ],
+      "html": ".impeccable/mocks/decision/assigned.html"
+    },
+    {
+      "id": "model-pick",
+      "kind": "pick",
+      "label": "Station Line",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Swiss rail and metro wayfinding",
+      "thesis": "The path is a transit line; folders are stations you can ride to.",
+      "palette": ["#ffffff", "#111111", "#e2001a", "#0068b4", "#00965e"],
+      "materials": ["enamel signage white", "line bullets", "strict grotesk grid"],
+      "viewport": "Address bar drawn as a line diagram with station dots; tabs carry coloured line bullets.",
+      "risk": "Swiss modernism is where most tool redesigns land; it may feel familiar.",
+      "html": ".impeccable/mocks/decision/model-pick.html"
+    },
+    {
+      "id": "challenger-console",
+      "kind": "challenger",
+      "catalogId": "digital-design-canon-dark-first-developer-console",
+      "label": "Graphite Console",
+      "verdict": "competitive",
+      "lineage": "dark-first developer consoles",
+      "thesis": "Graphite panels split by hairlines, with delete set apart from everything else.",
+      "palette": ["#16181b", "#23262b", "#7aa2f7", "#9ece6a", "#f7768e"],
+      "materials": ["graphite", "hairline seams"],
+      "viewport": "Persistent tiled panes; navigation swaps their contents, not the layout.",
+      "case": "Strong product clarity, but it reads as one more dev tool, not as Shark.",
+      "risk": "Dark-only, so it fights system light mode and Explorer users.",
+      "html": ".impeccable/mocks/decision/challenger-console.html"
+    },
+    {
+      "id": "challenger-star-atlas", "kind": "challenger", "catalogId": "notation-diagram-systems-star-atlas",
+      "label": "Star Atlas", "verdict": "declined", "lineage": "celestial charts",
+      "thesis": "Files plotted as stars by magnitude.", "palette": ["#0c1a33", "#f4f1e8", "#d9452b"],
+      "materials": ["navy chart", "magnitude dots"], "viewport": "A plotted field of files.",
+      "case": "A chart isn't a file list.", "risk": "Hides names behind dots.",
+      "kept": "Fixed magnitude ramp for file size."
+    },
+    {
+      "id": "challenger-saville", "kind": "challenger", "catalogId": "brand-identity-canon-saville-catalog-sleeve",
+      "label": "Factory Sleeve", "verdict": "declined", "lineage": "Factory Records catalog",
+      "thesis": "Coded colour strips instead of words.", "palette": ["#0b0b0b", "#ffffff", "#e8452c"],
+      "materials": ["matte black", "hue codes"], "viewport": "Black field, coded index.",
+      "case": "Coded labels fight findability.", "risk": "Users must decode names.",
+      "kept": "Nothing labelled twice."
+    },
+    {
+      "id": "challenger-botanical", "kind": "challenger", "catalogId": "editorial-sequence-montage-botanical-folio-season",
+      "label": "Botanical Folio", "verdict": "declined", "lineage": "botanical plates",
+      "thesis": "Fixed-scale plates in sequence.", "palette": ["#f3ead8", "#3d6b3a", "#b8281f"],
+      "materials": ["cream plates", "sepia rules"], "viewport": "Plates on one baseline.",
+      "case": "No link to file work.", "risk": "Decorative on a tool.",
+      "kept": "Same scale across panes."
+    },
+    {
+      "id": "challenger-doujin", "kind": "challenger", "catalogId": "pop-culture-shelf-doujin-event-catalog",
+      "label": "Event Catalog", "verdict": "declined", "lineage": "doujin convention catalogs",
+      "thesis": "Hundreds of stamp-size cells per page.", "palette": ["#f2f0ea", "#111111", "#e03c8a"],
+      "materials": ["newsprint", "single ink"], "viewport": "Packed thumbnail grid.",
+      "case": "Newsprint fights a long-session screen.", "risk": "Noisy.",
+      "kept": "Density courage."
+    },
+    {
+      "id": "challenger-type-specimen", "kind": "challenger", "catalogId": "variable-font-specimen",
+      "label": "Type Specimen", "verdict": "declined", "lineage": "variable font specimens",
+      "thesis": "Sliders that morph the whole grid live.", "palette": ["#fafafa", "#111111", "#ff4d00"],
+      "materials": ["paper", "glyph grid"], "viewport": "Giant glyph and axis sliders.",
+      "case": "The glyph is the subject there, not files.", "risk": "Off-task.",
+      "kept": "Live numeric readout."
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "The category standard",
+    "thesis": "Finder and Explorer conventions, executed impeccably.",
+    "palette": ["#ffffff", "#f2f2f4", "#1d1d1f", "#0a84ff"],
+    "materials": ["system materials", "SF Pro", "accent selection"],
+    "viewport": "Vibrant sidebar, unified toolbar, list view, accent-blue selection.",
+    "risk": "Indistinguishable from Finder by design.",
+    "html": ".impeccable/mocks/decision/canon.html"
+  },
+  "steer": true
+}

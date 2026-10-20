@@ -1,101 +1,91 @@
-# Roadmap: Shark (Dolphin for macOS)
+# Roadmap: Shark
+
+## Milestones
+
+- ✅ **v1.0 Dolphin Core** - Phases 1-6 (shipped 2026-10-13) — see milestones/v1.0-ROADMAP.md
+- 🚧 **v2.0 Finder Look, QTTabBar Power** - Phases 7-11 (in progress)
 
 ## Overview
 
-Shark delivers KDE Dolphin's power-user file management experience natively on macOS. This roadmap builds the application incrementally through 6 focused phases: from foundational async filesystem navigation and sidebar browsing, to dual-pane split views and tabs, multi-view modes with instant filtering, an embedded PTY terminal drawer, a rich metadata inspector, and a comprehensive file operations engine with live FSEvents observation and drag-and-drop.
+v2.0 keeps Shark looking like native macOS Finder and adds the power of QTTabBar and the ease of Windows File Explorer: pro tabs with session restore, Explorer clipboard and undo, cascading subfolder menus and hover previews, a command palette for everything, and a final Finder-fidelity polish pass. Every phase is verified by driving the real app with computer-use (cua-driver).
 
 ## Phases
 
-- [x] **Phase 1: Core Navigation & macOS Foundation** - Native Swift/SwiftUI app scaffolding, high-performance FileSystem service, Places sidebar, clickable/editable breadcrumb bar, and directory navigation.
-- [x] **Phase 2: Dual-Pane Split View & Tabbed Workspace** - Dolphin F3 dual-pane split navigation, active pane focus management, and multi-tab browsing (Cmd+T / Cmd+W).
-- [x] **Phase 3: View Modes, Instant Filtering & Quick Look** - Details/Table view with column sorting, Grid/Icons view with zoomable thumbnails, Compact view, live filter bar (Cmd+I), and native Quick Look (Space).
-- [x] **Phase 4: Embedded Terminal Drawer (F4)** - Collapsible bottom terminal panel with native PTY running user login shell ($SHELL) and bidirectional directory synchronization.
-- [x] **Phase 5: Information & Metadata Inspector (F11)** - Collapsible right-hand inspector with detailed metadata, POSIX permissions, media attributes, checksums, and preview.
-- [x] **Phase 6: File Operations Engine, FSEvents & Drag-and-Drop** - Async non-blocking file operations (copy, move, trash, delete, batch rename), live FSEvents filesystem monitoring, and native drag-and-drop.
+- [ ] **Phase 7: Pro Tab Strip & Session Restore** - QTTabBar-grade tabs: reorder, pin, lock, colour, reopen closed, persistence
+- [ ] **Phase 8: Explorer Ergonomics** - Cut/Copy/Paste, undo, inline rename, copy path, rich status bar, path bar, folder sizes, address bar
+- [ ] **Phase 9: QTTabBar Folder Power** - Cascading subfolder menus, hover previews, recent/frequent folders, tab groups
+- [ ] **Phase 10: Command Palette, Menus & Keyboard** - ⌘K palette, complete menu bar, type-to-select, settings window
+- [ ] **Phase 11: Finder Fidelity Polish** - Visual pass, real Columns view, states, accessibility, DESIGN.md
 
 ## Phase Details
 
-### Phase 1: Core Navigation & macOS Foundation
-**Goal**: Establish the native macOS application architecture, file system service, Places sidebar, breadcrumb location bar, and single-pane directory browsing.
-**Depends on**: Nothing (first phase)
-**Requirements**: CORE-01, CORE-02, CORE-03, CORE-04, CORE-05
+### Phase 7: Pro Tab Strip & Session Restore
+**Goal**: Replace the Finder sub-toolbar tab capsule with a full QTTabBar-grade tab strip that looks like Finder/Safari tabs and persists across launches.
+**Depends on**: Phase 6
+**Requirements**: TAB-01, TAB-02, TAB-03, TAB-04, TAB-05, TAB-06, TAB-07
 **Success Criteria** (what must be TRUE):
-  1. User can launch Shark and browse any directory on their Mac.
-  2. Sidebar shows system volumes, standard user locations (Home, Desktop, Downloads, Documents, Trash), and pinned favorites.
-  3. Clicking any breadcrumb segment jumps to that ancestor directory, and pressing Cmd+L toggles direct text editing of the path.
-  4. User can navigate forward, backward, and up using keyboard shortcuts (Cmd+[, Cmd+], Cmd+Up).
-**Plans**: 1 plan
+  1. User can drag a tab to a new position, middle-click to close it, and ⇧⌘T reopens the last closed tab at its path.
+  2. Tab context menu offers Duplicate, Pin, Lock, Close Others, Close to the Right, Colour, Copy Path, and each works.
+  3. Quitting and relaunching Shark restores the same tabs, pins, colours, paths, split state and view modes.
+  4. ⌘-double-click on a folder opens it in a new background tab; ⌘1–9 jump to tabs.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 01-01: Build Swift 6 package / app structure, FileItem models, FileSystemService, PlacesSidebar, BreadcrumbBar, and DirectoryView.
-
-### Phase 2: Dual-Pane Split View & Tabbed Workspace
-**Goal**: Implement Dolphin's iconic dual-pane split view (F3) and full multi-tab workflow.
-**Depends on**: Phase 1
-**Requirements**: SPLIT-01, SPLIT-02, SPLIT-03
+### Phase 8: Explorer Ergonomics
+**Goal**: Give Shark the everyday ease of Windows File Explorer: clipboard file operations, undo, inline rename, copy path, informative status and path bars, folder sizes, and a forgiving address bar.
+**Depends on**: Phase 7
+**Requirements**: EXP-01, EXP-02, EXP-03, EXP-04, EXP-05, EXP-06, EXP-07, EXP-08, EXP-09
 **Success Criteria** (what must be TRUE):
-  1. Pressing F3 toggles the secondary file pane side-by-side with independent directory navigation.
-  2. The active pane is visually distinguished with clear focus indicators, and pressing Tab cycles active pane.
-  3. User can create new tabs (Cmd+T), switch tabs, and close tabs (Cmd+W), each preserving its own path and split configuration.
-**Plans**: 1 plan
+  1. User can ⌘X a file in one tab and ⌘V it in another; the file moves and ⌘Z moves it back.
+  2. Pressing Return on a selected file starts inline rename with the base name selected.
+  3. Status bar shows "N items, M selected (size), X GB available" and live progress for running copies with a cancel button.
+  4. Context menu offers Copy Path, Open in Terminal, Open With, Compress, Calculate Size.
+  5. ⌘L edits the address; Tab autocompletes; an invalid path shows an inline error and does not navigate.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 02-01: Build PaneState, WorkspaceTab, DualPaneContainer, TabBarView, and active pane keyboard coordination.
-
-### Phase 3: View Modes, Instant Filtering & Quick Look
-**Goal**: Provide Details/Table, Grid/Icons, and Compact views, instant in-memory filtering (Cmd+I), and Quick Look integration.
-**Depends on**: Phase 2
-**Requirements**: VIEW-01, VIEW-02, VIEW-03, VIEW-04, VIEW-05
+### Phase 9: QTTabBar Folder Power
+**Goal**: Bring QTTabBar's signature folder navigation: cascading subfolder menus from breadcrumbs and folders, hover previews, recent/frequent folders, and saved tab groups.
+**Depends on**: Phase 7
+**Requirements**: QT-01, QT-02, QT-03, QT-04, QT-05
 **Success Criteria** (what must be TRUE):
-  1. User can switch between Details/Table, Grid/Icons, and Compact views via toolbar or shortcuts.
-  2. Details view supports sorting by Name, Size, Date Modified, Kind, and Permissions.
-  3. Grid view supports thumbnail sizing zoom.
-  4. Pressing Cmd+I opens the instant filter bar, filtering displayed files instantaneously as you type.
-  5. Pressing Space opens the native macOS Quick Look panel for selected items.
-**Plans**: 1 plan
+  1. Clicking the chevron after any breadcrumb segment shows its subfolders as a menu that cascades into deeper subfolders on hover; choosing one navigates.
+  2. Hovering an image file for ~0.6s shows a thumbnail preview; hovering a text file shows its first lines.
+  3. Sidebar shows Recent and Frequent folders that update as the user navigates.
+  4. User can save open tabs as a group and reopen the group later.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 03-01: Implement TableView, GridView, CompactView, LiveFilterBar, and QuickLookController.
-
-### Phase 4: Embedded Terminal Drawer (F4)
-**Goal**: Integrate Dolphin's iconic F4 terminal drawer powered by a real PTY running the user's shell.
-**Depends on**: Phase 2
-**Requirements**: TERM-01, TERM-02, TERM-03
+### Phase 10: Command Palette, Menus & Keyboard
+**Goal**: Make every capability findable by eye and doable by key: a ⌘K command palette, a complete menu bar, type-to-select, and a Settings window.
+**Depends on**: Phase 8, Phase 9
+**Requirements**: CMD-01, CMD-02, CMD-03, CMD-04
 **Success Criteria** (what must be TRUE):
-  1. Pressing F4 smoothly toggles the bottom terminal drawer.
-  2. The terminal runs an interactive pseudo-terminal session (forkpty/posix_spawn) executing the user's login shell.
-  3. Changing directory in the active pane automatically synchronizes the terminal's working directory.
-**Plans**: 1 plan
+  1. ⌘K opens a palette; typing "split" runs Toggle Split, typing "dow" jumps to Downloads, typing "/usr/loc" navigates there.
+  2. Every toolbar and context action appears in the menu bar with its shortcut; F3, F4, F11 and Space work.
+  3. Typing letters in a folder selects the first matching item in every view.
+  4. ⌘, opens Settings, and changes there apply immediately and persist.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 04-01: Build PTYSession, TerminalView (ANSI terminal emulator / NSViewRepresentable), and TerminalDrawer synced with active pane navigation.
-
-### Phase 5: Information & Metadata Inspector (F11)
-**Goal**: Build Dolphin's F11 inspector panel for deep file inspection and metadata exploration.
-**Depends on**: Phase 1
-**Requirements**: INSP-01, INSP-02
+### Phase 11: Finder Fidelity Polish
+**Goal**: Make Shark indistinguishable from Finder in look and feel while keeping its power: visual pass in light and dark, a real Columns view, honest empty/error states, accessibility, and DESIGN.md.
+**Depends on**: Phase 10
+**Requirements**: POL-01, POL-02, POL-03, POL-04, POL-05
 **Success Criteria** (what must be TRUE):
-  1. Pressing F11 toggles the collapsible right-hand Information panel.
-  2. Selecting any file reveals detailed size, POSIX permissions, owner/group, MIME type, dimensions/duration for media, and checksums.
-**Plans**: 1 plan
+  1. Side-by-side screenshots against Finder in light and dark show matching toolbar, sidebar, list and icon styling.
+  2. Columns view browses with Miller columns and keyboard arrows.
+  3. Opening a protected folder shows a permission state with a "Grant Full Disk Access" action.
+  4. VoiceOver reads every toolbar control and row; DESIGN.md exists and matches the build.
+**Plans**: TBD
+**UI hint**: yes
 
-Plans:
-- [x] 05-01: Build InspectorPanel, MetadataExtractor (extended attributes, file stats, image/audio metadata, hashing), and preview header.
+## Progress
 
-### Phase 6: File Operations Engine, FSEvents & Drag-and-Drop
-**Goal**: Provide asynchronous file operations with progress, batch renaming, live FSEvents file system monitoring, and native drag-and-drop.
-**Depends on**: Phase 3, Phase 5
-**Requirements**: OPS-01, OPS-02, OPS-03, OPS-04, OPS-05
-**Success Criteria** (what must be TRUE):
-  1. User can copy, move, duplicate, trash, delete, and create files/folders asynchronously without UI freezes.
-  2. User can select multiple files and batch-rename them with find-and-replace or numbered patterns.
-  3. External modifications to directories (e.g. terminal or Finder file creation) immediately update the view via FSEvents.
-  4. User can drag and drop files between split panes, to/from Finder, and onto sidebar folders.
-**Plans**: 1 plan
-
-Plans:
-- [x] 06-01: Implement FileOperationsManager actor, BatchRenameSheet, FSEventsWatcher, and DragDropCoordinator.
-
----
-*Roadmap defined: 2026-10-13*
-*Last updated: 2026-10-13 - All 6 phases completed*
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 7. Pro Tab Strip & Session Restore | v2.0 | 0/TBD | Not started | - |
+| 8. Explorer Ergonomics | v2.0 | 0/TBD | Not started | - |
+| 9. QTTabBar Folder Power | v2.0 | 0/TBD | Not started | - |
+| 10. Command Palette, Menus & Keyboard | v2.0 | 0/TBD | Not started | - |
+| 11. Finder Fidelity Polish | v2.0 | 0/TBD | Not started | - |

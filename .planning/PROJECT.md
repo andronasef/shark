@@ -1,8 +1,14 @@
-# Shark — Native Dolphin File Manager Clone for macOS
+# Shark — Finder-look File Manager with QTTabBar & Explorer Power
 
 ## What This Is
 
 Shark is an ultra-fast, native macOS clone of KDE's renowned Dolphin file manager. Built from the ground up with Swift 6, SwiftUI, and AppKit, Shark brings Dolphin's beloved power-user paradigms — dual-pane split navigation (F3), an integrated interactive terminal drawer (F4), an instant metadata and preview inspector (F11), editable breadcrumb navigation, fast filtering (Cmd+I), tabs, and asynchronous file operations — to the macOS desktop with native feel and performance.
+
+## Current Milestone: v2.0 Finder Look, QTTabBar Power
+
+**Goal:** Keep the native Finder look and add QTTabBar-grade tabs and folder navigation, Explorer ergonomics, and a command palette.
+
+**Target features:** pro tabs + session restore, cut/copy/paste + undo, cascading subfolder menus + hover previews, ⌘K palette + full menus, Finder fidelity polish.
 
 ## Core Value
 
