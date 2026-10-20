@@ -30,6 +30,7 @@ public struct ContentView: View {
                     HStack(spacing: 0) {
                         Button { activeState.goBack() } label: {
                             Image(systemName: "chevron.left").frame(width: 27, height: 28)
+                                .contentShape(Rectangle())
                         }
                         .disabled(!activeState.canGoBack)
                         .help("Back (⌘[)")
@@ -37,6 +38,7 @@ public struct ContentView: View {
                         Divider().frame(height: 14)
                         Button { activeState.goForward() } label: {
                             Image(systemName: "chevron.right").frame(width: 27, height: 28)
+                                .contentShape(Rectangle())
                         }
                         .disabled(!activeState.canGoForward)
                         .help("Forward (⌘])")
@@ -44,6 +46,7 @@ public struct ContentView: View {
                         Divider().frame(height: 14)
                         Button { activeState.goUp() } label: {
                             Image(systemName: "chevron.up").frame(width: 27, height: 28)
+                                .contentShape(Rectangle())
                         }
                         .disabled(!activeState.canGoUp)
                         .help("Enclosing Folder (⌘↑)")

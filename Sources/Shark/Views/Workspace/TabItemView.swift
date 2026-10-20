@@ -215,6 +215,7 @@ public struct TabItemView: View {
                                 Circle()
                                     .fill(isCloseHovered ? Color.primary.opacity(0.12) : Color.clear)
                             )
+                            .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
                     .onHover { isCloseHovered = $0 }
