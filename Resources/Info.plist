@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.personal.shark</string>
+	<string>com.increasinglabs.shark</string>
 	<key>CFBundleName</key>
 	<string>Shark</string>
 	<key>CFBundlePackageType</key>

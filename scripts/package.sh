@@ -1,10 +1,10 @@
 #!/bin/bash
 # Build a universal app and ZIP. Public downloads require Developer ID notarization.
-# Usage: scripts/package.sh MAJOR.MINOR.PATCH
+# Usage: scripts/package.sh MAJOR.MINOR.PATCH[-PRERELEASE]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 version=${1:?usage: scripts/package.sh <version>}
-[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Version must be MAJOR.MINOR.PATCH" >&2; exit 1; }
+[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "Version must be MAJOR.MINOR.PATCH or semver prerelease (e.g. 1.0.0-alpha)" >&2; exit 1; }
 identity=${SIGN_IDENTITY:--}
 notarize=0
 if [[ "${REQUIRE_NOTARIZATION:-0}" == 1 || -n "${NOTARY_APPLE_ID:-}${NOTARY_TEAM_ID:-}${NOTARY_PASSWORD:-}" ]]; then

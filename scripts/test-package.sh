@@ -30,7 +30,7 @@ expect_rejection() {
 }
 
 expect_rejection 'Version must' bash scripts/package.sh ../invalid
-expect_rejection 'Version must' bash scripts/package.sh 1.0.0-beta
+expect_rejection 'Version must' bash scripts/package.sh 1.0
 expect_rejection 'requires SIGN_IDENTITY' env REQUIRE_NOTARIZATION=1 bash scripts/package.sh 1.0.0
 expect_rejection 'Set NOTARY_TEAM_ID' env SIGN_IDENTITY=test NOTARY_APPLE_ID=test@example.com bash scripts/package.sh 1.0.0
 expect_rejection 'Set NOTARY_PASSWORD' env SIGN_IDENTITY=test NOTARY_APPLE_ID=test@example.com NOTARY_TEAM_ID=TEAM bash scripts/package.sh 1.0.0

@@ -9,7 +9,7 @@ The [release action](../.github/workflows/release.yml) builds a universal app fo
 ## One-time GitHub setup
 
 1. Push this repository to GitHub. No remote is configured in this checkout yet.
-2. Review `Resources/Info.plist`. Replace `com.personal.shark` with your permanent bundle identifier before the first public release; keep it stable afterward.
+2. Review `Resources/Info.plist`. The bundle identifier is set to `com.increasinglabs.shark`; keep it stable afterward.
 3. In Keychain Access, export your **Developer ID Application** certificate **with its private key** as a password-protected `.p12`. An Apple Development certificate is not a substitute.
 4. Open the GitHub repository's **Settings → Secrets and variables → Actions** and add these repository secrets:
 
@@ -31,22 +31,22 @@ Keep certificates, private keys, and passwords out of Git. The action imports th
 3. Commit the release, then push an unused version tag:
 
    ```sh
-   git tag v0.7.0
-   git push origin v0.7.0
+   git tag v1.0.0-alpha
+   git push origin v1.0.0-alpha
    ```
 
-The action accepts stable `vMAJOR.MINOR.PATCH` tags. It publishes `Shark-0.7.0.zip` and `Shark-0.7.0.zip.sha256` with generated release notes. A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
+The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.zip` and `Shark-<version>.zip.sha256` with generated release notes (marked as prerelease when appropriate). A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
 
 To check the downloaded ZIP, put both release assets in the same directory and run:
 
 ```sh
-shasum -a 256 -c Shark-0.7.0.zip.sha256
+shasum -a 256 -c Shark-1.0.0-alpha.zip.sha256
 ```
 
 ## Package locally
 
 ```sh
-scripts/package.sh 0.7.0
+scripts/package.sh 1.0.0-alpha
 ```
 
 This creates an **ad hoc signed development package** in `dist/`, without notarization. It is for local validation and is not suitable for public downloads. Run `bash scripts/test-package.sh` to check release validation without compiling. Release build products use `.build/package` so they do not share the live development app's hot reload build. `SHARK_BUILD_PATH` can override this scratch directory.
@@ -54,7 +54,7 @@ This creates an **ad hoc signed development package** in `dist/`, without notari
 For a public package, first import your Developer ID certificate into your keychain, set `SIGN_IDENTITY` and the three `NOTARY_*` environment variables listed above, then run:
 
 ```sh
-REQUIRE_NOTARIZATION=1 scripts/package.sh 0.7.0
+REQUIRE_NOTARIZATION=1 scripts/package.sh 1.0.0-alpha
 ```
 
 The script stops when credentials are missing, notarization is rejected, stapling fails, or Gatekeeper rejects the app. Never publish the local ad hoc ZIP in place of a signed release.

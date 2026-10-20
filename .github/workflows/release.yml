@@ -31,7 +31,7 @@ jobs:
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
         run: |
           set -euo pipefail
-          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Use a tag such as v0.7.0'; exit 1; }
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo 'Use a tag such as v1.0.0 or v1.0.0-alpha'; exit 1; }
           for name in P12_BASE64 P12_PASSWORD SIGN_IDENTITY NOTARY_APPLE_ID NOTARY_TEAM_ID NOTARY_PASSWORD; do
             [[ -n "${!name}" ]] || { echo "Missing release secret: $name"; exit 1; }
           done
@@ -77,9 +77,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="${GITHUB_REF_NAME#v}"
+          extra_args=()
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            extra_args+=(--prerelease)
+          fi
           gh release create "$GITHUB_REF_NAME" \
             "dist/Shark-$version.zip" "dist/Shark-$version.zip.sha256" \
-            --verify-tag --title "Shark $version" --generate-notes
+            --verify-tag --title "Shark $version" --generate-notes "${extra_args[@]}"
 
       - name: Remove signing material
         if: always()
