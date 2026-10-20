@@ -2,6 +2,8 @@
 
 This document establishes the official design tokens, materials, interaction models, and fidelity standards for Shark, achieving parity with Apple macOS Finder while integrating the productivity powers of QTTabBar and Windows File Explorer.
 
+The Astro marketing website has its own responsive layout and web material rules in [`website/DESIGN.md`](website/DESIGN.md); this document continues to govern the native macOS application.
+
 ---
 
 ## 1. Visual Hierarchy & Spatial Grid

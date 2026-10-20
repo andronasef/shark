@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import DownloadLink from '../components/DownloadLink.astro';
+import split from '../assets/tabs-and-split.webp';
+import terminal from '../assets/terminal.webp';
+import preview from '../assets/hover-preview.webp';
+import folders from '../assets/subfolder-menu.webp';
+
+const icon = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/icon.png`;
+const features = [
+  { id: 'split', icon: 'split' as const, title: 'A little more room.\nA lot less back and forth.', description: 'Keep your project folders in tabs. Open a second pane to move files between locations. Pin the places you use all day, and pick up where you left off.', action: 'Two places. One window.', shortcut: 'F3', shortcutLabel: 'Split panes', image: split, alt: 'Shark with pinned folder tabs and two file panes side by side', tint: 'blue' },
+  { id: 'terminal', icon: 'terminal' as const, title: 'Right where your\nwork happens.', description: 'Your files above. A real terminal below. Browse to a project and start working: the terminal follows your active folder, so everything stays in context.', action: 'Less switching. More doing.', shortcut: 'F4', shortcutLabel: 'Terminal', image: terminal, alt: 'The built-in terminal open below Shark’s file browser', tint: 'mint' },
+  { id: 'previews', icon: 'eye' as const, title: 'Take a look.\nKeep your place.', description: 'Hover to see inside images, documents, and text files. Preview video and audio with playback controls. Find the right file without opening another app.', action: 'A closer look, just a hover away.', shortcut: 'Space', shortcutLabel: 'Quick Look selected files', image: preview, alt: 'A large image preview floating beside a photo in Shark', tint: 'peach' },
+  { id: 'folders', icon: 'folder' as const, title: 'Go deeper.\nStay in the flow.', description: 'Explore a folder’s contents from a cascading menu. Browse into subfolders, open what you need, or send a folder to a new tab—all without leaving your current view.', action: 'Your next folder is within reach.', shortcut: '⌘L', shortcutLabel: 'Go to a path', image: folders, alt: 'Shark showing a cascading menu through nested project folders', tint: 'lavender' },
+];
+const tools = [
+  ['Four ways to see your files', 'Icons, list, columns, or gallery. Choose the view that fits what you’re doing.'],
+  ['A shortcut to somewhere', 'Jump to folders and actions with the command palette. Just press ⌘K.'],
+  ['The details, on hand', 'Check sizes, permissions, metadata, and SHA-256 checksums in the inspector.'],
+  ['Make everyday work lighter', 'Batch rename, cut and paste, compress, and move files to the Trash.'],
+];
+---
+<Layout>
+  <header class="site-header">
+    <nav class="nav glass" aria-label="Main navigation">
+      <a class="brand" href="#" aria-label="Shark home"><img src={icon} width="36" height="36" alt="" /><span>Shark</span></a>
+      <div class="nav-links"><a href="#features">Features</a><a href="#faq">FAQ</a><a href="https://github.com/andronasef/shark">GitHub <span aria-hidden="true">↗</span></a></div>
+      <DownloadLink compact />
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-copy container">
+        <h1 id="hero-heading">Your files.<br /><span>More possibilities.</span></h1>
+        <p class="hero-description">Tabs, split panes, a built-in terminal, and quick previews.<br class="desktop-break" /> All in a familiar Mac interface.</p>
+        <div class="hero-actions"><DownloadLink /><a class="text-link" href="#features">Meet Shark <Icon name="arrow" size={17} /></a></div>
+        <p class="compatibility">Free. Made for Mac. <span>macOS 14 or later.</span></p>
+      </div>
+      <div class="hero-stage">
+        <div class="hero-window">
+          <Image src={split} alt="Shark file manager showing folder tabs, a familiar sidebar, and two panes for working between folders" widths={[780, 1200, 1800, 2400]} sizes="(max-width: 700px) 94vw, 86vw" loading="eager" fetchpriority="high" class="app-screenshot" />
+        </div>
+        <div class="feature-dock glass" aria-label="Explore Shark features">
+          <a href="#split"><Icon name="split" /><span>Split panes</span><kbd>F3</kbd></a>
+          <span class="dock-divider" aria-hidden="true"></span>
+          <a href="#terminal"><Icon name="terminal" /><span>Terminal</span><kbd>F4</kbd></a>
+          <span class="dock-divider" aria-hidden="true"></span>
+          <a href="#previews"><Icon name="eye" /><span>Quick previews</span></a>
+        </div>
+      </div>
+      <p class="hero-caption">Feels like your Mac. Works the way you do.</p>
+    </section>
+
+    <section id="features" class="features container" aria-labelledby="features-heading">
+      <div class="section-intro"><h2 id="features-heading">Familiar, with a few<br />very useful extras.</h2><p>For the folders you visit every day.<br />And everything you do between them.</p></div>
+      {features.map((feature, index) => (
+        <article id={feature.id} class:list={['feature-story', { reverse: index % 2 === 1 }]}>
+          <div class="feature-copy">
+            <div class:list={['feature-symbol', feature.tint]}><Icon name={feature.icon} size={25} /></div>
+            <h3>{feature.title.split('\n').map((line, i) => <>{i > 0 && <> <br /></>}{line}</>)}</h3>
+            <p>{feature.description}</p>
+            <p class="feature-payoff">{feature.action}</p>
+            <div class="shortcut"><kbd>{feature.shortcut}</kbd><span>{feature.shortcutLabel}</span></div>
+          </div>
+          <div class:list={['feature-image', feature.tint]}>
+            <Image src={feature.image} alt={feature.alt} widths={[640, 1000, 1440]} sizes="(max-width: 800px) 90vw, 55vw" loading="lazy" />
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section class="everyday" aria-labelledby="everyday-heading">
+      <div class="container everyday-inner">
+        <div class="everyday-heading"><h2 id="everyday-heading">The small things.<br />All thought through.</h2><p>A few more reasons to make yourself at home.</p></div>
+        <dl class="tool-list">{tools.map(([title, description]) => <div><dt><Icon name="check" size={18} />{title}</dt><dd>{description}</dd></div>)}</dl>
+      </div>
+    </section>
+
+    <section id="faq" class="faq container" aria-labelledby="faq-heading">
+      <div><h2 id="faq-heading">A few things<br />you might ask.</h2><a class="text-link" href="https://github.com/andronasef/shark/issues">Have another question? <Icon name="arrow" size={17} /></a></div>
+      <div class="faq-list">
+        <details><summary>Is Shark free?<span aria-hidden="true">+</span></summary><p>Yes. Shark is free to download and use. You can also explore the source on <a href="https://github.com/andronasef/shark">GitHub</a>.</p></details>
+        <details><summary>Will it work on my Mac?<span aria-hidden="true">+</span></summary><p>Shark requires macOS Sonoma 14 or later and supports Apple silicon and Intel Macs. Native Liquid Glass chrome is available on macOS 26; earlier versions use system materials.</p></details>
+        <details><summary>How do I install it?<span aria-hidden="true">+</span></summary><p>Download the latest Shark ZIP from GitHub Releases, unzip it, and move Shark.app to your Applications folder. Then open Shark to get started.</p></details>
+        <details><summary>Why does it ask for folder access?<span aria-hidden="true">+</span></summary><p>macOS protects folders such as Documents and Downloads. Allow access to the folders you want to browse when macOS asks. You can manage those permissions in System Settings.</p></details>
+        <details><summary>Can I use it with the keyboard?<span aria-hidden="true">+</span></summary><p>Yes. Open tabs with ⌘T, jump to a path with ⌘L, and open the command palette with ⌘K. F3 toggles split panes and F4 opens the terminal. Depending on your keyboard settings, hold Fn with the function keys.</p></details>
+      </div>
+    </section>
+
+    <section class="closing container" aria-labelledby="closing-heading">
+      <img src={icon} alt="" width="92" height="92" loading="lazy" />
+      <h2 id="closing-heading">Make room for<br />a better workflow.</h2>
+      <p>Your next favorite place for your files.</p>
+      <DownloadLink />
+      <p class="compatibility">Free · macOS 14+ · Apple silicon &amp; Intel</p>
+    </section>
+  </main>
+
+  <footer class="footer container"><a class="brand" href="#"><img src={icon} width="28" height="28" alt="" /><span>Shark</span></a><p>A native Mac file manager.</p><div><a href="https://github.com/andronasef/shark">Source code</a><a href="https://github.com/andronasef/shark/releases">Releases</a><a href="https://github.com/andronasef/shark/issues">Report an issue</a></div></footer>
+</Layout>

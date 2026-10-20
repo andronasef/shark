@@ -1,0 +1,9 @@
+---
+import Icon from './Icon.astro';
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+---
+<a class:list={['button', 'button-primary', { 'button-compact': compact }]} href="https://github.com/andronasef/shark/releases/latest">
+  <Icon name="download" size={compact ? 16 : 19} />
+  <span>{compact ? 'Download' : 'Download for macOS'}</span>
+</a>

@@ -9,3 +9,4 @@ DerivedData/
 *.xcworkspace
 *.app
 /dist/
+/.impeccable/review/
