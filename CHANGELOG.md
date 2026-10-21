@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Undo and redo requests run one at a time; newer file actions invalidate pending redo history, and clearing history cannot be undone by an in-flight completion.
 - **Data loss:** Cut (⌘X) and Paste (⌘V) into the same folder permanently deleted the file. Pasting a cut item over an existing name (including one that differs only by case) permanently deleted the existing item. Paste now never overwrites: a cut pasted back into its own folder does nothing, and a move onto an existing name is refused.
 - **Data loss:** Undo after copy-pasting into a folder that already had the name deleted the *original* file rather than the "copy 1". Undo now removes exactly the items the copy made, and moves them to the Trash.
 - Select All followed by Move to Trash also trashed items hidden by the search filter. The selection now only ever contains visible items.

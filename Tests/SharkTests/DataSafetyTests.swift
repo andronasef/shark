@@ -274,8 +274,44 @@ extension DataSafetyTests {
 
 extension DataSafetyTests {
 
+    func testNewActionWhileUndoRunsInvalidatesRedo() async throws {
+        let history = FileUndoService()
+        let urls = try (0..<50).map { try file("created-\($0).txt") }
+        history.record(.create(urls: urls, name: "Copy"))
+        let pending = Task { try await history.undo() }
+        while history.currentUndoDescription != nil { await Task.yield() }
+        history.record(.create(urls: [], name: "New File"))
+        try await pending.value
+        XCTAssertFalse(history.canRedo, "A newer action invalidates the pending undo's redo entry")
+        XCTAssertEqual(history.currentUndoDescription, "New File")
+    }
 }
 
 extension DataSafetyTests {
+    func testClearingHistoryWhileUndoRunsKeepsItEmpty() async throws {
+        let history = FileUndoService()
+        let urls = try (0..<50).map { try file("created-\($0).txt") }
+        history.record(.create(urls: urls, name: "Copy"))
+        let pending = Task { try await history.undo() }
+        while history.currentUndoDescription != nil { await Task.yield() }
+        history.clear()
+        try await pending.value
+        XCTAssertFalse(history.canUndo)
+        XCTAssertFalse(history.canRedo)
+    }
 
+    func testSecondUndoWhileOneRunsDoesNotTouchOlderFiles() async throws {
+        let history = FileUndoService()
+        let older = try file("older.txt", "keep me")
+        let urls = try (0..<50).map { try file("new-\($0).txt") }
+        history.record(.create(urls: [older], name: "Older"))
+        history.record(.create(urls: urls, name: "Newer"))
+        let pending = Task { try await history.undo() }
+        while history.currentUndoDescription == "Newer" { await Task.yield() }
+        try await history.undo()
+        try await pending.value
+        XCTAssertEqual(try String(contentsOf: older, encoding: .utf8), "keep me")
+        XCTAssertEqual(history.currentUndoDescription, "Older")
+        XCTAssertTrue(history.canRedo)
+    }
 }

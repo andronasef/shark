@@ -30,9 +30,12 @@ public final class FileUndoService {
 
     private var undoStack: [FileUndoAction] = []
     private var redoStack: [FileUndoAction] = []
+    private var isPerforming = false
+    private var historyRevision = 0
+    private var resetGeneration = 0
 
-    public var canUndo: Bool { !undoStack.isEmpty }
-    public var canRedo: Bool { !redoStack.isEmpty }
+    public var canUndo: Bool { !isPerforming && !undoStack.isEmpty }
+    public var canRedo: Bool { !isPerforming && !redoStack.isEmpty }
 
     public var currentUndoDescription: String? {
         undoStack.last?.actionDescription
@@ -45,32 +48,52 @@ public final class FileUndoService {
     public init() {}
 
     public func record(_ action: FileUndoAction) {
+        historyRevision += 1
         undoStack.append(action)
         redoStack.removeAll()
     }
 
     public func clear() {
+        historyRevision += 1
+        resetGeneration += 1
         undoStack.removeAll()
         redoStack.removeAll()
     }
 
     /// On failure the action stays on the undo stack, so it can be retried.
     public func undo() async throws {
-        guard let action = undoStack.popLast() else { return }
+        guard !isPerforming, let action = undoStack.popLast() else { return }
+        isPerforming = true
+        defer { isPerforming = false }
+        let revision = historyRevision
+        let generation = resetGeneration
+        let position = undoStack.count
         do {
-            redoStack.append(try await Self.reverse(action))
+            let inverse = try await Self.reverse(action)
+            // A new operation invalidates Redo, even if this undo was still in flight.
+            if revision == historyRevision { redoStack.append(inverse) }
         } catch {
-            undoStack.append(action)
+            if generation == resetGeneration {
+                undoStack.insert(action, at: min(position, undoStack.count))
+            }
             throw error
         }
     }
 
     public func redo() async throws {
-        guard let action = redoStack.popLast() else { return }
+        guard !isPerforming, let action = redoStack.popLast() else { return }
+        isPerforming = true
+        defer { isPerforming = false }
+        let revision = historyRevision
+        let generation = resetGeneration
+        let position = undoStack.count
         do {
-            undoStack.append(try await Self.replay(action))
+            let inverse = try await Self.replay(action)
+            if generation == resetGeneration {
+                undoStack.insert(inverse, at: min(position, undoStack.count))
+            }
         } catch {
-            redoStack.append(action)
+            if revision == historyRevision { redoStack.append(action) }
             throw error
         }
     }
