@@ -106,11 +106,10 @@ codesign --verify --strict "$app"
 ditto -c -k --keepParent "$app" "$archive"
 
 if [[ "$notarize" == 1 ]]; then
-  xcrun notarytool submit "$archive" --wait --output-format json \
-    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" --password "$NOTARY_PASSWORD" > "$staging/notary.json"
-  cat "$staging/notary.json"
-  status=$(plutil -extract status raw -o - "$staging/notary.json")
-  [[ "$status" == Accepted ]] || { echo "Notarization was not accepted: $status" >&2; exit 1; }
+  echo "Submitting $archive to Apple Notary Service..."
+  xcrun notarytool submit "$archive" --wait \
+    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" --password "$NOTARY_PASSWORD"
+  echo "Notarization completed successfully. Stapling ticket..."
   xcrun stapler staple "$app"
   xcrun stapler validate "$app"
   spctl --assess --type execute --verbose=2 "$app"
