@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Drops now follow Finder: they move within a disk and copy to another disk. Hold ⌥ to copy or ⌘ to move. Before, every drop moved, so dragging from an SD card or external drive removed the files from it.
 - Every file operation can now be undone: Trash, drag-and-drop, duplicate, new folder and file, batch rename, and Compress join copy, move, and rename. Undoing something Shark created moves it to the Trash; nothing is permanently deleted.
 - Multi-item operations (paste, drop, Trash, batch rename, copy) are all-or-nothing: if one item fails, the finished ones are put back. Failures show an alert instead of failing silently or replacing the folder view with an error page.
+- Shark has a single window. ⌘N "New Window" is removed: extra windows mirrored the same tabs and panes, and the menus only drove the first one. Use tabs (⌘T) instead.
 - The subfolder menu lists at most 500 items, with a final item that opens the folder, so huge folders no longer freeze the menu.
 - Calculate Size recalculates on every request instead of showing a stale cached size.
 - Removed the unused hardened-runtime exceptions (JIT, unsigned executable memory, disabled library validation) from the Developer ID build, and the `com.apple.security.inherit` entitlement, which is only for helper tools, from the App Store build.

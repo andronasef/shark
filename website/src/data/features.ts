@@ -30,7 +30,6 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'tab-groups', title: 'Saved tab groups', description: 'Save a set of tabs as a named group. Restore it as your workspace or append it to your open tabs.' },
       { id: 'session-restore', title: 'Session restore', description: 'Return to your saved tabs and pane layout when you reopen Shark.' },
       { id: 'tab-navigation', title: 'Keyboard tab switching', description: 'Cycle through tabs with Control-Tab and Control-Shift-Tab, or jump to a tab with Option-Command and a number.' },
-      { id: 'multiple-windows', title: 'Multiple windows', description: 'Open another Shark window. Windows share the current tabs and workspace.', shortcut: '⌘N' },
     ],
   },
   // NavigationState, CommandPaletteService, RecentFoldersService, PlacesSidebarView, PathBarView.

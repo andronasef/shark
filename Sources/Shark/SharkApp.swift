@@ -39,7 +39,9 @@ struct SharkApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        // One window: the menu commands and the session drive a single WorkspaceState, so a second
+        // window would only mirror the first one's tabs. Use tabs (⌘T) for more locations.
+        Window("Shark", id: "main") {
             ContentView(workspaceState: appDelegate.workspace)
                 .frame(minWidth: 850, minHeight: 550)
         }
@@ -90,11 +92,6 @@ struct ExplorerCommands: Commands {
                 workspace.newTab(placement: .end)
             }
             .keyboardShortcut("t")
-
-            Button("New Window") {
-                NSApp.sendAction(#selector(NSWindow.newWindowForTab(_:)), to: nil, from: nil)
-            }
-            .keyboardShortcut("n", modifiers: .command)
 
             Button("New Folder") {
                 nav.requestedNewItemType = .folder
