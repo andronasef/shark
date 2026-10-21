@@ -8,6 +8,8 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
     private let navigationHandler: NavigationHandler
     private let showHiddenFiles: Bool
     private var menuURLs: [ObjectIdentifier: URL] = [:]
+    /// Menus past this size take seconds to build and are unusable anyway.
+    static let maxItems = 500
 
     public init(showHiddenFiles: Bool = false, onNavigate: @escaping NavigationHandler) {
         self.showHiddenFiles = showHiddenFiles
@@ -54,17 +56,17 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
         }
 
         // Sort: folders first, then alphabetically
-        let sorted = contents.sorted { a, b in
-            let aIsDir = (try? a.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            let bIsDir = (try? b.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            if aIsDir != bIsDir {
-                return aIsDir && !bIsDir
+        let entries = contents.map { url in
+            (url: url, isDir: (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false)
+        }
+        let sorted = entries.sorted { a, b in
+            if a.isDir != b.isDir {
+                return a.isDir
             }
-            return a.lastPathComponent.localizedStandardCompare(b.lastPathComponent) == .orderedAscending
+            return a.url.lastPathComponent.localizedStandardCompare(b.url.lastPathComponent) == .orderedAscending
         }
 
-        for itemURL in sorted {
-            let isDir = (try? itemURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+        for (itemURL, isDir) in sorted.prefix(Self.maxItems) {
             let displayName = itemURL.lastPathComponent
 
             let menuItem = NSMenuItem(
@@ -98,6 +100,15 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
             }
 
             menu.addItem(menuItem)
+        }
+
+        if sorted.count > Self.maxItems {
+            menu.addItem(.separator())
+            let more = NSMenuItem(title: "Open “\(dirURL.lastPathComponent)” to See All \(sorted.count) Items",
+                                  action: #selector(menuItemClicked(_:)), keyEquivalent: "")
+            more.target = self
+            more.representedObject = dirURL
+            menu.addItem(more)
         }
     }
 
