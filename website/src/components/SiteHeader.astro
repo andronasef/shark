@@ -7,13 +7,92 @@ const icon = `${home}icon.png`;
 ---
 <header class="site-header">
   <nav class="nav glass" aria-label="Main navigation">
-    <a class="brand" href={home} aria-label="Shark home"><img src={icon} width="36" height="36" alt="" /><span>Shark</span></a>
-    <div class="nav-links">
-      <a href={`${home}features/`} aria-current={currentPage === 'features' ? 'page' : undefined}>Features</a>
-      <a href={`${home}#faq`}>FAQ</a>
-      <a href="https://userhq.increasinglabs.com/increasing-labs/shark" target="_blank" rel="noopener">Feedback <span aria-hidden="true">↗</span></a>
-      <a href="https://github.com/andronasef/shark" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+    <div class="nav-bar">
+      <a class="brand" href={home} aria-label="Shark home">
+        <img src={icon} width="36" height="36" alt="" />
+        <span>Shark</span>
+      </a>
+      <div class="nav-actions">
+        <DownloadLink compact />
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+          aria-label="Open menu"
+        >
+          <span class="nav-toggle-box" aria-hidden="true">
+            <span class="nav-toggle-bar bar-top"></span>
+            <span class="nav-toggle-bar bar-bot"></span>
+          </span>
+        </button>
+      </div>
     </div>
-    <DownloadLink compact />
+    <div class="nav-links" id="nav-menu">
+      <a href={`${home}features/`} aria-current={currentPage === 'features' ? 'page' : undefined}>
+        <span>Features</span>
+        {currentPage === 'features' && <span class="nav-badge" aria-hidden="true">Current</span>}
+      </a>
+      <a href={`${home}#faq`}>
+        <span>FAQ</span>
+      </a>
+      <a href="https://userhq.increasinglabs.com/increasing-labs/shark" target="_blank" rel="noopener">
+        <span>Feedback</span>
+        <span class="ext-icon" aria-hidden="true">↗</span>
+      </a>
+      <a href="https://github.com/andronasef/shark" target="_blank" rel="noopener">
+        <span>GitHub</span>
+        <span class="ext-icon" aria-hidden="true">↗</span>
+      </a>
+    </div>
   </nav>
 </header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const nav = header?.querySelector<HTMLElement>('.nav');
+  const toggle = header?.querySelector<HTMLButtonElement>('.nav-toggle');
+  const menu = header?.querySelector<HTMLElement>('.nav-links');
+
+  if (header && nav && toggle && menu) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      nav.classList.toggle('is-open', open);
+    };
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      setOpen(!isOpen);
+    });
+
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (toggle.getAttribute('aria-expanded') === 'true') {
+          setOpen(false);
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (toggle.getAttribute('aria-expanded') === 'true' && !nav.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    });
+
+    const mediaQuery = window.matchMedia('(min-width: 769px)');
+    mediaQuery.addEventListener('change', (e) => {
+      if (e.matches && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+      }
+    });
+  }
+</script>

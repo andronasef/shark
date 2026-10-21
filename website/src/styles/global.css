@@ -27,14 +27,19 @@
 
 @layer components {
   .glass { background: rgba(255,255,255,.82); border: 1px solid rgba(255,255,255,.95); box-shadow: 0 8px 30px #24384e0c, inset 0 1px 0 white, inset 0 -1px 0 #b8c7d52b; backdrop-filter: blur(22px) saturate(145%); -webkit-backdrop-filter: blur(22px) saturate(145%); }
-  .site-header { position: sticky; top: 20px; z-index: 10; height: 68px; margin-top: 20px; }
-  .nav { width: min(1000px, calc(100% - 64px)); margin: auto; border-radius: 24px; padding: 10px 12px 10px 16px; display: flex; align-items: center; gap: 32px; }
-  .brand { display: inline-flex; align-items: center; gap: 9px; font-size: 20px; font-weight: 650; letter-spacing: -.025em; flex-shrink: 0; }
+  .site-header { position: sticky; top: 20px; z-index: 50; height: 68px; margin-top: 20px; }
+  .nav { width: min(1000px, calc(100% - 64px)); margin: auto; border-radius: 24px; padding: 10px 12px 10px 16px; display: flex; align-items: center; gap: 32px; position: relative; }
+  .nav-bar { display: contents; }
+  .brand { display: inline-flex; align-items: center; gap: 9px; font-size: 20px; font-weight: 650; letter-spacing: -.025em; flex-shrink: 0; order: 1; }
   .brand img { flex-shrink: 0; }
-  .nav-links { margin-left: auto; display: flex; gap: 28px; align-items: center; font-size: 13px; font-weight: 500; }
-  .nav-links a { padding-block: 9px; color: #3e4c5b; }
+  .nav-actions { display: contents; }
+  .nav-actions .button { order: 3; }
+  .nav-toggle { display: none; }
+  .nav-links { margin-left: auto; display: flex; gap: 28px; align-items: center; font-size: 13px; font-weight: 500; order: 2; }
+  .nav-links a { padding-block: 9px; color: #3e4c5b; display: inline-flex; align-items: center; gap: 4px; }
   .nav-links a:hover, .footer a:hover { color: var(--accent); }
   .nav-links a[aria-current='page'] { color: var(--accent); }
+  .nav-badge { display: none; }
   .all-features-link { margin-top: 60px; text-align: center; }
   .button { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 13px 23px; font-size: 15px; font-weight: 600; border-radius: 999px; line-height: 1.4; transition: background .24s var(--ease), box-shadow .24s var(--ease), transform .24s var(--ease); }
   .button-primary { color: white; background: #0069d4; box-shadow: inset 0 1px 1px #ffffff6b, inset 0 -1px 1px #00479d4d, 0 5px 12px #0879e71f; }
@@ -137,16 +142,171 @@
     .footer { flex-wrap: wrap; gap: 14px; }
     .footer > div { width: 100%; margin-left: 0; gap: 22px; }
   }
+  @media (max-width: 768px) {
+    .site-header { top: 12px; margin-top: 12px; height: 56px; }
+    .nav {
+      width: calc(100% - 28px);
+      max-width: 480px;
+      padding: 8px 10px 8px 12px;
+      gap: 0;
+      border-radius: 20px;
+    }
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .brand {
+      order: unset;
+      font-size: 18px;
+      gap: 7px;
+    }
+    .brand img {
+      width: 30px;
+      height: 30px;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-actions .button {
+      order: unset;
+      min-height: 38px;
+      padding: 8px 14px;
+      font-size: 13px;
+      gap: 6px;
+    }
+    .nav-actions .button svg {
+      display: none;
+    }
+    .nav-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: rgba(24, 35, 46, 0.05);
+      border: 1px solid rgba(24, 35, 46, 0.08);
+      color: var(--ink);
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      transition: background .2s var(--ease), transform .15s var(--ease);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-toggle:hover {
+      background: rgba(24, 35, 46, 0.1);
+    }
+    .nav-toggle:active {
+      transform: scale(0.94);
+    }
+    .nav-toggle:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .nav-toggle-box {
+      width: 16px;
+      height: 12px;
+      position: relative;
+      display: block;
+    }
+    .nav-toggle-bar {
+      position: absolute;
+      left: 0;
+      width: 16px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform .22s cubic-bezier(0.16, 1, 0.3, 1), top .22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bar-top { top: 2px; }
+    .bar-bot { top: 8px; }
+    .nav.is-open .bar-top {
+      top: 5px;
+      transform: rotate(45deg);
+    }
+    .nav.is-open .bar-bot {
+      top: 5px;
+      transform: rotate(-45deg);
+    }
+    .nav-links {
+      order: unset;
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0;
+      border-radius: 20px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 16px 36px rgba(24, 35, 46, 0.14), inset 0 1px 0 white, inset 0 -1px 0 #b8c7d52b;
+      backdrop-filter: blur(22px) saturate(145%);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+      font-size: 15px;
+      font-weight: 550;
+      z-index: 100;
+    }
+    .nav.is-open .nav-links {
+      display: flex;
+      animation: navReveal .2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      color: var(--ink);
+      text-decoration: none;
+      transition: background .15s ease, color .15s ease;
+      white-space: nowrap;
+    }
+    .nav-links a:hover,
+    .nav-links a:active {
+      background: var(--blue);
+      color: var(--accent);
+    }
+    .nav-links a[aria-current='page'] {
+      color: var(--accent);
+      background: rgba(227, 237, 248, 0.6);
+      font-weight: 600;
+    }
+    .nav-badge {
+      display: inline-flex;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: var(--accent);
+    }
+    .nav-links .ext-icon {
+      font-size: 14px;
+      color: var(--secondary);
+      transition: transform .15s ease, color .15s ease;
+      white-space: nowrap;
+    }
+    .nav-links a:hover .ext-icon,
+    .nav-links a:active .ext-icon {
+      color: var(--accent);
+      transform: translate(1px, -1px);
+    }
+  }
   @media (max-width: 540px) {
     .container { width: calc(100% - 40px); }
-    .site-header { top: 12px; margin-top: 12px; height: 60px; }
-    .nav { width: calc(100% - 28px); padding: 8px 9px 8px 12px; gap: 12px; border-radius: 20px; }
-    .brand { font-size: 18px; gap: 6px; }
-    .brand img { width: 30px; height: 30px; }
-    .nav-links { gap: 15px; font-size: 12px; }
-    .nav-links a[href*='github'] { display: none; }
-    .nav .button { padding-inline: 13px; }
-    .nav .button svg { display: none; }
     .hero { padding-top: 52px; }
     .hero h1 { font-size: clamp(44px, 10.7vw, 57px); letter-spacing: -.04em; }
     .hero-description { font-size: 15px; line-height: 1.7; margin-top: 23px; }
@@ -175,7 +335,7 @@
     .footer p { font-size: 11px; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
-  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .glass { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; border-color: #a5b3c1; } :root { --secondary: #344353; } }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .glass, .nav-links { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; border-color: #a5b3c1; } :root { --secondary: #344353; } }
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .glass { background: #fff; } }
   @media (forced-colors: active) { .glass, .button, kbd { border: 1px solid ButtonText; } .button-primary { background: ButtonFace; color: ButtonText; } .hero h1 span { color: CanvasText; } .feature-symbol svg, .tool-list svg { color: CanvasText; } }
 }
