@@ -87,7 +87,7 @@ struct OnboardingView: View {
     }
 
     private var features: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 16) {
             feature("Folder tabs", symbol: "rectangle.on.rectangle", shortcut: "⌘T",
                     detail: "Keep several locations open in one window.")
             feature("Side-by-side folders", symbol: "rectangle.split.2x1", shortcut: "F3",
@@ -96,6 +96,13 @@ struct OnboardingView: View {
                     detail: "Preview a selected file without opening its app.")
             feature("Built-in terminal", symbol: "terminal", shortcut: "⌃`",
                     detail: "Work in a shell right beneath your files.")
+            VStack(alignment: .leading, spacing: 6) {
+                Text("See everything Shark can do in Help → All Features.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Link("View All Features", destination: AppLinks.features)
+                    .font(.callout)
+            }
         }
     }
 

@@ -89,6 +89,15 @@ struct HelpView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 6) {
+                    Text("Explore Shark")
+                        .font(.title3.weight(.semibold))
+                    Link("All Features", destination: AppLinks.features)
+                    Text("Browse the complete features list, including shortcuts and settings, on the Shark website. You can also find it in Help → All Features.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
                     Text("Mouse")
                         .font(.largeTitle.bold())
                     Text("What a click or scroll does depends on where the pointer is. Optional actions can be turned off in Settings › Mouse.")

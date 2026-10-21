@@ -6,6 +6,7 @@ import AppKit
 public enum AppLinks {
     public static let repository = URL(string: "https://github.com/andronasef/shark")!
     public static let website = URL(string: "https://shark.andronasef.com/")!
+    public static let features = website.appendingPathComponent("features", isDirectory: true)
     public static let author = URL(string: "https://andronasef.com/")!
     public static let feedback = URL(string: "https://userhq.increasinglabs.com/increasing-labs/shark")!
 

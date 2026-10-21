@@ -139,6 +139,10 @@ struct HelpCommands: Commands {
             Button("Shark Help") { openWindow(id: "help") }
                 .keyboardShortcut("?", modifiers: .command)
 
+            Button("All Features") {
+                openURL(AppLinks.features)
+            }
+
             Divider()
 
             Button("Shark Website") {

@@ -140,7 +140,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'folder-permissions', title: 'macOS folder access', description: 'Grant access to protected folders when macOS asks. When privacy settings block a location, Shark offers guidance and a route to the relevant settings.' },
       { id: 'privacy-telemetry', title: 'Privacy & diagnostics', description: 'Anonymous usage statistics and crash reporting are on by default and can be independently turned off in Settings › Privacy. File names, folder paths, and terminal commands are never collected.' },
       { id: 'update-alerts', title: 'Update alerts', description: 'Shark checks for a new version once a day and from Shark › Check for Updates…. The alert points DMG installs to the download, Homebrew installs to brew upgrade --cask shark, and Mac App Store installs to the App Store, with the release notes when available. Choose Skip This Version, or turn automatic checks off in Settings › General.' },
-      { id: 'about-feedback', title: 'Help, website & feedback', description: 'Quickly reach the website, source repository, feedback board, and author details from the Help menu, About panel, and Settings › General.' },
+      { id: 'about-feedback', title: 'Help, website & feedback', description: 'Open the complete feature catalog from Help › All Features, the welcome’s feature step, or Shark Help. Quickly reach the website, source repository, feedback board, and author details from the Help menu, About panel, and Settings › General.' },
     ],
   },
 ];
