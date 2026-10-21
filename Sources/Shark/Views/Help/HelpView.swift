@@ -117,6 +117,27 @@ struct HelpView: View {
                         .background(RoundedRectangle(cornerRadius: 10).fill(Color.primary.opacity(0.05)))
                     }
                 }
+
+                Divider()
+                    .padding(.top, 8)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text("Feature request or bug?")
+                            .foregroundStyle(.secondary)
+                        Link("Tell us", destination: AppLinks.feedback)
+                        Text("•")
+                            .foregroundStyle(.secondary)
+                        Link("Shark Website", destination: AppLinks.website)
+                        Text("•")
+                            .foregroundStyle(.secondary)
+                        Link("GitHub", destination: AppLinks.repository)
+                        Text("•")
+                            .foregroundStyle(.secondary)
+                        Link("Andrew Nasef", destination: AppLinks.author)
+                    }
+                    .font(.callout)
+                }
             }
             .padding(28)
             .frame(maxWidth: 720, alignment: .leading)

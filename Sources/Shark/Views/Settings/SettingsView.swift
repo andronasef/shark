@@ -37,7 +37,7 @@ public struct SettingsView: View {
                 }
                 .tag(4)
         }
-        .frame(width: 480, height: 360)
+        .frame(width: 480, height: 420)
         .padding(20)
     }
 
@@ -65,6 +65,54 @@ public struct SettingsView: View {
                 Text("Shark checks once a day and only shows an alert. You can always use Shark › Check for Updates…")
                     .font(.caption)
                     .foregroundColor(.secondary)
+            }
+
+            Section("About & Feedback") {
+                Link(destination: AppLinks.website) {
+                    HStack {
+                        Text("Shark Website")
+                        Spacer()
+                        Text("shark.andronasef.com")
+                            .foregroundColor(.secondary)
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Link(destination: AppLinks.repository) {
+                    HStack {
+                        Text("Source Code")
+                        Spacer()
+                        Text("GitHub")
+                            .foregroundColor(.secondary)
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Link(destination: AppLinks.feedback) {
+                    HStack {
+                        Text("Feedback & Feature Requests")
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Link(destination: AppLinks.author) {
+                    HStack {
+                        Text("Created by Andrew Nasef")
+                        Spacer()
+                        Text("andronasef.com")
+                            .foregroundColor(.secondary)
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
         }
         .formStyle(.grouped)

@@ -67,8 +67,15 @@ struct SharkApp: App {
 
 struct HelpCommands: Commands {
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.openURL) private var openURL
 
     var body: some Commands {
+        CommandGroup(replacing: .appInfo) {
+            Button("About Shark") {
+                AppLinks.showAboutPanel()
+            }
+        }
+
         CommandGroup(after: .appInfo) {
             Button("Check for Updates…") { UpdateChecker.checkNow() }
         }
@@ -76,6 +83,26 @@ struct HelpCommands: Commands {
         CommandGroup(replacing: .help) {
             Button("Shark Help") { openWindow(id: "help") }
                 .keyboardShortcut("?", modifiers: .command)
+
+            Divider()
+
+            Button("Shark Website") {
+                openURL(AppLinks.website)
+            }
+
+            Button("Source Code on GitHub") {
+                openURL(AppLinks.repository)
+            }
+
+            Button("Send Feedback…") {
+                openURL(AppLinks.feedback)
+            }
+
+            Divider()
+
+            Button("About Andrew Nasef") {
+                openURL(AppLinks.author)
+            }
         }
     }
 }

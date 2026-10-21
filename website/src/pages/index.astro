@@ -6,12 +6,14 @@ import DownloadLink from '../components/DownloadLink.astro';
 import MacAppStoreLink from '../components/MacAppStoreLink.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { featureGroups } from '../data/features';
 import split from '../assets/tabs-and-split.webp';
 import terminal from '../assets/terminal.webp';
 import preview from '../assets/hover-preview.webp';
 import folders from '../assets/subfolder-menu.webp';
 
 const icon = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/icon.png`;
+const totalFeatures = featureGroups.reduce((acc, g) => acc + g.features.length, 0);
 const features = [
   { id: 'split', icon: 'split' as const, title: 'A little more room.\nA lot less back and forth.', description: 'Keep your project folders in tabs. Open a second pane to move files between locations. Pin the places you use all day, and pick up where you left off.', action: 'Two places. One window.', shortcut: 'F3', shortcutLabel: 'Split panes', image: split, alt: 'Shark with pinned folder tabs and two file panes side by side', tint: 'blue' },
   { id: 'terminal', icon: 'terminal' as const, title: 'Right where your\nwork happens.', description: 'Your files above. A real terminal below. Browse to a project and start working: the terminal follows your active folder, so everything stays in context.', action: 'Less switching. More doing.', shortcut: 'F4', shortcutLabel: 'Terminal', image: terminal, alt: 'The built-in terminal open below Shark’s file browser', tint: 'mint' },
@@ -67,7 +69,7 @@ const tools = [
           </div>
         </article>
       ))}
-      <div class="all-features-link"><a class="text-link" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/features/`}>Explore every feature <Icon name="arrow" size={17} /></a></div>
+      <div class="all-features-link"><a class="text-link" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/features/`}>Explore all {totalFeatures} features <Icon name="arrow" size={17} /></a></div>
     </section>
 
     <section class="everyday" aria-labelledby="everyday-heading">
@@ -78,7 +80,7 @@ const tools = [
     </section>
 
     <section id="faq" class="faq container" aria-labelledby="faq-heading">
-      <div><h2 id="faq-heading">A few things<br />you might ask.</h2><a class="text-link" href="https://github.com/andronasef/shark/issues">Have another question? <Icon name="arrow" size={17} /></a></div>
+      <div><h2 id="faq-heading">A few things<br />you might ask.</h2><a class="text-link" href="https://userhq.increasinglabs.com/increasing-labs/shark">Have another question? <Icon name="arrow" size={17} /></a></div>
       <div class="faq-list">
         <details><summary>Is Shark free?<span aria-hidden="true">+</span></summary><p>Yes. Shark is free to download and use. You can also explore the source on <a href="https://github.com/andronasef/shark">GitHub</a>.</p></details>
         <details><summary>Will it work on my Mac?<span aria-hidden="true">+</span></summary><p>Shark requires macOS Sonoma 14 or later and supports Apple silicon and Intel Macs. Native Liquid Glass chrome is available on macOS 26; earlier versions use system materials.</p></details>

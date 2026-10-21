@@ -5,6 +5,12 @@
 <h1 align="center">Shark</h1>
 <p align="center">A native Mac file manager for people who live in their folders.</p>
 <p align="center">macOS 14+ · Apple silicon & Intel · Built with Swift and SwiftUI</p>
+<p align="center">
+  <a href="https://shark.andronasef.com/">Website</a> ·
+  <a href="https://github.com/andronasef/shark">GitHub</a> ·
+  <a href="https://userhq.increasinglabs.com/increasing-labs/shark">Feedback & Feature Requests</a> ·
+  Created by <a href="https://andronasef.com/">Andrew Nasef</a>
+</p>
 
 Shark brings tabs, split panes, an embedded terminal, and quick previews into a familiar Mac interface. Keep your project folders open, move files between locations, and look inside things without losing your place.
 
@@ -104,12 +110,19 @@ For a local universal package:
 scripts/package.sh 0.7.0
 ```
 
+## Links
+
+- **Website:** [shark.andronasef.com](https://shark.andronasef.com/)
+- **Repository:** [github.com/andronasef/shark](https://github.com/andronasef/shark)
+- **Feedback & Bug Reports:** [Shark Feedback Board](https://userhq.increasinglabs.com/increasing-labs/shark)
+- **Author:** [Andrew Nasef](https://andronasef.com/)
+
 ## Contributing
 
 Bug reports, small fixes, documentation improvements, and feature ideas are welcome.
 
-- **Found a bug?** Open an issue with your macOS version, steps to reproduce, what you expected, and what happened. Screenshots help; hide any personal file names or paths.
-- **Have a bigger idea?** Open an issue to discuss it before starting a large change.
+- **Found a bug?** Submit a report on the [Shark Feedback Board](https://userhq.increasinglabs.com/increasing-labs/shark) with your macOS version, steps to reproduce, what you expected, and what happened. Screenshots help; hide any personal file names or paths.
+- **Have a bigger idea?** Share a feature request on the [Shark Feedback Board](https://userhq.increasinglabs.com/increasing-labs/shark) to discuss it before starting a large change.
 - **Want to send a fix?** Fork the repository, create a branch, and follow the build instructions above. Keep each pull request focused on one change.
 
 Before opening a pull request, run `swift test` and check the app itself if you changed the UI. Add tests for non-trivial logic and a changelog entry for meaningful changes. Include a short description of the change and how you tested it; add screenshots for visual changes.

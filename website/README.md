@@ -18,7 +18,7 @@ Open `http://localhost:4321/`. Build with `npm run build`, then use `npm run pre
 
 The site is configured for `https://shark.andronasef.com/` in `astro.config.mjs` with root `base: '/'`. Deploy by connecting the repository to Cloudflare Pages (or another static host) with root directory `website`, build command `npm run build`, and output directory `dist`.
 
-Download buttons point to `https://github.com/andronasef/shark/releases/latest`; source and issue links use the same repository. Publish a release containing a ZIP of the app before promoting the download page. The website intentionally makes no claims about a currently available version, signing status, or download count.
+Download buttons point to `https://github.com/andronasef/shark/releases/latest`; source links point to `https://github.com/andronasef/shark`, and feedback and bug reports use `https://userhq.increasinglabs.com/increasing-labs/shark`. Publish a release containing a ZIP of the app before promoting the download page. The website intentionally makes no claims about a currently available version, signing status, or download count.
 
 ## Editing
 
