@@ -8,7 +8,7 @@ public actor FileSystemService {
 
     public init() {}
 
-    private let resourceKeys: Set<URLResourceKey> = [
+    private nonisolated let resourceKeys: Set<URLResourceKey> = [
         .nameKey,
         .isDirectoryKey,
         .isPackageKey,
@@ -21,10 +21,13 @@ public actor FileSystemService {
         .localizedTypeDescriptionKey
     ]
 
-    /// Reads directory contents asynchronously with pre-fetched resource keys for ultra-fast performance.
-    public func contentsOfDirectory(at url: URL, showHidden: Bool = false) throws -> [FileItem] {
+    /// Reads directory contents with pre-fetched resource keys.
+    /// Nonisolated, so listings run in parallel: one slow network folder doesn't stall other panes.
+    /// Stops early when the calling task is cancelled (the user navigated away).
+    public nonisolated func contentsOfDirectory(at url: URL, showHidden: Bool = false) async throws -> [FileItem] {
         let normalizedURL = url.standardizedFileURL.resolvingSymlinksInPath()
-        
+        let fileManager = FileManager.default
+
         let contents = try fileManager.contentsOfDirectory(
             at: normalizedURL,
             includingPropertiesForKeys: Array(resourceKeys),
@@ -34,7 +37,8 @@ public actor FileSystemService {
         var items: [FileItem] = []
         items.reserveCapacity(contents.count)
 
-        for fileURL in contents {
+        for (index, fileURL) in contents.enumerated() {
+            if index % 1000 == 0 { try Task.checkCancellation() }
             do {
                 let resourceValues = try fileURL.resourceValues(forKeys: resourceKeys)
                 let name = resourceValues.name ?? fileURL.lastPathComponent
@@ -44,21 +48,16 @@ public actor FileSystemService {
                 let isSymlink = resourceValues.isSymbolicLink ?? false
                 let isExecutable = resourceValues.isExecutable ?? false
                 let fileSize = Int64(resourceValues.fileSize ?? 0)
-                let dateModified = resourceValues.contentModificationDate ?? Date()
-                let dateCreated = resourceValues.creationDate ?? Date()
+                let dateModified = resourceValues.contentModificationDate ?? .distantPast
+                let dateCreated = resourceValues.creationDate ?? .distantPast
                 let kindDescription = resourceValues.localizedTypeDescription ?? (isDirectory ? "Folder" : "File")
 
-                // POSIX attributes
+                // One lstat for the mode bits; attributesOfItem built a dictionary and looked up
+                // owner and group names per item, which nothing in the listing shows.
                 var permissions = 0o644
-                var ownerName = ""
-                var groupName = ""
-
-                if let attrs = try? fileManager.attributesOfItem(atPath: fileURL.path) {
-                    if let posixNumber = attrs[.posixPermissions] as? NSNumber {
-                        permissions = posixNumber.intValue
-                    }
-                    ownerName = attrs[.ownerAccountName] as? String ?? ""
-                    groupName = attrs[.groupOwnerAccountName] as? String ?? ""
+                var info = stat()
+                if lstat(fileURL.path, &info) == 0 {
+                    permissions = Int(info.st_mode & 0o7777)
                 }
 
                 let item = FileItem(
@@ -73,9 +72,7 @@ public actor FileSystemService {
                     dateModified: dateModified,
                     dateCreated: dateCreated,
                     kindDescription: kindDescription,
-                    posixPermissions: permissions,
-                    ownerName: ownerName,
-                    groupName: groupName
+                    posixPermissions: permissions
                 )
                 items.append(item)
             } catch {

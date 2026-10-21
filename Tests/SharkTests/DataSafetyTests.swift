@@ -1,4 +1,6 @@
 import XCTest
+import AppKit
+import os
 @testable import Shark
 
 /// Regression tests for operations that used to lose or misplace user files.
@@ -178,6 +180,21 @@ final class DataSafetyTests: XCTestCase {
         await nav.undo()
     }
 
+    func testSlowFolderResultDoesNotReplaceNewerFolder() async throws {
+        let slow = try folder("slow")
+        for index in 0..<5000 { fm.createFile(atPath: slow.appendingPathComponent("f\(index)").path, contents: nil) }
+        let fast = try folder("fast")
+        _ = try file("only.txt", in: fast)
+
+        let nav = NavigationState(initialURL: slow)
+        let slowLoad = Task { await nav.reloadCurrentDirectory() }
+        await Task.yield()
+        nav.navigateTo(fast)
+        await nav.reloadCurrentDirectory()
+        await slowLoad.value
+        XCTAssertEqual(nav.items.map(\.name), ["only.txt"])
+    }
+
     func testShiftClickExtendsFromAnchor() {
         let names = ["a", "b", "c", "d"]
         let nav = NavigationState(initialURL: dir)
@@ -205,6 +222,17 @@ final class DataSafetyTests: XCTestCase {
         XCTAssertFalse(fm.fileExists(atPath: dir.appendingPathComponent("pwned").path))
     }
 
+}
+
+extension DataSafetyTests {
+
+}
+
+extension DataSafetyTests {
+
+}
+
+extension DataSafetyTests {
     func testFailedBatchRenameUndoLeavesNamesIntactAndCanRetry() async throws {
         let renamed = try file("new.txt", "original")
         let old = try file("old.txt", "external")
@@ -220,5 +248,15 @@ final class DataSafetyTests: XCTestCase {
         try await FileUndoService.shared.undo()
         XCTAssertEqual(try String(contentsOf: old, encoding: .utf8), "original")
     }
+}
+
+extension DataSafetyTests {
+}
+
+extension DataSafetyTests {
+
+}
+
+extension DataSafetyTests {
 
 }

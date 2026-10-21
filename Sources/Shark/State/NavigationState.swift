@@ -126,10 +126,6 @@ public final class NavigationState {
         pathInputText = standardized.path
         selectedItemIDs.removeAll()
         renamingItemURL = nil
-
-        Task {
-            await reloadCurrentDirectory()
-        }
     }
 
     public func goBack() {
@@ -139,10 +135,6 @@ public final class NavigationState {
         pathInputText = previous.path
         selectedItemIDs.removeAll()
         renamingItemURL = nil
-
-        Task {
-            await reloadCurrentDirectory()
-        }
     }
 
     public func goForward() {
@@ -152,10 +144,6 @@ public final class NavigationState {
         pathInputText = next.path
         selectedItemIDs.removeAll()
         renamingItemURL = nil
-
-        Task {
-            await reloadCurrentDirectory()
-        }
     }
 
     public func goUp() {
@@ -195,16 +183,20 @@ public final class NavigationState {
         errorMessage = nil
         isPermissionError = false
 
-        SecurityScopedBookmarkManager.shared.ensureAccess(to: currentURL)
+        let url = currentURL
+        SecurityScopedBookmarkManager.shared.ensureAccess(to: url)
 
         do {
             let fetchedItems = try await fileSystemService.contentsOfDirectory(
-                at: currentURL,
+                at: url,
                 showHidden: showHiddenFiles
             )
+            // The user may have moved on while a slow folder was listing; drop the stale result.
+            guard url == currentURL else { return }
             self.items = fetchedItems
             RecentFoldersService.shared.recordVisit(to: self.currentURL)
         } catch {
+            guard url == currentURL, !(error is CancellationError) else { return }
             self.errorMessage = error.localizedDescription
             let ns = error as NSError
             let underlying = ns.userInfo[NSUnderlyingErrorKey] as? NSError

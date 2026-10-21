@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Copying or moving a folder into itself or one of its subfolders is refused instead of failing halfway or recursing.
 - Batch rename checked nothing up front, so a name collision part-way left some files renamed. It now rejects colliding or invalid names (`/`, `:`, `..`, over 255 bytes) before touching anything, supports swapping names, and is undoable.
 - Rename and New Folder/File reject names containing `/` or `:` (a name like `../x` used to move the item out of the folder). Case-only renames (`readme` → `README`) work.
+- A slow folder (for example on a network share) could replace the contents of a folder opened after it. Late results are now discarded, and navigation no longer loads each folder twice.
+- A folder that is slow to list no longer stalls loading in every other pane and tab; listing is also cancelled when you navigate away. Each item needs one `lstat` instead of a full attribute lookup.
 - Large folders no longer re-sort on every redraw and keypress; the sorted list is cached until the items, filter or sort change. The filter now ignores accents and case the way Finder search does.
 - Shift-click ranges, arrow keys, Space (Quick Look), Share and the Inspector started from an arbitrary selected item. They now start from the last clicked item, and Quick Look and Share use the whole selection. ⌘-click and ⇧-click now work in list view.
 - The embedded terminal typed its `cd` into whatever program was running (vim, python, psql). It now follows the folder only while the shell is at its prompt.
