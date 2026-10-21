@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Tagged releases now also build the sandboxed Mac App Store package and upload it to App Store Connect (skipped until the `APPSTORE_*` secrets are set). The upload lands as a build to select and submit for review; alpha tags upload as their base version with the workflow run number as the build number.
 - Update alerts: Shark checks for a newer version at launch (at most once a day) and from Shark › Check for Updates…, then offers the update route that matches how it was installed: Download for the DMG, Copy Command (`brew upgrade --cask shark`) for Homebrew, or Open App Store. The alert shows the release notes when the release has them. Skip a version, or turn automatic checks off in Settings › General. Shark never installs updates itself.
 
 ### Changed

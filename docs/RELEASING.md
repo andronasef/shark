@@ -4,7 +4,7 @@
 
 The [release action](../.github/workflows/release.yml) builds a universal app for Apple silicon and Intel, signs it with Developer ID, notarizes it, staples Apple's ticket, and publishes a DMG installer and its SHA-256 checksum on GitHub Releases. Tests, signature verification, notarization acceptance, and Gatekeeper assessment must pass before publication.
 
-**This action publishes direct downloads, not Mac App Store submissions.** Developer ID is Apple's certificate for distribution outside the store. The Mac App Store needs a separate distribution identity and a sandbox-compatible app. See [Apple's distribution overview](https://developer.apple.com/macos/distribution/).
+**The DMG job publishes direct downloads only.** Developer ID is Apple's certificate for distribution outside the store. The separate `appstore` job in the same workflow uploads a sandboxed build to App Store Connect (see below); it never submits for review. See [Apple's distribution overview](https://developer.apple.com/macos/distribution/).
 
 ## One-time GitHub setup
 
@@ -59,14 +59,20 @@ REQUIRE_NOTARIZATION=1 scripts/package.sh 1.0.0-alpha
 
 The script stops when credentials are missing, notarization is rejected, stapling fails, or Gatekeeper rejects the app. Never publish the local ad hoc build in place of a signed release.
 
-## Mac App Store preparation
+## Mac App Store upload
 
-Shark is **not ready for App Store submission yet**. This is application work, not just an upload setting:
+On every `v*` tag the `appstore` job runs `scripts/package-appstore.sh`, which builds the sandboxed app (`Entitlements/Shark.entitlements`), signs it with Apple Distribution, wraps it in a Mac Installer-signed `.pkg`, and uploads it with `xcrun altool`. It does nothing until `APPSTORE_API_KEY_ID` exists, so DMG-only releases keep working.
 
-- Enable [App Sandbox](https://developer.apple.com/documentation/security/app-sandbox), required for store distribution. This repository currently has no sandbox entitlements or store provisioning setup.
-- Add a user-selected folder access flow and [security-scoped bookmarks](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox). Navigation, favorites, restored tabs, previews, file operations, and file watching must retain valid access across launches. Currently Shark saves paths and opens directories directly.
-- Audit the embedded login shell in `TerminalView.swift`, shell directory synchronization, and external compression processes in `FileOperationsService.swift` under sandbox restrictions. Child processes inherit restrictions; an unrestricted shell cannot be assumed to work. Decide the store edition's supported terminal behavior and test it.
-- Register the final bundle ID and App Store Connect record. Configure the appropriate Mac App Store application/installer distribution certificates and provisioning profile, with matching entitlements and an increasing build number.
-- Package and validate the store build, upload it using Apple's supported tools, then complete screenshots, privacy information, support links, and review notes in App Store Connect.
+Versions: the App Store only accepts `MAJOR.MINOR.PATCH`, so `v1.0.0-alpha.1` uploads as `1.0.0`. The build number (`CFBundleVersion`) is the workflow run number, which always increases.
 
-Once the sandboxed edition is working and tested, add a separate App Store workflow. Do not upload the Developer ID build as a store build or simply switch on sandbox signing for the current app: that would leave its file access and terminal behavior unverified.
+Repository secrets:
+
+| Secret | Value |
+| --- | --- |
+| `APPSTORE_P12_BASE64`, `APPSTORE_P12_PASSWORD` | One `.p12` exported from Keychain Access holding both the **Apple Distribution** and **3rd Party Mac Developer Installer** certificates (select both, export), base64 encoded |
+| `APPSTORE_PROFILE_BASE64` | The Mac App Store provisioning profile for `com.increasinglabs.shark` (the file kept at `Entitlements/Shark.provisionprofile`, which is git-ignored), base64 encoded |
+| `APPSTORE_API_KEY_ID`, `APPSTORE_API_ISSUER_ID`, `APPSTORE_API_KEY_P8_BASE64` | An App Store Connect API key (Users and Access › Integrations) with the App Manager role, and its `.p8` file base64 encoded |
+
+Encode with `base64 -i file | pbcopy`. After the upload processes in App Store Connect, pick the build on the app version, finish screenshots, privacy and review notes, and submit it yourself.
+
+Before the first submission, verify the sandboxed build by running it: folder access and bookmarks across launches, the embedded terminal, and compression behave differently under App Sandbox. Run `bash scripts/package-appstore.sh 1.0.0` locally to produce the same package.
