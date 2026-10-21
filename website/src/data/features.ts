@@ -127,7 +127,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'mouse-preferences', title: 'Optional gestures & in-app help', description: 'Switch optional background, tab, wheel, and side-button actions on or off in Settings › Mouse. Help › Shark Help lists the bindings by pointer location.' },
     ],
   },
-  // SharkSettings, SettingsView, FinderChromeView, SecurityScopedBookmarkManager, DirectoryStateViews.
+  // SharkSettings, SettingsView, FinderChromeView, SecurityScopedBookmarkManager, DirectoryStateViews, UpdateChecker.
   // Omit startup/view-default and tab-preference controls until their stored settings drive app behavior.
   {
     id: 'mac-settings', title: 'Mac appearance & preferences',
@@ -138,6 +138,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'accessibility', title: 'Accessible controls & motion', description: 'Labeled controls, keyboard navigation, and support for Reduce Motion, Reduce Transparency, and increased contrast.' },
       { id: 'folder-permissions', title: 'macOS folder access', description: 'Grant access to protected folders when macOS asks. When privacy settings block a location, Shark offers guidance and a route to the relevant settings.' },
       { id: 'privacy-telemetry', title: 'Privacy & diagnostics', description: 'Anonymous usage statistics and crash reporting are on by default and can be independently turned off in Settings › Privacy. File names, folder paths, and terminal commands are never collected.' },
+      { id: 'update-alerts', title: 'Update alerts', description: 'Shark checks for a new version once a day and from Shark › Check for Updates…. The alert points DMG installs to the download, Homebrew installs to brew upgrade --cask shark, and Mac App Store installs to the App Store. Choose Skip This Version, or turn automatic checks off in Settings › General.' },
     ],
   },
 ];
