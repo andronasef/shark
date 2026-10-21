@@ -61,7 +61,7 @@ The script stops when credentials are missing, notarization is rejected, staplin
 
 ## Mac App Store upload
 
-On every `v*` tag the `appstore` job runs `scripts/package-appstore.sh`, which builds the sandboxed app (`Entitlements/Shark.entitlements`), signs it with Apple Distribution, wraps it in a Mac Installer-signed `.pkg`, and uploads it with `xcrun altool`. It does nothing until `APPSTORE_API_KEY_ID` exists, so DMG-only releases keep working.
+On every `v*` tag the `appstore` job runs `scripts/package-appstore.sh`, which builds the sandboxed app (`Entitlements/Shark.entitlements`), signs it with Apple Distribution, wraps it in a Mac Installer-signed `.pkg`, and uploads it with `xcrun altool`. It does nothing until `APPSTORE_P12_BASE64` exists, so DMG-only releases keep working.
 
 Versions: the App Store only accepts digits and dots, so alpha tags map to `0.0.N` (`v1.0.0-alpha.1` uploads as `0.0.1`, `-alpha.2` as `0.0.2`) and stable tags keep their version. A prerelease tag with no trailing number skips the upload. The build number (`CFBundleVersion`) is the workflow run number, which always increases.
 
@@ -71,7 +71,7 @@ Repository secrets:
 | --- | --- |
 | `APPSTORE_P12_BASE64`, `APPSTORE_P12_PASSWORD` | One `.p12` exported from Keychain Access holding both the **Apple Distribution** and **3rd Party Mac Developer Installer** certificates (select both, export), base64 encoded |
 | `APPSTORE_PROFILE_BASE64` | The Mac App Store provisioning profile for `com.increasinglabs.shark` (the file kept at `Entitlements/Shark.provisionprofile`, which is git-ignored), base64 encoded |
-| `APPSTORE_API_KEY_ID`, `APPSTORE_API_ISSUER_ID`, `APPSTORE_API_KEY_P8_BASE64` | An App Store Connect API key (Users and Access › Integrations) with the App Manager role, and its `.p8` file base64 encoded |
+| `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_PASSWORD` | Already set for notarization; the upload reuses the Apple ID and app-specific password |
 
 Encode with `base64 -i file | pbcopy`. After the upload processes in App Store Connect, pick the build on the app version, finish screenshots, privacy and review notes, and submit it yourself.
 

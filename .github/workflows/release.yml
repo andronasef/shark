@@ -136,11 +136,11 @@ jobs:
           rm -f "$RUNNER_TEMP/shark-cert.p12"
 
   appstore:
-    # Uploads a sandboxed build to App Store Connect. Skipped until the APPSTORE_* secrets exist.
+    # Uploads a sandboxed build to App Store Connect. Skipped until the APPSTORE_* secrets exist; uploads with the notarization Apple ID and app-specific password.
     runs-on: macos-15
     timeout-minutes: 60
     env:
-      ENABLED: ${{ secrets.APPSTORE_API_KEY_ID != '' }}
+      ENABLED: ${{ secrets.APPSTORE_P12_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
         if: env.ENABLED == 'true'
@@ -185,18 +185,16 @@ jobs:
       - name: Upload to App Store Connect
         if: env.ENABLED == 'true'
         env:
-          API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
-          API_KEY_P8_BASE64: ${{ secrets.APPSTORE_API_KEY_P8_BASE64 }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
         run: |
           set -euo pipefail
-          mkdir -p ~/.private_keys
-          printf '%s' "$API_KEY_P8_BASE64" | base64 --decode > ~/.private_keys/AuthKey_${API_KEY_ID}.p8
           [[ -n "${APPSTORE_VERSION:-}" ]] || { echo "No App Store package was built; nothing to upload"; exit 0; }
-          xcrun altool --upload-app -f dist/Shark-*.pkg -t macos --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
+          xcrun altool --upload-app -f dist/Shark-*.pkg -t macos -u "$NOTARY_APPLE_ID" -p "$NOTARY_PASSWORD" --asc-provider "$NOTARY_TEAM_ID"
 
       - name: Remove signing material
         if: always() && env.ENABLED == 'true'
         run: |
           security delete-keychain "$RUNNER_TEMP/shark-appstore.keychain-db" || true
-          rm -rf ~/.private_keys "$RUNNER_TEMP/Shark.provisionprofile"
+          rm -f "$RUNNER_TEMP/Shark.provisionprofile"
