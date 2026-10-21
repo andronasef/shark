@@ -11,13 +11,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Update alerts: Shark checks for a newer version at launch (at most once a day) and from Shark › Check for Updates…, then offers the update route that matches how it was installed: Download for the DMG, Copy Command (`brew upgrade --cask shark`) for Homebrew, or Open App Store. The alert shows the release notes when the release has them. Skip a version, or turn automatic checks off in Settings › General. Shark never installs updates itself.
 
 ### Changed
+- Drops now follow Finder: they move within a disk and copy to another disk. Hold ⌥ to copy or ⌘ to move. Before, every drop moved, so dragging from an SD card or external drive removed the files from it.
+- Every file operation can now be undone: Trash, drag-and-drop, duplicate, new folder and file, batch rename, and Compress join copy, move, and rename. Undoing something Shark created moves it to the Trash; nothing is permanently deleted.
+- Multi-item operations (paste, drop, Trash, batch rename, copy) are all-or-nothing: if one item fails, the finished ones are put back. Failures show an alert instead of failing silently or replacing the folder view with an error page.
 - The subfolder menu lists at most 500 items, with a final item that opens the folder, so huge folders no longer freeze the menu.
 - Calculate Size recalculates on every request instead of showing a stale cached size.
 - Removed the unused hardened-runtime exceptions (JIT, unsigned executable memory, disabled library validation) from the Developer ID build, and the `com.apple.security.inherit` entitlement, which is only for helper tools, from the App Store build.
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- **Data loss:** Cut (⌘X) and Paste (⌘V) into the same folder permanently deleted the file. Pasting a cut item over an existing name (including one that differs only by case) permanently deleted the existing item. Paste now never overwrites: a cut pasted back into its own folder does nothing, and a move onto an existing name is refused.
+- **Data loss:** Undo after copy-pasting into a folder that already had the name deleted the *original* file rather than the "copy 1". Undo now removes exactly the items the copy made, and moves them to the Trash.
 - Select All followed by Move to Trash also trashed items hidden by the search filter. The selection now only ever contains visible items.
+- Copying or moving a folder into itself or one of its subfolders is refused instead of failing halfway or recursing.
+- Batch rename checked nothing up front, so a name collision part-way left some files renamed. It now rejects colliding or invalid names (`/`, `:`, `..`, over 255 bytes) before touching anything, supports swapping names, and is undoable.
+- Rename and New Folder/File reject names containing `/` or `:` (a name like `../x` used to move the item out of the folder). Case-only renames (`readme` → `README`) work.
 - Large folders no longer re-sort on every redraw and keypress; the sorted list is cached until the items, filter or sort change. The filter now ignores accents and case the way Finder search does.
 - Shift-click ranges, arrow keys, Space (Quick Look), Share and the Inspector started from an arbitrary selected item. They now start from the last clicked item, and Quick Look and Share use the whole selection. ⌘-click and ⇧-click now work in list view.
 - The embedded terminal typed its `cd` into whatever program was running (vim, python, psql). It now follows the folder only while the shell is at its prompt.

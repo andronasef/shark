@@ -120,14 +120,7 @@ struct ExplorerCommands: Commands {
             .disabled(nav.selectedItemIDs.isEmpty)
 
             Button("Move to Trash") {
-                let urls = nav.selectedItems.map(\.url)
-                guard !urls.isEmpty else { return }
-                Task {
-                    do {
-                        try await FileOperationsService.shared.trash(items: urls)
-                        await nav.reloadCurrentDirectory()
-                    } catch {}
-                }
+                Task { await nav.trashSelected() }
             }
             .keyboardShortcut(.delete, modifiers: .command)
             .disabled(nav.selectedItemIDs.isEmpty)

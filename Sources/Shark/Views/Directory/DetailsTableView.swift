@@ -66,15 +66,8 @@ public struct DetailsTableView: View {
                 .draggable(item.url)
                 .dropDestination(for: URL.self) { droppedURLs, _ in
                     guard item.isNavigableDirectory else { return false }
-                    let isAltHeld = NSEvent.modifierFlags.contains(.option)
-                    Task {
-                        if isAltHeld {
-                            try? await FileOperationsService.shared.copy(items: droppedURLs, to: item.url)
-                        } else {
-                            try? await FileOperationsService.shared.move(items: droppedURLs, to: item.url)
-                        }
-                        await navigationState.reloadCurrentDirectory()
-                    }
+                    let modifiers = NSEvent.modifierFlags
+                    Task { await navigationState.drop(droppedURLs, into: item.url, modifiers: modifiers) }
                     return true
                 }
                 .onTapGesture {

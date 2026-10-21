@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 public struct RenameRule: Sendable, Equatable {
     public enum PatternType: Sendable {
@@ -63,6 +64,26 @@ public struct RenameRule: Sendable, Equatable {
     }
 }
 
+public enum FileOperationError: LocalizedError, Equatable {
+    case invalidName(String)
+    case alreadyExists(String)
+    case intoItself(String)
+    case duplicateResult(String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .invalidName(let name):
+            return "“\(name)” can’t be used as a name. Names can’t be empty, “.” or “..”, contain “/” or “:”, or be longer than 255 bytes."
+        case .alreadyExists(let name):
+            return "An item named “\(name)” already exists in this location."
+        case .intoItself(let name):
+            return "“\(name)” can’t be moved or copied into itself."
+        case .duplicateResult(let name):
+            return "More than one item would be named “\(name)”."
+        }
+    }
+}
+
 public actor FileOperationsService {
     public static let shared = FileOperationsService()
 
@@ -70,9 +91,31 @@ public actor FileOperationsService {
 
     private init() {}
 
+    /// Rejects names the file system would misread as paths or refuse outright.
+    public nonisolated static func validateName(_ name: String) throws {
+        if name.isEmpty || name == "." || name == ".." || name.contains("/") || name.contains(":")
+            || name.utf8.count > 255 {
+            throw FileOperationError.invalidName(name)
+        }
+    }
+
+    /// True when `directory` is `item` or lies inside it.
+    public nonisolated static func isSelfOrDescendant(_ directory: URL, of item: URL) -> Bool {
+        let dir = directory.standardizedFileURL.resolvingSymlinksInPath().path
+        let src = item.standardizedFileURL.resolvingSymlinksInPath().path
+        return dir == src || dir.hasPrefix(src.hasSuffix("/") ? src : src + "/")
+    }
+
+    public nonisolated static func isSameVolume(_ a: URL, _ b: URL) -> Bool {
+        let key: Set<URLResourceKey> = [.volumeIdentifierKey]
+        guard let va = try? a.resourceValues(forKeys: key).volumeIdentifier,
+              let vb = try? b.resourceValues(forKeys: key).volumeIdentifier else { return true }
+        return va.isEqual(vb)
+    }
+
     public func createFolder(named name: String, at parent: URL) throws -> URL {
-        let target = parent.appendingPathComponent(name, isDirectory: true)
-        var destination = target
+        try Self.validateName(name)
+        var destination = parent.appendingPathComponent(name, isDirectory: true)
         var counter = 1
 
         while fileManager.fileExists(atPath: destination.path) {
@@ -80,11 +123,12 @@ public actor FileOperationsService {
             counter += 1
         }
 
-        try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: destination, withIntermediateDirectories: false)
         return destination
     }
 
     public func createFile(named name: String, at parent: URL, content: Data? = nil) throws -> URL {
+        try Self.validateName(name)
         let ext = (name as NSString).pathExtension
         let base = (name as NSString).deletingPathExtension
 
@@ -97,90 +141,154 @@ public actor FileOperationsService {
             counter += 1
         }
 
-        fileManager.createFile(atPath: destination.path, contents: content ?? Data(), attributes: nil)
+        try (content ?? Data()).write(to: destination, options: .withoutOverwriting)
         return destination
     }
 
-    public func move(items: [URL], to destinationDir: URL) throws {
-        for item in items {
-            let destination = destinationDir.appendingPathComponent(item.lastPathComponent)
-            try fileManager.moveItem(at: item, to: destination)
-        }
-    }
-
-    public func copy(items: [URL], to destinationDir: URL) throws {
-        for item in items {
-            let filename = item.lastPathComponent
-            var target = destinationDir.appendingPathComponent(filename)
-            var counter = 1
-
-            let ext = (filename as NSString).pathExtension
-            let base = (filename as NSString).deletingPathExtension
-
-            while fileManager.fileExists(atPath: target.path) {
-                let newName = ext.isEmpty ? "\(base) copy \(counter)" : "\(base) copy \(counter).\(ext)"
-                target = destinationDir.appendingPathComponent(newName)
-                counter += 1
+    /// Moves items into `destinationDir`. Never overwrites: everything is checked before the first
+    /// move, items already in the folder are skipped, and a failure part-way moves the finished ones back.
+    @discardableResult
+    public func move(items: [URL], to destinationDir: URL) throws -> [(source: URL, destination: URL)] {
+        let dir = destinationDir.standardizedFileURL
+        var plan: [(source: URL, destination: URL)] = []
+        for item in items.map(\.standardizedFileURL) {
+            if item.deletingLastPathComponent().path == dir.path { continue }
+            if Self.isSelfOrDescendant(dir, of: item) { throw FileOperationError.intoItself(item.lastPathComponent) }
+            let destination = dir.appendingPathComponent(item.lastPathComponent)
+            if fileManager.fileExists(atPath: destination.path)
+                || plan.contains(where: { $0.destination.lastPathComponent.caseInsensitiveCompare(destination.lastPathComponent) == .orderedSame }) {
+                throw FileOperationError.alreadyExists(item.lastPathComponent)
             }
-
-            try fileManager.copyItem(at: item, to: target)
+            plan.append((item, destination))
         }
+        return try performMoves(plan)
     }
 
-    public func duplicate(items: [URL]) throws {
-        for item in items {
-            let parent = item.deletingLastPathComponent()
-            let filename = item.lastPathComponent
-            let ext = (filename as NSString).pathExtension
-            let base = (filename as NSString).deletingPathExtension
+    /// Copies items into `destinationDir`, naming collisions "name copy N". Returns the created URLs.
+    /// A failure part-way removes the copies this call made, including a half-written one.
+    @discardableResult
+    public func copy(items: [URL], to destinationDir: URL) throws -> [URL] {
+        try copy(items.map { ($0, destinationDir) })
+    }
 
-            var counter = 1
-            var destination: URL
-            repeat {
-                let newName = ext.isEmpty ? "\(base) copy \(counter)" : "\(base) copy \(counter).\(ext)"
-                destination = parent.appendingPathComponent(newName)
-                counter += 1
-            } while fileManager.fileExists(atPath: destination.path)
+    @discardableResult
+    public func duplicate(items: [URL]) throws -> [URL] {
+        try copy(items.map { ($0, $0.deletingLastPathComponent()) })
+    }
 
-            try fileManager.copyItem(at: item, to: destination)
+    private func copy(_ requests: [(item: URL, directory: URL)]) throws -> [URL] {
+        for request in requests where Self.isSelfOrDescendant(request.directory, of: request.item) {
+            throw FileOperationError.intoItself(request.item.lastPathComponent)
         }
+        var created: [URL] = []
+        for request in requests {
+            let target = availableCopyName(for: request.item.lastPathComponent, in: request.directory)
+            do {
+                try fileManager.copyItem(at: request.item, to: target)
+            } catch {
+                // Everything removed here was created by this call, so deleting it loses no user data.
+                // A target that appeared after the name check belongs to someone else: leave it.
+                let partial = (error as? CocoaError)?.code == .fileWriteFileExists ? [] : [target]
+                for url in created + partial { try? fileManager.removeItem(at: url) }
+                throw error
+            }
+            created.append(target)
+        }
+        return created
+    }
+
+    private func availableCopyName(for filename: String, in directory: URL) -> URL {
+        var target = directory.appendingPathComponent(filename)
+        let ext = (filename as NSString).pathExtension
+        let base = (filename as NSString).deletingPathExtension
+        var counter = 1
+        while fileManager.fileExists(atPath: target.path) {
+            let newName = ext.isEmpty ? "\(base) copy \(counter)" : "\(base) copy \(counter).\(ext)"
+            target = directory.appendingPathComponent(newName)
+            counter += 1
+        }
+        return target
     }
 
     public func rename(item: URL, to newName: String) throws -> URL {
-        let parent = item.deletingLastPathComponent()
-        let destination = parent.appendingPathComponent(newName)
-        if item.path == destination.path { return item }
+        try Self.validateName(newName)
+        let destination = item.deletingLastPathComponent().appendingPathComponent(newName)
+        if item.lastPathComponent == newName { return item }
+        // A case-only change ("foo" → "Foo") finds the item itself on a case-insensitive volume.
+        let caseOnly = item.lastPathComponent.caseInsensitiveCompare(newName) == .orderedSame
+        if !caseOnly && fileManager.fileExists(atPath: destination.path) {
+            throw FileOperationError.alreadyExists(newName)
+        }
         try fileManager.moveItem(at: item, to: destination)
         return destination
     }
 
-    public func trash(items: [URL]) throws {
+    /// Moves items to the Trash and returns where each one landed, for undo.
+    /// A failure part-way puts the already-trashed items back.
+    public func trash(items: [URL]) throws -> [(original: URL, inTrash: URL)] {
+        var done: [(original: URL, inTrash: URL)] = []
         for item in items {
-            try fileManager.trashItem(at: item, resultingItemURL: nil)
-        }
-    }
-
-    public func deletePermanently(items: [URL]) throws {
-        for item in items {
-            try fileManager.removeItem(at: item)
-        }
-    }
-
-    public func batchRename(items: [URL], rule: RenameRule) throws -> [URL] {
-        var renamedURLs: [URL] = []
-        for (index, item) in items.enumerated() {
-            let currentName = item.lastPathComponent
-            let newName = rule.apply(to: currentName, index: index)
-            if currentName == newName {
-                renamedURLs.append(item)
-                continue
+            var resulting: NSURL?
+            do {
+                try fileManager.trashItem(at: item, resultingItemURL: &resulting)
+            } catch {
+                for entry in done.reversed() { try? fileManager.moveItem(at: entry.inTrash, to: entry.original) }
+                throw error
             }
-
-            let destination = item.deletingLastPathComponent().appendingPathComponent(newName)
-            try fileManager.moveItem(at: item, to: destination)
-            renamedURLs.append(destination)
+            if let inTrash = resulting as URL? { done.append((item, inTrash)) }
         }
-        return renamedURLs
+        return done
+    }
+
+    /// Renames every item or none. Names are validated and checked for collisions first; the renames
+    /// then go through temporary names so swaps work, and a failure rolls all of them back.
+    public func batchRename(items: [URL], rule: RenameRule) throws -> [URL] {
+        var plan: [(source: URL, destination: URL)] = []
+        var seen = Set<String>()
+        let sources = Set(items.map { $0.standardizedFileURL.path.lowercased() })
+        for (index, item) in items.enumerated() {
+            let newName = rule.apply(to: item.lastPathComponent, index: index)
+            try Self.validateName(newName)
+            let destination = item.deletingLastPathComponent().appendingPathComponent(newName)
+            guard seen.insert(destination.standardizedFileURL.path.lowercased()).inserted else {
+                throw FileOperationError.duplicateResult(newName)
+            }
+            if newName == item.lastPathComponent { continue }
+            if fileManager.fileExists(atPath: destination.path),
+               !sources.contains(destination.standardizedFileURL.path.lowercased()) {
+                throw FileOperationError.alreadyExists(newName)
+            }
+            plan.append((item, destination))
+        }
+
+        let staged = plan.map { entry in
+            (source: entry.source,
+             destination: entry.source.deletingLastPathComponent().appendingPathComponent(".shark-rename-\(UUID().uuidString)"))
+        }
+        let moved = try performMoves(staged)
+        do {
+            _ = try performMoves(zip(moved, plan).map { ($0.destination, $1.destination) })
+        } catch {
+            for entry in moved.reversed() { try? fileManager.moveItem(at: entry.destination, to: entry.source) }
+            throw error
+        }
+        let renamed = Dictionary(uniqueKeysWithValues: plan.map { ($0.source, $0.destination) })
+        return items.map { renamed[$0] ?? $0 }
+    }
+
+    /// Runs the moves in order; if one fails, the earlier ones are moved back before rethrowing.
+    private func performMoves(_ moves: [(source: URL, destination: URL)]) throws -> [(source: URL, destination: URL)] {
+        var done: [(source: URL, destination: URL)] = []
+        for move in moves {
+            do {
+                try fileManager.moveItem(at: move.source, to: move.destination)
+            } catch {
+                for entry in done.reversed() { try? fileManager.moveItem(at: entry.destination, to: entry.source) }
+                throw error
+            }
+            done.append(move)
+        }
+        return done
     }
 
     public func compress(items: [URL]) async throws -> URL {

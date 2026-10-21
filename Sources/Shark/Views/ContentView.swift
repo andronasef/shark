@@ -428,21 +428,11 @@ public struct ContentView: View {
     }
 
     private func trashSelectedItems() {
-        let urls = Array(activeState.selectedItemIDs)
-        guard !urls.isEmpty else { return }
-        Task {
-            try? await FileOperationsService.shared.trash(items: urls)
-            await activeState.reloadCurrentDirectory()
-        }
+        Task { await activeState.trashSelected() }
     }
 
     private func duplicateSelected() {
-        let urls = Array(activeState.selectedItemIDs)
-        guard !urls.isEmpty else { return }
-        Task {
-            try? await FileOperationsService.shared.duplicate(items: urls)
-            await activeState.reloadCurrentDirectory()
-        }
+        Task { await activeState.duplicateSelected() }
     }
 
     private func shareCurrentSelection() {

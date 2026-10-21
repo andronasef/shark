@@ -39,7 +39,7 @@ enum MouseHelp {
                 HelpBinding(gesture: "In the subfolder menu", action: "Click opens, ⌘-click opens a folder in a new tab, ⌥-click copies."),
                 HelpBinding(gesture: "Hover a file", action: "After a short delay, a preview appears: images, text, video and audio with a seek bar, documents."),
                 HelpBinding(gesture: "Hover + Shift", action: "Preview only while Shift is held (turn on in Settings › Previews)."),
-                HelpBinding(gesture: "Drag onto a folder", action: "Move it there. Hold ⌥ to copy."),
+                HelpBinding(gesture: "Drag onto a folder", action: "Move it there, or copy it if the folder is on another disk. Hold ⌥ to copy, ⌘ to move."),
                 HelpBinding(gesture: "Right-click", action: "Item menu."),
             ]
         ),

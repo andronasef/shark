@@ -103,9 +103,11 @@ public struct NewItemSheet: View {
             do {
                 switch type {
                 case .folder:
-                    _ = try await FileOperationsService.shared.createFolder(named: trimmed, at: parentURL)
+                    let url = try await FileOperationsService.shared.createFolder(named: trimmed, at: parentURL)
+                    FileUndoService.shared.record(.create(urls: [url], name: "New Folder"))
                 case .file:
-                    _ = try await FileOperationsService.shared.createFile(named: trimmed, at: parentURL)
+                    let url = try await FileOperationsService.shared.createFile(named: trimmed, at: parentURL)
+                    FileUndoService.shared.record(.create(urls: [url], name: "New File"))
                 }
                 onCreated()
                 dismiss()

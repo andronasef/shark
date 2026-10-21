@@ -28,7 +28,8 @@ public struct DirectoryView: View {
             contentArea
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .dropDestination(for: URL.self) { urls, _ in
-                    handleDrop(urls: urls)
+                    let modifiers = NSEvent.modifierFlags
+                    Task { await navigationState.drop(urls, into: navigationState.currentURL, modifiers: modifiers) }
                     return true
                 }
                 .onCommandScrollZoom { delta in
@@ -40,6 +41,18 @@ public struct DirectoryView: View {
         .task(id: navigationState.currentURL) {
             await navigationState.reloadCurrentDirectory()
             setupFSEventsWatcher()
+
+        }
+        .alert(
+            "The operation couldn’t be completed",
+            isPresented: Binding(
+                get: { navigationState.operationError != nil },
+                set: { if !$0 { navigationState.operationError = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(navigationState.operationError ?? "")
         }
         .onAppear {
             if typeToSelectMonitor == nil {
@@ -470,21 +483,6 @@ public struct DirectoryView: View {
         }
     }
 
-    private func handleDrop(urls: [URL]) {
-        let destination = navigationState.currentURL
-        // macOS Finder & Windows File Explorer standard:
-        // Dragging normally MOVES items. Holding Alt / Option copies them (shows the green + badge).
-        let isAltHeld = NSEvent.modifierFlags.contains(.option)
-        Task {
-            if isAltHeld {
-                try? await FileOperationsService.shared.copy(items: urls, to: destination)
-            } else {
-                try? await FileOperationsService.shared.move(items: urls, to: destination)
-            }
-            await navigationState.reloadCurrentDirectory()
-        }
-    }
-
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
         let isMultiple = navigationState.selectedItemIDs.count > 1 && navigationState.selectedItemIDs.contains(item.id)
@@ -560,11 +558,7 @@ public struct DirectoryView: View {
         }
 
         Button("Duplicate") {
-            let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
-            Task {
-                try? await FileOperationsService.shared.duplicate(items: urls)
-                await navigationState.reloadCurrentDirectory()
-            }
+            Task { await navigationState.duplicateSelected() }
         }
 
         if isMultiple {
@@ -663,11 +657,7 @@ public struct DirectoryView: View {
             }
 
             Button("Duplicate") {
-                let urls = navigationState.selectedItems.map(\.url)
-                Task {
-                    try? await FileOperationsService.shared.duplicate(items: urls)
-                    await navigationState.reloadCurrentDirectory()
-                }
+                Task { await navigationState.duplicateSelected() }
             }
 
             Button(selectedCount == 1 ? "Compress" : "Compress \(selectedCount) Items") {

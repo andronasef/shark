@@ -140,8 +140,10 @@ public struct BatchRenameSheet: View {
 
         Task {
             do {
-                _ = try await FileOperationsService.shared.batchRename(items: urls, rule: rule)
+                let renamed = try await FileOperationsService.shared.batchRename(items: urls, rule: rule)
+                let pairs = zip(urls, renamed).filter { $0 != $1 }.map { (source: $0, destination: $1) }
                 await MainActor.run {
+                    if !pairs.isEmpty { FileUndoService.shared.record(.batchRename(pairs: pairs)) }
                     onRenameComplete()
                     dismiss()
                 }
