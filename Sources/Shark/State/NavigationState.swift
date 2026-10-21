@@ -36,10 +36,19 @@ public final class NavigationState {
     public private(set) var backStack: [URL] = []
     public private(set) var forwardStack: [URL] = []
 
-    public var items: [FileItem] = []
+    public var items: [FileItem] = [] {
+        didSet { refreshVisibleItems() }
+    }
+    /// `items` after the filter and sort, recomputed only when one of them changes.
+    public private(set) var filteredAndSortedItems: [FileItem] = []
     public var selectedItemIDs: Set<URL> = []
+    /// The item keyboard navigation and Shift-click ranges start from.
+    public var selectionAnchorID: URL? = nil
     public var isLoading: Bool = false
+    /// Set when the folder itself could not be listed; replaces the folder contents with an error page.
     public var errorMessage: String? = nil
+    /// Set when a file operation (paste, drop, rename, trash, undo…) fails; shown as an alert.
+    public var operationError: String? = nil
     /// True when the last directory load failed because macOS privacy protection (TCC) denied access.
     public var isPermissionError = false
 
@@ -52,14 +61,19 @@ public final class NavigationState {
     public var isEditingPath: Bool = false
     public var pathInputText: String = ""
 
-    public var filterText: String = ""
-    public var isFilterBarVisible: Bool = false
+    public var filterText: String = "" {
+        didSet { refreshVisibleItems() }
+    }
 
     public var viewMode: ViewMode = .grid
     public var iconSize: CGFloat = 80.0
 
-    public var sortField: SortField = .name
-    public var sortAscending: Bool = true
+    public var sortField: SortField = .name {
+        didSet { refreshVisibleItems() }
+    }
+    public var sortAscending: Bool = true {
+        didSet { refreshVisibleItems() }
+    }
     public var gridColumnCount: Int = 1
 
     // Explorer Ergonomics additions
@@ -93,8 +107,9 @@ public final class NavigationState {
         currentURL.path != "/" && currentURL.deletingLastPathComponent().path != currentURL.path
     }
 
+    /// Selected items in display order.
     public var selectedItems: [FileItem] {
-        items.filter { selectedItemIDs.contains($0.url) }
+        filteredAndSortedItems.filter { selectedItemIDs.contains($0.url) }
     }
 
     public var selectedTotalSize: Int64 {
@@ -218,41 +233,49 @@ public final class NavigationState {
         }
     }
 
-    public var filteredAndSortedItems: [FileItem] {
+    private func refreshVisibleItems() {
         var result = items
 
         if !filterText.isEmpty {
-            let query = filterText.lowercased()
-            result = result.filter { $0.name.lowercased().contains(query) }
+            result = result.filter { $0.name.localizedStandardContains(filterText) }
         }
 
+        let field = sortField
+        let ascending = sortAscending
         result.sort { itemA, itemB in
             if itemA.isDirectory != itemB.isDirectory {
                 return itemA.isDirectory
             }
 
-            switch sortField {
+            switch field {
             case .name:
                 let comp = itemA.name.localizedStandardCompare(itemB.name)
-                return sortAscending ? comp == .orderedAscending : comp == .orderedDescending
+                return ascending ? comp == .orderedAscending : comp == .orderedDescending
             case .dateModified:
-                return sortAscending
+                return ascending
                     ? itemA.dateModified < itemB.dateModified
                     : itemA.dateModified > itemB.dateModified
             case .size:
-                return sortAscending
+                return ascending
                     ? itemA.fileSize < itemB.fileSize
                     : itemA.fileSize > itemB.fileSize
             case .kind:
                 let comp = itemA.kindDescription.localizedStandardCompare(itemB.kindDescription)
-                return sortAscending ? comp == .orderedAscending : comp == .orderedDescending
+                return ascending ? comp == .orderedAscending : comp == .orderedDescending
             case .permissions:
                 let comp = itemA.permissionsString.localizedStandardCompare(itemB.permissionsString)
-                return sortAscending ? comp == .orderedAscending : comp == .orderedDescending
+                return ascending ? comp == .orderedAscending : comp == .orderedDescending
             }
         }
 
-        return result
+        filteredAndSortedItems = result
+
+        // Never keep hidden or vanished items selected: a later Trash or Cut would act on
+        // files the user can't see.
+        let visibleIDs = Set(result.map(\.id))
+        if !selectedItemIDs.isSubset(of: visibleIDs) {
+            selectedItemIDs.formIntersection(visibleIDs)
+        }
     }
 
     // MARK: - Explorer Operations
@@ -271,6 +294,10 @@ public final class NavigationState {
         let urls = selectedItems.map(\.url)
         guard !urls.isEmpty else { return }
         FileClipboardService.shared.copy(urls)
+    }
+
+    public func selectAll() {
+        selectedItemIDs = Set(filteredAndSortedItems.map(\.id))
     }
 
     public func paste() async {
@@ -364,78 +391,79 @@ public final class NavigationState {
         }
     }
 
-    // MARK: - Keyboard Item Navigation (Windows Explorer / Finder style)
+    // MARK: - Selection (Finder style)
 
-    public func selectPreviousItem() {
+    /// Applies a click: ⌘ toggles the item, ⇧ extends from the anchor, a plain click selects only it.
+    public func click(_ item: FileItem, command: Bool, shift: Bool) {
+        if command {
+            if selectedItemIDs.contains(item.id) {
+                selectedItemIDs.remove(item.id)
+            } else {
+                selectedItemIDs.insert(item.id)
+            }
+            selectionAnchorID = item.id
+        } else if shift, let from = focusIndex(in: filteredAndSortedItems),
+                  let to = filteredAndSortedItems.firstIndex(where: { $0.id == item.id }) {
+            selectedItemIDs.formUnion(filteredAndSortedItems[min(from, to)...max(from, to)].map(\.id))
+        } else {
+            selectOnly(item)
+        }
+    }
+
+    /// The anchor when it is still selected, otherwise the first selected item in display order.
+    private func focusIndex(in items: [FileItem]) -> Int? {
+        if let anchor = selectionAnchorID, selectedItemIDs.contains(anchor),
+           let index = items.firstIndex(where: { $0.id == anchor }) {
+            return index
+        }
+        return items.firstIndex { selectedItemIDs.contains($0.id) }
+    }
+
+    private func selectOnly(_ item: FileItem) {
+        selectedItemIDs = [item.id]
+        selectionAnchorID = item.id
+    }
+
+    /// Moves the keyboard selection by `offset` items; with no selection, selects the first item.
+    /// Out-of-range moves stay put unless `clamp` is set.
+    private func moveSelection(by offset: Int, clamp: Bool) {
         let items = filteredAndSortedItems
         guard !items.isEmpty else { return }
-
-        if let firstSelectedID = selectedItemIDs.first,
-           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
-            let prevIndex = max(0, currentIndex - 1)
-            selectedItemIDs = [items[prevIndex].id]
-        } else {
-            selectedItemIDs = [items[0].id]
+        guard let current = focusIndex(in: items) else {
+            selectOnly(items[0])
+            return
         }
+        let target = current + offset
+        if items.indices.contains(target) {
+            selectOnly(items[target])
+        } else if clamp {
+            selectOnly(items[max(0, min(items.count - 1, target))])
+        }
+    }
+
+    public func selectPreviousItem() {
+        moveSelection(by: -1, clamp: true)
     }
 
     public func selectNextItem() {
-        let items = filteredAndSortedItems
-        guard !items.isEmpty else { return }
-
-        if let firstSelectedID = selectedItemIDs.first,
-           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
-            let nextIndex = min(items.count - 1, currentIndex + 1)
-            selectedItemIDs = [items[nextIndex].id]
-        } else {
-            selectedItemIDs = [items[0].id]
-        }
+        moveSelection(by: 1, clamp: true)
     }
 
     public func selectAboveItem(approximateColumns: Int? = nil) {
-        let items = filteredAndSortedItems
-        guard !items.isEmpty else { return }
-
-        let cols = max(1, approximateColumns ?? gridColumnCount)
-        if let firstSelectedID = selectedItemIDs.first,
-           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
-            let targetIndex = currentIndex - cols
-            if targetIndex >= 0 {
-                selectedItemIDs = [items[targetIndex].id]
-            }
-        } else {
-            selectedItemIDs = [items[0].id]
-        }
+        moveSelection(by: -max(1, approximateColumns ?? gridColumnCount), clamp: false)
     }
 
     public func selectBelowItem(approximateColumns: Int? = nil) {
-        let items = filteredAndSortedItems
-        guard !items.isEmpty else { return }
-
-        let cols = max(1, approximateColumns ?? gridColumnCount)
-        if let firstSelectedID = selectedItemIDs.first,
-           let currentIndex = items.firstIndex(where: { $0.id == firstSelectedID }) {
-            let targetIndex = currentIndex + cols
-            if targetIndex < items.count {
-                selectedItemIDs = [items[targetIndex].id]
-            }
-        } else {
-            selectedItemIDs = [items[0].id]
-        }
+        moveSelection(by: max(1, approximateColumns ?? gridColumnCount), clamp: false)
     }
 
     public func selectFirstItem() {
-        if let first = filteredAndSortedItems.first {
-            selectedItemIDs = [first.id]
-        }
+        if let first = filteredAndSortedItems.first { selectOnly(first) }
     }
 
     public func selectLastItem() {
-        if let last = filteredAndSortedItems.last {
-            selectedItemIDs = [last.id]
-        }
+        if let last = filteredAndSortedItems.last { selectOnly(last) }
     }
-
     public func trashSelected() async {
         let urls = selectedItems.map(\.url)
         guard !urls.isEmpty else { return }

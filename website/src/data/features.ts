@@ -41,7 +41,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'editable-path', title: 'Editable folder paths', description: 'Click through ancestor folders in the location bar or type a path to go directly to a location. Show or hide the path bar from the View menu.', shortcut: '⌘L' },
       { id: 'folder-history', title: 'Back, forward & up', description: 'Retrace your folder history or go to the enclosing folder with Command-Up.' },
       { id: 'command-palette', title: 'Command palette', description: 'Find actions, common places, recent and frequent folders, saved tab groups, and paths from one keyboard-driven panel.', shortcut: '⌘K' },
-      { id: 'instant-filter', title: 'Instant filename filtering', description: 'Narrow the current folder by typing in the toolbar’s search field. This filters the folder you are viewing, rather than searching your whole disk.' },
+      { id: 'instant-filter', title: 'Instant filename filtering', description: 'Narrow the current folder by typing in the toolbar’s search field. Filtering ignores case and accents, and hidden results leave the selection so file actions only affect visible items.' },
       { id: 'type-to-select', title: 'Type to select', description: 'Type a filename to move the selection to a matching item without changing the folder.' },
       { id: 'favorites', title: 'Persistent favorites', description: 'Add and reorder folder shortcuts in the sidebar. Remove a shortcut without deleting the folder, or relocate it if its target moves.' },
       { id: 'sidebar-sections', title: 'Collapsible sidebar sections', description: 'Keep the sections you use open. Expansion is remembered, headings support the keyboard, and collapsed sections can open temporarily during a drag.' },
@@ -56,7 +56,7 @@ export const featureGroups: FeatureGroup[] = [
     description: 'See your files in the form that makes the most sense.',
     features: [
       { id: 'icon-view', title: 'Icon view', description: 'Browse a grid of folders and file thumbnails with adjustable icon sizes and drag selection.', shortcut: '⌘1' },
-      { id: 'list-view', title: 'List view', description: 'Compare names, modified dates, sizes, kinds, and permissions in a sortable details table.', shortcut: '⌘2' },
+      { id: 'list-view', title: 'List view', description: 'Compare names, modified dates, sizes, kinds, and permissions in a sortable details table. Command-click toggles items and Shift-click selects a range from the last clicked item.', shortcut: '⌘2' },
       { id: 'column-view', title: 'Column view', description: 'Follow a folder hierarchy across cascading columns, with arrow-key navigation, a preview, and file details at the end.', shortcut: '⌘3' },
       { id: 'gallery-view', title: 'Gallery view', description: 'Give the selected file a large preview while keeping a thumbnail strip in reach.', shortcut: '⌘4' },
       { id: 'icon-zoom', title: 'Adjustable icon zoom', description: 'Make icons larger or smaller with Command-plus, Command-minus, or Command-scroll. Command-0 restores the default size.' },

@@ -87,7 +87,11 @@ public struct DetailsTableView: View {
                     }
                     lastClickedURL = item.url
                     lastClickTime = now
-                    navigationState.selectedItemIDs = [item.id]
+                    navigationState.click(
+                        item,
+                        command: NSEvent.modifierFlags.contains(.command),
+                        shift: NSEvent.modifierFlags.contains(.shift)
+                    )
                 }
                 .onRightClickSelect {
                     if !navigationState.selectedItemIDs.contains(item.id) {

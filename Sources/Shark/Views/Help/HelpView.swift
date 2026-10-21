@@ -32,6 +32,7 @@ enum MouseHelp {
             title: "A file or folder",
             summary: "Pointing at an item.",
             bindings: [
+                HelpBinding(gesture: "Click / ⌘-click / ⇧-click", action: "Select an item, toggle an item, or extend the selection from the last clicked item."),
                 HelpBinding(gesture: "Double-click", action: "Open it."),
                 HelpBinding(gesture: "Middle-click a folder", action: "Open it in a new tab."),
                 HelpBinding(gesture: "Hover a folder", action: "A drop-down arrow appears beside its name. Click it to browse everything inside, to any depth."),

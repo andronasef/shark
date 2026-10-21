@@ -312,84 +312,6 @@ public struct DirectoryView: View {
         }
     }
 
-    // MARK: - Compact List View
-    private var compactList: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 2) {
-                ForEach(navigationState.filteredAndSortedItems) { item in
-                    let isSelected = navigationState.selectedItemIDs.contains(item.id)
-                    HStack(spacing: 8) {
-                        FileItemIconView(item: item, size: 16)
-                            .frame(width: 16, height: 16)
-                        Text(item.name)
-                            .font(.system(size: 12))
-                            .foregroundColor(isSelected ? .white : .primary)
-                            .lineLimit(1)
-                        Spacer()
-                        Text(item.formattedSize)
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
-                    }
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(isSelected ? Color.accentColor : Color.clear)
-                    )
-                    .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
-                    .contentShape(Rectangle())
-                    .draggable(item.url)
-                    .onTapGesture {
-                        let now = Date().timeIntervalSince1970
-                        if lastClickedURL == item.url && (now - lastClickTime < 0.4) {
-                            lastClickedURL = nil
-                            lastClickTime = 0
-                            handleActivate(item)
-                            return
-                        }
-                        lastClickedURL = item.url
-                        lastClickTime = now
-
-                        let isCmd = NSEvent.modifierFlags.contains(.command)
-                        let isShift = NSEvent.modifierFlags.contains(.shift)
-                        if isCmd {
-                            if navigationState.selectedItemIDs.contains(item.id) {
-                                navigationState.selectedItemIDs.remove(item.id)
-                            } else {
-                                navigationState.selectedItemIDs.insert(item.id)
-                            }
-                        } else if isShift, let first = navigationState.selectedItemIDs.first {
-                            let items = navigationState.filteredAndSortedItems
-                            if let idx1 = items.firstIndex(where: { $0.id == first }),
-                               let idx2 = items.firstIndex(where: { $0.id == item.id }) {
-                                let slice = items[min(idx1, idx2)...max(idx1, idx2)].map(\.id)
-                                navigationState.selectedItemIDs.formUnion(slice)
-                            } else {
-                                navigationState.selectedItemIDs.insert(item.id)
-                            }
-                        } else {
-                            navigationState.selectedItemIDs = [item.id]
-                        }
-                    }
-                    .onRightClickSelect {
-                        if !navigationState.selectedItemIDs.contains(item.id) {
-                            navigationState.selectedItemIDs = [item.id]
-                        }
-                    }
-                    .onMiddleClick {
-                        if item.isNavigableDirectory {
-                            workspace?.open(item.url, from: navigationState, newTab: true)
-                        }
-                    }
-                    .contextMenu {
-                        contextMenu(for: item)
-                    }
-                }
-            }
-            .padding(8)
-        }
-    }
-
     // MARK: - Gallery View
     private var galleryView: some View {
         VStack(spacing: 0) {
@@ -447,7 +369,11 @@ public struct DirectoryView: View {
                         .contentShape(Rectangle())
                         .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                         .onTapGesture {
-                            navigationState.selectedItemIDs = [item.id]
+                            navigationState.click(
+                                item,
+                                command: NSEvent.modifierFlags.contains(.command),
+                                shift: NSEvent.modifierFlags.contains(.shift)
+                            )
                         }
                         .onTapGesture(count: 2) {
                             handleActivate(item)

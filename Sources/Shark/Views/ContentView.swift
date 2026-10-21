@@ -275,8 +275,11 @@ public struct ContentView: View {
     }
 
     private var inspectorTargetURL: URL {
-        if let firstSelected = activeState.selectedItemIDs.first {
-            return firstSelected
+        if let anchor = activeState.selectionAnchorID, activeState.selectedItemIDs.contains(anchor) {
+            return anchor
+        }
+        if let firstSelected = activeState.selectedItems.first {
+            return firstSelected.url
         }
         return activeState.currentURL
     }
@@ -296,11 +299,6 @@ public struct ContentView: View {
             VStack(spacing: 0) {
                 // Pro Tab Strip (QTTabBar / Finder look)
                 TabStripView(workspace: workspaceState)
-
-                // Filter Bar (Cmd+I)
-                if activeState.isFilterBarVisible {
-                    filterBar
-                }
 
                 // Middle Area: Dual Pane + optional Right Inspector
                 HStack(spacing: 0) {
@@ -419,38 +417,14 @@ public struct ContentView: View {
         .enableInjection()
     }
 
-    private var filterBar: some View {
-        HStack {
-            Image(systemName: "line.3.horizontal.decrease")
-                .foregroundColor(.secondary)
-            TextField("Filter filenames in current folder...", text: Bindable(activeState).filterText)
-                .textFieldStyle(.plain)
-            if !activeState.filterText.isEmpty {
-                Button(action: { activeState.filterText = "" }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            Button("Done") {
-                activeState.isFilterBarVisible = false
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.small)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(Color(nsColor: .controlBackgroundColor).opacity(0.6))
-        .overlay(Divider(), alignment: .bottom)
-    }
-
     private func toggleTerminalDrawer() {
         workspaceState.isTerminalVisible.toggle()
     }
 
     private func triggerQuickLook() {
-        guard let firstID = activeState.selectedItemIDs.first else { return }
-        QuickLookCoordinator.shared.toggleQuickLook(for: [firstID])
+        let urls = activeState.selectedItems.map(\.url)
+        guard !urls.isEmpty else { return }
+        QuickLookCoordinator.shared.toggleQuickLook(for: urls)
     }
 
     private func trashSelectedItems() {
@@ -472,7 +446,7 @@ public struct ContentView: View {
     }
 
     private func shareCurrentSelection() {
-        let urls = Array(activeState.selectedItemIDs)
+        let urls = activeState.selectedItems.map(\.url)
         guard !urls.isEmpty else { return }
         let picker = NSSharingServicePicker(items: urls)
         if let window = NSApp.keyWindow {

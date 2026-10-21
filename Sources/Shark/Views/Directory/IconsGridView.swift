@@ -200,32 +200,11 @@ public struct IconsGridView: View {
         lastClickedURL = item.url
         lastClickTime = now
 
-        let isCmd = NSEvent.modifierFlags.contains(.command)
-        let isShift = NSEvent.modifierFlags.contains(.shift)
-
-        if isCmd {
-            // Toggle selection
-            if navigationState.selectedItemIDs.contains(item.id) {
-                navigationState.selectedItemIDs.remove(item.id)
-            } else {
-                navigationState.selectedItemIDs.insert(item.id)
-            }
-        } else if isShift, let lastSelected = navigationState.selectedItemIDs.first {
-            // Range selection
-            let items = navigationState.filteredAndSortedItems
-            if let idx1 = items.firstIndex(where: { $0.id == lastSelected }),
-               let idx2 = items.firstIndex(where: { $0.id == item.id }) {
-                let lower = min(idx1, idx2)
-                let upper = max(idx1, idx2)
-                let rangeItems = items[lower...upper].map(\.id)
-                navigationState.selectedItemIDs.formUnion(rangeItems)
-            } else {
-                navigationState.selectedItemIDs.insert(item.id)
-            }
-        } else {
-            // Single select
-            navigationState.selectedItemIDs = [item.id]
-        }
+        navigationState.click(
+            item,
+            command: NSEvent.modifierFlags.contains(.command),
+            shift: NSEvent.modifierFlags.contains(.shift)
+        )
     }
 
     private func updateMarqueeSelection(rect: CGRect) {

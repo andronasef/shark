@@ -32,6 +32,18 @@ final class DataSafetyTests: XCTestCase {
         return url
     }
 
+    func testShiftClickExtendsFromAnchor() {
+        let names = ["a", "b", "c", "d"]
+        let nav = NavigationState(initialURL: dir)
+        nav.items = names.map { FileItem(url: dir.appendingPathComponent($0), name: $0, isDirectory: false) }
+        let items = nav.filteredAndSortedItems
+        nav.click(items[2], command: false, shift: false)
+        nav.click(items[0], command: false, shift: true)
+        XCTAssertEqual(nav.selectedItems.map(\.name), ["a", "b", "c"])
+        nav.selectNextItem()
+        XCTAssertEqual(nav.selectedItems.map(\.name), ["d"], "Arrow keys move from the anchor, not an arbitrary item")
+    }
+
     func testShellQuotedRoundTripsHostileNames() throws {
         let hostile = "it's $(touch pwned) `id` \"q\"\nline"
         let process = Process()
