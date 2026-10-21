@@ -2,7 +2,6 @@ import AppKit
 import XCTest
 @testable import Shark
 
-@MainActor
 final class TerminalOpeningTests: XCTestCase {
     private var directory: URL!
 
@@ -15,6 +14,7 @@ final class TerminalOpeningTests: XCTestCase {
         try FileManager.default.removeItem(at: directory)
     }
 
+    @MainActor
     func testExternalTerminalReceivesDirectoryAndExplicitApplication() async throws {
         let application = URL(fileURLWithPath: "/System/Applications/Utilities/Terminal.app")
         var receivedURLs: [URL] = []
@@ -28,6 +28,7 @@ final class TerminalOpeningTests: XCTestCase {
         XCTAssertEqual(receivedApplication, application)
     }
 
+    @MainActor
     func testFileOpensItsParentAndMissingTargetsNeverLaunch() async throws {
         let file = directory.appendingPathComponent("note.txt")
         try Data().write(to: file)
@@ -44,6 +45,7 @@ final class TerminalOpeningTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testEmbeddedTerminalTargetsClickedFolderWithoutNavigatingBrowser() throws {
         let workspace = WorkspaceState(initialURL: URL(fileURLWithPath: "/"))
         let tab = workspace.activeTab
@@ -60,6 +62,7 @@ final class TerminalOpeningTests: XCTestCase {
         XCTAssertNotEqual(workspace.embeddedTerminalRequest?.id, firstRequest)
     }
 
+    @MainActor
     func testEmbeddedDirectoryCommandPreservesLiteralShellCharacters() throws {
         let folder = directory.appendingPathComponent("folder 'quoted' $HOME `literal`")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -76,6 +79,7 @@ final class TerminalOpeningTests: XCTestCase {
         XCTAssertEqual(actual.resolvingSymlinksInPath().path, folder.resolvingSymlinksInPath().path)
     }
 
+    @MainActor
     func testEmbeddedTerminalFileUsesParent() throws {
         let file = directory.appendingPathComponent("note.txt")
         try Data().write(to: file)

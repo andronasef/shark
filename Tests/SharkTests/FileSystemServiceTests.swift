@@ -20,13 +20,13 @@ final class FileSystemServiceTests: XCTestCase {
     }
 
     func testResolvePathTilde() async {
-        let homeResolved = await service.resolvePath("~")
+        let homeResolved = service.resolvePath("~")
         XCTAssertNotNil(homeResolved)
         XCTAssertEqual(homeResolved?.path, FileManager.default.homeDirectoryForCurrentUser.path)
     }
 
     func testResolveNonExistentPath() async {
-        let invalid = await service.resolvePath("/this/path/should/definitely/not/exist/\(UUID().uuidString)")
+        let invalid = service.resolvePath("/this/path/should/definitely/not/exist/\(UUID().uuidString)")
         XCTAssertNil(invalid)
     }
 

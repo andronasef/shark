@@ -28,6 +28,8 @@ final class FinderPolishAndStatesTests: XCTestCase {
             onNewFolder: { created = true }
         )
         XCTAssertNotNil(emptyWithoutFilter)
+        _ = cleared
+        _ = created
     }
 
     func testDirectoryErrorStateCallbacks() {
@@ -47,6 +49,8 @@ final class FinderPolishAndStatesTests: XCTestCase {
             onGoHome: { home = true }
         )
         XCTAssertNotNil(genericErrorView)
+        _ = retried
+        _ = home
     }
 
     func testDirectoryLoadingViewInitialization() {

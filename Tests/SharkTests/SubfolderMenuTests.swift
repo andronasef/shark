@@ -1,7 +1,6 @@
 import XCTest
 @testable import Shark
 
-@MainActor
 final class SubfolderMenuTests: XCTestCase {
     private var root: URL!
 
@@ -14,6 +13,7 @@ final class SubfolderMenuTests: XCTestCase {
         try? FileManager.default.removeItem(at: root)
     }
 
+    @MainActor
     func testMenuCascadesSixLevelsDeepAndListsTheFileAtTheBottom() throws {
         var deepest = root!
         for level in 1...6 { deepest.appendPathComponent("level\(level)", isDirectory: true) }
@@ -31,6 +31,7 @@ final class SubfolderMenuTests: XCTestCase {
         XCTAssertEqual(menu.items.map(\.title), ["target.txt"])
     }
 
+    @MainActor
     func testClickOpensFoldersAndCommandOpensInANewTab() throws {
         var calls: [(URL, Bool)] = []
         let builder = SubfolderMenuBuilder { calls.append(($0, $1)) }
@@ -39,6 +40,7 @@ final class SubfolderMenuTests: XCTestCase {
         XCTAssertEqual(calls.map(\.1), [false, true])
     }
 
+    @MainActor
     func testOptionClickCopiesInsteadOfOpening() throws {
         var navigated = false
         let builder = SubfolderMenuBuilder { _, _ in navigated = true }
