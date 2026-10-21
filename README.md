@@ -49,6 +49,10 @@ brew tap andronasef/shark
 brew install --cask shark
 ```
 
+### Mac App Store (coming soon)
+
+[Download Shark on the Mac App Store](https://apps.apple.com/us/app/shark-better-finder/id6825086341) — coming soon.
+
 ### Direct download
 
 Once a release is published, download `Shark-<version>.dmg` from this repository's **Releases** page, open it, and drag **Shark.app** onto **Applications**. Public downloads built by the release action are Developer ID signed and notarized by Apple.

@@ -4,6 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import DownloadLink from '../components/DownloadLink.astro';
+import MacAppStoreLink from '../components/MacAppStoreLink.astro';
 import Icon from '../components/Icon.astro';
 import { featureGroups } from '../data/features';
 import split from '../assets/tabs-and-split.webp';
@@ -52,7 +53,7 @@ import '../styles/features.css';
 
     <section class="catalog-close container" aria-labelledby="catalog-close-title">
       <div><h2 id="catalog-close-title">Put your tools to work.</h2><p>A free, native file manager for your Mac.</p></div>
-      <DownloadLink />
+      <div class="cta-row"><DownloadLink /><MacAppStoreLink /></div>
     </section>
   </main>
   <SiteFooter />
