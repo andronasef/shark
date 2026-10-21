@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - The subfolder menu lists at most 500 items, with a final item that opens the folder, so huge folders no longer freeze the menu.
+- Calculate Size recalculates on every request instead of showing a stale cached size.
 - Removed the unused hardened-runtime exceptions (JIT, unsigned executable memory, disabled library validation) from the Developer ID build, and the `com.apple.security.inherit` entitlement, which is only for helper tools, from the App Store build.
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 

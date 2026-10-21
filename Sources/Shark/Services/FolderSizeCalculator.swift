@@ -21,7 +21,8 @@ public final class FolderSizeCalculator {
 
     public func requestSize(for url: URL) {
         let stdURL = url.standardizedFileURL
-        if cache[stdURL] != nil || calculating.contains(stdURL) {
+        // A repeat request recalculates: the folder may have changed since the cached size.
+        if calculating.contains(stdURL) {
             return
         }
 
