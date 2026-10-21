@@ -46,7 +46,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Compressing a large selection no longer blocks other file operations until the archive is done, and a failed archive leaves no partial ZIP behind.
 - Compress now handles multiple selected items correctly; ditto previously rejected multiple archive sources.
 - Compress can now be stopped: a stop button appears beside "Compressing…" in the status bar, and stopping removes the partial ZIP.
+- The status bar's free-space reading and gallery icons no longer do disk or icon work on every redraw.
 - The terminal view no longer writes model state on every SwiftUI update.
+- Removed the unused filter bar and compact list code.
 
 ## [1.0.0-alpha.1] - 2026-10-21
 

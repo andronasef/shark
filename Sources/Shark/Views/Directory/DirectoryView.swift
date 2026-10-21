@@ -14,6 +14,7 @@ public struct DirectoryView: View {
     @State private var lastClickedURL: URL? = nil
     @State private var lastClickTime: TimeInterval = 0
     @State private var typeToSelectMonitor: Any? = nil
+    @State private var diskSpaceSummary: String? = nil
 
     public init(
         navigationState: NavigationState,
@@ -41,7 +42,9 @@ public struct DirectoryView: View {
         .task(id: navigationState.currentURL) {
             await navigationState.reloadCurrentDirectory()
             setupFSEventsWatcher()
-
+            let url = navigationState.currentURL
+            // Volume capacity can block on network volumes, so it is read once per folder, off main.
+            diskSpaceSummary = await Task.detached { DiskSpaceService.shared.getDiskSpace(for: url)?.summary }.value
         }
         .alert(
             "The operation couldn’t be completed",
@@ -333,9 +336,7 @@ public struct DirectoryView: View {
             if let item = selectedItem {
                 VStack(spacing: 12) {
                     Spacer()
-                    Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+                    FileItemIconView(item: item, size: 180)
                         .frame(maxWidth: 180, maxHeight: 180)
                         .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
 
@@ -360,9 +361,7 @@ public struct DirectoryView: View {
                     ForEach(navigationState.filteredAndSortedItems) { item in
                         let isSelected = navigationState.selectedItemIDs.contains(item.id)
                         VStack(spacing: 4) {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path))
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
+                            FileItemIconView(item: item, size: 48)
                                 .frame(width: 48, height: 48)
 
                             Text(item.name)
@@ -426,8 +425,8 @@ public struct DirectoryView: View {
                         .foregroundColor(.primary)
                 }
 
-                if let diskInfo = DiskSpaceService.shared.getDiskSpace(for: navigationState.currentURL) {
-                    Text("• \(diskInfo.summary)")
+                if let diskSpaceSummary {
+                    Text("• \(diskSpaceSummary)")
                         .foregroundColor(.secondary)
                 }
             }
@@ -737,6 +736,7 @@ public struct DirectoryView: View {
 }
 
 extension String {
+
     /// Elides the middle so long names keep their start and ending (e.g. the extension) in compact menus.
     func middleTruncated(to limit: Int) -> String {
         guard limit > 1, count > limit else { return self }
