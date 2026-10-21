@@ -82,6 +82,8 @@ public final class NavigationState {
     public var isBottomPathBarVisible: Bool = true
     public var activeOperationProgress: Double? = nil
     public var activeOperationTitle: String? = nil
+    /// Stops the running operation shown in the status bar; nil when it can't be cancelled.
+    public private(set) var cancelActiveOperation: (() -> Void)? = nil
 
     private let fileSystemService: FileSystemService
     private var lastRecordedVisit: URL?
@@ -317,6 +319,8 @@ public final class NavigationState {
         await reloadCurrentDirectory()
     }
 
+    /// Drops `urls` into `directory`. Like Finder, a drop moves within a volume and copies across
+    /// volumes; ⌥ forces a copy and ⌘ forces a move.
     public func drop(_ urls: [URL], into directory: URL, modifiers: NSEvent.ModifierFlags) async {
         guard !urls.isEmpty else { return }
         let crossesVolume = urls.contains { !FileOperationsService.isSameVolume($0, directory) }
@@ -396,22 +400,41 @@ public final class NavigationState {
     }
 
     public func compressSelected() async {
+        guard cancelActiveOperation == nil else { return }
         let urls = selectedItems.map(\.url)
         guard !urls.isEmpty else { return }
         activeOperationTitle = "Compressing..."
         activeOperationProgress = 0.5
-        do {
-            let archiveURL = try await FileOperationsService.shared.compress(items: urls)
-            FileUndoService.shared.record(.create(urls: [archiveURL], name: "Compress"))
+        let task = Task { try await FileOperationsService.shared.compress(items: urls) }
+        cancelActiveOperation = { task.cancel() }
+        defer {
             activeOperationTitle = nil
             activeOperationProgress = nil
+            cancelActiveOperation = nil
+        }
+        do {
+            let archiveURL = try await task.value
+            FileUndoService.shared.record(.create(urls: [archiveURL], name: "Compress"))
             await reloadCurrentDirectory()
             selectedItemIDs = [archiveURL]
+        } catch is CancellationError {
+            await reloadCurrentDirectory()
         } catch {
-            activeOperationTitle = nil
-            activeOperationProgress = nil
-            self.errorMessage = "Compress failed: \(error.localizedDescription)"
+            self.operationError = "Compress failed: \(error.localizedDescription)"
         }
+    }
+
+    public func trashSelected() async {
+        let urls = selectedItems.map(\.url)
+        guard !urls.isEmpty else { return }
+        do {
+            let restorations = try await FileOperationsService.shared.trash(items: urls)
+            FileUndoService.shared.record(.trash(restorations: restorations))
+            selectedItemIDs.removeAll()
+        } catch {
+            self.operationError = "Move to Trash failed: \(error.localizedDescription)"
+        }
+        await reloadCurrentDirectory()
     }
 
     // MARK: - Selection (Finder style)
@@ -486,17 +509,5 @@ public final class NavigationState {
 
     public func selectLastItem() {
         if let last = filteredAndSortedItems.last { selectOnly(last) }
-    }
-    public func trashSelected() async {
-        let urls = selectedItems.map(\.url)
-        guard !urls.isEmpty else { return }
-        do {
-            let restorations = try await FileOperationsService.shared.trash(items: urls)
-            FileUndoService.shared.record(.trash(restorations: restorations))
-            selectedItemIDs.removeAll()
-        } catch {
-            self.operationError = "Move to Trash failed: \(error.localizedDescription)"
-        }
-        await reloadCurrentDirectory()
     }
 }

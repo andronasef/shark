@@ -311,29 +311,68 @@ public actor FileOperationsService {
             counter += 1
         }
 
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
-        var arguments = ["-c", "-k", "--sequesterRsrc", "--keepParent"]
-        for item in items {
-            arguments.append(item.path)
-        }
-        arguments.append(destination.path)
-        process.arguments = arguments
-
-        do {
-            try process.run()
-            process.waitUntilExit()
-
-            guard process.terminationStatus == 0 else {
-                throw NSError(domain: "FileOperationsError", code: Int(process.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "Compression failed with status \(process.terminationStatus)"])
+        try Task.checkCancellation()
+        // Keep partial output private. Publishing with moveItem never replaces a file that
+        // another process created while ditto was running.
+        let work = parentDir.appendingPathComponent(".shark-compress-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: work, withIntermediateDirectories: false)
+        defer { try? fileManager.removeItem(at: work) }
+        let output = work.appendingPathComponent("output.zip")
+        let source: URL
+        if items.count == 1 {
+            source = first
+        } else {
+            // ditto can archive only one source. Stage each input under its own name
+            // so selected folders stay separate, preserving resource forks and attributes.
+            source = work.appendingPathComponent("contents", isDirectory: true)
+            try fileManager.createDirectory(at: source, withIntermediateDirectories: false)
+            for item in items {
+                try await runCompressionHelper(arguments: [item.path, source.appendingPathComponent(item.lastPathComponent).path])
             }
-        } catch {
-            let isSandboxed = ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil || NSHomeDirectory().contains("/Library/Containers/")
-            if isSandboxed {
-                throw NSError(domain: "FileOperationsError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Archive helper execution is restricted under App Sandbox. Ensure directory permissions are granted or export uncompressed."])
-            }
-            throw error
         }
+        var arguments = ["-c", "-k", "--sequesterRsrc"]
+        if items.count == 1 { arguments.append("--keepParent") }
+        try await runCompressionHelper(arguments: arguments + [source.path, output.path])
+        try Task.checkCancellation()
+        try fileManager.moveItem(at: output, to: destination)
         return destination
     }
+
+    /// Suspends the actor while ditto runs. The lock serializes launch, cancellation and exit,
+    /// so a cancellation cannot miss a just-launched process or reuse a completed process ID.
+    private func runCompressionHelper(arguments: [String]) async throws {
+        try Task.checkCancellation()
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+        process.arguments = arguments
+        let runningPID = OSAllocatedUnfairLock<pid_t>(initialState: 0)
+        let status: Int32 = try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                process.terminationHandler = { process in
+                    runningPID.withLock { $0 = 0 }
+                    continuation.resume(returning: process.terminationStatus)
+                }
+                do {
+                    try runningPID.withLock { pid in
+                        try Task.checkCancellation()
+                        try process.run()
+                        pid = process.processIdentifier
+                        if Task.isCancelled { kill(pid, SIGTERM) }
+                    }
+                } catch {
+                    process.terminationHandler = nil
+                    continuation.resume(throwing: error)
+                }
+            }
+        } onCancel: {
+            runningPID.withLock { pid in
+                if pid > 0 { kill(pid, SIGTERM) }
+            }
+        }
+        try Task.checkCancellation()
+        guard status == 0 else {
+            throw NSError(domain: "FileOperationsError", code: Int(status), userInfo: [NSLocalizedDescriptionKey: "Compression failed with status \(status)"])
+        }
+    }
+
 }

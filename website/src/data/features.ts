@@ -90,7 +90,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'rename', title: 'Inline rename', description: 'Change a file or folder name in place.', shortcut: 'F2' },
       { id: 'batch-rename', title: 'Batch rename with a preview', description: 'Find and replace text, add a prefix or suffix, or apply sequential numbering to a selection. Review the new names before applying them. Shark renames all items or none, and refuses names that collide or contain “/” or “:”.' },
       { id: 'duplicate', title: 'Duplicate files', description: 'Create another copy of selected items in the same folder.' },
-      { id: 'compress', title: 'ZIP compression', description: 'Create a ZIP archive from the selected files and folders.' },
+      { id: 'compress', title: 'ZIP compression', description: 'Create a ZIP archive from the selected files and folders. Stop a long one from the status bar.' },
       { id: 'trash', title: 'Move to Trash', description: 'Send selected items to the macOS Trash.', shortcut: '⌘⌫' },
       { id: 'undo-redo', title: 'Undo & redo', description: 'Undo and redo moves, copies, duplicates, new folders and files, renames (including batch renames), ZIP archives, and Trash with Command-Z and Command-Shift-Z. Undoing a copy moves the copy to the Trash.' },
       { id: 'copy-path', title: 'Copy file & folder paths', description: 'Copy a full, relative, or quoted path from the item menu, or copy the active tab’s folder path.' },

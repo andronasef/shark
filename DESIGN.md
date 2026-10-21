@@ -120,6 +120,7 @@ Shark uses the macOS San Francisco system font family with tabular figures where
   - Paste (`⌘V`): Copies files into the target directory, or moves them after a Cut. Never overwrites: copies take a "name copy N" name, a move onto an existing name (case-insensitive) is refused, and pasting a cut back into its own folder does nothing.
   - Drop: moves within a volume, copies across volumes (Finder rule). `⌥` forces copy, `⌘` forces move. Never into the item itself or a descendant.
   - Multi-item operations are all-or-nothing: a failure part-way rolls back the finished items. Failures show an alert; they are never silent.
+  - Compress: one archive operation per pane; the status bar Stop button cancels it and removes its private partial output. Only a finished ZIP appears in the folder.
   - Full Undo/Redo (`⌘Z` / `⇧⌘Z`) for every file operation: move, copy, duplicate, new item, rename, batch rename, compress, and trash. Undoing something Shark created moves it to the Trash, never deletes it.
 - **Subfolder Menus (QT-01 & QT-02)**:
   - Breadcrumb segment chevrons reveal cascading popover menus.

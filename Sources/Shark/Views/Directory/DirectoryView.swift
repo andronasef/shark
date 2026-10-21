@@ -441,6 +441,16 @@ public struct DirectoryView: View {
                     Text(title)
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
+                    if let cancel = navigationState.cancelActiveOperation {
+                        Button(action: cancel) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .help("Stop")
+                        .accessibilityLabel("Stop \(title)")
+                    }
                 }
             }
 

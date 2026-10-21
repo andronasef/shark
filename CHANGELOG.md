@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Multi-folder ZIP archives preserve each selected folder and files with the same name inside different folders.
 - Undo and redo requests run one at a time; newer file actions invalidate pending redo history, and clearing history cannot be undone by an in-flight completion.
 - **Data loss:** Cut (⌘X) and Paste (⌘V) into the same folder permanently deleted the file. Pasting a cut item over an existing name (including one that differs only by case) permanently deleted the existing item. Paste now never overwrites: a cut pasted back into its own folder does nothing, and a move onto an existing name is refused.
 - **Data loss:** Undo after copy-pasting into a folder that already had the name deleted the *original* file rather than the "copy 1". Undo now removes exactly the items the copy made, and moves them to the Trash.
@@ -36,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Copy Path › POSIX Quoted Path used double quotes, so a file name containing `$(…)` or backticks ran a command when pasted into a shell. Paths are now single-quoted.
 - The folder watcher could use a freed object if a pane closed while an event was being delivered, and raced on its callback.
 - Drag-and-drop no longer forces a move when the source app only allows copying (Safari, Photos, Mail).
+- Compressing a large selection no longer blocks other file operations until the archive is done, and a failed archive leaves no partial ZIP behind.
+- Compress now handles multiple selected items correctly; ditto previously rejected multiple archive sources.
+- Compress can now be stopped: a stop button appears beside "Compressing…" in the status bar, and stopping removes the partial ZIP.
 - The terminal view no longer writes model state on every SwiftUI update.
 
 ## [1.0.0-alpha.1] - 2026-10-21

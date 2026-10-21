@@ -244,11 +244,76 @@ final class DataSafetyTests: XCTestCase {
 }
 
 extension DataSafetyTests {
+    func testCompressCanBeCancelledAndLeavesNoArchive() async throws {
+        // Random data compresses slowly enough to cancel ditto mid-run.
+        let big = dir.appendingPathComponent("big.bin")
+        var bytes = [UInt8](repeating: 0, count: 64 * 1024 * 1024)
+        for index in stride(from: 0, to: bytes.count, by: 8) { bytes[index] = UInt8.random(in: 0...255) }
+        try Data(bytes).write(to: big)
 
+        let task = Task { try await FileOperationsService.shared.compress(items: [big]) }
+        try await Task.sleep(for: .milliseconds(150))
+        task.cancel()
+        do {
+            _ = try await task.value
+            XCTFail("A cancelled compress must throw")
+        } catch {
+            XCTAssertTrue(error is CancellationError)
+        }
+        XCTAssertFalse(fm.fileExists(atPath: dir.appendingPathComponent("big.zip").path), "No partial archive left behind")
+    }
+
+    func testCompressCancelledBeforeStartDoesNothing() async throws {
+        let small = try file("small.txt")
+        let task = Task {
+            withUnsafeCurrentTask { $0?.cancel() }
+            return try await FileOperationsService.shared.compress(items: [small])
+        }
+        do {
+            _ = try await task.value
+            XCTFail("A cancelled compress must throw")
+        } catch {
+            XCTAssertTrue(error is CancellationError)
+        }
+        XCTAssertFalse(fm.fileExists(atPath: dir.appendingPathComponent("small.zip").path))
+    }
 }
 
 extension DataSafetyTests {
+    func testCompressMultipleItemsContainsEveryInput() async throws {
+        let first = try file("one.txt", "one")
+        let second = try file("two.txt", "two")
+        let archive = try await FileOperationsService.shared.compress(items: [first, second])
+        let unpacked = try folder("unpacked")
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+        process.arguments = ["-x", "-k", archive.path, unpacked.path]
+        try process.run()
+        process.waitUntilExit()
+        XCTAssertEqual(process.terminationStatus, 0)
+        XCTAssertEqual(try String(contentsOf: unpacked.appendingPathComponent("one.txt"), encoding: .utf8), "one")
+        XCTAssertEqual(try String(contentsOf: unpacked.appendingPathComponent("two.txt"), encoding: .utf8), "two")
+    }
 
+    func testCompressIgnoresSecondRequestWhileOneIsActive() async throws {
+        let big = dir.appendingPathComponent("big.bin")
+        try Data(repeating: 42, count: 64 * 1024 * 1024).write(to: big)
+        let nav = NavigationState(initialURL: dir)
+        await nav.reloadCurrentDirectory()
+        nav.selectAll()
+        let first = Task { await nav.compressSelected() }
+        // Wait for the model to expose the stop control, without depending on ditto's speed.
+        while nav.cancelActiveOperation == nil { await Task.yield() }
+        let second = Task { await nav.compressSelected() }
+        await Task.yield()
+        nav.cancelActiveOperation?()
+        await second.value
+        nav.cancelActiveOperation?()
+        await first.value
+        XCTAssertNil(nav.cancelActiveOperation)
+        XCTAssertNil(nav.activeOperationTitle)
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: dir.path).filter { $0.hasSuffix(".zip") }, [])
+    }
 }
 
 extension DataSafetyTests {
@@ -273,6 +338,22 @@ extension DataSafetyTests {
 }
 
 extension DataSafetyTests {
+    func testCompressPreservesSelectedFolderBoundaries() async throws {
+        let a = try folder("a")
+        let b = try folder("b")
+        _ = try file("same.txt", in: a, "first")
+        _ = try file("same.txt", in: b, "second")
+        let archive = try await FileOperationsService.shared.compress(items: [a, b])
+        let unpacked = try folder("unpacked")
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+        process.arguments = ["-x", "-k", archive.path, unpacked.path]
+        try process.run()
+        process.waitUntilExit()
+        XCTAssertEqual(process.terminationStatus, 0)
+        XCTAssertEqual(try String(contentsOf: unpacked.appendingPathComponent("a/same.txt"), encoding: .utf8), "first")
+        XCTAssertEqual(try String(contentsOf: unpacked.appendingPathComponent("b/same.txt"), encoding: .utf8), "second")
+    }
 
     func testNewActionWhileUndoRunsInvalidatesRedo() async throws {
         let history = FileUndoService()
