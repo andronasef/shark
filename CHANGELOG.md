@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.0-alpha.1] - 2026-10-21
+
+### Added
+- Releases now include a signed, notarized `Shark-<version>.dmg` installer (drag Shark to Applications) in place of the ZIP, which is no longer published. The Homebrew cask now installs from the DMG.
+
+## [1.0.0-alpha] - 2026-10-20
+
 ### Changed
 - Calmer Location breadcrumbs: lighter, thinner separator chevrons, and the current folder is marked once (bold label on a neutral capsule) instead of also getting a blue folder icon.
 - The sidebar hides iCloud Drive when it is switched off, as Finder does, instead of showing an item that fails with "Unable to open directory".

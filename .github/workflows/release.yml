@@ -92,7 +92,7 @@ jobs:
             extra_args+=(--prerelease)
           fi
           gh release create "$GITHUB_REF_NAME" \
-            "dist/Shark-$version.zip" "dist/Shark-$version.zip.sha256" \
+            "dist/Shark-$version.dmg" "dist/Shark-$version.dmg.sha256" \
             --verify-tag --title "Shark $version" --generate-notes "${extra_args[@]}"
 
       - name: Update Homebrew Cask Tap
@@ -101,7 +101,7 @@ jobs:
         run: |
           if [[ -n "$TAP_TOKEN" ]]; then
             version="${GITHUB_REF_NAME#v}"
-            sha=$(cat "dist/Shark-$version.zip.sha256" | awk '{print $1}')
+            sha=$(cat "dist/Shark-$version.dmg.sha256" | awk '{print $1}')
             
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -114,6 +114,7 @@ jobs:
             path = 'Casks/shark.rb'
             with open(path, 'r') as f:
                 content = f.read()
+            content = content.replace('.zip', '.dmg')
             content = re.sub(r'version \".*?\"', f'version \"$version\"', content)
             content = re.sub(r'sha256 .*', f'sha256 \"$sha\"', content)
             with open(path, 'w') as f:

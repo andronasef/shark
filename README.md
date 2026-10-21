@@ -51,7 +51,7 @@ brew install --cask shark
 
 ### Direct download
 
-Once a release is published, download `Shark-<version>.zip` from this repository's **Releases** page, unzip it, and move **Shark.app** to **Applications**. Public downloads built by the release action are Developer ID signed and notarized by Apple.
+Once a release is published, download `Shark-<version>.dmg` from this repository's **Releases** page, open it, and drag **Shark.app** onto **Applications**. Public downloads built by the release action are Developer ID signed and notarized by Apple.
 
 Open a folder from the sidebar, or press **⌘L**, type a path, and press Return. macOS may ask for access to protected folders such as Documents or Downloads; allow the folders you want to browse.
 

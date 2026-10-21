@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build a universal app and ZIP. Public downloads require Developer ID notarization.
+# Build a universal app and DMG installer. Public downloads require Developer ID notarization.
 # Usage: scripts/package.sh MAJOR.MINOR.PATCH[-PRERELEASE]
 set -euo pipefail
 
@@ -31,7 +31,8 @@ staging=$(mktemp -d "$PWD/dist/.package.XXXXXX")
 trap 'rm -rf "$staging"' EXIT
 
 app="$staging/Shark.app"
-archive="$staging/Shark-$version.zip"
+archive="$staging/notarize.zip" # submission only, never shipped
+dmg="$staging/Shark-$version.dmg"
 
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp Resources/Info.plist "$app/Contents/"
@@ -113,18 +114,32 @@ if [[ "$notarize" == 1 ]]; then
   xcrun stapler staple "$app"
   xcrun stapler validate "$app"
   spctl --assess --type execute --verbose=2 "$app"
-  rm "$archive"
-  ditto -c -k --keepParent "$app" "$archive"
 fi
+# Drag-to-Applications installer, built from the final (stapled) app.
+dmg_src="$staging/dmg"
+mkdir "$dmg_src"
+cp -R "$app" "$dmg_src/Shark.app"
+ln -s /Applications "$dmg_src/Applications"
+hdiutil create -volname "Shark" -srcfolder "$dmg_src" -ov -format UDZO "$dmg" >/dev/null
+if [[ "$identity" != - ]]; then
+  codesign --force ${timestamp_args[@]+"${timestamp_args[@]}"} --sign "$identity" "$dmg"
+fi
+if [[ "$notarize" == 1 ]]; then
+  xcrun notarytool submit "$dmg" --wait \
+    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" --password "$NOTARY_PASSWORD"
+  xcrun stapler staple "$dmg"
+  xcrun stapler validate "$dmg"
+fi
+
 # Replace only this package, leaving other release artifacts intact.
 rm -rf dist/Shark.app dist/Shark.app.dSYM
 mv "$app" dist/Shark.app
 mv "$staging/Shark.app.dSYM" dist/Shark.app.dSYM
-mv "$archive" "dist/Shark-$version.zip"
-(cd dist && shasum -a 256 "Shark-$version.zip" > "Shark-$version.zip.sha256")
+mv "$dmg" "dist/Shark-$version.dmg"
+(cd dist && shasum -a 256 "Shark-$version.dmg" > "Shark-$version.dmg.sha256")
 
 if [[ "${UPLOAD_CRASHLYTICS_SYMBOLS:-0}" == 1 ]]; then
   scripts/upload-symbols.sh "dist/Shark.app.dSYM"
 fi
 
-echo "dist/Shark-$version.zip"
+echo "dist/Shark-$version.dmg"

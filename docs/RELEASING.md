@@ -2,7 +2,7 @@
 
 ## Choose the distribution route
 
-The [release action](../.github/workflows/release.yml) builds a universal app for Apple silicon and Intel, signs it with Developer ID, notarizes it, staples Apple's ticket, and publishes a ZIP and SHA-256 checksum on GitHub Releases. Tests, signature verification, notarization acceptance, and Gatekeeper assessment must pass before publication.
+The [release action](../.github/workflows/release.yml) builds a universal app for Apple silicon and Intel, signs it with Developer ID, notarizes it, staples Apple's ticket, and publishes a DMG installer and its SHA-256 checksum on GitHub Releases. Tests, signature verification, notarization acceptance, and Gatekeeper assessment must pass before publication.
 
 **This action publishes direct downloads, not Mac App Store submissions.** Developer ID is Apple's certificate for distribution outside the store. The Mac App Store needs a separate distribution identity and a sandbox-compatible app. See [Apple's distribution overview](https://developer.apple.com/macos/distribution/).
 
@@ -35,12 +35,12 @@ Keep certificates, private keys, and passwords out of Git. The action imports th
    git push origin v1.0.0-alpha
    ```
 
-The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.zip` and `Shark-<version>.zip.sha256` with generated release notes (marked as prerelease when appropriate). A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
+The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.dmg` and `Shark-<version>.dmg.sha256` with generated release notes (marked as prerelease when appropriate). A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
 
-To check the downloaded ZIP, put both release assets in the same directory and run:
+To check a download, put the file and its `.sha256` in the same directory and run:
 
 ```sh
-shasum -a 256 -c Shark-1.0.0-alpha.zip.sha256
+shasum -a 256 -c Shark-1.0.0-alpha.dmg.sha256
 ```
 
 ## Package locally
@@ -57,7 +57,7 @@ For a public package, first import your Developer ID certificate into your keych
 REQUIRE_NOTARIZATION=1 scripts/package.sh 1.0.0-alpha
 ```
 
-The script stops when credentials are missing, notarization is rejected, stapling fails, or Gatekeeper rejects the app. Never publish the local ad hoc ZIP in place of a signed release.
+The script stops when credentials are missing, notarization is rejected, stapling fails, or Gatekeeper rejects the app. Never publish the local ad hoc build in place of a signed release.
 
 ## Mac App Store preparation
 
@@ -69,4 +69,4 @@ Shark is **not ready for App Store submission yet**. This is application work, n
 - Register the final bundle ID and App Store Connect record. Configure the appropriate Mac App Store application/installer distribution certificates and provisioning profile, with matching entitlements and an increasing build number.
 - Package and validate the store build, upload it using Apple's supported tools, then complete screenshots, privacy information, support links, and review notes in App Store Connect.
 
-Once the sandboxed edition is working and tested, add a separate App Store workflow. Do not upload the Developer ID ZIP as a store build or simply switch on sandbox signing for the current app: that would leave its file access and terminal behavior unverified.
+Once the sandboxed edition is working and tested, add a separate App Store workflow. Do not upload the Developer ID build as a store build or simply switch on sandbox signing for the current app: that would leave its file access and terminal behavior unverified.
