@@ -90,4 +90,13 @@ final class UpdateCheckerTests: XCTestCase {
         XCTAssertEqual(UpdateChecker.channel(hasReceipt: false, hasCask: true), .homebrew)
         XCTAssertEqual(UpdateChecker.channel(hasReceipt: false, hasCask: false), .dmg)
     }
+
+    func testReleaseNotesDecodeAndRender() {
+        XCTAssertNil(release("v1.0.0").body)
+        XCTAssertNil(UpdateChecker.releaseNotes(nil))
+        XCTAssertNil(UpdateChecker.releaseNotes("  \n "))
+        let notes = UpdateChecker.releaseNotes("**Fixed** the [crash](https://example.com)\n- second line")
+        XCTAssertEqual(notes?.string, "Fixed the crash\n- second line")
+        XCTAssertEqual(notes?.attribute(.link, at: 10, effectiveRange: nil) as? URL, URL(string: "https://example.com"))
+    }
 }

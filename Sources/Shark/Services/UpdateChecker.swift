@@ -75,10 +75,12 @@ struct GitHubRelease: Decodable, Sendable {
     let prerelease: Bool
     let htmlURL: URL
     let assets: [Asset]
+    /// Release notes (Markdown); GitHub sends null or omits it when there are none.
+    let body: String?
 
     enum CodingKeys: String, CodingKey {
         case tagName = "tag_name"
-        case draft, prerelease, assets
+        case draft, prerelease, assets, body
         case htmlURL = "html_url"
     }
 
@@ -107,6 +109,7 @@ enum UpdateChecker {
         struct Result: Decodable {
             let version: String
             let trackViewUrl: URL
+            let releaseNotes: String?
         }
         let results: [Result]
     }
@@ -168,24 +171,25 @@ enum UpdateChecker {
             }
             // Only the automatic check honours a skipped version.
             if !manual, UserDefaults.standard.string(forKey: skippedVersionKey) == update.version.description { return }
-            showUpdateAlert(latest: update.version, current: current, channel: channel, actionURL: update.url)
+            showUpdateAlert(latest: update.version, current: current, channel: channel,
+                            actionURL: update.url, notes: update.notes)
         } catch {
             if manual { NSAlert(error: error).runModal() }
         }
     }
 
     private static func newestUpdate(for channel: InstallChannel,
-                                     current: SemanticVersion) async throws -> (version: SemanticVersion, url: URL)? {
+                                     current: SemanticVersion) async throws -> (version: SemanticVersion, url: URL, notes: String?)? {
         if channel == .appStore {
             let lookup = try await fetch(AppStoreLookup.self, from: appStoreLookup)
             guard let result = lookup.results.first, let version = SemanticVersion(result.version),
                   version > current else { return nil }
-            return (version, result.trackViewUrl)
+            return (version, result.trackViewUrl, result.releaseNotes)
         }
         let releases = try await fetch([GitHubRelease].self, from: releasesAPI, accept: "application/vnd.github+json")
         guard let release = newestRelease(in: releases, newerThan: current),
               let version = SemanticVersion(release.tagName) else { return nil }
-        return (version, release.downloadURL)
+        return (version, release.downloadURL, release.body)
     }
 
     private static func fetch<T: Decodable>(_ type: T.Type, from url: URL, accept: String? = nil) async throws -> T {
@@ -197,10 +201,11 @@ enum UpdateChecker {
     }
 
     private static func showUpdateAlert(latest: SemanticVersion, current: SemanticVersion,
-                                        channel: InstallChannel, actionURL: URL) {
+                                        channel: InstallChannel, actionURL: URL, notes: String?) {
         let alert = NSAlert()
         alert.messageText = "Shark \(latest) is available"
         alert.informativeText = "You have \(current)."
+        if let notes = releaseNotes(notes) { alert.accessoryView = notesView(notes) }
         switch channel {
         case .appStore:
             alert.addButton(withTitle: "Open App Store")
@@ -242,6 +247,38 @@ enum UpdateChecker {
     /// Opens network-derived URLs only over https; anything else falls back to the releases page.
     private static func openHTTPS(_ url: URL) {
         NSWorkspace.shared.open(url.scheme == "https" ? url : releasesPage)
+    }
+
+    /// Release notes as display text, or nil when there are none. Links stay clickable.
+    nonisolated static func releaseNotes(_ markdown: String?) -> NSAttributedString? {
+        guard let markdown = markdown?.trimmingCharacters(in: .whitespacesAndNewlines), !markdown.isEmpty else { return nil }
+        let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        let text = (try? NSMutableAttributedString(AttributedString(markdown: markdown, options: options)))
+            ?? NSMutableAttributedString(string: markdown)
+        let all = NSRange(location: 0, length: text.length)
+        text.addAttribute(.font, value: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize), range: all)
+        text.addAttribute(.foregroundColor, value: NSColor.labelColor, range: all)
+        return text
+    }
+
+    private static func notesView(_ notes: NSAttributedString) -> NSView {
+        let scrollView = NSTextView.scrollableTextView()
+        scrollView.frame = NSRect(x: 0, y: 0, width: 360, height: 160)
+        scrollView.borderType = .bezelBorder
+        scrollView.autohidesScrollers = true
+        let textView = scrollView.documentView as! NSTextView
+        textView.isEditable = false
+        textView.drawsBackground = false
+        textView.textContainerInset = NSSize(width: 4, height: 6)
+        textView.textStorage?.setAttributedString(notes)
+        // Fit short notes; scroll beyond 160 pt.
+        if let layout = textView.layoutManager, let container = textView.textContainer {
+            textView.frame.size.width = scrollView.contentSize.width
+            layout.ensureLayout(for: container)
+            let height = ceil(layout.usedRect(for: container).height) + textView.textContainerInset.height * 2 + 4
+            scrollView.frame.size.height = min(160, height)
+        }
+        return scrollView
     }
 
     private static func showInfo(_ message: String, _ informative: String) {
