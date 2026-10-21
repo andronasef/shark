@@ -41,7 +41,7 @@ public struct ContentView: View {
     }
 
     @ToolbarContentBuilder
-    private var finderToolbar: some ToolbarContent {
+    private func finderToolbar(for activeState: NavigationState) -> some ToolbarContent {
         // AppKit must place these together while the restored window is first measured.
         // Separate navigation items can straddle the sidebar tracking separator at launch.
         ToolbarItem(id: "navigation-location", placement: .navigation) {
@@ -291,7 +291,10 @@ public struct ContentView: View {
     }
 
     public var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
+        // Read the active navigation in the parent body so a tab selected by an external
+        // open event updates the toolbar as well as the tab strip and directory content.
+        let activeState = workspaceState.activeNavigationState
+        return NavigationSplitView(columnVisibility: $columnVisibility) {
             PlacesSidebarView(navigationState: activeState)
                 .navigationSplitViewColumnWidth(min: 170, ideal: 210, max: 280)
         } detail: {
@@ -327,7 +330,7 @@ public struct ContentView: View {
             .background(GeometryReader { geometry in
                 Color.clear.onChange(of: geometry.size.width, initial: true) { _, width in detailWidth = width }
             })
-            .toolbar { finderToolbar }
+            .toolbar { finderToolbar(for: activeState) }
         }
         .environment(workspaceState)
         .onChange(of: activeState.currentURL) { _, newURL in

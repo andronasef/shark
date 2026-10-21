@@ -93,6 +93,32 @@ public final class WorkspaceState {
         activeTab.activeNavigationState
     }
 
+    /// Open events preserve existing tabs and return unsupported/missing URLs for a user-facing error.
+    @discardableResult
+    func openExternalFolders(_ urls: [URL]) -> [URL] {
+        var rejected: [URL] = []
+        for url in urls {
+            guard url.isFileURL,
+                  let values = try? url.resolvingSymlinksInPath().resourceValues(forKeys: [.isDirectoryKey, .isPackageKey]),
+                  values.isDirectory == true, values.isPackage != true else {
+                rejected.append(url)
+                continue
+            }
+            let target = url.standardizedFileURL
+            let canonical = target.resolvingSymlinksInPath()
+            if let tab = tabs.first(where: {
+                $0.primaryPane.currentURL.standardizedFileURL.resolvingSymlinksInPath() == canonical ||
+                ($0.isSplit && $0.secondaryPane.currentURL.standardizedFileURL.resolvingSymlinksInPath() == canonical)
+            }) {
+                activeTabID = tab.id
+                tab.activePane = tab.primaryPane.currentURL.standardizedFileURL.resolvingSymlinksInPath() == canonical ? .primary : .secondary
+            } else {
+                newTab(url: target)
+            }
+        }
+        return rejected
+    }
+
     public func newTab(
         url: URL? = nil,
         placement: TabPlacement = .end,

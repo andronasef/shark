@@ -3,8 +3,10 @@ import AppKit
 import SwiftTerm
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     let workspace: WorkspaceState
+    var showMainWindow: (() -> Void)?
+    @Published var folderOpenError: String?
     private var sessionStore: SessionStore?
 
     override init() {
@@ -33,17 +35,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Flush final snapshot immediately
         sessionStore?.saveNow(workspace)
     }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        // Open events provide sandbox access. Persist that grant for restored tabs when possible.
+        if SecurityScopedBookmarkManager.shared.isSandboxed {
+            for url in urls where url.isFileURL {
+                _ = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: url)
+            }
+        }
+        let rejected = workspace.openExternalFolders(urls)
+        if !rejected.isEmpty {
+            folderOpenError = "Shark opens existing folders, not individual files or app packages. Check that the folder exists and that Shark has permission to access it."
+        }
+        showMainWindow?()
+        application.activate(ignoringOtherApps: true)
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        showMainWindow?()
+        return true
+    }
 }
 
 @main
 struct SharkApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @State private var onboarding = OnboardingState()
 
     var body: some Scene {
         // One window: the menu commands and the session drive a single WorkspaceState, so a second
         // window would only mirror the first one's tabs. Use tabs (⌘T) for more locations.
         Window("Shark", id: "main") {
-            ContentView(workspaceState: appDelegate.workspace)
+            MainWindowView(appDelegate: appDelegate, onboarding: onboarding)
                 .frame(minWidth: 850, minHeight: 550)
         }
         .windowStyle(.titleBar)
@@ -52,7 +75,7 @@ struct SharkApp: App {
             SidebarCommands()
             TabCommands(workspace: appDelegate.workspace)
             ExplorerCommands(workspace: appDelegate.workspace)
-            HelpCommands()
+            HelpCommands(onboarding: onboarding)
         }
 
         Window("Shark Help", id: "help") {
@@ -65,7 +88,34 @@ struct SharkApp: App {
     }
 }
 
+private struct MainWindowView: View {
+    @ObservedObject var appDelegate: AppDelegate
+    @Bindable var onboarding: OnboardingState
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some View {
+        ContentView(workspaceState: appDelegate.workspace)
+            .onAppear {
+                appDelegate.showMainWindow = { openWindow(id: "main") }
+            }
+            .task {
+                await Task.yield()
+                onboarding.presentIfNeeded()
+            }
+            .sheet(isPresented: $onboarding.isPresented) { OnboardingView() }
+            .alert("Couldn’t Open Folder", isPresented: Binding(
+                get: { appDelegate.folderOpenError != nil },
+                set: { if !$0 { appDelegate.folderOpenError = nil } }
+            )) {
+                Button("OK") { appDelegate.folderOpenError = nil }
+            } message: {
+                Text(appDelegate.folderOpenError ?? "")
+            }
+    }
+}
+
 struct HelpCommands: Commands {
+    let onboarding: OnboardingState
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openURL) private var openURL
 
@@ -81,6 +131,11 @@ struct HelpCommands: Commands {
         }
 
         CommandGroup(replacing: .help) {
+            Button("Welcome to Shark") {
+                openWindow(id: "main")
+                onboarding.show()
+            }
+
             Button("Shark Help") { openWindow(id: "help") }
                 .keyboardShortcut("?", modifiers: .command)
 

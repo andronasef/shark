@@ -60,6 +60,10 @@ public struct SettingsView: View {
                 Toggle("Enable Liquid Glass translucency and vibrancy", isOn: $settings.liquidGlassTranslucency)
             }
 
+            Section("Default Folder App") {
+                DefaultFolderAppControls(allowsRestore: true)
+            }
+
             Section("Updates") {
                 Toggle("Automatically check for updates", isOn: $settings.automaticallyCheckForUpdates)
                 Text("Shark checks once a day and only shows an alert. You can always use Shark › Check for Updates…")
@@ -171,6 +175,10 @@ public struct SettingsView: View {
 
     private var privacyTab: some View {
         Form {
+            Section("Full Disk Access") {
+                FullDiskAccessControls()
+            }
+
             Section("Analytics & Crash Reporting") {
                 Toggle("Share anonymous usage statistics", isOn: $settings.isAnalyticsEnabled)
                     .onChange(of: settings.isAnalyticsEnabled) { _, newValue in
