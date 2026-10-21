@@ -8,11 +8,12 @@ const { compact = false } = Astro.props;
   <span>{compact ? 'Download' : 'Download for macOS'}</span>
 </a>
 <script>
-  // /releases/latest skips prereleases, so ask the API for the newest release (alphas included) and link its DMG.
-  fetch('https://api.github.com/repos/andronasef/shark/releases?per_page=1')
+  // /releases/latest skips prereleases, so list recent releases (alphas included) and link the newest DMG.
+  type Asset = { name: string; browser_download_url: string };
+  fetch('https://api.github.com/repos/andronasef/shark/releases?per_page=10')
     .then((r) => r.json())
-    .then(([release]) => {
-      const dmg = release?.assets?.find((a: { name: string }) => a.name.endsWith('.dmg'));
+    .then((releases: { assets: Asset[] }[]) => {
+      const dmg = releases.flatMap((r) => r.assets).find((a) => a.name.endsWith('.dmg'));
       if (dmg) document.querySelectorAll<HTMLAnchorElement>('.js-download').forEach((a) => (a.href = dmg.browser_download_url));
     })
     .catch(() => {}); // keep the Releases page link
