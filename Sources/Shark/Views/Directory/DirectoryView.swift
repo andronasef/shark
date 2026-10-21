@@ -673,8 +673,8 @@ public struct DirectoryView: View {
             Button("POSIX Quoted Path") {
                 NSPasteboard.general.clearContents()
                 let quoted = isMultiple
-                    ? navigationState.selectedItems.map { "\"\($0.url.path)\"" }.joined(separator: " ")
-                    : "\"\(item.url.path)\""
+                    ? navigationState.selectedItems.map(\.url.path.shellQuoted).joined(separator: " ")
+                    : item.url.path.shellQuoted
                 NSPasteboard.general.setString(quoted, forType: .string)
             }
         }
@@ -804,8 +804,8 @@ public struct DirectoryView: View {
             Button("POSIX Quoted Path") {
                 NSPasteboard.general.clearContents()
                 let quoted = hasSelection
-                    ? navigationState.selectedItems.map { "\"\($0.url.path)\"" }.joined(separator: " ")
-                    : "\"\(navigationState.currentURL.path)\""
+                    ? navigationState.selectedItems.map(\.url.path.shellQuoted).joined(separator: " ")
+                    : navigationState.currentURL.path.shellQuoted
                 NSPasteboard.general.setString(quoted, forType: .string)
             }
         }

@@ -41,8 +41,7 @@ public final class PTYSession {
     }
 
     static func directoryChangeCommand(to directory: URL) -> String {
-        let quoted = "'" + directory.path.replacingOccurrences(of: "'", with: "'\\''") + "'"
-        return "cd -- " + quoted + "\n"
+        "cd -- " + directory.path.shellQuoted + "\n"
     }
 
     public func clear() {
@@ -56,5 +55,13 @@ public final class PTYSession {
     public func terminate() {
         self.isRunning = false
         self.terminalView = nil
+    }
+}
+
+extension String {
+    /// POSIX single-quoted form: safe to paste into any sh-compatible shell, because nothing
+    /// inside single quotes is expanded ($(…), backticks, variables).
+    var shellQuoted: String {
+        "'" + replacingOccurrences(of: "'", with: "'\\''") + "'"
     }
 }
