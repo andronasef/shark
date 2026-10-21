@@ -173,9 +173,14 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$PROVISIONING_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/Shark.provisionprofile"
-          # The App Store only accepts MAJOR.MINOR.PATCH, so alpha tags upload as their base version.
+          # The App Store only accepts digits and dots: v1.0.0-alpha.N uploads as 0.0.N, v1.2.3 as 1.2.3.
           version="${GITHUB_REF_NAME#v}"
-          PROVISIONING_PROFILE="$RUNNER_TEMP/Shark.provisionprofile" bash scripts/package-appstore.sh "${version%%-*}"
+          if [[ "$version" == *-* ]]; then
+            [[ "$version" =~ \.([0-9]+)$ ]] || { echo "::warning::$GITHUB_REF_NAME has no trailing number (e.g. -alpha.1); skipping the App Store upload"; exit 0; }
+            version="0.0.${BASH_REMATCH[1]}"
+          fi
+          echo "APPSTORE_VERSION=$version" >> "$GITHUB_ENV"
+          PROVISIONING_PROFILE="$RUNNER_TEMP/Shark.provisionprofile" bash scripts/package-appstore.sh "$version"
 
       - name: Upload to App Store Connect
         if: env.ENABLED == 'true'
@@ -187,6 +192,7 @@ jobs:
           set -euo pipefail
           mkdir -p ~/.private_keys
           printf '%s' "$API_KEY_P8_BASE64" | base64 --decode > ~/.private_keys/AuthKey_${API_KEY_ID}.p8
+          [[ -n "${APPSTORE_VERSION:-}" ]] || { echo "No App Store package was built; nothing to upload"; exit 0; }
           xcrun altool --upload-app -f dist/Shark-*.pkg -t macos --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
 
       - name: Remove signing material
