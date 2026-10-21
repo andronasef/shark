@@ -38,7 +38,7 @@ export const featureGroups: FeatureGroup[] = [
     description: 'A direct route to a folder, a file, or the action you need.',
     features: [
       { id: 'editable-path', title: 'Editable folder paths', description: 'Click through ancestor folders in the location bar or type a path to go directly to a location. Show or hide the path bar from the View menu.', shortcut: '⌘L' },
-      { id: 'folder-history', title: 'Back, forward & up', description: 'Retrace your folder history or go to the enclosing folder with Command-Up.' },
+      { id: 'folder-history', title: 'Back, forward & up', description: 'Retrace your folder history with Command-[ and Command-] (or Option-Left and Option-Right), or go to the enclosing folder with Command-Up.' },
       { id: 'command-palette', title: 'Command palette', description: 'Find actions, common places, recent and frequent folders, saved tab groups, and paths from one keyboard-driven panel.', shortcut: '⌘K' },
       { id: 'instant-filter', title: 'Instant filename filtering', description: 'Narrow the current folder by typing in the toolbar’s search field. Filtering ignores case and accents, and hidden results leave the selection so file actions only affect visible items.' },
       { id: 'type-to-select', title: 'Type to select', description: 'Type a filename to move the selection to a matching item without changing the folder.' },
@@ -102,7 +102,7 @@ export const featureGroups: FeatureGroup[] = [
     id: 'terminal-inspector', title: 'Terminal & inspection',
     description: 'Work with your files, and see what is behind them.',
     features: [
-      { id: 'terminal-drawer', title: 'Built-in terminal', description: 'Open a real interactive terminal beneath your files, with shell input and terminal output in the same window.', shortcut: 'F4' },
+      { id: 'terminal-drawer', title: 'Built-in terminal', description: 'Open a real interactive terminal beneath your files, with shell input and terminal output in the same window. Control-` also toggles it, for keyboards where F4 opens Launchpad.', shortcut: 'F4' },
       { id: 'terminal-sync', title: 'Folder-aware terminal', description: 'The embedded terminal follows the active folder while the shell is at its prompt. It never types into a program that is running, such as an editor.' },
       { id: 'external-terminal', title: 'Open in Terminal', description: 'Open the chosen folder in macOS Terminal, or choose Open in Embedded Terminal to work inside Shark.' },
       { id: 'file-inspector', title: 'File inspector', description: 'Inspect the selected item’s location, size, dates, kind, and owner, group, and POSIX permissions.', shortcut: '⌥⌘I' },

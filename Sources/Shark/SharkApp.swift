@@ -88,11 +88,6 @@ struct ExplorerCommands: Commands {
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
-            Button("New Tab") {
-                workspace.newTab(placement: .end)
-            }
-            .keyboardShortcut("t")
-
             Button("New Folder") {
                 nav.requestedNewItemType = .folder
             }
@@ -213,13 +208,13 @@ struct ExplorerCommands: Commands {
                 let url = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first ?? home.appendingPathComponent("Desktop")
                 nav.navigateTo(url)
             }
-            .keyboardShortcut("d", modifiers: [.command, .option])
+            .keyboardShortcut("d", modifiers: [.command, .shift])
 
             Button("Documents") {
                 let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first ?? home.appendingPathComponent("Documents")
                 nav.navigateTo(url)
             }
-            .keyboardShortcut("o", modifiers: [.command, .option])
+            .keyboardShortcut("o", modifiers: [.command, .shift])
 
             Button("Downloads") {
                 let url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first ?? home.appendingPathComponent("Downloads")
@@ -347,11 +342,6 @@ struct TabCommands: Commands {
         }
 
         CommandMenu("Tab") {
-            Button("New Tab") {
-                workspace.newTab(placement: .end)
-            }
-            .keyboardShortcut("t")
-
             Button("Reopen Closed Tab") {
                 workspace.reopenClosedTab()
             }

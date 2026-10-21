@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Every file operation can now be undone: Trash, drag-and-drop, duplicate, new folder and file, batch rename, and Compress join copy, move, and rename. Undoing something Shark created moves it to the Trash; nothing is permanently deleted.
 - Multi-item operations (paste, drop, Trash, batch rename, copy) are all-or-nothing: if one item fails, the finished ones are put back. Failures show an alert instead of failing silently or replacing the folder view with an error page.
 - Shark has a single window. ⌘N "New Window" is removed: extra windows mirrored the same tabs and panes, and the menus only drove the first one. Use tabs (⌘T) instead.
+- Go › Desktop is now ⇧⌘D and Go › Documents ⇧⌘O, matching Finder. ⌥⌘D clashed with the system Dock shortcut.
+- Back and Forward also work with ⌘[ and ⌘], as the toolbar tooltips already said. The terminal drawer also toggles with ⌃`, for keyboards where F4 opens Launchpad.
 - The subfolder menu lists at most 500 items, with a final item that opens the folder, so huge folders no longer freeze the menu.
 - Calculate Size recalculates on every request instead of showing a stale cached size.
 - Removed the unused hardened-runtime exceptions (JIT, unsigned executable memory, disabled library validation) from the Developer ID build, and the `com.apple.security.inherit` entitlement, which is only for helper tools, from the App Store build.

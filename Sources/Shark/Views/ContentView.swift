@@ -396,20 +396,16 @@ public struct ContentView: View {
                 Button("") {
                     if activeState.selectedItemIDs.count > 1 { showingBatchRenameSheet = true }
                 }.keyboardShortcut("r", modifiers: [.command, .shift])
-                Button("") { activeState.viewMode = .grid }.keyboardShortcut("1", modifiers: .command)
-                Button("") { activeState.viewMode = .details }.keyboardShortcut("2", modifiers: .command)
-                Button("") { activeState.viewMode = .compact }.keyboardShortcut("3", modifiers: .command)
-                Button("") { activeState.viewMode = .gallery }.keyboardShortcut("4", modifiers: .command)
                 Button("") { workspaceState.toggleSplit() }.keyboardShortcut("s", modifiers: [.command, .shift])
                 Button("") { workspaceState.previousTab() }.keyboardShortcut("[", modifiers: [.command, .shift])
                 Button("") { workspaceState.nextTab() }.keyboardShortcut("]", modifiers: [.command, .shift])
                 Button("") { isInspectorVisible.toggle() }.keyboardShortcut("i", modifiers: [.command, .option])
-                Button("") { workspaceState.toggleCommandPalette() }.keyboardShortcut("k", modifiers: .command)
                 Button("") { workspaceState.toggleCommandPalette() }.keyboardShortcut("p", modifiers: [.command, .shift])
-                Button("") { workspaceState.toggleSplit() }.keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF3FunctionKey)!)), modifiers: [])
-                Button("") { toggleTerminalDrawer() }.keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF4FunctionKey)!)), modifiers: [])
+                // F4 often launches Launchpad or Spotlight, so the drawer also has ⌃`.
+                Button("") { toggleTerminalDrawer() }.keyboardShortcut("`", modifiers: .control)
+                Button("") { activeState.goBack() }.keyboardShortcut("[", modifiers: .command)
+                Button("") { activeState.goForward() }.keyboardShortcut("]", modifiers: .command)
                 Button("") { isInspectorVisible.toggle() }.keyboardShortcut(KeyEquivalent(Character(UnicodeScalar(NSF11FunctionKey)!)), modifiers: [])
-                Button("") { activeState.requestedNewItemType = .folder }.keyboardShortcut("n", modifiers: [.command, .shift])
             }
             .opacity(0)
             .allowsHitTesting(false)
