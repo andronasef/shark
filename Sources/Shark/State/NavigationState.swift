@@ -84,6 +84,7 @@ public final class NavigationState {
     public var activeOperationTitle: String? = nil
 
     private let fileSystemService: FileSystemService
+    private var lastRecordedVisit: URL?
 
     public init(
         initialURL: URL? = nil,
@@ -194,7 +195,12 @@ public final class NavigationState {
             // The user may have moved on while a slow folder was listing; drop the stale result.
             guard url == currentURL else { return }
             self.items = fetchedItems
-            RecentFoldersService.shared.recordVisit(to: self.currentURL)
+            // Count a visit once per arrival, not on every refresh (FSEvents reloads would
+            // otherwise rewrite the recents file and inflate Frequent Folders).
+            if lastRecordedVisit != url {
+                lastRecordedVisit = url
+                RecentFoldersService.shared.recordVisit(to: url)
+            }
         } catch {
             guard url == currentURL, !(error is CancellationError) else { return }
             self.errorMessage = error.localizedDescription

@@ -222,6 +222,25 @@ final class DataSafetyTests: XCTestCase {
         XCTAssertFalse(fm.fileExists(atPath: dir.appendingPathComponent("pwned").path))
     }
 
+    func testWatcherIgnoresChangesBelowDirectChildren() async throws {
+        let nested = try folder("sub/deeper")
+        // Let FSEvents flush the folder-creation events above before the stream starts.
+        try await Task.sleep(for: .milliseconds(2000))
+        let changed = expectation(description: "direct child change")
+        changed.assertForOverFulfill = false
+        let watcher = FSEventsWatcher()
+        let calls = OSAllocatedUnfairLock(initialState: 0)
+        watcher.watch(url: dir) { calls.withLock { $0 += 1 }; changed.fulfill() }
+        try await Task.sleep(for: .milliseconds(300))
+
+        _ = try file("deep.txt", in: nested)
+        try await Task.sleep(for: .milliseconds(800))
+        XCTAssertEqual(calls.withLock { $0 }, 0, "Changes two levels down must not reload the folder")
+
+        _ = try file("top.txt")
+        await fulfillment(of: [changed], timeout: 3)
+        watcher.stop()
+    }
 }
 
 extension DataSafetyTests {

@@ -227,13 +227,11 @@ public struct DirectoryView: View {
     }
 
     private func setupFSEventsWatcher() {
-        fseventsWatcher.stop()
-        fseventsWatcher.onChange = { [weak navigationState] in
+        fseventsWatcher.watch(url: navigationState.currentURL) { [weak navigationState] in
             Task { @MainActor in
                 await navigationState?.reloadCurrentDirectory()
             }
         }
-        fseventsWatcher.watch(url: navigationState.currentURL)
     }
 
     // MARK: - Main Content Area
