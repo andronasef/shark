@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The embedded terminal typed its `cd` into whatever program was running (vim, python, psql). It now follows the folder only while the shell is at its prompt.
 - Copy Path › POSIX Quoted Path used double quotes, so a file name containing `$(…)` or backticks ran a command when pasted into a shell. Paths are now single-quoted.
 - The folder watcher could use a freed object if a pane closed while an event was being delivered, and raced on its callback.
+- Session autosave no longer creates a security-scoped bookmark for every pane on every save, which made `bookmarks.json` grow without limit and slowed launch in the sandboxed build.
 - Drag-and-drop no longer forces a move when the source app only allows copying (Safari, Photos, Mail).
 - Compressing a large selection no longer blocks other file operations until the archive is done, and a failed archive leaves no partial ZIP behind.
 - Compress now handles multiple selected items correctly; ditto previously rejected multiple archive sources.

@@ -361,13 +361,9 @@ public final class WorkspaceState {
     }
 
     private func snapshotForTab(_ tab: WorkspaceTab) -> TabSnapshot {
-        var primaryBookmark: Data? = nil
-        var secondaryBookmark: Data? = nil
-        if SecurityScopedBookmarkManager.shared.isSandboxed {
-            primaryBookmark = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: tab.primaryPane.currentURL)
-            secondaryBookmark = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: tab.secondaryPane.currentURL)
-        }
-
+        // No per-pane bookmarks: access comes from the folders the user granted, which the bookmark
+        // manager resolves for any path beneath them. Creating one per autosave grew bookmarks.json
+        // without bound and slowed launch.
         let primarySnap = PaneSnapshot(
             url: tab.primaryPane.currentURL,
             viewMode: String(describing: tab.primaryPane.viewMode),
@@ -375,7 +371,7 @@ public final class WorkspaceState {
             sortAscending: tab.primaryPane.sortAscending,
             showHidden: tab.primaryPane.showHiddenFiles,
             iconSize: tab.primaryPane.iconSize,
-            bookmarkData: primaryBookmark
+            bookmarkData: nil
         )
         let secondarySnap = PaneSnapshot(
             url: tab.secondaryPane.currentURL,
@@ -384,7 +380,7 @@ public final class WorkspaceState {
             sortAscending: tab.secondaryPane.sortAscending,
             showHidden: tab.secondaryPane.showHiddenFiles,
             iconSize: tab.secondaryPane.iconSize,
-            bookmarkData: secondaryBookmark
+            bookmarkData: nil
         )
         return TabSnapshot(
             id: tab.id,
