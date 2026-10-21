@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import SwiftTerm
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -79,6 +80,19 @@ struct HelpCommands: Commands {
     }
 }
 
+/// Sends an editing action to the focused text field or terminal instead of the file list.
+/// The Edit menu's ⌘X/⌘C/⌘V/⌘A/⌘Z/⌘⌫ are file commands here, and menu key equivalents reach the
+/// menu before the field editor, so without this they would move or trash files while typing.
+@MainActor
+func forwardToTextEditor(_ action: Selector) -> Bool {
+    guard let responder = (NSApp.keyWindow ?? NSApp.mainWindow ?? NSApp.windows.first(where: { $0.isVisible }))?.firstResponder,
+          responder is NSText || responder is SwiftTerm.TerminalView else { return false }
+    // Even an unsupported editing action belongs to this responder. Falling through would
+    // turn (for example) an unavailable terminal Undo into an unrelated file undo.
+    _ = NSApp.sendAction(action, to: nil, from: nil)
+    return true
+}
+
 struct ExplorerCommands: Commands {
     let workspace: WorkspaceState
 
@@ -88,6 +102,11 @@ struct ExplorerCommands: Commands {
 
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
+            Button("New Tab") {
+                workspace.newTab(placement: .end)
+            }
+            .keyboardShortcut("t")
+
             Button("New Folder") {
                 nav.requestedNewItemType = .folder
             }
@@ -112,47 +131,50 @@ struct ExplorerCommands: Commands {
             .disabled(nav.selectedItemIDs.isEmpty)
 
             Button("Move to Trash") {
+                if forwardToTextEditor(#selector(NSResponder.deleteToBeginningOfLine(_:))) { return }
                 Task { await nav.trashSelected() }
             }
             .keyboardShortcut(.delete, modifiers: .command)
-            .disabled(nav.selectedItemIDs.isEmpty)
         }
 
         CommandGroup(replacing: .undoRedo) {
+            // Not disabled when the file history is empty: text fields still need ⌘Z.
             Button("Undo \(FileUndoService.shared.currentUndoDescription ?? "")") {
+                if forwardToTextEditor(Selector(("undo:"))) { return }
                 Task { await nav.undo() }
             }
             .keyboardShortcut("z", modifiers: .command)
-            .disabled(!FileUndoService.shared.canUndo)
 
             Button("Redo \(FileUndoService.shared.currentRedoDescription ?? "")") {
+                if forwardToTextEditor(Selector(("redo:"))) { return }
                 Task { await nav.redo() }
             }
             .keyboardShortcut("z", modifiers: [.command, .shift])
-            .disabled(!FileUndoService.shared.canRedo)
         }
 
         CommandGroup(replacing: .pasteboard) {
+            // Never disabled: with a text field focused these edit its text instead.
             Button("Cut") {
+                if forwardToTextEditor(#selector(NSText.cut(_:))) { return }
                 nav.cutSelected()
             }
             .keyboardShortcut("x", modifiers: .command)
-            .disabled(nav.selectedItemIDs.isEmpty)
 
             Button("Copy") {
+                if forwardToTextEditor(#selector(NSText.copy(_:))) { return }
                 nav.copySelected()
             }
             .keyboardShortcut("c", modifiers: .command)
-            .disabled(nav.selectedItemIDs.isEmpty)
 
             Button("Paste") {
+                if forwardToTextEditor(#selector(NSText.paste(_:))) { return }
                 Task { await nav.paste() }
             }
             .keyboardShortcut("v", modifiers: .command)
-            .disabled(!FileClipboardService.shared.hasItemsToPaste)
 
             Button("Select All") {
-                nav.selectedItemIDs = Set(nav.items.map(\.url))
+                if forwardToTextEditor(#selector(NSText.selectAll(_:))) { return }
+                nav.selectAll()
             }
             .keyboardShortcut("a", modifiers: .command)
 
@@ -169,18 +191,21 @@ struct ExplorerCommands: Commands {
 
         CommandMenu("Go") {
             Button("Back") {
+                if forwardToTextEditor(#selector(NSResponder.moveWordLeft(_:))) { return }
                 nav.goBack()
             }
             .keyboardShortcut(.leftArrow, modifiers: .option)
             .disabled(!nav.canGoBack)
 
             Button("Forward") {
+                if forwardToTextEditor(#selector(NSResponder.moveWordRight(_:))) { return }
                 nav.goForward()
             }
             .keyboardShortcut(.rightArrow, modifiers: .option)
             .disabled(!nav.canGoForward)
 
             Button("Enclosing Folder") {
+                if forwardToTextEditor(#selector(NSResponder.moveToBeginningOfDocument(_:))) { return }
                 nav.goUp()
             }
             .keyboardShortcut(.upArrow, modifiers: .command)

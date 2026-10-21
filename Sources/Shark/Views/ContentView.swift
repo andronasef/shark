@@ -392,7 +392,6 @@ public struct ContentView: View {
         .background {
             Group {
                 Button("") { triggerQuickLook() }.keyboardShortcut(.space, modifiers: [])
-                Button("") { trashSelectedItems() }.keyboardShortcut(.delete, modifiers: .command)
                 Button("") {
                     if activeState.selectedItemIDs.count > 1 { showingBatchRenameSheet = true }
                 }.keyboardShortcut("r", modifiers: [.command, .shift])

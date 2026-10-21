@@ -84,7 +84,7 @@ export const featureGroups: FeatureGroup[] = [
     description: 'The familiar essentials, with room for the bigger jobs.',
     features: [
       { id: 'new-items', title: 'New folders & files', description: 'Create a folder or a new file directly in the location you are browsing. Command-Shift-N creates a folder.' },
-      { id: 'clipboard', title: 'Cut, copy & paste', description: 'Use Command-X, Command-C, and Command-V to move or copy files between folders. Cut items are dimmed so you can see what is ready to move. Pasting never replaces an existing item: copies get a “copy” name, and a move onto an existing name is refused.' },
+      { id: 'clipboard', title: 'Cut, copy & paste', description: 'Use Command-X, Command-C, and Command-V to move or copy files between folders. Cut items are dimmed so you can see what is ready to move. Pasting never replaces an existing item: copies get a “copy” name, and a move onto an existing name is refused. In text fields, these keys edit the text as usual.' },
       { id: 'drag-drop', title: 'Drag & drop', description: 'Move files between panes or into folders. Like Finder, a drop moves within a disk and copies to another disk. Hold Option to copy or Command to move.' },
       { id: 'rename', title: 'Inline rename', description: 'Change a file or folder name in place.', shortcut: 'F2' },
       { id: 'batch-rename', title: 'Batch rename with a preview', description: 'Find and replace text, add a prefix or suffix, or apply sequential numbering to a selection. Review the new names before applying them. Shark renames all items or none, and refuses names that collide or contain “/” or “:”.' },

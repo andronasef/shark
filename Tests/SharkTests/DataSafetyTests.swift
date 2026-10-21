@@ -335,6 +335,22 @@ extension DataSafetyTests {
 }
 
 extension DataSafetyTests {
+    func testUnhandledTextEditingActionDoesNotFallThroughToFiles() {
+        _ = NSApplication.shared
+        let previousPolicy = NSApp.activationPolicy()
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+        defer { NSApp.setActivationPolicy(previousPolicy) }
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 200, height: 100), styleMask: [.titled], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        let editor = NSTextView(frame: window.contentView!.bounds)
+        window.contentView = editor
+        window.makeKeyAndOrderFront(nil)
+        window.makeFirstResponder(editor)
+        XCTAssertTrue(window.firstResponder is NSText, "Fixture must focus the text editor")
+        defer { window.close() }
+        XCTAssertTrue(forwardToTextEditor(Selector(("sharkUnsupportedEditingAction:"))), "An unsupported text action must still consume the file shortcut")
+    }
 }
 
 extension DataSafetyTests {
