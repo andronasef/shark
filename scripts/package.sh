@@ -17,6 +17,9 @@ if [[ "${REQUIRE_NOTARIZATION:-0}" == 1 || -n "${NOTARY_APPLE_ID:-}${NOTARY_TEAM
   notarize=1
 fi
 
+# stapler talks to Apple's CloudKit, which drops connections now and then.
+retry() { local n; for n in 1 2 3 4 5; do "$@" && return 0; echo "Attempt $n failed: $*" >&2; sleep $((n * 10)); done; return 1; }
+
 echo "Packaging Shark v$version..."
 
 # Keep release products separate from the development app and hot reload flags.
@@ -111,8 +114,8 @@ if [[ "$notarize" == 1 ]]; then
   xcrun notarytool submit "$archive" --wait \
     --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" --password "$NOTARY_PASSWORD"
   echo "Notarization completed successfully. Stapling ticket..."
-  xcrun stapler staple "$app"
-  xcrun stapler validate "$app"
+  retry xcrun stapler staple "$app"
+  retry xcrun stapler validate "$app"
   spctl --assess --type execute --verbose=2 "$app"
 fi
 # Drag-to-Applications installer, built from the final (stapled) app.
@@ -127,8 +130,8 @@ fi
 if [[ "$notarize" == 1 ]]; then
   xcrun notarytool submit "$dmg" --wait \
     --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" --password "$NOTARY_PASSWORD"
-  xcrun stapler staple "$dmg"
-  xcrun stapler validate "$dmg"
+  retry xcrun stapler staple "$dmg"
+  retry xcrun stapler validate "$dmg"
 fi
 
 # Replace only this package, leaving other release artifacts intact.
