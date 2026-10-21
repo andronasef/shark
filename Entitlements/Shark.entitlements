@@ -23,9 +23,5 @@
     <!-- Outgoing network client for remote disk mounts and network shares -->
     <key>com.apple.security.network.client</key>
     <true/>
-
-    <!-- Child process sandbox inheritance -->
-    <key>com.apple.security.inherit</key>
-    <true/>
 </dict>
 </plist>
