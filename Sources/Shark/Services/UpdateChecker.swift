@@ -97,7 +97,19 @@ enum InstallChannel: Sendable {
 enum UpdateChecker {
     private static let releasesAPI = URL(string: "https://api.github.com/repos/andronasef/shark/releases?per_page=10")!
     private static let releasesPage = URL(string: "https://github.com/andronasef/shark/releases")!
+    private static let appStoreLookup = URL(string: "https://itunes.apple.com/lookup?bundleId=com.increasinglabs.shark")!
     private static let skippedVersionKey = "skippedUpdateVersion"
+    private static let lastCheckKey = "lastUpdateCheck"
+    /// A constant: network-derived text never reaches the pasteboard.
+    private static let brewCommand = "brew upgrade --cask shark"
+
+    private struct AppStoreLookup: Decodable {
+        struct Result: Decodable {
+            let version: String
+            let trackViewUrl: URL
+        }
+        let results: [Result]
+    }
 
     nonisolated static func channel(hasReceipt: Bool, hasCask: Bool) -> InstallChannel {
         hasReceipt ? .appStore : hasCask ? .homebrew : .dmg
@@ -123,6 +135,23 @@ enum UpdateChecker {
         Task { await check(manual: true) }
     }
 
+    /// The launch check: at most once a day, only when enabled, and silent unless an update is available.
+    static func checkAutomatically() {
+        guard SharkSettings.shared.automaticallyCheckForUpdates, currentVersion != nil else { return }
+        let defaults = UserDefaults.standard
+        if let last = defaults.object(forKey: lastCheckKey) as? Date, Date().timeIntervalSince(last) < 24 * 60 * 60 { return }
+        // Stamped before fetching so a failing network still checks at most once a day.
+        defaults.set(Date(), forKey: lastCheckKey)
+        Task { await check(manual: false) }
+    }
+
+    private static var installChannel: InstallChannel {
+        let fileManager = FileManager.default
+        let hasReceipt = Bundle.main.appStoreReceiptURL.map { fileManager.fileExists(atPath: $0.path) } ?? false
+        let hasCask = ["/opt/homebrew/Caskroom/shark", "/usr/local/Caskroom/shark"].contains { fileManager.fileExists(atPath: $0) }
+        return channel(hasReceipt: hasReceipt, hasCask: hasCask)
+    }
+
     private static func check(manual: Bool) async {
         guard let current = currentVersion else {
             if manual {
@@ -131,17 +160,32 @@ enum UpdateChecker {
             }
             return
         }
+        let channel = installChannel
         do {
-            let releases = try await fetch([GitHubRelease].self, from: releasesAPI, accept: "application/vnd.github+json")
-            guard let release = newestRelease(in: releases, newerThan: current),
-                  let latest = SemanticVersion(release.tagName) else {
+            guard let update = try await newestUpdate(for: channel, current: current) else {
                 if manual { showInfo("You’re up to date", "Shark \(current) is the newest version.") }
                 return
             }
-            showUpdateAlert(latest: latest, current: current, channel: .dmg, actionURL: release.downloadURL)
+            // Only the automatic check honours a skipped version.
+            if !manual, UserDefaults.standard.string(forKey: skippedVersionKey) == update.version.description { return }
+            showUpdateAlert(latest: update.version, current: current, channel: channel, actionURL: update.url)
         } catch {
             if manual { NSAlert(error: error).runModal() }
         }
+    }
+
+    private static func newestUpdate(for channel: InstallChannel,
+                                     current: SemanticVersion) async throws -> (version: SemanticVersion, url: URL)? {
+        if channel == .appStore {
+            let lookup = try await fetch(AppStoreLookup.self, from: appStoreLookup)
+            guard let result = lookup.results.first, let version = SemanticVersion(result.version),
+                  version > current else { return nil }
+            return (version, result.trackViewUrl)
+        }
+        let releases = try await fetch([GitHubRelease].self, from: releasesAPI, accept: "application/vnd.github+json")
+        guard let release = newestRelease(in: releases, newerThan: current),
+              let version = SemanticVersion(release.tagName) else { return nil }
+        return (version, release.downloadURL)
     }
 
     private static func fetch<T: Decodable>(_ type: T.Type, from url: URL, accept: String? = nil) async throws -> T {
@@ -157,17 +201,41 @@ enum UpdateChecker {
         let alert = NSAlert()
         alert.messageText = "Shark \(latest) is available"
         alert.informativeText = "You have \(current)."
-        alert.addButton(withTitle: "Download")
+        switch channel {
+        case .appStore:
+            alert.addButton(withTitle: "Open App Store")
+        case .homebrew:
+            alert.informativeText += " Run \(brewCommand) in Terminal to update."
+            alert.addButton(withTitle: "Copy Command")
+        case .dmg:
+            alert.addButton(withTitle: "Download")
+        }
         alert.addButton(withTitle: "Skip This Version")
         alert.addButton(withTitle: "Later")
 
         switch alert.runModal() {
         case .alertFirstButtonReturn:
-            openHTTPS(actionURL)
+            performAction(for: channel, url: actionURL)
         case .alertSecondButtonReturn:
             UserDefaults.standard.set(latest.description, forKey: skippedVersionKey)
         default:
             break
+        }
+    }
+
+    private static func performAction(for channel: InstallChannel, url: URL) {
+        switch channel {
+        case .homebrew:
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(brewCommand, forType: .string)
+        case .appStore:
+            guard url.scheme == "https" else { return openHTTPS(url) }
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            components?.scheme = "macappstore"
+            if let storeURL = components?.url, NSWorkspace.shared.open(storeURL) { return }
+            NSWorkspace.shared.open(url)
+        case .dmg:
+            openHTTPS(url)
         }
     }
 

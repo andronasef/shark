@@ -59,6 +59,13 @@ public struct SettingsView: View {
                 Toggle("Show hidden files and dotfiles by default", isOn: $settings.showHiddenFilesByDefault)
                 Toggle("Enable Liquid Glass translucency and vibrancy", isOn: $settings.liquidGlassTranslucency)
             }
+
+            Section("Updates") {
+                Toggle("Automatically check for updates", isOn: $settings.automaticallyCheckForUpdates)
+                Text("Shark checks once a day and only shows an alert. You can always use Shark › Check for Updates…")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .formStyle(.grouped)
     }

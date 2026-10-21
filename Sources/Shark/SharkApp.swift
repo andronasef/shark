@@ -25,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DragOperationPatcher.install()
         // Initialize Firebase Analytics & Crashlytics
         TelemetryService.shared.initialize()
+        UpdateChecker.checkAutomatically()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

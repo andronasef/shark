@@ -59,6 +59,7 @@ public final class SharkSettings: ObservableObject {
     @AppStorage("liquidGlassTranslucency") public var liquidGlassTranslucency: Bool = true
     @AppStorage("isAnalyticsEnabled") public var isAnalyticsEnabled: Bool = true
     @AppStorage("isCrashReportingEnabled") public var isCrashReportingEnabled: Bool = true
+    @AppStorage("automaticallyCheckForUpdates") public var automaticallyCheckForUpdates: Bool = true
 
     private init() {}
 }
