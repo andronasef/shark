@@ -43,34 +43,37 @@ public enum DragOperationPatcher {
     }
 }
 
+/// Move by default and copy with ⌥, but never an operation the drag source doesn't offer
+/// (Safari, Photos and Mail only allow copying); forcing one would reject or break the drop.
+@MainActor
+private func preferredOperation(original: NSDragOperation, sourceMask: NSDragOperation?) -> NSDragOperation {
+    guard original != [] else { return [] }
+    let wanted: NSDragOperation = NSEvent.modifierFlags.contains(.option) ? .copy : .move
+    guard let mask = sourceMask else { return wanted }
+    return mask.contains(wanted) ? wanted : original
+}
+
 extension NSView {
     @objc func shark_draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        let op = self.shark_draggingEntered(sender)
-        guard op != [] else { return [] }
-        return NSEvent.modifierFlags.contains(.option) ? .copy : .move
+        preferredOperation(original: self.shark_draggingEntered(sender), sourceMask: sender.draggingSourceOperationMask)
     }
 
     @objc func shark_draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
-        let op = self.shark_draggingUpdated(sender)
-        guard op != [] else { return [] }
-        return NSEvent.modifierFlags.contains(.option) ? .copy : .move
+        preferredOperation(original: self.shark_draggingUpdated(sender), sourceMask: sender.draggingSourceOperationMask)
     }
 }
 
 extension NSObject {
-    @objc func shark_setLastDragDestinationOperation(_ operation: UInt) {
-        var op = operation
-        if op != 0 {
-            let isAlt = NSEvent.modifierFlags.contains(.option)
-            op = isAlt ? NSDragOperation.copy.rawValue : NSDragOperation.move.rawValue
-        }
-        self.shark_setLastDragDestinationOperation(op)
+    // Drag destinations are only driven on the main thread.
+    // NSDragDestination is the NSDraggingInfo passed to drop targets, so it knows the source mask.
+    @MainActor @objc func shark_setLastDragDestinationOperation(_ operation: UInt) {
+        let mask = (self as? NSDraggingInfo)?.draggingSourceOperationMask
+        let op = preferredOperation(original: NSDragOperation(rawValue: operation), sourceMask: mask)
+        self.shark_setLastDragDestinationOperation(op.rawValue)
     }
 
-    @objc func shark_lastDragDestinationOperation() -> UInt {
-        let orig = self.shark_lastDragDestinationOperation()
-        guard orig != 0 else { return 0 }
-        let isAlt = NSEvent.modifierFlags.contains(.option)
-        return isAlt ? NSDragOperation.copy.rawValue : NSDragOperation.move.rawValue
+    @MainActor @objc func shark_lastDragDestinationOperation() -> UInt {
+        let mask = (self as? NSDraggingInfo)?.draggingSourceOperationMask
+        return preferredOperation(original: NSDragOperation(rawValue: self.shark_lastDragDestinationOperation()), sourceMask: mask).rawValue
     }
 }
