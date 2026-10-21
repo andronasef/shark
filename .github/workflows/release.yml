@@ -173,12 +173,9 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$PROVISIONING_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/Shark.provisionprofile"
-          # The App Store only accepts digits and dots: v1.0.0-alpha.N uploads as 0.0.N, v1.2.3 as 1.2.3.
+          # The App Store only accepts digits and dots, so v1.0.0-alpha.N uploads as another build of 1.0.0.
           version="${GITHUB_REF_NAME#v}"
-          if [[ "$version" == *-* ]]; then
-            [[ "$version" =~ \.([0-9]+)$ ]] || { echo "::warning::$GITHUB_REF_NAME has no trailing number (e.g. -alpha.1); skipping the App Store upload"; exit 0; }
-            version="0.0.${BASH_REMATCH[1]}"
-          fi
+          version="${version%%-*}"
           echo "APPSTORE_VERSION=$version" >> "$GITHUB_ENV"
           PROVISIONING_PROFILE="$RUNNER_TEMP/Shark.provisionprofile" bash scripts/package-appstore.sh "$version"
 

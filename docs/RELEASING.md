@@ -63,7 +63,7 @@ The script stops when credentials are missing, notarization is rejected, staplin
 
 On every `v*` tag the `appstore` job runs `scripts/package-appstore.sh`, which builds the sandboxed app (`Entitlements/Shark.entitlements`), signs it with Apple Distribution, wraps it in a Mac Installer-signed `.pkg`, and uploads it with `xcrun altool`. It does nothing until `APPSTORE_P12_BASE64` exists, so DMG-only releases keep working.
 
-Versions: the App Store only accepts digits and dots, so alpha tags map to `0.0.N` (`v1.0.0-alpha.1` uploads as `0.0.1`, `-alpha.2` as `0.0.2`) and stable tags keep their version. A prerelease tag with no trailing number skips the upload. The build number (`CFBundleVersion`) is the workflow run number, which always increases.
+Versions: the App Store only accepts digits and dots, so a prerelease tag uploads as another build of its base version (`v1.0.0-alpha.2` is a new 1.0.0 build; the alpha name stays on GitHub). The build number (`CFBundleVersion`) is the workflow run number, which always increases.
 
 Repository secrets:
 
