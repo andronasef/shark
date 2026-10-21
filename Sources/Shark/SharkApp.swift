@@ -65,6 +65,10 @@ struct HelpCommands: Commands {
     @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") { UpdateChecker.checkNow() }
+        }
+
         CommandGroup(replacing: .help) {
             Button("Shark Help") { openWindow(id: "help") }
                 .keyboardShortcut("?", modifiers: .command)
