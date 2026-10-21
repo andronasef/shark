@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import Observation
 import SwiftTerm
 
@@ -32,12 +33,18 @@ public final class PTYSession {
         }
     }
 
+    /// Types a `cd` into the shell, but only while the shell itself owns the terminal. When a
+    /// program such as vim or psql is in the foreground the keystrokes would go to that program,
+    /// so the drawer keeps its old directory instead.
     public func syncDirectory(to directory: URL) {
-        currentWorkingDirectory = directory
-        if let terminalView {
-            let command = "\u{15}" + Self.directoryChangeCommand(to: directory)
-            terminalView.process.send(data: ArraySlice(command.utf8))
+        guard let terminalView else {
+            currentWorkingDirectory = directory
+            return
         }
+        guard let process = terminalView.process, process.running, tcgetpgrp(process.childfd) == process.shellPid else { return }
+        currentWorkingDirectory = directory
+        let command = "\u{15}" + Self.directoryChangeCommand(to: directory)
+        process.send(data: ArraySlice(command.utf8))
     }
 
     static func directoryChangeCommand(to directory: URL) -> String {

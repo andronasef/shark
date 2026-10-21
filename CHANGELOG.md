@@ -17,8 +17,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- The embedded terminal typed its `cd` into whatever program was running (vim, python, psql). It now follows the folder only while the shell is at its prompt.
 - Copy Path › POSIX Quoted Path used double quotes, so a file name containing `$(…)` or backticks ran a command when pasted into a shell. Paths are now single-quoted.
 - Drag-and-drop no longer forces a move when the source app only allows copying (Safari, Photos, Mail).
+- The terminal view no longer writes model state on every SwiftUI update.
 
 ## [1.0.0-alpha.1] - 2026-10-21
 

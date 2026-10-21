@@ -104,7 +104,7 @@ export const featureGroups: FeatureGroup[] = [
     description: 'Work with your files, and see what is behind them.',
     features: [
       { id: 'terminal-drawer', title: 'Built-in terminal', description: 'Open a real interactive terminal beneath your files, with shell input and terminal output in the same window.', shortcut: 'F4' },
-      { id: 'terminal-sync', title: 'Folder-aware terminal', description: 'The embedded terminal follows the active folder, keeping shell work and file browsing in context.' },
+      { id: 'terminal-sync', title: 'Folder-aware terminal', description: 'The embedded terminal follows the active folder while the shell is at its prompt. It never types into a program that is running, such as an editor.' },
       { id: 'external-terminal', title: 'Open in Terminal', description: 'Open the chosen folder in macOS Terminal, or choose Open in Embedded Terminal to work inside Shark.' },
       { id: 'file-inspector', title: 'File inspector', description: 'Inspect the selected item’s location, size, dates, kind, and owner, group, and POSIX permissions.', shortcut: '⌥⌘I' },
       { id: 'image-dimensions', title: 'Image dimensions', description: 'Check the pixel dimensions of supported images in the inspector.' },

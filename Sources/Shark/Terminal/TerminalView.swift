@@ -29,6 +29,9 @@ public struct TerminalView: NSViewRepresentable {
     }
 
     public func updateNSView(_ nsView: LocalProcessTerminalView, context: Context) {
-        session.attach(terminalView: nsView)
+        // Writing observable state during a view update re-invalidates the view; attach only once.
+        if session.terminalView !== nsView {
+            session.attach(terminalView: nsView)
+        }
     }
 }
