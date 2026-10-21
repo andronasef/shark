@@ -13,7 +13,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", from: "1.0.7"),
+        .package(url: "https://github.com/migueldeicaza/SwiftTerm.git", "1.0.7"..<"1.19.0"),
         .package(url: "https://github.com/krzysztofzablocki/Inject.git", from: "1.2.4"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "11.0.0")
     ],
