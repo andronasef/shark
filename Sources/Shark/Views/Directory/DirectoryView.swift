@@ -388,6 +388,7 @@ public struct DirectoryView: View {
                         .onTapGesture(count: 2) {
                             handleActivate(item)
                         }
+                        .fileItemAccessibility(item, isSelected: isSelected) { handleActivate(item) }
                         .onMiddleClick {
                             if item.isNavigableDirectory {
                                 workspace?.open(item.url, from: navigationState, newTab: true)
@@ -742,5 +743,17 @@ extension String {
         guard limit > 1, count > limit else { return self }
         let head = limit / 2
         return prefix(head) + "…" + suffix(limit - 1 - head)
+    }
+}
+
+extension View {
+    /// Makes a custom file cell readable and openable with VoiceOver.
+    func fileItemAccessibility(_ item: FileItem, isSelected: Bool, isRenaming: Bool = false, onOpen: @escaping () -> Void) -> some View {
+        // While renaming, the text field inside must stay reachable.
+        accessibilityElement(children: isRenaming ? .contain : .ignore)
+            .accessibilityLabel(item.name)
+            .accessibilityValue(item.isDirectory ? "Folder" : item.kindDescription)
+            .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+            .accessibilityAction { onOpen() }
     }
 }

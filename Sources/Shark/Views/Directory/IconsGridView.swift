@@ -133,6 +133,9 @@ public struct IconsGridView: View {
                                 contextMenuBuilder(item)
                             }
                             .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
+                            .fileItemAccessibility(item, isSelected: isSelected, isRenaming: navigationState.renamingItemURL == item.url) {
+                                onActivate(item)
+                            }
                         }
                     }
                     .padding(20)
