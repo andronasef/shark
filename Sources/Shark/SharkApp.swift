@@ -356,6 +356,7 @@ struct TabCommands: Commands {
     var body: some Commands {
         CommandGroup(replacing: .saveItem) {
             Button("Close Tab") {
+                if workspace.activeTab.isLocked { NSSound.beep(); return }
                 workspace.closeTab(id: workspace.activeTabID)
             }
             .keyboardShortcut("w")

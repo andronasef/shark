@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Shark has a single window. ⌘N "New Window" is removed: extra windows mirrored the same tabs and panes, and the menus only drove the first one. Use tabs (⌘T) instead.
 - Go › Desktop is now ⇧⌘D and Go › Documents ⇧⌘O, matching Finder. ⌥⌘D clashed with the system Dock shortcut.
 - Back and Forward also work with ⌘[ and ⌘], as the toolbar tooltips already said. The terminal drawer also toggles with ⌃`, for keyboards where F4 opens Launchpad.
+- Locked tabs can no longer be closed with ⌘W or a tab's close button, matching Close Other Tabs.
 - The subfolder menu lists at most 500 items, with a final item that opens the folder, so huge folders no longer freeze the menu.
 - Calculate Size recalculates on every request instead of showing a stale cached size.
 - Removed the unused hardened-runtime exceptions (JIT, unsigned executable memory, disabled library validation) from the Developer ID build, and the `com.apple.security.inherit` entitlement, which is only for helper tools, from the App Store build.

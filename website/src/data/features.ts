@@ -25,7 +25,7 @@ export const featureGroups: FeatureGroup[] = [
     features: [
       { id: 'folder-tabs', title: 'Folder tabs', description: 'Open folders in separate tabs, duplicate a tab, and close one, the others, or everything to its right.', shortcut: '⌘T' },
       { id: 'split-panes', title: 'Side-by-side panes', description: 'Browse two locations in one tab. Each pane keeps its own folder and view, and file actions follow the active pane.', shortcut: 'F3' },
-      { id: 'tab-organization', title: 'Reorder, pin, lock & color', description: 'Drag tabs into order, pin frequently used folders, lock a tab’s location, and choose a color to distinguish it.' },
+      { id: 'tab-organization', title: 'Reorder, pin, lock & color', description: 'Drag tabs into order, pin frequently used folders, lock a tab so its location stays put and it can’t be closed by accident, and choose a color to distinguish it.' },
       { id: 'reopen-tabs', title: 'Reopen closed tabs', description: 'Bring back a closed tab or choose one from the Recently Closed menu.', shortcut: '⇧⌘T' },
       { id: 'tab-groups', title: 'Saved tab groups', description: 'Save a set of tabs as a named group. Restore it as your workspace or append it to your open tabs.' },
       { id: 'session-restore', title: 'Session restore', description: 'Return to your saved tabs and pane layout when you reopen Shark.' },

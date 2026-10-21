@@ -180,8 +180,9 @@ public final class WorkspaceState {
         activeTabID = copy.id
     }
 
+    /// Locked tabs stay open, matching Close Other Tabs and Close Tabs to the Right.
     public func closeTab(id: UUID) {
-        guard let index = tabs.firstIndex(where: { $0.id == id }) else { return }
+        guard let index = tabs.firstIndex(where: { $0.id == id }), !tabs[index].isLocked else { return }
         let tabToClose = tabs[index]
 
         let snap = snapshotForTab(tabToClose)
