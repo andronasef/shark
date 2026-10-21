@@ -42,8 +42,10 @@ public struct ContentView: View {
 
     @ToolbarContentBuilder
     private var finderToolbar: some ToolbarContent {
-        ToolbarItem(id: "nav-history", placement: .navigation) {
-            HStack(alignment: .top, spacing: 14) {
+        // AppKit must place these together while the restored window is first measured.
+        // Separate navigation items can straddle the sidebar tracking separator at launch.
+        ToolbarItem(id: "navigation-location", placement: .navigation) {
+            HStack(alignment: .top, spacing: 8) {
                 FinderToolbarCaption("Navigation") {
                     HStack(spacing: 0) {
                         Button { activeState.goBack() } label: {
@@ -78,25 +80,22 @@ public struct ContentView: View {
                             .disabled(!activeState.canGoUp)
                     }
                 }
-            }
-        }
-        .finderChromeItem()
 
-        // Left-aligned beside Navigation, taking all the width the other toolbar items leave.
-        ToolbarItem(id: "location", placement: .navigation) {
-            Group {
-                if activeState.isBottomPathBarVisible || activeState.isEditingPath {
-                    FinderToolbarCaption("Location") {
-                        BottomPathBarView(navigationState: activeState, workspace: workspaceState, inToolbar: true)
+                // Left-aligned beside Navigation, using the remaining toolbar width.
+                Group {
+                    if activeState.isBottomPathBarVisible || activeState.isEditingPath {
+                        FinderToolbarCaption("Location") {
+                            BottomPathBarView(navigationState: activeState, workspace: workspaceState, inToolbar: true)
+                        }
+                    } else {
+                        Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
+                            .font(.system(size: 13, weight: .semibold))
+                            .lineLimit(1)
+                            .frame(height: 28)
                     }
-                } else {
-                    Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
-                        .font(.system(size: 13, weight: .semibold))
-                        .lineLimit(1)
-                        .frame(height: 28)
                 }
+                .frame(width: locationWidth)
             }
-            .frame(width: locationWidth)
         }
         .finderChromeItem()
 

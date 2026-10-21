@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Keep Navigation and Location together in one toolbar item to prevent independent placement across the sidebar boundary during launch.
 - Multi-folder ZIP archives preserve each selected folder and files with the same name inside different folders.
 - Undo and redo requests run one at a time; newer file actions invalidate pending redo history, and clearing history cannot be undone by an in-flight completion.
 - **Data loss:** Cut (⌘X) and Paste (⌘V) into the same folder permanently deleted the file. Pasting a cut item over an existing name (including one that differs only by case) permanently deleted the existing item. Paste now never overwrites: a cut pasted back into its own folder does nothing, and a move onto an existing name is refused.
