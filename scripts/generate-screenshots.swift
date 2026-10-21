@@ -1,194 +1,139 @@
+// Renders the App Store (2880x1800) and Product Hunt (2560x1440) slides from docs/screenshots/.
+// Run from the repo root: swift scripts/generate-screenshots.swift
 import Cocoa
 import WebKit
 
-struct ScreenshotConfig {
+struct Slide {
     let filename: String
     let headline: String
-    let glowColor1: String
-    let glowColor2: String
-    let shadowGlow: String
-    let sourceImage: String
+    let source: String
+    // Wallpaper colours: deep base, then three light blooms.
+    let base: String
+    let blooms: [String]
 }
 
-let configs: [ScreenshotConfig] = [
-    ScreenshotConfig(
-        filename: "01-tabs-and-split.png",
-        headline: "Browse two folders side by side<br>with infinite tabs",
-        glowColor1: "rgba(38, 140, 255, 0.40)",
-        glowColor2: "rgba(14, 165, 233, 0.22)",
-        shadowGlow: "rgba(14, 165, 233, 0.28)",
-        sourceImage: "docs/screenshots/tabs-and-split.png"
-    ),
-    ScreenshotConfig(
-        filename: "02-hover-preview.png",
-        headline: "Preview documents, code, and media<br>without opening them",
-        glowColor1: "rgba(251, 113, 133, 0.40)",
-        glowColor2: "rgba(249, 115, 22, 0.22)",
-        shadowGlow: "rgba(244, 63, 94, 0.28)",
-        sourceImage: "docs/screenshots/hover-preview.png"
-    ),
-    ScreenshotConfig(
-        filename: "03-subfolder-navigation.png",
-        headline: "Fly through nested folders<br>at the speed of thought",
-        glowColor1: "rgba(168, 85, 247, 0.40)",
-        glowColor2: "rgba(99, 102, 241, 0.22)",
-        shadowGlow: "rgba(147, 51, 234, 0.28)",
-        sourceImage: "docs/screenshots/subfolder-menu.png"
-    ),
-    ScreenshotConfig(
-        filename: "04-integrated-terminal.png",
-        headline: "An integrated terminal<br>synced to your active folder",
-        glowColor1: "rgba(16, 185, 129, 0.40)",
-        glowColor2: "rgba(52, 211, 153, 0.22)",
-        shadowGlow: "rgba(16, 185, 129, 0.28)",
-        sourceImage: "docs/screenshots/terminal.png"
-    )
+struct Target {
+    let width: Int
+    let height: Int
+    let headlineSize: Int
+    let paddingTop: Int
+    let gap: Int
+    let windowWidth: Int
+    let outputDirs: [String]
+}
+
+let slides = [
+    Slide(filename: "01-tabs-and-split.png",
+          headline: "Two folders.<br>One window.",
+          source: "docs/screenshots/tabs-and-split.png",
+          base: "#0A1A4A", blooms: ["#3B82F6", "#22D3EE", "#8B5CF6"]),
+    Slide(filename: "02-hover-preview.png",
+          headline: "Peek inside any file<br>without opening it",
+          source: "docs/screenshots/hover-preview.png",
+          base: "#3A0D2E", blooms: ["#F97316", "#F43F5E", "#FBBF24"]),
+    Slide(filename: "03-list-view.png",
+          headline: "Every file,<br>sized and sorted",
+          source: "docs/screenshots/list-view.png",
+          base: "#1E1046", blooms: ["#A855F7", "#6366F1", "#EC4899"]),
+    Slide(filename: "04-integrated-terminal.png",
+          headline: "A terminal that follows<br>your folder",
+          source: "docs/screenshots/terminal.png",
+          base: "#052E2B", blooms: ["#10B981", "#84CC16", "#06B6D4"]),
 ]
 
-func generateHTML(config: ScreenshotConfig, base64Image: String) -> String {
+let targets = [
+    Target(width: 1440, height: 900, headlineSize: 56, paddingTop: 64, gap: 40, windowWidth: 1200,
+           outputDirs: ["docs/appstore-screenshots", "dist/screenshots"]),
+    Target(width: 1280, height: 720, headlineSize: 46, paddingTop: 44, gap: 30, windowWidth: 980,
+           outputDirs: ["docs/producthunt", "dist/producthunt"]),
+]
+
+func html(_ slide: Slide, _ target: Target, image: String) -> String {
+    let b = slide.blooms
     return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset="utf-8">
-    <style>
+    <!DOCTYPE html><html><head><meta charset="utf-8"><style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
-        width: 1440px;
-        height: 900px;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 68px;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", "Helvetica Neue", sans-serif;
+        width: \(target.width)px; height: \(target.height)px; overflow: hidden;
+        display: flex; flex-direction: column; align-items: center;
+        padding-top: \(target.paddingTop)px;
+        font-family: -apple-system, "SF Pro Display", sans-serif;
         -webkit-font-smoothing: antialiased;
-        background: #06080D;
+        background:
+          radial-gradient(ellipse 70% 55% at 12% 18%, \(b[0]) 0%, transparent 70%),
+          radial-gradient(ellipse 60% 50% at 88% 30%, \(b[1]) 0%, transparent 70%),
+          radial-gradient(ellipse 90% 60% at 50% 105%, \(b[2]) 0%, transparent 70%),
+          \(slide.base);
       }
-      .grid-pattern {
-        position: absolute;
-        inset: 0;
-        background-image: 
-          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-        background-size: 48px 48px;
-        mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 80%);
-        pointer-events: none;
+      /* A soft wave band, like the macOS wallpapers. */
+      body::before {
+        content: ""; position: absolute; inset: -20%;
+        background: radial-gradient(ellipse 60% 22% at 50% 62%, rgba(255,255,255,0.16), transparent 70%);
+        transform: rotate(-8deg); filter: blur(30px);
       }
-      .aurora-glow {
-        position: absolute;
-        top: 140px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 1150px;
-        height: 520px;
-        background: radial-gradient(ellipse at 50% 30%, \(config.glowColor1) 0%, \(config.glowColor2) 45%, transparent 75%);
-        filter: blur(85px);
-        pointer-events: none;
+      body::after {
+        content: ""; position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.22), transparent 35%);
       }
-      .headline {
-        position: relative;
-        z-index: 10;
-        font-size: 50px;
-        font-weight: 700;
-        letter-spacing: -0.035em;
-        line-height: 1.15;
-        text-align: center;
-        max-width: 960px;
-        background: linear-gradient(180deg, #FFFFFF 20%, #CBD5E1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 46px;
-        filter: drop-shadow(0 2px 20px rgba(255, 255, 255, 0.15));
+      h1 {
+        position: relative; z-index: 1;
+        color: #fff; text-align: center;
+        font-size: \(target.headlineSize)px; font-weight: 700;
+        letter-spacing: -0.03em; line-height: 1.08;
+        text-shadow: 0 2px 24px rgba(0,0,0,0.25);
+        margin-bottom: \(target.gap)px;
       }
-      .window-stage {
-        position: relative;
-        z-index: 10;
-        width: 1200px;
-        height: 620px;
-        border-radius: 18px;
-        box-shadow: 
-          0 50px 140px -20px rgba(0, 0, 0, 0.95),
-          0 30px 60px -15px \(config.shadowGlow),
-          0 0 0 1px rgba(255, 255, 255, 0.18),
-          0 1px 0 0 rgba(255, 255, 255, 0.35) inset;
-        overflow: hidden;
-        background: #0f141c;
+      img {
+        position: relative; z-index: 1;
+        width: \(target.windowWidth)px; display: block; border-radius: 12px;
+        filter: drop-shadow(0 28px 50px rgba(0,0,0,0.5)) drop-shadow(0 0 1px rgba(0,0,0,0.6));
       }
-      .window-stage img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top center;
-        display: block;
-      }
-    </style>
-    </head>
-    <body>
-      <div class="grid-pattern"></div>
-      <div class="aurora-glow"></div>
-      <h1 class="headline">\(config.headline)</h1>
-      <div class="window-stage">
-        <img src="\(base64Image)" />
-      </div>
-    </body>
-    </html>
+    </style></head><body>
+      <h1>\(slide.headline)</h1>
+      <img src="\(image)">
+    </body></html>
     """
 }
 
-let app = NSApplication.shared
-let width: CGFloat = 1440
-let height: CGFloat = 900
-let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: width, height: height))
+final class Renderer: NSObject, WKNavigationDelegate {
+    let jobs: [(Slide, Target)] = targets.flatMap { t in slides.map { ($0, t) } }
+    var index = 0
+    var webView: WKWebView!
 
-var currentIndex = 0
+    func start() { renderNext() }
 
-class RenderDelegate: NSObject, WKNavigationDelegate {
+    func renderNext() {
+        guard index < jobs.count else { print("Done."); exit(0) }
+        let (slide, target) = jobs[index]
+        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: target.width, height: target.height))
+        webView.navigationDelegate = self
+        guard let data = FileManager.default.contents(atPath: slide.source) else {
+            print("Missing \(slide.source)"); exit(1)
+        }
+        webView.loadHTMLString(html(slide, target, image: "data:image/png;base64," + data.base64EncodedString()), baseURL: nil)
+    }
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            webView.takeSnapshot(with: nil) { image, error in
-                guard let image = image,
-                      let tiff = image.tiffRepresentation,
-                      let rep = NSBitmapImageRep(data: tiff),
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            webView.takeSnapshot(with: nil) { image, _ in
+                guard let tiff = image?.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff),
                       let png = rep.representation(using: .png, properties: [:]) else {
-                    print("Error snapshotting: \(String(describing: error))")
-                    exit(1)
+                    print("Snapshot failed"); exit(1)
                 }
-                
-                let currentConfig = configs[currentIndex]
-                let distURL = URL(fileURLWithPath: "dist/screenshots/\(currentConfig.filename)")
-                let docsURL = URL(fileURLWithPath: "docs/appstore-screenshots/\(currentConfig.filename)")
-                
-                try? png.write(to: distURL)
-                try? png.write(to: docsURL)
-                print("[\(currentIndex + 1)/\(configs.count)] Generated: \(currentConfig.filename) (\(rep.pixelsWide)x\(rep.pixelsHigh))")
-                
-                currentIndex += 1
-                if currentIndex < configs.count {
-                    renderNext()
-                } else {
-                    print("ALL 4 OBSIDIAN SCREENSHOTS SUCCESSFULLY GENERATED!")
-                    exit(0)
+                let (slide, target) = self.jobs[self.index]
+                for dir in target.outputDirs {
+                    try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+                    try? png.write(to: URL(fileURLWithPath: dir).appendingPathComponent(slide.filename))
                 }
+                print("\(target.outputDirs[0])/\(slide.filename) (\(rep.pixelsWide)x\(rep.pixelsHigh))")
+                self.index += 1
+                self.renderNext()
             }
         }
     }
 }
 
-let delegate = RenderDelegate()
-webView.navigationDelegate = delegate
-
-func renderNext() {
-    let config = configs[currentIndex]
-    guard let shotData = try? Data(contentsOf: URL(fileURLWithPath: config.sourceImage)) else {
-        print("Failed to read: \(config.sourceImage)")
-        exit(1)
-    }
-    let base64 = "data:image/png;base64," + shotData.base64EncodedString()
-    let html = generateHTML(config: config, base64Image: base64)
-    webView.loadHTMLString(html, baseURL: nil)
-}
-
-renderNext()
+let app = NSApplication.shared
+let renderer = Renderer()
+renderer.start()
 app.run()
