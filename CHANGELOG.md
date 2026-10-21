@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Update alerts: Shark checks for a newer version at launch (at most once a day) and from Shark › Check for Updates…, then offers the update route that matches how it was installed: Download for the DMG, Copy Command (`brew upgrade --cask shark`) for Homebrew, or Open App Store. The alert shows the release notes when the release has them. Skip a version, or turn automatic checks off in Settings › General. Shark never installs updates itself.
 
 ### Changed
+- Full Disk Access setup shows the running Shark app’s exact location and can reveal it in Finder, so development builds and duplicate installations are easier to add. Default-folder errors now distinguish a rejected one-click request from the separate restart-based manual option.
 - Drops now follow Finder: they move within a disk and copy to another disk. Hold ⌥ to copy or ⌘ to move. Before, every drop moved, so dragging from an SD card or external drive removed the files from it.
 - Every file operation can now be undone: Trash, drag-and-drop, duplicate, new folder and file, batch rename, and Compress join copy, move, and rename. Undoing something Shark created moves it to the Trash; nothing is permanently deleted.
 - Multi-item operations (paste, drop, Trash, batch rename, copy) are all-or-nothing: if one item fails, the finished ones are put back. Failures show an alert instead of failing silently or replacing the folder view with an error page.

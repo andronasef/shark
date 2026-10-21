@@ -120,10 +120,19 @@ struct FullDiskAccessControls: View {
                 let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!
                 couldNotOpenSettings = !NSWorkspace.shared.open(url)
             }
-            Text("Turn on Shark. If it isn’t listed, click + and choose Shark.app. Reopen Shark if macOS asks.")
+            Button("Show Shark in Finder") {
+                NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
+            }
+            Text("If Shark isn’t listed, click +, then press ⇧⌘G and paste the app location below. Choose Open, enable Shark, and reopen it if macOS asks. Use this running copy if you have more than one Shark installed.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+            Text(Bundle.main.bundlePath)
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel("Running Shark app location: \(Bundle.main.bundlePath)")
             if couldNotOpenSettings {
                 Text("Open System Settings → Privacy & Security → Full Disk Access.")
                     .font(.caption)

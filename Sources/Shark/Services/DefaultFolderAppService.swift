@@ -87,7 +87,7 @@ final class DefaultFolderAppService {
             let status = failure.userInfo[NSUnderlyingErrorKey] as? NSError ?? failure
             if status.domain == NSOSStatusErrorDomain, status.code == -50 {
                 requiresManualSetup = true
-                errorMessage = "macOS did not allow the folder default to change. Use Manual Setup for instructions that require restarting your Mac."
+                errorMessage = "macOS rejected one-click setup. Manual Setup is a separate option that requires restarting your Mac and may not work on this macOS version."
                 return false
             }
         }
