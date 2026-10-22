@@ -63,6 +63,30 @@
   .hero h1 span { color: #516f88; }
   .hero-description { margin-top: 26px; font-size: 18px; line-height: 1.65; color: var(--secondary); }
   .hero-actions { margin-top: 29px; flex-wrap: wrap; row-gap: 17px; display: flex; justify-content: center; gap: 26px; align-items: center; }
+  .brew { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; margin-top: 22px; padding: 6px 8px 6px 6px; border: 0; border-radius: 999px; background: #18232e0a; box-shadow: inset 0 0 0 1px #dde3e9; color: var(--ink, #18232e); font: inherit; cursor: copy; transition: background .15s, box-shadow .15s; }
+  .brew:hover { background: #fff; box-shadow: inset 0 0 0 1px #b9c4cf, 0 3px 10px #18232e10; }
+  .brew:focus-visible { outline: 2px solid #0069d4; outline-offset: 3px; }
+  .brew-label { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #fff; color: #586674; box-shadow: 0 0 0 1px #dde3e9; }
+  .brew code { font: 12.5px/1.4 ui-monospace, 'SF Mono', Menlo, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brew-copy { display: grid; color: #586674; }
+  .brew-copy svg { grid-area: 1 / 1; transition: opacity .15s, scale .15s; }
+  .brew-copy svg + svg, .brew.copied .brew-copy svg:first-child { opacity: 0; scale: .6; }
+  .brew.copied .brew-copy svg + svg { opacity: 1; scale: 1; color: #1f7a4d; }
+  .brew-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .brew-row { order: 1; flex-basis: 100%; display: flex; justify-content: center; }
+  .brew-row .brew { margin-top: 0; }
+  .faq-list code { font: .9em ui-monospace, 'SF Mono', Menlo, monospace; padding: 1px 5px; border-radius: 5px; background: #18232e0d; }
+  @media (hover: none) { .store-peek { display: none; } }
+  @media (max-width: 540px) {
+    .brew-row { order: 0; flex-basis: auto; width: min(100%, 350px); }
+    .brew { width: 100%; min-height: 48px; justify-content: space-between; padding-inline: 16px; gap: 8px; }
+    .brew-label { display: none; }
+    .brew code { font-size: 11.5px; }
+    .hero-actions > .button, .cta-row > .button, .store-wrap, .store-wrap .button { width: min(100%, 350px); justify-content: center; }
+    .store-wrap .button { width: 100%; justify-content: space-between; }
+    .cta-row { flex-direction: column; align-items: center; }
+  }
+  @media (prefers-reduced-motion: reduce) { .brew, .brew-copy svg { transition: none; } }
   .compatibility { font-size: 12px; color: var(--secondary); margin-top: 17px; }
   .compatibility span { margin-left: 5px; }
   .hero-stage { position: relative; isolation: isolate; width: min(1320px, 100%); margin: 66px auto 0; padding: 0 58px 28px; }

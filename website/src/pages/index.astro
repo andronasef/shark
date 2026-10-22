@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import DownloadLink from '../components/DownloadLink.astro';
+import BrewCommand from '../components/BrewCommand.astro';
 import MacAppStoreLink from '../components/MacAppStoreLink.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
@@ -35,7 +36,7 @@ const tools = [
       <div class="hero-copy container">
         <h1 id="hero-heading">Your files.<br /><span>More possibilities.</span></h1>
         <p class="hero-description">Tabs, split panes, a built-in terminal, and quick previews.<br class="desktop-break" /> All in a familiar Mac interface.</p>
-        <div class="hero-actions"><DownloadLink /><MacAppStoreLink /><a class="text-link" href="#features">Meet Shark <Icon name="arrow" size={17} /></a></div>
+        <div class="hero-actions"><DownloadLink /><MacAppStoreLink /><BrewCommand /><a class="text-link" href="#features">Meet Shark <Icon name="arrow" size={17} /></a></div>
         <p class="compatibility">Free. Made for Mac. <span>macOS 14 or later.</span></p>
       </div>
       <div class="hero-stage">
@@ -84,7 +85,7 @@ const tools = [
       <div class="faq-list">
         <details><summary>Is Shark free?<span aria-hidden="true">+</span></summary><p>Yes. Shark is free to download and use. You can also explore the source on <a href="https://github.com/andronasef/shark">GitHub</a>.</p></details>
         <details><summary>Will it work on my Mac?<span aria-hidden="true">+</span></summary><p>Shark requires macOS Sonoma 14 or later and supports Apple silicon and Intel Macs. Native Liquid Glass chrome is available on macOS 26; earlier versions use system materials.</p></details>
-        <details><summary>How do I install it?<span aria-hidden="true">+</span></summary><p>Download the latest Shark DMG, open it, and drag Shark.app to your Applications folder. Then open Shark to get started. The Mac App Store version is waiting for Apple’s review.</p></details>
+        <details><summary>How do I install it?<span aria-hidden="true">+</span></summary><p>With Homebrew, run <code>brew install --cask andronasef/shark/shark</code>. Or download the latest Shark DMG, open it, and drag Shark.app to your Applications folder. The Mac App Store version is waiting for Apple’s review.</p></details>
         <details><summary>Why does it ask for folder access?<span aria-hidden="true">+</span></summary><p>macOS protects folders such as Documents and Downloads. Allow access to the folders you want to browse when macOS asks. You can manage those permissions in System Settings.</p></details>
         <details><summary>Can I use it with the keyboard?<span aria-hidden="true">+</span></summary><p>Yes. Open tabs with ⌘T, jump to a path with ⌘L, and open the command palette with ⌘K. F3 toggles split panes and F4 opens the terminal. Depending on your keyboard settings, hold Fn with the function keys.</p></details>
       </div>
@@ -94,7 +95,7 @@ const tools = [
       <img src={icon} alt="" width="92" height="92" loading="lazy" />
       <h2 id="closing-heading">Make room for<br />a better workflow.</h2>
       <p>Your next favorite place for your files.</p>
-      <div class="cta-row"><DownloadLink /><MacAppStoreLink /></div>
+      <div class="cta-row"><DownloadLink /><MacAppStoreLink /><BrewCommand /></div>
       <p class="compatibility">Free · macOS 14+ · Apple silicon &amp; Intel</p>
     </section>
   </main>

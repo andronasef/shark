@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+const command = 'brew install --cask andronasef/shark/shark';
+---
+<div class="brew-row"><button type="button" class="brew" data-command={command} aria-label={`Copy Homebrew install command: ${command}`}>
+  <span class="brew-label">Homebrew</span>
+  <code>{command}</code>
+  <span class="brew-copy" aria-hidden="true"><Icon name="copy" size={15} /><Icon name="check" size={15} /></span>
+  <span class="brew-status" role="status"></span>
+</button></div>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.brew').forEach((button) => {
+    button.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(button.dataset.command!); } catch { return; }
+      button.classList.add('copied');
+      button.querySelector('.brew-status')!.textContent = 'Copied';
+      setTimeout(() => { button.classList.remove('copied'); button.querySelector('.brew-status')!.textContent = ''; }, 1600);
+    });
+  });
+</script>

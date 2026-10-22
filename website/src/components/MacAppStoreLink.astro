@@ -8,7 +8,7 @@ const days = Math.max(1, Math.ceil((Date.now() - Date.parse(submitted)) / 864e5)
 <span class="store-wrap">
   <a class="button button-store" href="https://apps.apple.com/us/app/shark-better-finder/id6825086341" aria-describedby="review-status">
     <span class="store-name"><small>Download on the</small>Mac App Store</span>
-    <span class="store-soon" data-submitted={submitted}>Waiting for review · day {days}</span>
+    <span class="store-soon" data-submitted={submitted}>In review · day {days}</span>
   </a>
   <span class="store-peek" id="review-status" role="tooltip">
     <Image src={reviewStatus} alt="App Store Connect showing Shark - Better Finder, macOS 1.0.0, Waiting for Review" width={420} />
@@ -18,6 +18,6 @@ const days = Math.max(1, Math.ceil((Date.now() - Date.parse(submitted)) / 864e5)
   // Static site: refresh the day count in the visitor's browser.
   document.querySelectorAll<HTMLElement>('.store-soon[data-submitted]').forEach((el) => {
     const days = Math.max(1, Math.ceil((Date.now() - Date.parse(el.dataset.submitted!)) / 864e5));
-    el.textContent = `Waiting for review · day ${days}`;
+    el.textContent = `In review · day ${days}`;
   });
 </script>

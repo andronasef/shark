@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Website: a copyable Homebrew install command (`brew install --cask andronasef/shark/shark`) sits under the download buttons, and the install FAQ mentions it. The App Store review pill is shorter ("In review · day N"). README: download badges (latest release, Homebrew, Mac App Store, total downloads, macOS 14+) and a direct link to the Releases page.
 - Shark is now licensed under the Apache License 2.0 (`LICENSE`).
 - Website: the Mac App Store button shows how many days the app has been waiting for Apple’s review (since 20 Oct 2026) and previews the App Store Connect status on hover. Added a 1200×630 social share image, Open Graph and Twitter large-card tags, canonical and `SoftwareApplication` structured data, plus a generated `robots.txt` and sitemap (Astro plugins).
 - Help › All Features opens the complete website feature catalog. The welcome’s feature step and Shark Help window also link to the full list.
