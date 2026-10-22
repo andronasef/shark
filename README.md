@@ -128,3 +128,7 @@ Bug reports, small fixes, documentation improvements, and feature ideas are welc
 Before opening a pull request, run `swift test` and check the app itself if you changed the UI. Add tests for non-trivial logic and a changelog entry for meaningful changes. Include a short description of the change and how you tested it; add screenshots for visual changes.
 
 Keep the interface native to macOS. Update the design guide when changing layout or interaction rules, and the in-app Help when changing mouse gestures.
+
+## License
+
+Shark is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Andrew Nasef.

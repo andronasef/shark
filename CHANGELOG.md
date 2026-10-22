@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Shark is now licensed under the Apache License 2.0 (`LICENSE`).
 - Website: the Mac App Store button shows how many days the app has been waiting for Apple’s review (since 20 Oct 2026) and previews the App Store Connect status on hover. Added a 1200×630 social share image, Open Graph and Twitter large-card tags, canonical and `SoftwareApplication` structured data, plus a generated `robots.txt` and sitemap (Astro plugins).
 - Help › All Features opens the complete website feature catalog. The welcome’s feature step and Shark Help window also link to the full list.
 - A three-step first-run welcome introduces Shark, highlights tabs, split panes, Quick Look, and the terminal, and offers optional setup for the default folder app and Full Disk Access. Skip it or reopen it from Help › Welcome to Shark. Settings › General can request Shark as the default folder app or restore Finder, with copyable manual setup commands when macOS rejects the APIs (restart required; availability varies by macOS version); Settings › Privacy links to Full Disk Access. Incoming folders reuse an open pane or open in a new tab, including when reopening Shark’s window. Finder-specific reveal actions still use Finder.
