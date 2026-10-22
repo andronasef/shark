@@ -8,6 +8,13 @@
     "build": "astro build",
     "preview": "astro preview"
   },
-  "dependencies": { "astro": "7.4.1" },
-  "engines": { "node": ">=22.22.0" }
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "7.4.1",
+    "astro-robots-txt": "^1.0.0",
+    "astro-seo": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  }
 }

@@ -1,27 +1,55 @@
 ---
+import { SEO } from 'astro-seo';
 import '../styles/global.css';
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 interface Props { title?: string; description?: string; }
 const {
-  title = 'Shark — Your files. More possibilities.',
+  title = 'Shark — A Better Finder for Mac with Tabs, Split Panes & Terminal',
   description = 'A free, native Mac file manager with tabs, split panes, a built-in terminal, and quick previews. Familiar on the outside. More capable within.',
 } = Astro.props;
+const abs = (path: string) => new URL(`${base}${path}`, Astro.site).href;
+const ogImage = abs('/og.png');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Shark',
+  alternateName: 'Shark - Better Finder',
+  description,
+  url: abs('/'),
+  image: ogImage,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'macOS 14 or later',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  author: { '@type': 'Person', name: 'Andrew Nasef', url: 'https://andronasef.com/' },
+  sameAs: ['https://github.com/andronasef/shark'],
+};
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content={description} />
     <meta name="theme-color" content="#f7f9fc" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(`${base.replace(/\/$/, '')}/icon.png`, Astro.site).href} />
-    <meta name="twitter:card" content="summary" />
-    <link rel="icon" type="image/png" href={`${base.replace(/\/$/, '')}/icon.png`} />
-    <link rel="canonical" href={Astro.url} />
-    <title>{title}</title>
+    <SEO
+      title={title}
+      description={description}
+      canonical={Astro.url.href}
+      openGraph={{
+        basic: { title, type: 'website', image: ogImage, url: Astro.url.href },
+        image: { width: 1200, height: 630, alt: 'Shark - Better Finder, a native Mac file manager with folder tabs and two panes' },
+        optional: { description, siteName: 'Shark', locale: 'en_US' },
+      }}
+      twitter={{ card: 'summary_large_image', title, description, image: ogImage, imageAlt: 'Shark - Better Finder, a native Mac file manager' }}
+      extend={{
+        link: [
+          { rel: 'icon', type: 'image/png', href: `${base}/icon.png` },
+          { rel: 'apple-touch-icon', href: `${base}/icon.png` },
+          { rel: 'sitemap', href: `${base}/sitemap-index.xml` },
+        ],
+        meta: [{ name: 'author', content: 'Andrew Nasef' }],
+      }}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
