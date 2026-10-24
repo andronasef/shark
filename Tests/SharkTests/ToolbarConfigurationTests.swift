@@ -17,15 +17,22 @@ struct ToolbarConfigurationTests {
         #expect(ToolbarConfiguration.validatedIdentifiers([], allowed: ["search"]).isEmpty)
     }
 
-    @Test @MainActor func toolbarForcesIconOnlyDisplayMode() {
+    @Test @MainActor func toolbarAllowsDisplayModeCustomizationAndSupportsBothModes() {
         let toolbar = NSToolbar(identifier: ToolbarConfiguration.identifier)
-        toolbar.displayMode = .iconAndLabel
         if #available(macOS 15.0, *) {
-            toolbar.allowsDisplayModeCustomization = false
-            #expect(!toolbar.allowsDisplayModeCustomization)
+            toolbar.allowsDisplayModeCustomization = true
+            #expect(toolbar.allowsDisplayModeCustomization)
         }
+
         toolbar.displayMode = .iconOnly
+        ToolbarDisplayState.shared.update(from: toolbar)
         #expect(toolbar.displayMode == .iconOnly)
+        #expect(!ToolbarDisplayState.shared.showsLabels)
+
+        toolbar.displayMode = .iconAndLabel
+        ToolbarDisplayState.shared.update(from: toolbar)
+        #expect(toolbar.displayMode == .iconAndLabel)
+        #expect(ToolbarDisplayState.shared.showsLabels)
     }
 
     @Test @MainActor func configureItemSetsPaletteLabelAndLabel() {

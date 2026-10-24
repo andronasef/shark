@@ -1,5 +1,26 @@
 import AppKit
 import SwiftUI
+import Observation
+
+@Observable
+@MainActor
+public final class ToolbarDisplayState {
+    public static let shared = ToolbarDisplayState()
+
+    public var showsLabels: Bool = false
+    public var displayMode: NSToolbar.DisplayMode = .iconOnly {
+        didSet {
+            showsLabels = (displayMode == .iconAndLabel)
+        }
+    }
+
+    public func update(from toolbar: NSToolbar) {
+        let mode: NSToolbar.DisplayMode = (toolbar.displayMode == .default) ? .iconOnly : toolbar.displayMode
+        if displayMode != mode {
+            displayMode = mode
+        }
+    }
+}
 
 /// The identifier is also SwiftUI/AppKit's native autosave namespace. AppKit owns storage,
 /// defaults, palette presentation and overflow; this bridge never stores a second layout.
@@ -21,6 +42,7 @@ enum ToolbarConfiguration {
         }
     }
 
+    @MainActor
     static func configureItem(_ item: NSToolbarItem) {
         if let label = itemLabel(for: item.itemIdentifier.rawValue) {
             item.paletteLabel = label
@@ -94,6 +116,7 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
         private var applying = false
         private var observed = false
         private var delegateProxy: ToolbarDelegateProxy?
+        private nonisolated(unsafe) var displayModeObservation: NSKeyValueObservation?
         private static let layoutChanged = Notification.Name("SharkNativeToolbarLayoutChanged")
 
         private func attachDelegateProxy(to toolbar: NSToolbar) {
@@ -103,16 +126,28 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
             toolbar.delegate = proxy
         }
 
+        private func attachDisplayModeObservation(to toolbar: NSToolbar) {
+            guard displayModeObservation == nil else { return }
+            displayModeObservation = toolbar.observe(\.displayMode, options: [.initial, .new]) { [weak self] tb, _ in
+                Task { @MainActor in
+                    ToolbarDisplayState.shared.update(from: tb)
+                    self?.scheduleMeasurement()
+                }
+            }
+        }
+
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
             if let toolbar = window?.toolbar {
                 if #available(macOS 15.0, *) {
-                    toolbar.allowsDisplayModeCustomization = false
+                    toolbar.allowsDisplayModeCustomization = true
                 }
-                if toolbar.displayMode != .iconOnly {
+                if toolbar.displayMode == .default {
                     toolbar.displayMode = .iconOnly
                 }
+                ToolbarDisplayState.shared.update(from: toolbar)
                 attachDelegateProxy(to: toolbar)
+                attachDisplayModeObservation(to: toolbar)
             }
             if !observed {
                 observed = true
@@ -123,7 +158,10 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
             scheduleMeasurement()
         }
 
-        deinit { NotificationCenter.default.removeObserver(self) }
+        deinit {
+            displayModeObservation?.invalidate()
+            NotificationCenter.default.removeObserver(self)
+        }
 
         @objc private func itemsChanged(_ notification: Notification) {
             guard let toolbar = notification.object as? NSToolbar, toolbar === window?.toolbar else { return }
@@ -146,13 +184,17 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                let allowed = toolbar.delegate?.toolbarAllowedItemIdentifiers?(toolbar) {
                 configuration["TB Item Identifiers"] = ToolbarConfiguration.validatedIdentifiers(identifiers, allowed: Set(allowed.map(\.rawValue)))
             }
-            configuration["TB Display Mode"] = NSToolbar.DisplayMode.iconOnly.rawValue
+            if let modeRaw = configuration["TB Display Mode"] as? UInt,
+               let mode = NSToolbar.DisplayMode(rawValue: modeRaw) {
+                configuration["TB Display Mode"] = mode.rawValue
+                toolbar.displayMode = mode
+                ToolbarDisplayState.shared.update(from: toolbar)
+            }
             applying = true
             toolbar.setConfiguration(configuration)
             if #available(macOS 15.0, *) {
-                    toolbar.allowsDisplayModeCustomization = false
-                }
-            toolbar.displayMode = .iconOnly
+                toolbar.allowsDisplayModeCustomization = true
+            }
             applying = false
             scheduleMeasurement()
         }
@@ -167,12 +209,11 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 toolbar.allowsUserCustomization = true
                 toolbar.autosavesConfiguration = true
                 if #available(macOS 15.0, *) {
-                    toolbar.allowsDisplayModeCustomization = false
+                    toolbar.allowsDisplayModeCustomization = true
                 }
-                if toolbar.displayMode != .iconOnly {
-                    toolbar.displayMode = .iconOnly
-                }
+                ToolbarDisplayState.shared.update(from: toolbar)
                 self.attachDelegateProxy(to: toolbar)
+                self.attachDisplayModeObservation(to: toolbar)
                 for item in toolbar.items {
                     ToolbarConfiguration.configureItem(item)
                 }

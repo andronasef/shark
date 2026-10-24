@@ -70,19 +70,19 @@ public struct ContentView: View {
                 }
 
                 // Left-aligned beside Navigation, using the remaining toolbar width.
-                Group {
-                    if activeState.isBottomPathBarVisible || activeState.isEditingPath {
-                        FinderToolbarCaption("Location") {
+                FinderToolbarCaption("Location") {
+                    Group {
+                        if activeState.isBottomPathBarVisible || activeState.isEditingPath {
                             BottomPathBarView(navigationState: activeState, workspace: workspaceState, inToolbar: true)
+                        } else {
+                            Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
+                                .font(.system(size: 13, weight: .semibold))
+                                .lineLimit(1)
+                                .frame(height: 28)
                         }
-                    } else {
-                        Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
-                            .font(.system(size: 13, weight: .semibold))
-                            .lineLimit(1)
-                            .frame(height: 28)
                     }
+                    .frame(width: locationWidth)
                 }
-                .frame(width: locationWidth)
             }
         }
         .customizableFinderChromeItem()
