@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import AppKit
 
 /// Preference IDs are persisted independently of translated display names.
 public enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
@@ -28,12 +29,16 @@ public enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
 
 public enum AppLocalization {
     public static let preferenceKey = "appLanguage"
-    /// Captured once: changing the preference takes effect after relaunch, consistently
-    /// for SwiftUI, AppKit menus and dialogs.
-    public static let language: AppLanguage = resolvedLanguage(
-        preference: AppLanguage.preference(UserDefaults.standard.string(forKey: preferenceKey)),
-        preferredLanguages: Locale.preferredLanguages
-    )
+
+    /// Dynamic resolved language: changing the preference takes effect immediately
+    /// in the UI, and persists across launches.
+    public static var language: AppLanguage {
+        resolvedLanguage(
+            preference: AppLanguage.preference(UserDefaults.standard.string(forKey: preferenceKey)),
+            preferredLanguages: Locale.preferredLanguages
+        )
+    }
+
     public static var locale: Locale { Locale(identifier: language.rawValue) }
     public static var layoutDirection: LayoutDirection { language.isRightToLeft ? .rightToLeft : .leftToRight }
 
@@ -45,11 +50,33 @@ public enum AppLocalization {
     }
 
     public static func configureAtStartup() {
+        updateProcessArguments()
+    }
+
+    public static func updateProcessArguments() {
         // Process-only override also guides AppKit's standard menu strings. Never
         // persist AppleLanguages, so System Default continues to follow macOS.
         var arguments = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
         arguments["AppleLanguages"] = [language.rawValue]
         UserDefaults.standard.setVolatileDomain(arguments, forName: UserDefaults.argumentDomain)
+    }
+
+    @MainActor
+    public static func relaunchApp() {
+        let bundleURL = Bundle.main.bundleURL
+        if bundleURL.pathExtension == "app" {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+            process.arguments = ["-n", bundleURL.path]
+            try? process.run()
+        } else {
+            let exec = CommandLine.arguments[0]
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: exec)
+            process.arguments = Array(CommandLine.arguments.dropFirst())
+            try? process.run()
+        }
+        NSApp.terminate(nil)
     }
 
     public static func bundle(for language: AppLanguage) -> Bundle {

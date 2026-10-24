@@ -8,6 +8,7 @@ public enum DefaultStartupLocation: String, CaseIterable, Identifiable, Sendable
     case lastSession = "Last Session"
 
     public var id: String { rawValue }
+    public var displayName: String { L10n.text(rawValue) }
 
     public var url: URL {
         let homeURL = FileManager.default.homeDirectoryForCurrentUser
@@ -31,6 +32,7 @@ public enum DefaultViewModeSetting: String, CaseIterable, Identifiable, Sendable
     case gallery = "Gallery"
 
     public var id: String { rawValue }
+    public var displayName: String { L10n.text(rawValue) }
 
     public var viewMode: ViewMode {
         switch self {

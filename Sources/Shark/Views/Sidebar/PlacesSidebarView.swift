@@ -41,12 +41,12 @@ public struct PlacesSidebarView: View {
                 if !isTree {
                 VStack(spacing: 0) {
                     sidebarRow(
-                        name: "Recents",
+                        name: L10n.text("Recents"),
                         iconName: "clock",
                         url: FileManager.default.homeDirectoryForCurrentUser
                     )
                     sidebarRow(
-                        name: "Shared",
+                        name: L10n.text("Shared"),
                         iconName: "folder.badge.person.crop",
                         url: URL(fileURLWithPath: "/Users/Shared")
                     )
@@ -490,8 +490,8 @@ public struct PlacesSidebarView: View {
         return iCloudItem + [
             SidebarItem(name: home.lastPathComponent, url: home, iconName: "house", section: .places),
             SidebarItem(name: "Macintosh HD", url: URL(fileURLWithPath: "/"), iconName: "internaldrive", section: .places),
-            SidebarItem(name: "AirDrop", url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "airdrop", section: .places),
-            SidebarItem(name: "Trash", url: home.appendingPathComponent(".Trash"), iconName: "trash", section: .places)
+            SidebarItem(name: L10n.text("AirDrop"), url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "airdrop", section: .places),
+            SidebarItem(name: L10n.text("Trash"), url: home.appendingPathComponent(".Trash"), iconName: "trash", section: .places)
         ]
     }
 

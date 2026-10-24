@@ -62,6 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 struct SharkApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var onboarding = OnboardingState()
+    @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguage.system.rawValue
 
     var body: some Scene {
         // One window: the menu commands and the session drive a single WorkspaceState, so a second
@@ -70,6 +71,7 @@ struct SharkApp: App {
             MainWindowView(appDelegate: appDelegate, onboarding: onboarding)
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
+                .id("main-window-\(languagePreference)")
                 .frame(minWidth: 850, minHeight: 550)
         }
         .windowStyle(.titleBar)
@@ -85,12 +87,14 @@ struct SharkApp: App {
             HelpView()
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
+                .id("help-window-\(languagePreference)")
         }
 
         Settings {
             SettingsView()
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
+                .id("settings-window-\(languagePreference)")
         }
     }
 }

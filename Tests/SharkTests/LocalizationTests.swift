@@ -44,6 +44,27 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(DefaultViewModeSetting(rawValue: "Details (List)"), .list)
     }
 
+    func testDynamicLanguageResolutionFromUserDefaults() {
+        let original = UserDefaults.standard.string(forKey: AppLocalization.preferenceKey)
+        defer {
+            if let original {
+                UserDefaults.standard.set(original, forKey: AppLocalization.preferenceKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: AppLocalization.preferenceKey)
+            }
+        }
+
+        UserDefaults.standard.set(AppLanguage.ar.rawValue, forKey: AppLocalization.preferenceKey)
+        XCTAssertEqual(AppLocalization.language, .ar)
+        XCTAssertEqual(AppLocalization.layoutDirection, .rightToLeft)
+        XCTAssertEqual(L10n.text("General"), "عام")
+
+        UserDefaults.standard.set(AppLanguage.de.rawValue, forKey: AppLocalization.preferenceKey)
+        XCTAssertEqual(AppLocalization.language, .de)
+        XCTAssertEqual(AppLocalization.layoutDirection, .leftToRight)
+        XCTAssertEqual(L10n.text("General"), "Allgemein")
+    }
+
     private func formatTokens(_ value: String) -> [String] {
         let expression = try! NSRegularExpression(pattern: "%[0-9$.*]*[d@fslu]")
         return expression.matches(in: value, range: NSRange(value.startIndex..., in: value)).map {
