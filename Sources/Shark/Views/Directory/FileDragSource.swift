@@ -104,7 +104,9 @@ private final class FavoriteDragNSView: DragSourceNSView {
 
     func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
         let cancelledWithEscape = NSApp.currentEvent?.type == .keyDown
-        guard operation == [], !cancelledWithEscape, let sidebar = enclosingScrollView, let window = sidebar.window else { return }
+        // Only sidebar targets use a favorite shortcut; elsewhere SwiftUI may still report a
+        // generic operation for the declared type, so the release point decides.
+        guard !cancelledWithEscape, let sidebar = enclosingScrollView, let window = sidebar.window else { return }
         let sidebarFrame = window.convertToScreen(sidebar.convert(sidebar.bounds, to: nil))
         guard !sidebarFrame.contains(screenPoint) else { return }
         session.animatesToStartingPositionsOnCancelOrFail = false

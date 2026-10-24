@@ -77,7 +77,7 @@ struct FolderTreeRows: View {
                             activate: @escaping () -> Void, toggle: @escaping () -> Void) -> some View {
         let tint = Color.primary.opacity(isSelected ? 0.09 : (hovered == rowID ? 0.045 : 0))
         return HStack(spacing: 2) {
-            Color.clear.frame(width: CGFloat(row.depth) * 14, height: 1)
+            Color.clear.frame(width: CGFloat(row.depth) * 12, height: 1)
             Button(action: toggle) { chevron(row) }
                 .buttonStyle(.plain)
                 .disabled(!row.canExpand)
@@ -111,7 +111,7 @@ struct FolderTreeRows: View {
             Text(row.name)
                 .font(.system(size: 13, weight: isSelected ? .medium : .regular))
                 .lineLimit(1)
-                .truncationMode(.middle)
+                .truncationMode(.tail)
             Spacer(minLength: 0)
         }
         .frame(height: 28)
