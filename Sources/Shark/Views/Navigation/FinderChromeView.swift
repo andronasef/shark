@@ -83,7 +83,6 @@ extension ToolbarContent {
 struct FinderToolbarCaption<Content: View>: View {
     let title: String
     @ViewBuilder let content: Content
-    @Environment(\.colorScheme) private var colorScheme
 
     init(_ title: String, @ViewBuilder content: () -> Content) {
         self.title = title
@@ -91,17 +90,8 @@ struct FinderToolbarCaption<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 2) {
-            content
-            if ToolbarDisplayState.shared.showsLabels {
-                Text(L10n.text(title))
-                    .font(.system(size: 10, weight: .regular))
-                    .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.8) : Color.secondary)
-                    .lineLimit(1)
-                    .fixedSize()
-            }
-        }
-        .accessibilityLabel(L10n.text(title))
+        content
+            .accessibilityLabel(L10n.text(title))
     }
 }
 
@@ -151,7 +141,7 @@ struct FinderSearchField: View {
             }
         }
         .padding(.horizontal, 10)
-        .frame(width: 200, height: 28)
+        .frame(height: 28)
         .finderGlass(interactive: false)
     }
 }

@@ -46,9 +46,7 @@ enum ToolbarConfiguration {
     static func configureItem(_ item: NSToolbarItem) {
         if let label = itemLabel(for: item.itemIdentifier.rawValue) {
             item.paletteLabel = label
-            // Keep item.label empty so AppKit does not draw its large standard font label.
-            // FinderToolbarCaption renders the compact 10pt secondary caption instead.
-            item.label = ""
+            item.label = label
         }
         let appAppearance = NSApp?.keyWindow?.effectiveAppearance ?? NSApp?.effectiveAppearance ?? NSAppearance(named: .aqua)
         if let view = item.view, let appAppearance {
@@ -71,6 +69,32 @@ enum ToolbarConfiguration {
                 }
             }
             enhancePaletteHierarchy(subview, appearance: appearance)
+        }
+    }
+
+    @MainActor
+    static func applyToolbarLabelStyling(in window: NSWindow?) {
+        guard let window, let frameView = window.contentView?.superview else { return }
+        styleLabelsRecursively(in: frameView)
+    }
+
+    @MainActor
+    private static func styleLabelsRecursively(in view: NSView) {
+        let typeName = String(describing: type(of: view))
+        if typeName.contains("Toolbar") || typeName.contains("Titlebar") {
+            for sub in view.subviews {
+                let subType = String(describing: type(of: sub))
+                if let tf = sub as? NSTextField, !subType.contains("Hosting"), !typeName.contains("Hosting") {
+                    if let font = tf.font, font.pointSize > 10.5 {
+                        tf.font = NSFont.systemFont(ofSize: 10, weight: .regular)
+                    }
+                }
+                styleLabelsRecursively(in: sub)
+            }
+        } else {
+            for sub in view.subviews {
+                styleLabelsRecursively(in: sub)
+            }
         }
     }
 
@@ -146,11 +170,12 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
         private var observed = false
         private var delegateProxy: ToolbarDelegateProxy?
         private nonisolated(unsafe) var displayModeObservation: NSKeyValueObservation?
+        private nonisolated(unsafe) var sheetObserver: (any NSObjectProtocol)?
         private static let layoutChanged = Notification.Name("SharkNativeToolbarLayoutChanged")
 
         private func attachDelegateProxy(to toolbar: NSToolbar) {
-            guard let delegate = toolbar.delegate, !(delegate is ToolbarDelegateProxy) else { return }
-            let proxy = ToolbarDelegateProxy(original: delegate)
+            guard !(toolbar.delegate is ToolbarDelegateProxy) else { return }
+            let proxy = ToolbarDelegateProxy(original: toolbar.delegate)
             self.delegateProxy = proxy
             toolbar.delegate = proxy
         }
@@ -158,8 +183,28 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
         private func attachDisplayModeObservation(to toolbar: NSToolbar) {
             guard displayModeObservation == nil else { return }
             displayModeObservation = toolbar.observe(\.displayMode, options: [.initial, .new]) { [weak self] tb, _ in
-                Task { @MainActor in
+                MainActor.assumeIsolated {
                     ToolbarDisplayState.shared.update(from: tb)
+                    self?.scheduleMeasurement()
+                }
+            }
+        }
+
+        private func setupSheetObservation() {
+            guard sheetObserver == nil else { return }
+            sheetObserver = NotificationCenter.default.addObserver(
+                forName: NSWindow.willBeginSheetNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] notif in
+                let sheet = notif.userInfo?["NSWindow"] as? NSWindow ?? notif.object as? NSWindow
+                MainActor.assumeIsolated {
+                    guard let sheet else { return }
+                    let appAppearance = NSApp?.keyWindow?.effectiveAppearance ?? NSApp?.effectiveAppearance ?? NSAppearance(named: .aqua)
+                    if let appearance = appAppearance {
+                        sheet.appearance = appearance
+                        ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
+                    }
                     self?.scheduleMeasurement()
                 }
             }
@@ -177,36 +222,23 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 ToolbarDisplayState.shared.update(from: toolbar)
                 attachDelegateProxy(to: toolbar)
                 attachDisplayModeObservation(to: toolbar)
+                setupSheetObservation()
             }
             if !observed {
                 observed = true
                 NotificationCenter.default.addObserver(self, selector: #selector(itemsChanged(_:)), name: NSToolbar.willAddItemNotification, object: nil)
                 NotificationCenter.default.addObserver(self, selector: #selector(itemsChanged(_:)), name: NSToolbar.didRemoveItemNotification, object: nil)
                 NotificationCenter.default.addObserver(self, selector: #selector(receiveLayout(_:)), name: Self.layoutChanged, object: nil)
-                NotificationCenter.default.addObserver(self, selector: #selector(sheetWillBegin(_:)), name: NSWindow.willBeginSheetNotification, object: nil)
             }
             scheduleMeasurement()
         }
 
         deinit {
             displayModeObservation?.invalidate()
+            if let sheetObserver {
+                NotificationCenter.default.removeObserver(sheetObserver)
+            }
             NotificationCenter.default.removeObserver(self)
-        }
-
-        @objc private func sheetWillBegin(_ notification: Notification) {
-            guard let hostWindow = window,
-                  let sheet = notification.userInfo?["NSWindow"] as? NSWindow ?? hostWindow.sheets.first else { return }
-            let appearance = hostWindow.effectiveAppearance
-            sheet.appearance = appearance
-            ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak sheet] in
-                guard let sheet else { return }
-                ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak sheet] in
-                guard let sheet else { return }
-                ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
-            }
         }
 
         @objc private func itemsChanged(_ notification: Notification) {
@@ -263,6 +295,7 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 for item in toolbar.items {
                     ToolbarConfiguration.configureItem(item)
                 }
+                ToolbarConfiguration.applyToolbarLabelStyling(in: self.window)
                 let others = toolbar.items.filter {
                     !$0.itemIdentifier.rawValue.contains("navigation-location") &&
                     !$0.itemIdentifier.rawValue.contains("flexible-space") &&
