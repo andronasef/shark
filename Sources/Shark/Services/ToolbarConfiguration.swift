@@ -50,16 +50,16 @@ enum ToolbarConfiguration {
             // FinderToolbarCaption renders the compact 10pt secondary caption instead.
             item.label = ""
         }
-        let appAppearance = NSApp.keyWindow?.effectiveAppearance ?? NSApp.effectiveAppearance
-        if let view = item.view {
+        let appAppearance = NSApp?.keyWindow?.effectiveAppearance ?? NSApp?.effectiveAppearance ?? NSAppearance(named: .aqua)
+        if let view = item.view, let appAppearance {
             view.appearance = appAppearance
             enhancePaletteHierarchy(view, appearance: appAppearance)
         }
     }
 
     @MainActor
-    static func enhancePaletteHierarchy(_ root: NSView?, appearance: NSAppearance) {
-        guard let root else { return }
+    static func enhancePaletteHierarchy(_ root: NSView?, appearance: NSAppearance?) {
+        guard let root, let appearance else { return }
         root.appearance = appearance
         let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
         for subview in root.subviews {
@@ -108,8 +108,8 @@ final class ToolbarDelegateProxy: NSObject, NSToolbarDelegate {
         let item = originalDelegate?.toolbar?(toolbar, itemForItemIdentifier: itemIdentifier, willBeInsertedIntoToolbar: flag)
         if let item {
             ToolbarConfiguration.configureItem(item)
-            let appearance = NSApp.keyWindow?.effectiveAppearance ?? NSApp.effectiveAppearance
-            if let view = item.view {
+            let appearance = NSApp?.keyWindow?.effectiveAppearance ?? NSApp?.effectiveAppearance ?? NSAppearance(named: .aqua)
+            if let view = item.view, let appearance {
                 view.appearance = appearance
                 ToolbarConfiguration.enhancePaletteHierarchy(view, appearance: appearance)
             }
