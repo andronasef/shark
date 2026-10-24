@@ -252,11 +252,9 @@ struct ExplorerCommands: Commands {
         CommandGroup(after: .toolbar) {
             // Menu homes for toolbar commands, so removing a toolbar item never removes the command.
             Menu(L10n.text("Sort By")) {
-                Picker(L10n.text("Sort By"), selection: Binding(get: { nav.sortField }, set: { nav.sortField = $0 })) {
-                    ForEach(SortField.allCases) { field in Text(L10n.text(field.rawValue)).tag(field) }
+                ForEach(SortField.allCases) { field in
+                    Toggle(L10n.text(field.rawValue), isOn: Binding(get: { nav.sortField == field }, set: { if $0 { nav.sortField = field } }))
                 }
-                .pickerStyle(.inline)
-                .labelsHidden()
                 Divider()
                 Toggle(L10n.text("Ascending"), isOn: Binding(get: { nav.sortAscending }, set: { nav.sortAscending = $0 }))
             }
