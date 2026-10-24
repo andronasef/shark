@@ -24,6 +24,7 @@ Shark strictly adheres to macOS Human Interface Guidelines (HIG) with an 8pt-bas
   - Sidebar folder navigation and exact-match selection follow the active pane. Favorites containing the current folder show a subtle dot instead of a selected fill.
   - Favorites are persistent, user-selected folder shortcuts. Add/reorder insertion targets are distinct from folder destinations; internal shortcut drags cannot move files. Removal leaves folders intact. Unavailable targets retain their labels and offer relocation.
   - Dragging over a collapsed section temporarily expands it after 600 ms; leaving or ending the drag restores temporary state. A successful drop onto Favorites persists expansion.
+  - **Sidebar style option**: choose between Places (Finder-style Locations and Tags) and Folder Tree (Windows File Explorer-style collapsible folder hierarchy) in Settings › General › Sidebar. The tree lazily loads subfolders on demand, auto-reveals parent folders for the active location, supports full keyboard navigation (arrows, Return, Space), drag-and-drop file moves/copies, and item context menus.
 - **Pro Tab Strip**:
   - Height: `34` pt, with `28` pt tab capsules, `12` pt labels, and `20` pt close-button slots.
   - Open/close motion: `200ms` ease-out, subtle `0.96` scale and fade, with animated width redistribution. Reduce Motion disables movement.
