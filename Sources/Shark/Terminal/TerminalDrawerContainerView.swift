@@ -6,6 +6,7 @@ public struct TerminalDrawerContainerView: View {
     @Binding var isPresented: Bool
     @State private var drawerHeight: CGFloat = 220
     @State private var resizeStartHeight: CGFloat?
+    @State private var copiedCommand = false
     let currentDirectory: URL
 
     public init(session: PTYSession, isPresented: Binding<Bool>, currentDirectory: URL = FileManager.default.homeDirectoryForCurrentUser) {
@@ -25,7 +26,7 @@ public struct TerminalDrawerContainerView: View {
             if SecurityScopedBookmarkManager.shared.isSandboxed {
                 HStack(spacing: 6) {
                     Image(systemName: "lock.shield")
-                    Text("App Sandbox Active: Terminal interactive shell is restricted by macOS App Store sandbox policy.")
+                    Text(L10n.text("App Sandbox Active: Terminal interactive shell is restricted by macOS App Store sandbox policy."))
                 }
                 .font(.system(size: 11))
                 .foregroundColor(.orange)
@@ -36,13 +37,14 @@ public struct TerminalDrawerContainerView: View {
             }
 
             TerminalView(session: session)
+                .environment(\.layoutDirection, .leftToRight)
                 .frame(height: drawerHeight)
                 .overlay(alignment: .bottom) {
                     if !session.isRunning {
                         HStack {
-                            Text("Shell exited")
+                            Text(L10n.text("Shell exited"))
                             if let code = session.exitCode { Text("(\(code))") }
-                            Button("Restart") { session.restart() }
+                            Button(L10n.text("Restart")) { session.restart() }
                         }
                         .font(.system(size: 12))
                         .padding(8)
@@ -55,10 +57,10 @@ public struct TerminalDrawerContainerView: View {
 
     private func confirmTermination() -> Bool {
         let alert = NSAlert()
-        alert.messageText = "Terminate this terminal session?"
-        alert.informativeText = "This stops the shell and its running commands."
-        alert.addButton(withTitle: "Cancel")
-        alert.addButton(withTitle: "Terminate")
+        alert.messageText = L10n.text("Terminate this terminal session?")
+        alert.informativeText = L10n.text("This stops the shell and its running commands.")
+        alert.addButton(withTitle: L10n.text("Cancel"))
+        alert.addButton(withTitle: L10n.text("Terminate"))
         return alert.runModal() == .alertSecondButtonReturn
     }
 
@@ -86,11 +88,11 @@ public struct TerminalDrawerContainerView: View {
                 .font(.system(size: 11))
                 .foregroundColor(.accentColor)
 
-            Text("Terminal")
+            Text(L10n.text("Terminal"))
                 .font(.system(size: 11, weight: .semibold))
 
             // Working directory badge
-            Text((session.hasReportedDirectory ? "" : "Started in: ") + session.currentWorkingDirectory.path)
+            Text((session.hasReportedDirectory ? "" : L10n.text("Started in: ")) + session.currentWorkingDirectory.path)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundColor(.secondary)
                 .lineLimit(1)
@@ -104,33 +106,35 @@ public struct TerminalDrawerContainerView: View {
 
             Spacer()
 
-            Button("Use Current Folder") {
+            Button(copiedCommand ? L10n.text("Directory command copied") : L10n.text("Use Current Folder")) {
                 do {
                     let command = try session.useDirectory(currentDirectory)
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(command, forType: .string)
-                    let alert = NSAlert()
-                    alert.messageText = "Directory command copied"
-                    alert.informativeText = "Paste the copied cd command into an empty shell prompt when you are ready. The terminal's existing input and running commands are preserved."
-                    alert.runModal()
+                    // Paste (⌘V) into an empty prompt when ready; existing input and programs stay untouched.
+                    copiedCommand = true
                     session.focus()
+                    Task {
+                        try? await Task.sleep(for: .seconds(2))
+                        copiedCommand = false
+                    }
                 } catch { NSAlert(error: error).runModal() }
             }
             .font(.system(size: 10))
-            .help("Copy a quoted cd command for the current folder")
+            .help(L10n.text("Copy a quoted cd command for the current folder"))
 
             Menu {
-                Button("Restart Shell…") {
+                Button(L10n.text("Restart Shell…")) {
                     if !session.isRunning || confirmTermination() { session.restart() }
                 }
-                Button("Terminate Shell…") {
+                Button(L10n.text("Terminate Shell…")) {
                     if confirmTermination() { session.terminate() }
                 }
                 .disabled(!session.isRunning)
                 Divider()
-                Button("Increase Text Size") { session.adjustFontSize(by: 1) }
-                Button("Decrease Text Size") { session.adjustFontSize(by: -1) }
-                Button("Reset Text Size") { session.resetFontSize() }
+                Button(L10n.text("Increase Text Size")) { session.adjustFontSize(by: 1) }
+                Button(L10n.text("Decrease Text Size")) { session.adjustFontSize(by: -1) }
+                Button(L10n.text("Reset Text Size")) { session.resetFontSize() }
             } label: { Image(systemName: "ellipsis.circle") }
             .menuStyle(.borderlessButton)
             .frame(width: 20)
@@ -144,7 +148,7 @@ public struct TerminalDrawerContainerView: View {
                     .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Clear Terminal Buffer")
+            .help(L10n.text("Clear Terminal Buffer"))
 
             // Close Drawer button
             Button(action: {
@@ -155,7 +159,7 @@ public struct TerminalDrawerContainerView: View {
                     .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Close Terminal Drawer (F4)")
+            .help(L10n.text("Close Terminal Drawer (F4)"))
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4)

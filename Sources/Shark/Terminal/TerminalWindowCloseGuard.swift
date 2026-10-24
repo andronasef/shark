@@ -36,10 +36,10 @@ final class TerminalWindowCloseGuard: NSObject, NSWindowDelegate {
         guard original?.windowShouldClose?(sender) ?? true else { return false }
         guard session?.isRunning == true else { return true }
         let alert = NSAlert()
-        alert.messageText = "Terminate this terminal session?"
-        alert.informativeText = "Closing this window terminates its shell and any running commands. Hide the terminal drawer to keep them running."
-        alert.addButton(withTitle: "Cancel")
-        alert.addButton(withTitle: "Terminate and Close")
+        alert.messageText = L10n.text("Terminate this terminal session?")
+        alert.informativeText = L10n.text("Closing this window terminates its shell and any running commands. Hide the terminal drawer to keep them running.")
+        alert.addButton(withTitle: L10n.text("Cancel"))
+        alert.addButton(withTitle: L10n.text("Terminate and Close"))
         return alert.runModal() == .alertSecondButtonReturn
     }
 
