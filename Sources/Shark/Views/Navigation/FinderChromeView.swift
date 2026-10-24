@@ -135,6 +135,7 @@ struct FinderSearchField: View {
                 .accessibilityLabel(L10n.text("Search files in current folder"))
                 .focused($focused)
                 .onChange(of: focusRequest) { focused = true }
+                .background(ToolbarFieldFocuser(request: focusRequest, onAppear: false))
             if !text.isEmpty {
                 Button { text = "" } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -163,5 +164,63 @@ extension CustomizableToolbarContent {
 #else
         self
 #endif
+    }
+}
+
+/// SwiftUI focus requests don't reach a toolbar item while another hosting view (such as the
+/// sidebar) holds AppKit focus, so ⌘L/⌘F would show or target a field without moving the
+/// keyboard into it. This makes the neighbouring AppKit text field the first responder when it
+/// appears (if `onAppear`) and whenever `request` changes.
+struct ToolbarFieldFocuser: NSViewRepresentable {
+    var request: Int
+    var onAppear = true
+
+    func makeNSView(context: Context) -> Probe {
+        let probe = Probe()
+        probe.focusOnWindow = onAppear
+        probe.lastRequest = request
+        return probe
+    }
+
+    func updateNSView(_ probe: Probe, context: Context) {
+        guard request != probe.lastRequest else { return }
+        probe.lastRequest = request
+        probe.focusSoon()
+    }
+
+    final class Probe: NSView {
+        var focusOnWindow = true
+        var lastRequest = 0
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if window != nil && focusOnWindow { focusSoon() }
+        }
+
+        func focusSoon() {
+            DispatchQueue.main.async { [weak self] in
+                guard let self, let window = self.window, let field = self.nearestTextField() else { return }
+                if window.firstResponder !== field.currentEditor() { window.makeFirstResponder(field) }
+            }
+        }
+
+        /// The field is a sibling in the same small hosting subtree; search a few levels up.
+        private func nearestTextField() -> NSTextField? {
+            var ancestor = superview
+            for _ in 0..<6 {
+                guard let current = ancestor else { return nil }
+                if let field = Self.firstTextField(in: current) { return field }
+                ancestor = current.superview
+            }
+            return nil
+        }
+
+        private static func firstTextField(in view: NSView) -> NSTextField? {
+            for sub in view.subviews {
+                if let field = sub as? NSTextField, field.isEditable { return field }
+                if let found = firstTextField(in: sub) { return found }
+            }
+            return nil
+        }
     }
 }

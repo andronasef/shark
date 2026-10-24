@@ -49,7 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 - Photo viewer: a zoomed-in photo no longer spills over the file name, details line and thumbnail strip, and the window no longer shows a focus ring along its top edge.
-- ⌘L now moves the keyboard into the path field. Before, it showed the field but typing went nowhere while the sidebar had focus.
+- ⌘L and ⌘F now move the keyboard into the path field and the search field. Before, they showed or targeted the field but typing went nowhere while the sidebar had focus.
 - Toolbar crashes: Shark no longer replaces SwiftUI's toolbar delegate or restyles AppKit's private toolbar and sheet views, which crashed item insertion and broke the Icon and Text layout. Both display modes use native item labels.
 - Changing the language no longer restarts Shark without asking (which would end running terminal commands); it offers Restart Now or Later, and the restart waits for the old copy to quit.
 - An open hover preview refits when a display is connected, disconnected, or resized.
