@@ -635,3 +635,13 @@
 "The terminal is already running" = "ターミナルはすでに実行中です";
 "Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "このフォルダの cd コマンドをコピーして、準備ができたら貼り付けますか？入力中の内容と実行中のコマンドはそのままです。";
 "Copy cd Command" = "cd コマンドをコピー";
+"The sidebar (Places or Folder Tree) and the location capsule in the toolbar." = "サイドバー（場所またはフォルダツリー）とツールバーの場所カプセル。";
+"Click a folder in Folder Tree" = "フォルダツリーのフォルダをクリック";
+"Open it. Click its arrow to expand or collapse without opening it." = "開きます。矢印をクリックすると、開かずに展開・折りたたみできます。";
+"Drag a folder into Favorites" = "フォルダをお気に入りにドラッグ";
+"Add it as a shortcut. Drop between favorites to choose its place." = "ショートカットとして追加します。お気に入りの間にドロップすると位置を選べます。";
+"Drag a favorite" = "お気に入りをドラッグ";
+"Reorder it. Release it outside the sidebar to remove the shortcut; the folder stays." = "並べ替えます。サイドバーの外で離すとショートカットが削除されます（フォルダは残ります）。";
+"Drop files onto a sidebar folder" = "サイドバーのフォルダにファイルをドロップ";
+"Right-click a place or folder" = "場所またはフォルダを右クリック";
+"Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "新しいタブで開く、Finder で表示、お気に入りに追加、またはツリーを更新します。";

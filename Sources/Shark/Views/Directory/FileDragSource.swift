@@ -1,17 +1,18 @@
 import AppKit
+import UniformTypeIdentifiers
 import SwiftUI
 
 /// Native multi-item dragging writes one file URL per pasteboard item, including for Finder.
-/// One shared monitor avoids installing a monitor for every visible grid cell.
+/// One shared monitor avoids installing a monitor for every visible grid cell or sidebar row.
 @MainActor
 private final class FileDragRegistry {
     static let shared = FileDragRegistry()
-    private let views = NSHashTable<FileDragNSView>.weakObjects()
-    private weak var candidate: FileDragNSView?
+    private let views = NSHashTable<DragSourceNSView>.weakObjects()
+    private weak var candidate: DragSourceNSView?
     private var start = CGPoint.zero
     private var monitor: Any?
 
-    func register(_ view: FileDragNSView) {
+    func register(_ view: DragSourceNSView) {
         views.add(view)
         guard monitor == nil else { return }
         monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp]) { [weak self] event in
@@ -45,16 +46,23 @@ private final class FileDragRegistry {
     }
 }
 
+/// Sits behind a row or cell without taking clicks; the registry starts its drag.
 @MainActor
-private final class FileDragNSView: NSView, NSDraggingSource {
-    var urls: () -> [URL] = { [] }
+private class DragSourceNSView: NSView, NSDraggingSource {
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         if window != nil { FileDragRegistry.shared.register(self) }
     }
+    func startDrag(_ event: NSEvent) {}
+    func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation { [] }
+}
 
-    func startDrag(_ event: NSEvent) {
+@MainActor
+private final class FileDragNSView: DragSourceNSView {
+    var urls: () -> [URL] = { [] }
+
+    override func startDrag(_ event: NSEvent) {
         let payload = urls()
         guard !payload.isEmpty else { return }
         let point = convert(event.locationInWindow, from: nil)
@@ -68,7 +76,49 @@ private final class FileDragNSView: NSView, NSDraggingSource {
         session.draggingFormation = .pile
     }
 
-    func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation { [.copy, .move] }
+    override func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation { [.copy, .move] }
+}
+
+/// A sidebar favorite drags as a shortcut, never as a file, so reordering can't move the folder.
+/// Released outside the sidebar with no taker (like Finder), the shortcut is removed.
+@MainActor
+private final class FavoriteDragNSView: DragSourceNSView {
+    var url = URL(fileURLWithPath: "/")
+    var onRemove: () -> Void = {}
+
+    override func startDrag(_ event: NSEvent) {
+        guard let data = try? JSONEncoder().encode(FavoriteShortcutTransfer(url: url)) else { return }
+        let pasteboardItem = NSPasteboardItem()
+        pasteboardItem.setData(data, forType: NSPasteboard.PasteboardType(UTType.sharkFavorite.identifier))
+        let item = NSDraggingItem(pasteboardWriter: pasteboardItem)
+        let point = convert(event.locationInWindow, from: nil)
+        item.setDraggingFrame(CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20),
+                              contents: NSImage(systemSymbolName: "folder", accessibilityDescription: nil))
+        let session = beginDraggingSession(with: [item], event: event, source: self)
+        session.animatesToStartingPositionsOnCancelOrFail = true
+    }
+
+    override func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
+        context == .withinApplication ? [.copy, .move, .generic] : []
+    }
+
+    func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
+        let cancelledWithEscape = NSApp.currentEvent?.type == .keyDown
+        guard operation == [], !cancelledWithEscape, let sidebar = enclosingScrollView, let window = sidebar.window else { return }
+        let sidebarFrame = window.convertToScreen(sidebar.convert(sidebar.bounds, to: nil))
+        guard !sidebarFrame.contains(screenPoint) else { return }
+        session.animatesToStartingPositionsOnCancelOrFail = false
+        NSAnimationEffect.disappearingItemDefault.show(centeredAt: screenPoint, size: .zero)
+        onRemove()
+    }
+}
+
+private struct FavoriteDragSource: NSViewRepresentable {
+    let url: URL
+    let onRemove: () -> Void
+    func makeNSView(context: Context) -> FavoriteDragNSView { let view = FavoriteDragNSView(); update(view); return view }
+    func updateNSView(_ view: FavoriteDragNSView, context: Context) { update(view) }
+    private func update(_ view: FavoriteDragNSView) { view.url = url; view.onRemove = onRemove }
 }
 
 private struct FileDragSource: NSViewRepresentable {
@@ -82,6 +132,10 @@ private struct FileDragSource: NSViewRepresentable {
 }
 
 extension View {
+    func favoriteDragSource(url: URL, onRemove: @escaping () -> Void) -> some View {
+        background(FavoriteDragSource(url: url, onRemove: onRemove))
+    }
+
     func fileDragSource(item: FileItem, navigationState: NavigationState, orderedItems: [FileItem]? = nil) -> some View {
         background(FileDragSource {
             let urls = FileDragSelection.urls(dragged: item.url, selected: navigationState.selectedItemIDs,

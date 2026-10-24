@@ -635,3 +635,13 @@
 "The terminal is already running" = "Das Terminal läuft bereits";
 "Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "Einen cd-Befehl für diesen Ordner kopieren, um ihn bei Bedarf einzufügen? Ihre Eingabe und laufende Befehle bleiben unverändert.";
 "Copy cd Command" = "cd-Befehl kopieren";
+"The sidebar (Places or Folder Tree) and the location capsule in the toolbar." = "Die Seitenleiste (Orte oder Ordnerbaum) und die Pfadkapsel in der Symbolleiste.";
+"Click a folder in Folder Tree" = "Klick auf einen Ordner im Ordnerbaum";
+"Open it. Click its arrow to expand or collapse without opening it." = "Öffnet ihn. Klicken Sie auf seinen Pfeil, um ihn ohne Öffnen auf- oder zuzuklappen.";
+"Drag a folder into Favorites" = "Ordner in Favoriten ziehen";
+"Add it as a shortcut. Drop between favorites to choose its place." = "Fügt ihn als Verknüpfung hinzu. Zwischen Favoriten ablegen, um die Position zu wählen.";
+"Drag a favorite" = "Favoriten ziehen";
+"Reorder it. Release it outside the sidebar to remove the shortcut; the folder stays." = "Ordnet ihn neu. Außerhalb der Seitenleiste loslassen entfernt die Verknüpfung; der Ordner bleibt.";
+"Drop files onto a sidebar folder" = "Dateien auf einen Seitenleistenordner ziehen";
+"Right-click a place or folder" = "Rechtsklick auf einen Ort oder Ordner";
+"Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "In neuem Tab öffnen, im Finder zeigen, zu Favoriten hinzufügen oder den Baum aktualisieren.";

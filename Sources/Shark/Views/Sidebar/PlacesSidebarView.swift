@@ -65,7 +65,7 @@ public struct PlacesSidebarView: View {
                             url: item.url,
                             favorite: item
                         )
-                        .draggable(FavoriteShortcutTransfer(url: item.url))
+                        .favoriteDragSource(url: item.url) { favoritesStore.remove(item.id) }
                         favoriteInsertion(at: index + 1)
                     }
                     Button { addFavorite() } label: {

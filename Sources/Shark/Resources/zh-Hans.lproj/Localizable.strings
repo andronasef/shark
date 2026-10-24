@@ -635,3 +635,13 @@
 "The terminal is already running" = "终端已在运行";
 "Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "要拷贝此文件夹的 cd 命令，以便准备好时粘贴吗？当前输入和正在运行的命令保持不变。";
 "Copy cd Command" = "拷贝 cd 命令";
+"The sidebar (Places or Folder Tree) and the location capsule in the toolbar." = "边栏（位置或文件夹树）以及工具栏中的位置胶囊。";
+"Click a folder in Folder Tree" = "点按文件夹树中的文件夹";
+"Open it. Click its arrow to expand or collapse without opening it." = "打开它。点按其箭头可展开或收起而不打开。";
+"Drag a folder into Favorites" = "将文件夹拖到个人收藏";
+"Add it as a shortcut. Drop between favorites to choose its place." = "将其添加为快捷方式。放在两个收藏之间可选择位置。";
+"Drag a favorite" = "拖移个人收藏";
+"Reorder it. Release it outside the sidebar to remove the shortcut; the folder stays." = "重新排序。在边栏外松开可移除快捷方式，文件夹保留。";
+"Drop files onto a sidebar folder" = "将文件放到边栏文件夹上";
+"Right-click a place or folder" = "右键点按位置或文件夹";
+"Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "在新标签页中打开、在访达中显示、添加到个人收藏或刷新文件夹树。";
