@@ -4,32 +4,39 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing version tag to build and publish
+        required: true
+        type: string
 
 permissions:
   contents: read
 
+env:
+  # Match the local Xcode 27.0 (Swift 6.4) toolchain without installing tools.
+  DEVELOPER_DIR: /Applications/Xcode_27.0.app/Contents/Developer
+  RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.release_tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   release:
-    runs-on: macos-15 # macOS 15 includes Xcode 16 / Swift 6.0
+    runs-on: xcode-27
     timeout-minutes: 90
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
 
-      - name: Select Xcode 16 (Swift 6)
+      - name: Verify Xcode toolchain
         run: |
-          if [ -d "/Applications/Xcode_16.1.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer
-          elif [ -d "/Applications/Xcode_16.0.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
-          elif [ -d "/Applications/Xcode_16.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
-          fi
+          test -d "$DEVELOPER_DIR"
           xcodebuild -version
           swift --version
 
@@ -43,7 +50,7 @@ jobs:
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
         run: |
           set -euo pipefail
-          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo 'Use a tag such as v1.0.0 or v1.0.0-alpha'; exit 1; }
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo 'Use a tag such as v1.0.0 or v1.0.0-alpha'; exit 1; }
           for name in P12_BASE64 P12_PASSWORD SIGN_IDENTITY NOTARY_APPLE_ID NOTARY_TEAM_ID NOTARY_PASSWORD; do
             [[ -n "${!name}" ]] || { echo "Missing release secret: $name"; exit 1; }
           done
@@ -51,6 +58,12 @@ jobs:
 
       - name: Check packaging guardrails
         run: bash scripts/test-package.sh
+
+      - name: Verify release tag exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --silent
 
       - name: Run tests
         run: swift test
@@ -80,18 +93,18 @@ jobs:
           NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
           REQUIRE_NOTARIZATION: "1"
-        run: scripts/package.sh "${GITHUB_REF_NAME#v}"
+        run: scripts/package.sh "${RELEASE_TAG#v}"
 
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${RELEASE_TAG#v}"
           extra_args=()
-          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+          if [[ "$RELEASE_TAG" == *-* ]]; then
             extra_args+=(--prerelease)
           fi
-          gh release create "$GITHUB_REF_NAME" \
+          gh release create "$RELEASE_TAG" \
             "dist/Shark-$version.dmg" "dist/Shark-$version.dmg.sha256" \
             --verify-tag --title "Shark $version" --generate-notes "${extra_args[@]}"
 
@@ -100,7 +113,7 @@ jobs:
           TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
         run: |
           if [[ -n "$TAP_TOKEN" ]]; then
-            version="${GITHUB_REF_NAME#v}"
+            version="${RELEASE_TAG#v}"
             sha=$(cat "dist/Shark-$version.dmg.sha256" | awk '{print $1}')
             
             git config --global user.name "github-actions[bot]"
@@ -137,13 +150,22 @@ jobs:
 
   appstore:
     # Uploads a sandboxed build to App Store Connect. Skipped until the APPSTORE_* secrets exist; uploads with the notarization Apple ID and app-specific password.
-    runs-on: macos-15
+    runs-on: xcode-27
     timeout-minutes: 60
     env:
       ENABLED: ${{ secrets.APPSTORE_P12_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
         if: env.ENABLED == 'true'
+
+      - name: Verify Xcode toolchain
+        if: env.ENABLED == 'true'
+        run: |
+          test -d "$DEVELOPER_DIR"
+          xcodebuild -version
+          swift --version
 
       - name: Import App Store certificates
         if: env.ENABLED == 'true'
@@ -174,7 +196,7 @@ jobs:
           set -euo pipefail
           printf '%s' "$PROVISIONING_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/Shark.provisionprofile"
           # The App Store only accepts digits and dots, so v1.0.0-alpha.N uploads as another build of 1.0.0.
-          version="${GITHUB_REF_NAME#v}"
+          version="${RELEASE_TAG#v}"
           version="${version%%-*}"
           echo "APPSTORE_VERSION=$version" >> "$GITHUB_ENV"
           PROVISIONING_PROFILE="$RUNNER_TEMP/Shark.provisionprofile" bash scripts/package-appstore.sh "$version"

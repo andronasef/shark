@@ -22,7 +22,7 @@ The [release action](../.github/workflows/release.yml) builds a universal app fo
 | `NOTARY_TEAM_ID` | Your Apple Developer team ID. |
 | `NOTARY_PASSWORD` | An [app-specific password](https://support.apple.com/102654) for notarization, not your account password. |
 
-Keep certificates, private keys, and passwords out of Git. The action imports the certificate into a temporary keychain and removes it at the end, including on failure. The runner must have Xcode 26 or newer selected; `macos-26` supplies the SDK needed by Shark's Liquid Glass chrome.
+Keep certificates, private keys, and passwords out of Git. The action imports the certificate into a temporary keychain and removes it at the end, including on failure. Both release jobs run on the `xcode-27` Apple Silicon image with its preinstalled Xcode 27.0 explicitly selected through `DEVELOPER_DIR`, matching the local Xcode 27.0 / Swift 6.4 toolchain without installing another Xcode. The package declares Swift 6.2 as its minimum toolchain; the app still targets macOS 14+.
 
 ## Publish a version
 
@@ -36,6 +36,8 @@ Keep certificates, private keys, and passwords out of Git. The action imports th
    ```
 
 The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.dmg` and `Shark-<version>.dmg.sha256` with generated release notes (marked as prerelease when appropriate). A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
+
+For a workflow-only repair, use **Actions › Release › Run workflow** on `main` and enter the existing version tag in `release_tag`. This uses the repaired workflow from `main` but checks out and builds the existing tag; the tag is never moved. CLI equivalent: `gh workflow run release.yml --ref main -f release_tag=v1.0.0-alpha.2`.
 
 To check a download, put the file and its `.sha256` in the same directory and run:
 
