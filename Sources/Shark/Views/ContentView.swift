@@ -24,24 +24,12 @@ public struct ContentView: View {
         self.workspaceState = workspaceState
     }
 
-    /// Toolbar items never stretch on their own, so the Location capsule is sized from the detail
-    /// width minus what the other items use (Navigation plus Path through Search, with gaps).
-    /// Includes the native spacing between toolbar groups; retune if controls change.
-    private static let otherToolbarItemsWidth: CGFloat = 768
+    @State private var measuredLocationWidth: CGFloat = 160
 
-    /// With the sidebar hidden the detail column spans the whole window, so the traffic lights and
-    /// sidebar button also sit in the toolbar row. Without this the capsule is too wide and macOS
-    /// moves Back/Forward/Up into the overflow menu.
-    /// Native leading controls occupy 116 pt in the collapsed layout.
-    private static let collapsedSidebarInset: CGFloat = 116
-
-    private var locationWidth: CGFloat {
-        let inset = columnVisibility == .detailOnly ? Self.collapsedSidebarInset : 0
-        return max(160, detailWidth - Self.otherToolbarItemsWidth - inset)
-    }
+    private var locationWidth: CGFloat { measuredLocationWidth }
 
     @ToolbarContentBuilder
-    private func finderToolbar(for activeState: NavigationState) -> some ToolbarContent {
+    private func finderToolbar(for activeState: NavigationState) -> some CustomizableToolbarContent {
         // AppKit must place these together while the restored window is first measured.
         // Separate navigation items can straddle the sidebar tracking separator at launch.
         ToolbarItem(id: "navigation-location", placement: .navigation) {
@@ -97,11 +85,11 @@ public struct ContentView: View {
                 .frame(width: locationWidth)
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         // Keeps the right-hand controls at the trailing edge if the location ends early.
-        ToolbarItem(placement: .principal) { Spacer() }
-            .finderChromeItem()
+        ToolbarItem(id: "flexible-space", placement: .principal) { Spacer() }
+            .customizableFinderChromeItem()
 
         ToolbarItem(id: "path", placement: .primaryAction) {
             FinderToolbarCaption("Path") {
@@ -117,7 +105,7 @@ public struct ContentView: View {
                 }
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         ToolbarItem(id: "view-mode", placement: .primaryAction) {
             FinderToolbarCaption("View") {
@@ -136,7 +124,7 @@ public struct ContentView: View {
                 .accessibilityLabel("View Mode")
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         ToolbarItem(id: "group-sort", placement: .primaryAction) {
             FinderToolbarCaption("Group") {
@@ -152,7 +140,7 @@ public struct ContentView: View {
                 }
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         ToolbarItem(id: "share", placement: .primaryAction) {
             FinderToolbarCaption("Share") {
@@ -166,26 +154,13 @@ public struct ContentView: View {
                 .accessibilityLabel("Share Selection")
             }
         }
-        .finderChromeItem()
-
-        ToolbarItem(id: "tags", placement: .primaryAction) {
-            FinderToolbarCaption("Edit Tags") {
-                Button {} label: { FinderToolbarSymbol(symbol: "tag") }
-                    .buttonStyle(.plain)
-                    .finderGlass()
-                    .disabled(true)
-                    .help("Tag editing is not yet available")
-                    .accessibilityLabel("Edit Tags")
-            }
-        }
-        .finderChromeItem()
-
+        .customizableFinderChromeItem()
 
         utilityToolbar
     }
 
     @ToolbarContentBuilder
-    private var utilityToolbar: some ToolbarContent {
+    private var utilityToolbar: some CustomizableToolbarContent {
         ToolbarItem(id: "split", placement: .primaryAction) {
             FinderToolbarCaption("Split") {
                 Button { workspaceState.toggleSplit() } label: {
@@ -198,7 +173,7 @@ public struct ContentView: View {
                 .accessibilityValue(workspaceState.activeTab.isSplit ? "On" : "Off")
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         ToolbarItem(id: "terminal", placement: .primaryAction) {
             FinderToolbarCaption("Terminal") {
@@ -212,7 +187,7 @@ public struct ContentView: View {
                 .accessibilityValue(workspaceState.isTerminalVisible ? "On" : "Off")
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         ToolbarItem(id: "actions", placement: .primaryAction) {
             FinderToolbarCaption("Action") {
@@ -241,14 +216,14 @@ public struct ContentView: View {
                 }
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
 
         ToolbarItem(id: "search", placement: .primaryAction) {
             FinderToolbarCaption("Search") {
                 FinderSearchField(text: Bindable(activeState).filterText)
             }
         }
-        .finderChromeItem()
+        .customizableFinderChromeItem()
     }
 
     private func viewModeButton(_ mode: ViewMode, symbol: String, label: String) -> some View {
@@ -331,7 +306,8 @@ public struct ContentView: View {
             .background(GeometryReader { geometry in
                 Color.clear.onChange(of: geometry.size.width, initial: true) { _, width in detailWidth = width }
             })
-            .toolbar { finderToolbar(for: activeState) }
+            .toolbar(id: ToolbarConfiguration.identifier) { finderToolbar(for: activeState) }
+            .background(ToolbarLayoutObserver(availableWidth: detailWidth, locationWidth: $measuredLocationWidth))
         }
         .environment(workspaceState)
         .onChange(of: workspaceState.isTerminalVisible) { _, visible in

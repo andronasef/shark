@@ -91,7 +91,7 @@ struct FinderToolbarCaption<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             content
-            Text(title)
+            Text(L10n.text(title))
                 .font(.system(size: 9, weight: .regular))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -125,21 +125,38 @@ struct FinderSearchField: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
-            TextField("Search", text: $text)
+            TextField(L10n.text("Search"), text: $text)
+                .environment(\.layoutDirection, .leftToRight)
                 .textFieldStyle(.plain)
                 .font(.system(size: 12))
-                .accessibilityLabel("Search files in current folder")
+                .accessibilityLabel(L10n.text("Search files in current folder"))
             if !text.isEmpty {
                 Button { text = "" } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Clear Search")
+                .accessibilityLabel(L10n.text("Clear Search"))
             }
         }
         .padding(.horizontal, 10)
         .frame(width: 200, height: 28)
         .finderGlass(interactive: false)
+    }
+}
+
+// Keep customization conformance through the macOS 26 glass modifier.
+extension CustomizableToolbarContent {
+    @ToolbarContentBuilder
+    func customizableFinderChromeItem() -> some CustomizableToolbarContent {
+#if compiler(>=6.2)
+        if #available(macOS 26, *) {
+            sharedBackgroundVisibility(.hidden)
+        } else {
+            self
+        }
+#else
+        self
+#endif
     }
 }
