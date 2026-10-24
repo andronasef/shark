@@ -80,11 +80,25 @@ public enum AppLocalization {
 
     @MainActor
     public static func relaunchApp() {
-        let bundleURL = Bundle.main.bundleURL
-        if bundleURL.pathExtension == "app" {
+        var appBundleURL: URL? = nil
+        var current = Bundle.main.bundleURL
+        while current.path != "/" {
+            if current.pathExtension == "app" {
+                appBundleURL = current
+                break
+            }
+            current = current.deletingLastPathComponent()
+        }
+
+        if let appBundleURL {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-            process.arguments = ["-n", bundleURL.path]
+            process.arguments = ["-n", appBundleURL.path]
+            try? process.run()
+        } else if let execURL = Bundle.main.executableURL {
+            let process = Process()
+            process.executableURL = execURL
+            process.arguments = Array(CommandLine.arguments.dropFirst())
             try? process.run()
         } else {
             let exec = CommandLine.arguments[0]
