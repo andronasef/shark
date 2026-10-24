@@ -86,7 +86,7 @@
 "Choose what works for you. Both options are optional." = "اختر ما يناسبك. كلا الخيارين اختياريان.";
 "Clear Filter" = "مسح التصفية";
 "Clear Search" = "مسح البحث";
-"Clear Terminal Buffer" = "مسح المخزن المؤقت للمحطة";
+"Clear Terminal Buffer" = "مسح المخزن المؤقت للطرفية";
 "Clear the selection." = "امسح التحديد.";
 "Click" = "انقر";
 "Click / ⌘-click / ⇧-click" = "انقر / ⌘ انقر / ⇧ انقر";
@@ -104,7 +104,7 @@
 "Close Split View (F3)" = "إغلاق العرض المقسم (F3)";
 "Close Tab" = "إغلاق علامة التبويب";
 "Close Tabs to the Right" = "إغلاق علامات التبويب إلى اليمين";
-"Close Terminal Drawer (F4)" = "إغلاق درج المحطة الطرفية (F4)";
+"Close Terminal Drawer (F4)" = "إغلاق درج الطرفية (F4)";
 "Close Window" = "إغلاق النافذة";
 "Close the tab." = "أغلق علامة التبويب.";
 "Closing this window terminates its shell and any running commands. Hide the terminal drawer to keep them running." = "يؤدي إغلاق هذه النافذة إلى إنهاء غلافها وأي أوامر قيد التشغيل. قم بإخفاء الدرج الطرفي لإبقائه قيد التشغيل.";
@@ -120,7 +120,7 @@
 "Compressing..." = "ضغط...";
 "Compression failed with status %d" = "فشل الضغط مع الحالة %d";
 "Compute recursive directory sizes in background" = "حساب أحجام الدليل العودي في الخلفية";
-"Computer" = "حاسوب";
+"Computer" = "الكمبيوتر";
 "Confirm before closing a window with multiple tabs" = "قم بالتأكيد قبل إغلاق النافذة التي تحتوي على علامات تبويب متعددة";
 "Contains current folder" = "يحتوي على المجلد الحالي";
 "Continue" = "متابعة";
@@ -161,7 +161,7 @@
 "Directory command copied" = "تم نسخ أمر الدليل";
 "Directory exists" = "الدليل موجود";
 "Document" = "وثيقة";
-"Documents" = "وثائق";
+"Documents" = "المستندات";
 "Done" = "منتهي";
 "Double-click" = "انقر نقرا مزدوجا";
 "Double-click a tab to pin or unpin it" = "انقر نقرًا مزدوجًا فوق علامة التبويب لتثبيتها أو إزالة تثبيتها";
@@ -175,7 +175,7 @@
 "Drives & Volumes" = "محركات الأقراص ووحدات التخزين";
 "Duplicate" = "ينسخ";
 "Duplicate (⌘D)" = "مكررة (⌘D)";
-"Duplicate Tab" = "علامة تبويب مكررة";
+"Duplicate Tab" = "تكرار علامة التبويب";
 "Duplicate failed: %@" = "فشل التكرار: %@";
 "Edit Path (⌘L)" = "تحرير المسار (⌘L)";
 "Edit Tags" = "تحرير العلامات";
@@ -183,7 +183,7 @@
 "Empty space in a folder" = "مساحة فارغة في مجلد";
 "Enable Liquid Glass translucency and vibrancy" = "تمكين شفافية وحيوية الزجاج السائل";
 "Enable hover quick-previews for images, text, video, and audio" = "قم بتمكين المعاينة السريعة للصور والنصوص والفيديو والصوت";
-"Enclosing Folder" = "المجلد المرفق";
+"Enclosing Folder" = "المجلد الأصلي";
 "Enclosing Folder (⌘↑)" = "المجلد المرفق (⌘↑)";
 "Error: %@" = "خطأ: %@";
 "Expand %@" = "قم بتوسيع %@";
@@ -220,7 +220,7 @@
 "General" = "عام";
 "Get Info (⌘I)" = "الحصول على معلومات (⌘I)";
 "GitHub" = "GitHub";
-"Go" = "يذهب";
+"Go" = "انتقال";
 "Go back in folder history." = "العودة في تاريخ المجلد.";
 "Go forward in folder history." = "المضي قدما في تاريخ المجلد.";
 "Go to Folder..." = "انتقل إلى المجلد...";
@@ -235,7 +235,7 @@
 "Gray" = "رمادي";
 "Green" = "أخضر";
 "Grid view mode" = "وضع عرض الشبكة";
-"Group" = "مجموعة";
+"Group" = "تجميع";
 "Group %d" = "المجموعة %d";
 "Group & Sort" = "المجموعة والفرز";
 "Group Name" = "اسم المجموعة";
@@ -244,7 +244,7 @@
 "Hide Hidden Files" = "إخفاء الملفات المخفية";
 "Hide Path Bar" = "إخفاء شريط المسار";
 "Hide Thumbnails" = "إخفاء الصور المصغرة";
-"Home" = "بيت";
+"Home" = "الرئيسية";
 "Hover + Shift" = "تحوم + التحول";
 "Hover Delay" = "تأخير التحويم";
 "Hover Delay:" = "تأخير التحويم:";
@@ -314,7 +314,7 @@
 "Navigate Back" = "انتقل إلى الخلف";
 "Navigate Forward" = "انتقل إلى الأمام";
 "Navigate Up" = "انتقل لأعلى";
-"Navigation" = "ملاحة";
+"Navigation" = "تنقل";
 "New File" = "ملف جديد";
 "New Folder" = "مجلد جديد";
 "New Tab" = "علامة تبويب جديدة";
@@ -365,7 +365,7 @@
 "Paste files into current folder" = "لصق الملفات في المجلد الحالي";
 "Paste into Folder" = "لصق في المجلد";
 "Paste the copied cd command into an empty shell prompt when you are ready. The terminal's existing input and running commands are preserved." = "الصق أمر القرص المضغوط المنسوخ في موجه Shell فارغ عندما تكون جاهزًا. يتم الاحتفاظ بأوامر الإدخال والتشغيل الحالية للمحطة.";
-"Path" = "طريق";
+"Path" = "المسار";
 "Path (e.g. ~/Documents or /Users)" = "المسار (على سبيل المثال ~/Documents أو /Users)";
 "Path Hierarchy" = "التسلسل الهرمي للمسار";
 "Path not found: %@" = "لم يتم العثور على المسار: %@";
@@ -376,7 +376,7 @@
 "Photo" = "صورة";
 "Photo Viewer" = "عارض الصور";
 "Photo loading was canceled." = "تم إلغاء تحميل الصور.";
-"Pin Tab" = "دبوس علامة التبويب";
+"Pin Tab" = "تثبيت علامة التبويب";
 "Pin or unpin active tab to the left" = "قم بتثبيت علامة التبويب النشطة أو إزالة تثبيتها على اليسار";
 "Pin or unpin the tab." = "تثبيت علامة التبويب أو إلغاء تثبيتها.";
 "Places" = "الأماكن";
@@ -398,7 +398,7 @@
 "Quick Preview (QT-03)" = "معاينة سريعة (QT-03)";
 "Reapply previously undone operation" = "إعادة تطبيق العملية التي تم التراجع عنها سابقًا";
 "Recent Folders" = "المجلدات الأخيرة";
-"Recently Closed" = "مغلق مؤخرا";
+"Recently Closed" = "المغلقة حديثًا";
 "Recents" = "الأخيرة";
 "Red" = "أحمر";
 "Redo" = "إعادة";
@@ -420,7 +420,7 @@
 "Restart Shark to apply a language change." = "أعد تشغيل Shark لتطبيق تغيير اللغة.";
 "Restart Shark to apply the selected language." = "أعد تشغيل Shark لتطبيق اللغة المحددة.";
 "Restart Shell…" = "إعادة تشغيل شل...";
-"Restart Terminal" = "إعادة تشغيل المحطة";
+"Restart Terminal" = "إعادة تشغيل الطرفية";
 "Restore (Replace All)" = "استعادة (استبدال الكل)";
 "Restore (Replace)" = "استعادة (استبدال)";
 "Restore Finder" = "استعادة الباحث";
@@ -459,7 +459,7 @@
 "Send crash reports" = "إرسال تقارير الأعطال";
 "Session" = "حصة";
 "Settings" = "الإعدادات";
-"Share" = "يشارك";
+"Share" = "مشاركة";
 "Share Selection" = "مشاركة الاختيار";
 "Share anonymous usage statistics" = "مشاركة إحصائيات الاستخدام المجهولة";
 "Shared" = "مشترك";
@@ -501,9 +501,9 @@
 "Sort By" = "فرز حسب";
 "Source Code" = "كود المصدر";
 "Source Code on GitHub" = "كود المصدر على GitHub";
-"Space" = "فضاء";
-"Space continues to open Quick Look. You can always open the photo viewer from an image’s context menu." = "يستمر الفضاء في فتح نظرة سريعة. يمكنك دائمًا فتح عارض الصور من قائمة سياق الصورة.";
-"Split" = "ينقسم";
+"Space" = "المسافة";
+"Space continues to open Quick Look. You can always open the photo viewer from an image’s context menu." = "يستمر مفتاح المسافة في فتح نظرة سريعة. يمكنك دائمًا فتح عارض الصور من قائمة سياق الصورة.";
+"Split" = "تقسيم";
 "Stage items to copy" = "عناصر المرحلة للنسخ";
 "Stage items to move" = "عناصر المرحلة للتحرك";
 "Start Slideshow" = "ابدأ عرض الشرائح";
@@ -518,7 +518,7 @@
 "Switch to the tab." = "قم بالتبديل إلى علامة التبويب.";
 "System" = "نظام";
 "System Default" = "إعداد النظام الافتراضي";
-"Tab" = "فاتورة غير مدفوعة";
+"Tab" = "علامة تبويب";
 "Tab Groups" = "مجموعات علامات التبويب";
 "Tab Groups." = "مجموعات علامات التبويب.";
 "Tab Groups:" = "مجموعات علامات التبويب:";
@@ -528,7 +528,7 @@
 "Tags" = "العلامات";
 "Tags:" = "العلامات:";
 "Tell us" = "أخبرنا";
-"Terminal" = "صالة";
+"Terminal" = "الطرفية";
 "Terminal.app could not be found." = "تعذر العثور على Terminal.app.";
 "Terminate" = "إنهاء";
 "Terminate Shell…" = "إنهاء شل…";
@@ -557,9 +557,9 @@
 "Toggle Full Screen" = "تبديل الشاشة الكاملة";
 "Toggle Split View" = "تبديل عرض الانقسام";
 "Toggle Split View (F3)" = "تبديل العرض المقسم (F3)";
-"Toggle Terminal" = "تبديل المحطة";
-"Toggle Terminal (F4)" = "تبديل المحطة (F4)";
-"Toggle Terminal Drawer" = "تبديل درج المحطة الطرفية";
+"Toggle Terminal" = "تبديل الطرفية";
+"Toggle Terminal (F4)" = "تبديل الطرفية (F4)";
+"Toggle Terminal Drawer" = "تبديل درج الطرفية";
 "Toggle visibility of dotfiles and hidden folders" = "تبديل رؤية الملفات النقطية والمجلدات المخفية";
 "Top" = "قمة";
 "Trash" = "نفاية";
@@ -572,12 +572,12 @@
 "Undo failed: %@" = "فشل التراجع: %@";
 "Undo: %@" = "التراجع: %@";
 "Unknown" = "مجهول";
-"Unlock Tab" = "فتح علامة التبويب";
-"Unpin Tab" = "إزالة تثبيت علامة التبويب";
+"Unlock Tab" = "إلغاء قفل علامة التبويب";
+"Unpin Tab" = "إلغاء تثبيت علامة التبويب";
 "Update checking is unavailable in development builds." = "التحقق من التحديث غير متوفر في إصدارات التطوير.";
 "Updates" = "التحديثات";
 "Use Current Folder" = "استخدم المجلد الحالي";
-"View" = "منظر";
+"View" = "عرض";
 "View All Features" = "عرض جميع الميزات";
 "View Mode" = "وضع العرض";
 "View Selected Photos" = "عرض الصور المحددة";

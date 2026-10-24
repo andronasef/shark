@@ -71,7 +71,6 @@ struct SharkApp: App {
             MainWindowView(appDelegate: appDelegate, onboarding: onboarding)
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
-                .id("main-window-\(languagePreference)")
                 .frame(minWidth: 850, minHeight: 550)
         }
         .windowStyle(.titleBar)
@@ -87,14 +86,12 @@ struct SharkApp: App {
             HelpView()
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
-                .id("help-window-\(languagePreference)")
         }
 
         Settings {
             SettingsView()
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
-                .id("settings-window-\(languagePreference)")
         }
     }
 }

@@ -69,7 +69,12 @@ public enum AppLocalization {
         // Process-only override also guides AppKit's standard menu strings. Never
         // persist AppleLanguages, so System Default continues to follow macOS.
         var arguments = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
-        arguments["AppleLanguages"] = [language.rawValue]
+        let pref = AppLanguage.preference(UserDefaults.standard.string(forKey: preferenceKey))
+        if pref == .system {
+            arguments.removeValue(forKey: "AppleLanguages")
+        } else {
+            arguments["AppleLanguages"] = [pref.rawValue]
+        }
         UserDefaults.standard.setVolatileDomain(arguments, forName: UserDefaults.argumentDomain)
     }
 
