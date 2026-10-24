@@ -57,7 +57,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'icon-view', title: 'Icon view', description: 'Browse a grid of folders and file thumbnails with adjustable icon sizes and drag selection.', shortcut: '⌘1' },
       { id: 'list-view', title: 'List view', description: 'Compare names, modified dates, sizes, kinds, and permissions in a sortable details table. Command-click toggles items and Shift-click selects a range from the last clicked item.', shortcut: '⌘2' },
       { id: 'column-view', title: 'Column view', description: 'Follow a folder hierarchy across cascading columns, with arrow-key navigation, a preview, and file details at the end.', shortcut: '⌘3' },
-      { id: 'gallery-view', title: 'Gallery view', description: 'Give the selected file a large preview while keeping a thumbnail strip in reach.', shortcut: '⌘4' },
+      { id: 'gallery-view', title: 'Gallery view', description: 'Give the selected file a large preview, with real image previews, while keeping a thumbnail strip in reach. Files without a preview show their icon.', shortcut: '⌘4' },
       { id: 'icon-zoom', title: 'Adjustable icon zoom', description: 'Make icons larger or smaller with Command-plus, Command-minus, or Command-scroll. Command-0 restores the default size.' },
       { id: 'sorting', title: 'Sorting controls', description: 'Sort by name, modified date, size, kind, or permissions, and switch between ascending and descending order.' },
       { id: 'hidden-files', title: 'Hidden files & dotfiles', description: 'Show or hide dotfiles and other hidden items in the folder you are browsing.', shortcut: '⇧⌘.' },
@@ -71,7 +71,7 @@ export const featureGroups: FeatureGroup[] = [
     description: 'Look inside a file before you decide what comes next.',
     features: [
       { id: 'quick-look', title: 'macOS Quick Look', description: 'Preview selected files using the Mac’s built-in Quick Look.', shortcut: 'Space' },
-      { id: 'image-previews', title: 'Image & animated image previews', description: 'Hover over an image to see it in a floating preview, including animated images.' },
+      { id: 'image-previews', title: 'Image & animated image previews', description: 'Hover over an image to see it, with its full aspect ratio, in a floating preview, including animated images. The preview stays inside the usable area of the screen you are on, flipping to the other side of the pointer or shrinking when needed, and still works when it extends past the Shark window.' },
       { id: 'text-previews', title: 'Text file previews', description: 'Read up to 40 lines of a text file on hover, with support for UTF-8, UTF-16, and Latin-1 text.' },
       { id: 'document-previews', title: 'Document thumbnails', description: 'See available document thumbnails, including PDF, Office, iWork, and RTF files.' },
       { id: 'media-previews', title: 'Video & audio playback', description: 'Play media in the hover preview with playback and seek controls. Move the pointer into the preview to use them.' },
@@ -85,7 +85,7 @@ export const featureGroups: FeatureGroup[] = [
     features: [
       { id: 'new-items', title: 'New folders & files', description: 'Create a folder or a new file directly in the location you are browsing. Command-Shift-N creates a folder.' },
       { id: 'clipboard', title: 'Cut, copy & paste', description: 'Use Command-X, Command-C, and Command-V to move or copy files between folders. Cut items are dimmed so you can see what is ready to move. Pasting never replaces an existing item: copies get a “copy” name, and a move onto an existing name is refused. In text fields, these keys edit the text as usual.' },
-      { id: 'drag-drop', title: 'Drag & drop', description: 'Move files between panes or into folders. Like Finder, a drop moves within a disk and copies to another disk. Hold Option to copy or Command to move.' },
+      { id: 'drag-drop', title: 'Drag & drop', description: 'Drag a selected item to carry the whole selection, or drag an unselected item to move just that one. Drop onto folders, the folder background, sidebar places, or the other pane. Like Finder, a drop moves within a disk and copies to another disk. Hold Option to copy or Command to move. A move that cannot finish puts back what it moved and tells you if anything is left elsewhere.' },
       { id: 'rename', title: 'Inline rename', description: 'Change a file or folder name in place.', shortcut: 'F2' },
       { id: 'batch-rename', title: 'Batch rename with a preview', description: 'Find and replace text, add a prefix or suffix, or apply sequential numbering to a selection. Review the new names before applying them. Shark renames all items or none, and refuses names that collide or contain “/” or “:”.' },
       { id: 'duplicate', title: 'Duplicate files', description: 'Create another copy of selected items in the same folder.' },
@@ -94,7 +94,9 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'undo-redo', title: 'Undo & redo', description: 'Undo and redo moves, copies, duplicates, new folders and files, renames (including batch renames), ZIP archives, and Trash with Command-Z and Command-Shift-Z. Undoing a copy moves the copy to the Trash.' },
       { id: 'copy-path', title: 'Copy file & folder paths', description: 'Copy a full, relative, or quoted path from the item menu, or copy the active tab’s folder path.' },
       { id: 'show-in-finder', title: 'Show in Finder', description: 'Reveal selected items or a sidebar favorite in Finder whenever you want to switch to the system file browser.' },
-      { id: 'sharing', title: 'Native sharing', description: 'Send selected files through the macOS sharing menu using the Share button.' },
+      { id: 'sharing', title: 'Native sharing', description: 'Send selected files through the macOS sharing menu using the Share button or Share… in the item menu.' },
+      { id: 'open-with', title: 'Open With', description: 'Right-click files and choose Open With to pick any application that can open every selected file, or choose Other… to browse. Opening more than 20 items at once asks for confirmation first, and opening several folders gives each its own tab.' },
+      { id: 'context-menus', title: 'Context-sensitive menus', description: 'Right-click an item to act on it, or on part of a selection to act on the whole selection. Menus are grouped for opening, previews, clipboard, renaming, paths, and Trash, and the title and count match what the action will affect.' },
     ],
   },
   // TerminalDrawerView, PTYSession, TerminalSessionManager, InspectorPanelView, FileMetadataService.
@@ -102,8 +104,9 @@ export const featureGroups: FeatureGroup[] = [
     id: 'terminal-inspector', title: 'Terminal & inspection',
     description: 'Work with your files, and see what is behind them.',
     features: [
-      { id: 'terminal-drawer', title: 'Built-in terminal', description: 'Open a real interactive terminal beneath your files, with shell input and terminal output in the same window. Control-` also toggles it, for keyboards where F4 opens Launchpad.', shortcut: 'F4' },
-      { id: 'terminal-sync', title: 'Folder-aware terminal', description: 'The embedded terminal follows the active folder while the shell is at its prompt. It never types into a program that is running, such as an editor.' },
+      { id: 'terminal-drawer', title: 'Built-in terminal', description: 'Open a real interactive terminal beneath your files and type into it as you would in Terminal: history, line editing, Tab completion, Control-C/D/Z, selection, copy and paste, and full-screen programs. Opening it focuses the shell and clicking a file returns the keys to the file list. Drag its top edge to resize it. Control-` also toggles it, for keyboards where F4 opens Launchpad.', shortcut: 'F4' },
+      { id: 'terminal-sync', title: 'One shell per window', description: 'Hiding the drawer, changing tabs, or switching panes keeps the same shell, running command, and scrollback. It starts in the folder you were browsing and browsing never types into it. Use Current Folder copies a quoted cd command to paste when you are ready, so partly typed input and running programs are never disturbed. Restart or terminate the shell from the drawer menu; closing a window with a running command asks first.' },
+      { id: 'terminal-text-size', title: 'Terminal text size', description: 'With the terminal focused, Command-plus, Command-minus, and Command-0 change only the terminal text. The size is remembered.' },
       { id: 'external-terminal', title: 'Open in Terminal', description: 'Open the chosen folder in macOS Terminal, or choose Open in Embedded Terminal to work inside Shark.' },
       { id: 'file-inspector', title: 'File inspector', description: 'Inspect the selected item’s location, size, dates, kind, and owner, group, and POSIX permissions.', shortcut: '⌥⌘I' },
       { id: 'image-dimensions', title: 'Image dimensions', description: 'Check the pixel dimensions of supported images in the inspector.' },
@@ -126,6 +129,18 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'mouse-preferences', title: 'Optional gestures & in-app help', description: 'Switch optional background, tab, wheel, and side-button actions on or off in Settings › Mouse. Help › Shark Help lists the bindings by pointer location.' },
     ],
   },
+  // PhotoViewerWindowController, PhotoViewerState, PhotoViewerView, PhotoImageDecoder, FileThumbnailView.
+  {
+    id: 'photo-viewer', title: 'Photo viewer',
+    description: 'Browse a folder of pictures without leaving Shark.',
+    features: [
+      { id: 'photo-viewer-window', title: 'Shark Photo Viewer', description: 'Open images in a dedicated window from Open in Shark Photo Viewer in the item menu, or turn on Settings › Previews › Open images in Shark Photo Viewer on double-click. Space still opens Quick Look.' },
+      { id: 'photo-browsing', title: 'Browse a folder or a selection', description: 'Move between photos in the folder’s current filter and sort order with the arrow keys or the thumbnail strip, or choose View Selected Photos to browse only the selected images. The viewer keeps the list it was opened with and shows the file name and position.' },
+      { id: 'photo-zoom', title: 'Fit, actual size, zoom & pan', description: 'Fit the photo to the window, show one image pixel per display pixel, zoom with Command-plus, Command-minus, or pinch, and drag to pan. Rotating is for viewing only and never changes the file.' },
+      { id: 'photo-slideshow', title: 'Slideshow & full screen', description: 'Play a slideshow that stops at the last photo, when you interact, or when the window loses focus, and view in full screen. Escape leaves full screen first, then closes the viewer.' },
+      { id: 'photo-formats', title: 'Formats & metadata', description: 'View JPEG, PNG, HEIC, TIFF, animated GIF, and other formats macOS can decode, with orientation respected and a details line for pixel size, format, file size, camera model, and capture date when available. Missing or damaged files show an explanation and let you move on.' },
+    ],
+  },
   // SharkSettings, SettingsView, FinderChromeView, SecurityScopedBookmarkManager, DirectoryStateViews, UpdateChecker.
   // Omit startup/view-default and tab-preference controls until their stored settings drive app behavior.
   {
@@ -135,6 +150,8 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'welcome-setup', title: 'A short welcome & optional setup', description: 'A three-step first-run welcome introduces Shark and its everyday tools, then offers optional default-folder-app and Full Disk Access setup. Skip it anytime or revisit it from Help › Welcome to Shark. Full Disk Access must be enabled manually in System Settings; the same guidance is available in Settings › Privacy. Setup shows the running app’s exact location and can reveal it in Finder to help you add the correct copy.' },
       { id: 'default-folder-app', title: 'Default folder app setup', description: 'Request Shark as your default folder app, or restore Finder, in Settings › General. If macOS rejects the change, manual setup instructions are available; they require restarting your Mac and may not work on every version. Folders sent to Shark reuse a matching open pane or open in a new tab, bringing its window back if needed. Finder-specific reveal actions and macOS Open/Save dialogs still use the system interface.' },
       { id: 'native-materials', title: 'Native Mac materials', description: 'Liquid Glass chrome on macOS 26, with system material fallbacks on macOS 14 and 15. Translucency can be turned off in Settings.' },
+      { id: 'toolbar-customization', title: 'Customizable toolbar', description: 'Right-click the toolbar and choose Customize Toolbar… to add, remove, and reorder actions or return to the default set. The layout is remembered for all windows, and the location bar adapts to the space left. Removed actions stay available from the menus and shortcuts.' },
+      { id: 'languages', title: 'Eight languages', description: 'Use Shark in English, Arabic, Spanish, French, German, Brazilian Portuguese, Simplified Chinese, or Japanese. Choose System Default or a language in Settings › General (applied after restarting Shark). Arabic mirrors the interface, while file names, paths, and the terminal keep their own direction.' },
       { id: 'appearance', title: 'Light & dark appearance', description: 'The app follows your Mac’s appearance and uses native controls and system colors.' },
       { id: 'accessibility', title: 'Accessible controls & motion', description: 'Labeled controls, keyboard navigation, and support for Reduce Motion, Reduce Transparency, and increased contrast.' },
       { id: 'folder-permissions', title: 'macOS folder access', description: 'Grant access to protected folders when macOS asks. When privacy settings block a location, Shark offers guidance and a route to the relevant settings.' },

@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Shark Photo Viewer: a separate window for browsing images, opened from Open in Shark Photo Viewer in the item menu (View Selected Photos browses only the selection) or, if switched on in Settings › Previews, by double-clicking an image. Previous/next follow the folder's filtered and sorted order, with a thumbnail strip, fit and actual-size zoom, pinch/⌘± zoom and pan, view-only rotation, slideshow, full screen, an information line, and animated GIFs. JPEG, PNG, HEIC, TIFF and any other format macOS decodes; missing or damaged files show an explanation instead of failing. Space still opens Quick Look. Gallery view now shows real image previews.
+- Item menus now include Open With (applications that can open every selected file, plus Other…), Share…, and a clearly named Shark Preview, grouped for opening, clipboard, renaming, paths and Trash. Opening more than 20 items asks first, and several folders open in separate tabs.
+- Customize Toolbar…: add, remove and reorder toolbar actions with the native macOS customization sheet. The layout is saved for all windows, Restore Defaults is built in, and narrow windows overflow natively.
+- Shark is available in English, Arabic, Spanish, French, German, Brazilian Portuguese, Simplified Chinese and Japanese. Settings › General › Language offers System Default or an explicit language (applies after restarting). Arabic mirrors the layout while file names, paths and the terminal keep their own direction.
+- Terminal: ⌘+, ⌘− and ⌘0 change the terminal text size while it is focused (remembered, 8–36 pt), the drawer drags to resize from its top edge, and a shell that exits offers Restart.
+- Help › Shark Help lists multi-selection drag, the optional image double-click, selection menus, and the terminal drawer.
 - Website: a copyable Homebrew install command (`brew install --cask andronasef/shark/shark`) sits under the download buttons, and the install FAQ mentions it. The App Store review pill is shorter ("In review · day N"). README: download badges (latest release, Homebrew, Mac App Store, total downloads, macOS 14+) and a direct link to the Releases page.
 - Shark is now licensed under the Apache License 2.0 (`LICENSE`).
 - Website: the Mac App Store button shows how many days the app has been waiting for Apple’s review (since 20 Oct 2026) and previews the App Store Connect status on hover. Added a 1200×630 social share image, Open Graph and Twitter large-card tags, canonical and `SoftwareApplication` structured data, plus a generated `robots.txt` and sitemap (Astro plugins).
@@ -17,6 +23,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Update alerts: Shark checks for a newer version at launch (at most once a day) and from Shark › Check for Updates…, then offers the update route that matches how it was installed: Download for the DMG, Copy Command (`brew upgrade --cask shark`) for Homebrew, or Open App Store. The alert shows the release notes when the release has them. Skip a version, or turn automatic checks off in Settings › General. Shark never installs updates itself.
 
 ### Changed
+- The terminal no longer follows the folder you browse, which used to clear a partly typed command with Ctrl-U and type `cd` into the prompt. It starts in the active folder, keeps one shell per window across tabs, panes and hiding the drawer, and Use Current Folder now copies a quoted `cd` command to paste when you are ready.
+- Closing a window with a running terminal command asks before ending it.
+- Hover previews keep the image's whole aspect ratio instead of cropping extreme shapes, decode off the main thread at a bounded size, and cache by file revision and memory use.
+- Directory thumbnails load with bounded concurrency, are reused only for the same file revision, size and display scale, cancel when scrolled away, and retry after a transient failure instead of caching a generic icon.
+- The Location bar width is measured from the installed toolbar items instead of a fixed allowance.
+- Release packaging (`scripts/package.sh`) and `scripts/run.sh` now bundle the localization resources. Menu items such as Undo and Redo use translatable text.
 - Full Disk Access setup shows the running Shark app’s exact location and can reveal it in Finder, so development builds and duplicate installations are easier to add. Default-folder errors now distinguish a rejected one-click request from the separate restart-based manual option.
 - Drops now follow Finder: they move within a disk and copy to another disk. Hold ⌥ to copy or ⌘ to move. Before, every drop moved, so dragging from an SD card or external drive removed the files from it.
 - Every file operation can now be undone: Trash, drag-and-drop, duplicate, new folder and file, batch rename, and Compress join copy, move, and rename. Undoing something Shark created moves it to the Trash; nothing is permanently deleted.
@@ -31,6 +43,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Dragging a selected file now moves or copies the whole selection (icons, list, columns), not just one item; dragging an unselected item carries only that item. A batch move that cannot fully roll back after a failure now reports where the remaining items are.
+- Terminal keys: with the terminal focused, arrow keys, history, Tab, Ctrl-C/D/Z and ⌘C/⌘V/⌘A go to the shell instead of the file list or file shortcuts, and clicking a file returns the keys to the files. Type-to-select and the other file shortcuts no longer fire in another window.
+- Hover previews no longer extend below or beyond the screen: they flip to the other side of the pointer, shrink to fit, and recompute when content finishes loading, on secondary displays, or when displays change.
+- Scrolling a large photo folder no longer decodes every image at once.
+- A Sendable error in the hover preview thumbnail code that broke the build.
 - Keep Navigation and Location together in one toolbar item to prevent independent placement across the sidebar boundary during launch.
 - Multi-folder ZIP archives preserve each selected folder and files with the same name inside different folders.
 - Undo and redo requests run one at a time; newer file actions invalidate pending redo history, and clearing history cannot be undone by an in-flight completion.
