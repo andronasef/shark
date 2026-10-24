@@ -46,7 +46,9 @@ enum ToolbarConfiguration {
     static func configureItem(_ item: NSToolbarItem) {
         if let label = itemLabel(for: item.itemIdentifier.rawValue) {
             item.paletteLabel = label
-            item.label = label
+            // Keep item.label empty so AppKit does not draw its large standard font label.
+            // FinderToolbarCaption renders the compact 10pt secondary caption instead.
+            item.label = ""
         }
     }
 
