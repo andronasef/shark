@@ -230,6 +230,12 @@ struct ExplorerCommands: Commands {
             .keyboardShortcut(.delete, modifiers: .command)
         }
 
+        CommandGroup(after: .toolbar) {
+            Button(L10n.text("Customize Toolbar…")) {
+                (NSApp.keyWindow ?? NSApp.mainWindow)?.toolbar?.runCustomizationPalette(nil)
+            }
+        }
+
         CommandGroup(replacing: .undoRedo) {
             // Not disabled when the file history is empty: text fields still need ⌘Z.
             Button(FileUndoService.shared.currentUndoDescription.map { L10n.format("Undo: %@", $0) } ?? L10n.text("Undo")) {

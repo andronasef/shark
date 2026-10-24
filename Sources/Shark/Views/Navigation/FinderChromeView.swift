@@ -112,6 +112,8 @@ struct FinderToolbarSymbol: View {
                     .font(.system(size: 7, weight: .semibold))
             }
         }
+        // Explicit, so the Customize Toolbar palette doesn't render the symbols in its dimmed default.
+        .foregroundStyle(.primary)
         .frame(width: disclosure ? 42 : 30, height: 28)
         .contentShape(Capsule())
     }
