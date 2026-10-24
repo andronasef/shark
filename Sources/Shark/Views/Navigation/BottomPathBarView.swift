@@ -64,11 +64,11 @@ public struct BottomPathBarView: View {
                     }
             }
             .contextMenu {
-                Button(L10n.text("Edit Path (⌘L)")) {
+                Button(L10n.text("Edit Path (⌘L)"), systemImage: "pencil") {
                     navigationState.pathInputText = navigationState.currentURL.path
                     navigationState.isEditingPath = true
                 }
-                Button(L10n.text("Copy Path")) {
+                Button(L10n.text("Copy Path"), systemImage: "link") {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
                 }
@@ -127,10 +127,10 @@ public struct BottomPathBarView: View {
                             workspace?.open(seg.url, from: navigationState, newTab: true)
                         }
                         .contextMenu {
-                            Button(L10n.text("Open in New Tab")) {
+                            Button(L10n.text("Open in New Tab"), systemImage: "plus.rectangle.on.rectangle") {
                                 workspace?.open(seg.url, from: navigationState, newTab: true)
                             }
-                            Button(L10n.text("Copy Path")) {
+                            Button(L10n.text("Copy Path"), systemImage: "link") {
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(seg.url.path, forType: .string)
                             }

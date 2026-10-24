@@ -520,36 +520,36 @@ public struct DirectoryView: View {
         let targets = FileContextSelection.items(clicked: item, selected: navigationState.selectedItemIDs, ordered: navigationState.filteredAndSortedItems)
         let urls = targets.map(\.url)
         let isMultiple = targets.count > 1
-        Button(isMultiple ? L10n.format("Open %d Items", targets.count) : L10n.text("Open")) {
+        Button(isMultiple ? L10n.format("Open %d Items", targets.count) : L10n.text("Open"), systemImage: "arrow.up.forward.app") {
             openContextItems(targets)
         }
         if !item.isDirectory {
-            Menu(L10n.text("Open With")) {
+            Menu(L10n.text("Open With"), systemImage: "arrow.up.forward.square") {
                 ForEach(OpenWithService.applications(for: targets), id: \.self) { app in
                     Button(app.deletingPathExtension().lastPathComponent) {
                         OpenWithService.open(urls, with: app) { navigationState.operationError = $0 }
                     }
                 }
                 Divider()
-                Button(L10n.text("Other…")) {
+                Button(L10n.text("Other…"), systemImage: "ellipsis.circle") {
                     OpenWithService.chooseApplication(for: urls) { navigationState.operationError = $0 }
                 }
             }
             if targets.allSatisfy({ PhotoViewerWindowController.supports(url: $0.url) }) {
-                Button(L10n.text("Open in Shark Photo Viewer")) {
+                Button(L10n.text("Open in Shark Photo Viewer"), systemImage: "photo.on.rectangle") {
                     PhotoViewerWindowController.open(items: navigationState.filteredAndSortedItems, initialURL: item.url)
                 }
                 if isMultiple {
-                    Button(L10n.text("View Selected Photos")) {
+                    Button(L10n.text("View Selected Photos"), systemImage: "photo.stack") {
                         PhotoViewerWindowController.open(items: targets, initialURL: item.url, selectedURLs: Set(urls))
                     }
                 }
             }
-            if !isMultiple { Button(L10n.text("Shark Preview")) { previewItem = item } }
+            if !isMultiple { Button(L10n.text("Shark Preview"), systemImage: "macwindow") { previewItem = item } }
         }
         if !isMultiple && item.isNavigableDirectory {
-            Button(L10n.text("Open in New Tab")) { workspace?.newTab(url: item.url) }
-            Button(L10n.text("Browse Subfolders…")) {
+            Button(L10n.text("Open in New Tab"), systemImage: "plus.rectangle.on.rectangle") { workspace?.newTab(url: item.url) }
+            Button(L10n.text("Browse Subfolders…"), systemImage: "list.bullet.indent") {
                 let builder = SubfolderMenuBuilder { url, inNewTab in
                     if inNewTab { workspace?.open(url, from: navigationState, newTab: true) }
                     else { navigationState.navigateTo(url) }
@@ -559,36 +559,36 @@ public struct DirectoryView: View {
                 }
             }
         }
-        Button(L10n.text("Quick Look")) { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
-        Button(L10n.text("Share…")) { OpenWithService.share(urls) }
-        Button(L10n.text("Show in Finder")) { NSWorkspace.shared.activateFileViewerSelecting(urls) }
+        Button(L10n.text("Quick Look"), systemImage: "eye") { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
+        Button(L10n.text("Share…"), systemImage: "square.and.arrow.up") { OpenWithService.share(urls) }
+        Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting(urls) }
         Divider()
         TerminalMenuItems(url: isMultiple ? navigationState.currentURL : item.url, workspace: workspace, source: navigationState)
         Divider()
-        Button(L10n.text("Cut")) { FileClipboardService.shared.cut(urls) }
-        Button(L10n.text("Copy")) { FileClipboardService.shared.copy(urls) }
+        Button(L10n.text("Cut"), systemImage: "scissors") { FileClipboardService.shared.cut(urls) }
+        Button(L10n.text("Copy"), systemImage: "doc.on.doc") { FileClipboardService.shared.copy(urls) }
         if !isMultiple && item.isNavigableDirectory && FileClipboardService.shared.hasItemsToPaste {
-            Button(L10n.text("Paste into Folder")) {
+            Button(L10n.text("Paste into Folder"), systemImage: "doc.on.clipboard") {
                 Task { await navigationState.paste(into: item.url) }
             }
         }
         Divider()
-        Button(isMultiple ? L10n.text("Batch Rename…") : L10n.text("Rename")) {
+        Button(isMultiple ? L10n.text("Batch Rename…") : L10n.text("Rename"), systemImage: "pencil") {
             if isMultiple { contextRenameItems = targets; showingBatchRenameSheet = true }
             else { navigationState.startRenaming(url: item.url) }
         }
-        Button(L10n.text("Duplicate")) { performContextOperation(.duplicate, urls: urls) }
-        Button(L10n.text("Compress")) { performContextOperation(.compress, urls: urls) }
-        Menu(L10n.text("Copy Path")) {
+        Button(L10n.text("Duplicate"), systemImage: "plus.square.on.square") { performContextOperation(.duplicate, urls: urls) }
+        Button(L10n.text("Compress"), systemImage: "archivebox") { performContextOperation(.compress, urls: urls) }
+        Menu(L10n.text("Copy Path"), systemImage: "link") {
             Button(L10n.text("Full Path")) { copyContextText(urls.map(\.path).joined(separator: "\n")) }
             Button(L10n.text("Relative Path")) { copyContextText(targets.map(\.name).joined(separator: "\n")) }
             Button(L10n.text("POSIX Quoted Path")) { copyContextText(urls.map { $0.path.shellQuoted }.joined(separator: " ")) }
         }
         if !isMultiple && item.isDirectory {
-            Button(L10n.text("Calculate Size")) { FolderSizeCalculator.shared.requestSize(for: item.url) }
+            Button(L10n.text("Calculate Size"), systemImage: "chart.pie") { FolderSizeCalculator.shared.requestSize(for: item.url) }
         }
         Divider()
-        Button(isMultiple ? L10n.format("Move %d Items to Trash", targets.count) : L10n.text("Move to Trash"), role: .destructive) {
+        Button(isMultiple ? L10n.format("Move %d Items to Trash", targets.count) : L10n.text("Move to Trash"), systemImage: "trash", role: .destructive) {
             performContextOperation(.trash, urls: urls)
         }
     }
@@ -698,16 +698,16 @@ public struct DirectoryView: View {
             Divider()
         }
 
-        Button("New Folder") {
+        Button("New Folder", systemImage: "folder.badge.plus") {
             showingNewItemSheet = .folder
         }
 
-        Button("New File") {
+        Button("New File", systemImage: "doc.badge.plus") {
             showingNewItemSheet = .file
         }
 
         if FileClipboardService.shared.hasItemsToPaste {
-            Button("Paste") {
+            Button("Paste", systemImage: "doc.on.clipboard") {
                 Task {
                     await navigationState.paste()
                 }
@@ -718,19 +718,19 @@ public struct DirectoryView: View {
 
         TerminalMenuItems(url: navigationState.currentURL, workspace: workspace, source: navigationState)
 
-        Button("Reload") {
+        Button("Reload", systemImage: "arrow.clockwise") {
             Task {
                 await navigationState.reloadCurrentDirectory()
             }
         }
 
-        Button("Show Hidden Files") {
+        Button("Show Hidden Files", systemImage: "eye") {
             navigationState.showHiddenFiles.toggle()
         }
 
         Divider()
 
-        Menu("Copy Path") {
+        Menu("Copy Path", systemImage: "link") {
             Button("Full Path") {
                 NSPasteboard.general.clearContents()
                 let paths = hasSelection

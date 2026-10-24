@@ -96,7 +96,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'show-in-finder', title: 'Show in Finder', description: 'Reveal selected items or a sidebar favorite in Finder whenever you want to switch to the system file browser.' },
       { id: 'sharing', title: 'Native sharing', description: 'Send selected files through the macOS sharing menu using the Share button or Share… in the item menu.' },
       { id: 'open-with', title: 'Open With', description: 'Right-click files and choose Open With to pick any application that can open every selected file, or choose Other… to browse. Opening more than 20 items at once asks for confirmation first, and opening several folders gives each its own tab.' },
-      { id: 'context-menus', title: 'Context-sensitive menus', description: 'Right-click an item to act on it, or on part of a selection to act on the whole selection. Menus are grouped for opening, previews, clipboard, renaming, paths, and Trash, and the title and count match what the action will affect.' },
+      { id: 'context-menus', title: 'Context-sensitive menus', description: 'Right-click an item to act on it, or on part of a selection to act on the whole selection. Menus are grouped for opening, previews, clipboard, renaming, paths, and Trash, each action has an icon, and the title and count match what the action will affect.' },
     ],
   },
   // TerminalDrawerView, PTYSession, TerminalSessionManager, InspectorPanelView, FileMetadataService.

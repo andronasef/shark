@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Update alerts: Shark checks for a newer version at launch (at most once a day) and from Shark › Check for Updates…, then offers the update route that matches how it was installed: Download for the DMG, Copy Command (`brew upgrade --cask shark`) for Homebrew, or Open App Store. The alert shows the release notes when the release has them. Skip a version, or turn automatic checks off in Settings › General. Shark never installs updates itself.
 
 ### Changed
+- Right-click menus now show an icon beside each action (file and folder menus, folder background, tabs, tab groups, sidebar places, path bar, and the terminal's More menu), matching the icons already used in the toolbar's Action menu.
 - The terminal no longer follows the folder you browse, which used to clear a partly typed command with Ctrl-U and type `cd` into the prompt. It starts in the active folder, keeps one shell per window across tabs, panes and hiding the drawer, and Use Current Folder now copies a quoted `cd` command to paste when you are ready.
 - Closing a window with a running terminal command asks before ending it.
 - Hover previews keep the image's whole aspect ratio instead of cropping extreme shapes, decode off the main thread at a bounded size, and cache by file revision and memory use.

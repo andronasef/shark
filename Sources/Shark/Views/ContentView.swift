@@ -64,7 +64,7 @@ public struct ContentView: View {
                     .buttonStyle(.plain)
                     .finderGlass()
                     .contextMenu {
-                        Button("Enclosing Folder") { activeState.goUp() }
+                        Button("Enclosing Folder", systemImage: "arrow.up") { activeState.goUp() }
                             .disabled(!activeState.canGoUp)
                     }
                 }

@@ -129,22 +129,22 @@ public struct TabStripView: View {
 
     @ViewBuilder
     private var tabGroupCommands: some View {
-        Button(L10n.text("Save Tabs as Group...")) {
+        Button(L10n.text("Save Tabs as Group..."), systemImage: "rectangle.stack.badge.plus") {
             newGroupName = L10n.format("Group %d", TabGroupService.shared.groups.count + 1)
             isShowingSaveGroupAlert = true
         }
         if !TabGroupService.shared.groups.isEmpty {
             Divider()
             ForEach(TabGroupService.shared.groups) { group in
-                Menu(group.name) {
-                    Button(L10n.text("Restore (Replace)")) {
+                Menu(group.name, systemImage: "rectangle.stack") {
+                    Button(L10n.text("Restore (Replace)"), systemImage: "arrow.triangle.2.circlepath") {
                         TabGroupService.shared.restore(group: group, into: workspace, replace: true)
                     }
-                    Button(L10n.text("Append Tabs")) {
+                    Button(L10n.text("Append Tabs"), systemImage: "plus.rectangle.on.rectangle") {
                         TabGroupService.shared.restore(group: group, into: workspace, replace: false)
                     }
                     Divider()
-                    Button(L10n.text("Delete Group"), role: .destructive) {
+                    Button(L10n.text("Delete Group"), systemImage: "trash", role: .destructive) {
                         TabGroupService.shared.deleteGroup(id: group.id)
                     }
                 }

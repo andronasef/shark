@@ -124,17 +124,17 @@ public struct TerminalDrawerContainerView: View {
             .help(L10n.text("Copy a quoted cd command for the current folder"))
 
             Menu {
-                Button(L10n.text("Restart Shell…")) {
+                Button(L10n.text("Restart Shell…"), systemImage: "arrow.clockwise") {
                     if !session.isRunning || confirmTermination() { session.restart() }
                 }
-                Button(L10n.text("Terminate Shell…")) {
+                Button(L10n.text("Terminate Shell…"), systemImage: "stop.circle") {
                     if confirmTermination() { session.terminate() }
                 }
                 .disabled(!session.isRunning)
                 Divider()
-                Button(L10n.text("Increase Text Size")) { session.adjustFontSize(by: 1) }
-                Button(L10n.text("Decrease Text Size")) { session.adjustFontSize(by: -1) }
-                Button(L10n.text("Reset Text Size")) { session.resetFontSize() }
+                Button(L10n.text("Increase Text Size"), systemImage: "textformat.size.larger") { session.adjustFontSize(by: 1) }
+                Button(L10n.text("Decrease Text Size"), systemImage: "textformat.size.smaller") { session.adjustFontSize(by: -1) }
+                Button(L10n.text("Reset Text Size"), systemImage: "textformat.size") { session.resetFontSize() }
             } label: { Image(systemName: "ellipsis.circle") }
             .menuStyle(.borderlessButton)
             .frame(width: 20)

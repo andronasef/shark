@@ -116,18 +116,18 @@ public struct PlacesSidebarView: View {
                             .padding(.horizontal, 10)
                             .modifier(SidebarRowFeedback(isFocused: sidebarFocus == "Tab Groups:" + group.id.uuidString))
                             .contextMenu {
-                                Button(L10n.text("Restore (Replace All)")) {
+                                Button(L10n.text("Restore (Replace All)"), systemImage: "arrow.triangle.2.circlepath") {
                                     if let ws = workspace {
                                         TabGroupService.shared.restore(group: group, into: ws, replace: true)
                                     }
                                 }
-                                Button(L10n.text("Append Tabs")) {
+                                Button(L10n.text("Append Tabs"), systemImage: "plus.rectangle.on.rectangle") {
                                     if let ws = workspace {
                                         TabGroupService.shared.restore(group: group, into: ws, replace: false)
                                     }
                                 }
                                 Divider()
-                                Button(L10n.text("Delete Group"), role: .destructive) {
+                                Button(L10n.text("Delete Group"), systemImage: "trash", role: .destructive) {
                                     TabGroupService.shared.deleteGroup(id: group.id)
                                 }
                             }
@@ -378,16 +378,16 @@ public struct PlacesSidebarView: View {
             workspace?.open(url, from: navigationState, newTab: true)
         }
         .contextMenu {
-            Button(L10n.text("Open in New Tab")) {
+            Button(L10n.text("Open in New Tab"), systemImage: "plus.rectangle.on.rectangle") {
                 workspace?.open(url, from: navigationState, newTab: true)
             }
             .disabled(!available)
-            Button(L10n.text("Show in Finder")) { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+            Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                 .disabled(!available)
             if let favorite {
-                Button(L10n.text("Locate Folder…")) { locateFavorite(favorite) }
+                Button(L10n.text("Locate Folder…"), systemImage: "folder.badge.questionmark") { locateFavorite(favorite) }
                 Divider()
-                Button(L10n.text("Remove from Favorites")) { favoritesStore.remove(favorite.id) }
+                Button(L10n.text("Remove from Favorites"), systemImage: "star.slash") { favoritesStore.remove(favorite.id) }
             }
         }
         .dropDestination(for: URL.self) { urls, _ in

@@ -265,23 +265,23 @@ public struct TabItemView: View {
 
     @ViewBuilder
     private var tabContextMenu: some View {
-        Button(L10n.text("New Tab")) {
+        Button(L10n.text("New Tab"), systemImage: "plus.square") {
             workspace.newTab(placement: .afterActive)
         }
 
-        Button(L10n.text("Duplicate Tab")) {
+        Button(L10n.text("Duplicate Tab"), systemImage: "plus.square.on.square") {
             workspace.duplicateTab(id: tab.id)
         }
 
-        Button(tab.isPinned ? L10n.text("Unpin Tab") : L10n.text("Pin Tab")) {
+        Button(tab.isPinned ? L10n.text("Unpin Tab") : L10n.text("Pin Tab"), systemImage: tab.isPinned ? "pin.slash" : "pin") {
             workspace.togglePin(id: tab.id)
         }
 
-        Button(tab.isLocked ? L10n.text("Unlock Tab") : L10n.text("Lock Tab")) {
+        Button(tab.isLocked ? L10n.text("Unlock Tab") : L10n.text("Lock Tab"), systemImage: tab.isLocked ? "lock.open" : "lock") {
             workspace.toggleLock(id: tab.id)
         }
 
-        Menu(L10n.text("Colour")) {
+        Menu(L10n.text("Colour"), systemImage: "paintpalette") {
             Button(L10n.text("None")) {
                 workspace.setColor(nil, for: tab.id)
             }
@@ -302,26 +302,26 @@ public struct TabItemView: View {
 
         Divider()
 
-        Button(L10n.text("Copy Path")) {
+        Button(L10n.text("Copy Path"), systemImage: "link") {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(tab.activeNavigationState.currentURL.path, forType: .string)
         }
 
         Divider()
 
-        Button(L10n.text("Close Tab")) {
+        Button(L10n.text("Close Tab"), systemImage: "xmark") {
             workspace.closeTab(id: tab.id)
         }
 
-        Button(L10n.text("Close Other Tabs")) {
+        Button(L10n.text("Close Other Tabs"), systemImage: "xmark.square") {
             workspace.closeOtherTabs(id: tab.id)
         }
 
-        Button(L10n.text("Close Tabs to the Right")) {
+        Button(L10n.text("Close Tabs to the Right"), systemImage: "arrow.right.to.line") {
             workspace.closeTabsToRight(id: tab.id)
         }
 
-        Button(L10n.text("Reopen Closed Tab")) {
+        Button(L10n.text("Reopen Closed Tab"), systemImage: "arrow.uturn.backward") {
             workspace.reopenClosedTab()
         }
         .disabled(workspace.closedTabs.isEmpty)

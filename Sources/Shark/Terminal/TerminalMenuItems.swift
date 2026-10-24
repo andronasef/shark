@@ -7,14 +7,14 @@ struct TerminalMenuItems: View {
     let source: NavigationState
 
     var body: some View {
-        Button(L10n.text("Open in Terminal")) {
+        Button(L10n.text("Open in Terminal"), systemImage: "terminal") {
             Task {
                 do { try await TerminalOpener.shared.open(at: url) }
                 catch { NSAlert(error: error).runModal() }
             }
         }
         if let workspace {
-            Button(L10n.text("Open in Embedded Terminal")) {
+            Button(L10n.text("Open in Embedded Terminal"), systemImage: "rectangle.bottomthird.inset.filled") {
                 do { try workspace.openEmbeddedTerminal(at: url, from: source) }
                 catch { NSAlert(error: error).runModal() }
             }
