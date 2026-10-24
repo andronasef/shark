@@ -68,3 +68,22 @@ private final class KeyboardTestWindow: NSWindow {
     override var canBecomeKey: Bool { true }
 }
 
+
+final class TerminalKeyRoutingTests: XCTestCase {
+    private func key(_ code: Int) -> String { String(UnicodeScalar(UInt16(code))!) }
+
+    func testShellOwnsMenuKeysWithoutCommand() {
+        XCTAssertTrue(TerminalKeyRouting.shellOwns(modifiers: [], characters: key(NSF2FunctionKey)), "F2 must not rename a file")
+        XCTAssertTrue(TerminalKeyRouting.shellOwns(modifiers: [], characters: key(NSF3FunctionKey)))
+        XCTAssertTrue(TerminalKeyRouting.shellOwns(modifiers: .control, characters: "\t"), "⌃Tab must not switch tabs")
+        XCTAssertTrue(TerminalKeyRouting.shellOwns(modifiers: .option, characters: key(NSLeftArrowFunctionKey)))
+        XCTAssertTrue(TerminalKeyRouting.shellOwns(modifiers: .control, characters: "c"))
+    }
+
+    func testAppKeepsCommandShortcutsAndDrawerToggles() {
+        XCTAssertFalse(TerminalKeyRouting.shellOwns(modifiers: .command, characters: "t"))
+        XCTAssertFalse(TerminalKeyRouting.shellOwns(modifiers: [], characters: key(NSF4FunctionKey)), "F4 hides the drawer")
+        XCTAssertFalse(TerminalKeyRouting.shellOwns(modifiers: .control, characters: "`"))
+        XCTAssertFalse(TerminalKeyRouting.shellOwns(modifiers: [], characters: "a"), "plain typing takes the normal keyDown path")
+    }
+}

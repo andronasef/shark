@@ -632,3 +632,6 @@
 "Expand" = "Expand";
 "Add to Favorites" = "Add to Favorites";
 "Refresh" = "Refresh";
+"The terminal is already running" = "The terminal is already running";
+"Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are.";
+"Copy cd Command" = "Copy cd Command";

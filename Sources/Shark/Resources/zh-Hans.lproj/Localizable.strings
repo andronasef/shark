@@ -632,3 +632,6 @@
 "Expand" = "展开";
 "Add to Favorites" = "添加到个人收藏";
 "Refresh" = "刷新";
+"The terminal is already running" = "终端已在运行";
+"Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "要拷贝此文件夹的 cd 命令，以便准备好时粘贴吗？当前输入和正在运行的命令保持不变。";
+"Copy cd Command" = "拷贝 cd 命令";

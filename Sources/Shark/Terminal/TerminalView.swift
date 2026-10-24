@@ -38,14 +38,34 @@ public final class TerminalKeyboardOwnership {
     }
 }
 
+enum TerminalKeyRouting {
+    /// Whether a key-equivalent candidate belongs to the focused shell rather than the menu bar:
+    /// anything without ⌘ that uses ⌃ or ⌥ or is a function/navigation key, except the drawer
+    /// toggles F4 and ⌃` (so the terminal can still be hidden from the keyboard).
+    static func shellOwns(modifiers: NSEvent.ModifierFlags, characters: String?) -> Bool {
+        let mods = modifiers.intersection([.command, .control, .option])
+        guard !mods.contains(.command), let scalar = characters?.unicodeScalars.first else { return false }
+        if scalar.value == UInt32(NSF4FunctionKey) && mods.isEmpty { return false }
+        if characters == "`" && mods == .control { return false }
+        let isFunctionKey = (0xF700...0xF8FF).contains(scalar.value)
+        return !mods.isEmpty || isFunctionKey
+    }
+}
+
 /// Intercept native editing equivalents before SwiftUI's file menu shortcuts.
 @MainActor
 final class SharkTerminalView: LocalProcessTerminalView {
     weak var session: PTYSession?
 
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        guard window?.firstResponder === self,
-              event.modifierFlags.intersection([.command, .control, .option]) == .command else {
+        guard window?.firstResponder === self else { return super.performKeyEquivalent(with: event) }
+        // Menu shortcuts without ⌘ (F2 rename, F3 split, ⌃Tab, ⌥←) would otherwise fire inside
+        // htop, mc or vim. Hand them to the shell; only the drawer toggles stay with the app.
+        if TerminalKeyRouting.shellOwns(modifiers: event.modifierFlags, characters: event.charactersIgnoringModifiers) {
+            keyDown(with: event)
+            return true
+        }
+        guard event.modifierFlags.intersection([.command, .control, .option]) == .command else {
             return super.performKeyEquivalent(with: event)
         }
         switch event.charactersIgnoringModifiers?.lowercased() {

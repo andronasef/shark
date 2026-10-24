@@ -632,3 +632,6 @@
 "Expand" = "توسيع";
 "Add to Favorites" = "إضافة إلى المفضلة";
 "Refresh" = "تحديث";
+"The terminal is already running" = "الطرفية قيد التشغيل بالفعل";
+"Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "هل تريد نسخ أمر cd لهذا المجلد للصقه عندما تكون جاهزًا؟ يبقى ما كتبته والأوامر قيد التشغيل كما هي.";
+"Copy cd Command" = "نسخ أمر cd";

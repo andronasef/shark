@@ -338,12 +338,16 @@ public struct ContentView: View {
                 if !terminalSession.hasStarted {
                     terminalSession.prepareInitialDirectory(request.directory)
                 } else if let command = try? terminalSession.useDirectory(request.directory) {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(command, forType: .string)
+                    // Never touch the shell's input or the clipboard without asking.
                     let alert = NSAlert()
-                    alert.messageText = "Directory command copied"
-                    alert.informativeText = "The terminal session is already open. Paste the copied cd command when you are ready to change folders. Your current input and running commands are preserved."
-                    alert.runModal()
+                    alert.messageText = L10n.text("The terminal is already running")
+                    alert.informativeText = L10n.text("Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are.")
+                    alert.addButton(withTitle: L10n.text("Copy cd Command"))
+                    alert.addButton(withTitle: L10n.text("Cancel"))
+                    if alert.runModal() == .alertFirstButtonReturn {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(command, forType: .string)
+                    }
                 }
                 lastHandledTerminalRequestID = request.id
                 DispatchQueue.main.async { terminalSession.focus() }

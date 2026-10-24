@@ -632,3 +632,6 @@
 "Expand" = "展開";
 "Add to Favorites" = "お気に入りに追加";
 "Refresh" = "更新";
+"The terminal is already running" = "ターミナルはすでに実行中です";
+"Copy a cd command for this folder to paste when you are ready? Your current input and running commands stay as they are." = "このフォルダの cd コマンドをコピーして、準備ができたら貼り付けますか？入力中の内容と実行中のコマンドはそのままです。";
+"Copy cd Command" = "cd コマンドをコピー";
