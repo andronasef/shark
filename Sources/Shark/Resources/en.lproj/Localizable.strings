@@ -624,3 +624,11 @@
 "Drag the top edge" = "Drag the top edge";
 "Resize the drawer." = "Resize the drawer.";
 "Customize Toolbar…" = "Customize Toolbar…";
+"Sidebar" = "Sidebar";
+"Sidebar Style:" = "Sidebar Style:";
+"Folder Tree" = "Folder Tree";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags.";
+"Collapse" = "Collapse";
+"Expand" = "Expand";
+"Add to Favorites" = "Add to Favorites";
+"Refresh" = "Refresh";

@@ -624,3 +624,11 @@
 "Drag the top edge" = "اسحب الحافة العلوية";
 "Resize the drawer." = "غيّر حجم الدرج.";
 "Customize Toolbar…" = "تخصيص شريط الأدوات…";
+"Sidebar" = "الشريط الجانبي";
+"Sidebar Style:" = "نمط الشريط الجانبي:";
+"Folder Tree" = "شجرة المجلدات";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "تعرض شجرة المجلدات قائمة قابلة للتوسيع بالمجلدات، مثل مستكشف الملفات، بدلًا من المواقع والوسوم.";
+"Collapse" = "طي";
+"Expand" = "توسيع";
+"Add to Favorites" = "إضافة إلى المفضلة";
+"Refresh" = "تحديث";

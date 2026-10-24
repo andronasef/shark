@@ -13,6 +13,10 @@ public struct PlacesSidebarView: View {
     @State private var hoveredRow: String?
     @State private var dropTargetRow: String?
     @State private var locations: [SidebarItem] = Self.standardLocations
+    @AppStorage(SidebarStyle.storageKey) private var sidebarStyleValue = SidebarStyle.places.rawValue
+    @State private var folderTree = FolderTreeModel()
+
+    private var isTree: Bool { SidebarStyle.preference(sidebarStyleValue) == .tree }
 
     private let fileSystemService = FileSystemService.shared
 
@@ -34,6 +38,7 @@ public struct PlacesSidebarView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 // Standalone top items (Recents, Shared)
+                if !isTree {
                 VStack(spacing: 0) {
                     sidebarRow(
                         name: "Recents",
@@ -45,6 +50,7 @@ public struct PlacesSidebarView: View {
                         iconName: "folder.badge.person.crop",
                         url: URL(fileURLWithPath: "/Users/Shared")
                     )
+                }
                 }
 
                 // Favorites section
@@ -137,6 +143,15 @@ public struct PlacesSidebarView: View {
 
 
 
+                // Folder Tree replaces Locations and Tags
+                if isTree {
+                    SidebarSectionGroup("Folders", focus: $sidebarFocus) {
+                        FolderTreeRows(roots: treeRoots, navigationState: navigationState, tree: folderTree,
+                                       favoritesStore: favoritesStore, focus: $sidebarFocus)
+                    }
+                }
+
+                if !isTree {
                 // Locations section
                 SidebarSectionGroup("Locations", focus: $sidebarFocus) {
                     ForEach(locations) { item in
@@ -197,6 +212,7 @@ public struct PlacesSidebarView: View {
                     .focused($sidebarFocus, equals: "Tags:all")
                     .padding(.horizontal, 10)
                     .modifier(SidebarRowFeedback(isFocused: sidebarFocus == "Tags:all"))
+                }
                 }
             }
             .padding(.horizontal, 14)
@@ -401,7 +417,7 @@ public struct PlacesSidebarView: View {
     }
 
     private func moveSidebarFocus(by offset: Int) {
-        var order = ["Top:" + FileManager.default.homeDirectoryForCurrentUser.path, "Top:/Users/Shared"]
+        var order = isTree ? [] : ["Top:" + FileManager.default.homeDirectoryForCurrentUser.path, "Top:/Users/Shared"]
         func expanded(_ section: String) -> Bool {
             UserDefaults.standard.object(forKey: "sidebar.section.\(section).expanded") as? Bool ?? true
         }
@@ -414,15 +430,28 @@ public struct PlacesSidebarView: View {
             order.append("Tab Groups:header")
             if expanded("Tab Groups") { order += TabGroupService.shared.groups.map { "Tab Groups:" + $0.id.uuidString } }
         }
-        order.append("Locations:header")
-        if expanded("Locations") { order += locations.map { "Locations:" + $0.url.path } }
-        order.append("Tags:header")
-        if expanded("Tags") {
-            order += tagItems.map { "Tags:" + $0.name }
-            order.append("Tags:all")
+        if isTree {
+            order.append("Folders:header")
+            if expanded("Folders") { order += folderTree.rows(for: treeRoots).map { "Tree:" + $0.id } }
+        } else {
+            order.append("Locations:header")
+            if expanded("Locations") { order += locations.map { "Locations:" + $0.url.path } }
+            order.append("Tags:header")
+            if expanded("Tags") {
+                order += tagItems.map { "Tags:" + $0.name }
+                order.append("Tags:all")
+            }
         }
         let current = sidebarFocus.flatMap { order.firstIndex(of: $0) } ?? (offset > 0 ? -1 : order.count)
         sidebarFocus = order[max(0, min(current + offset, order.count - 1))]
+    }
+
+    /// Home first, then iCloud, the startup disk, and mounted volumes (like Explorer's This PC).
+    private var treeRoots: [FolderTreeRoot] {
+        let home = FileManager.default.homeDirectoryForCurrentUser.standardizedFileURL
+        let places = locations.filter { $0.name != "AirDrop" && $0.name != "Trash" }
+        let ordered = places.filter { $0.url.standardizedFileURL == home } + places.filter { $0.url.standardizedFileURL != home }
+        return ordered.map { FolderTreeRoot(url: $0.url, name: $0.name, icon: $0.iconName) }
     }
 
     private func favoriteInsertion(at index: Int) -> some View {

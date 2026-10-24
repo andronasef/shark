@@ -624,3 +624,11 @@
 "Drag the top edge" = "Arrastar a borda superior";
 "Resize the drawer." = "Redimensiona a gaveta.";
 "Customize Toolbar…" = "Personalizar Barra de Ferramentas…";
+"Sidebar" = "Barra lateral";
+"Sidebar Style:" = "Estilo da barra lateral:";
+"Folder Tree" = "Árvore de pastas";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "A árvore de pastas mostra uma lista expansível de pastas, como o Explorador de Arquivos, no lugar de Locais e Etiquetas.";
+"Collapse" = "Recolher";
+"Expand" = "Expandir";
+"Add to Favorites" = "Adicionar aos favoritos";
+"Refresh" = "Atualizar";

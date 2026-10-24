@@ -624,3 +624,11 @@
 "Drag the top edge" = "Faire glisser le bord supérieur";
 "Resize the drawer." = "Redimensionne le tiroir.";
 "Customize Toolbar…" = "Personnaliser la barre d’outils…";
+"Sidebar" = "Barre latérale";
+"Sidebar Style:" = "Style de la barre latérale :";
+"Folder Tree" = "Arborescence des dossiers";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "L’arborescence affiche une liste de dossiers dépliable, comme l’Explorateur de fichiers, à la place des Emplacements et des Étiquettes.";
+"Collapse" = "Replier";
+"Expand" = "Déplier";
+"Add to Favorites" = "Ajouter aux favoris";
+"Refresh" = "Actualiser";

@@ -624,3 +624,11 @@
 "Drag the top edge" = "拖移上边缘";
 "Resize the drawer." = "调整抽屉大小。";
 "Customize Toolbar…" = "自定工具栏…";
+"Sidebar" = "边栏";
+"Sidebar Style:" = "边栏样式：";
+"Folder Tree" = "文件夹树";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "文件夹树以可展开的文件夹列表（类似文件资源管理器）取代“位置”和“标签”。";
+"Collapse" = "收起";
+"Expand" = "展开";
+"Add to Favorites" = "添加到个人收藏";
+"Refresh" = "刷新";

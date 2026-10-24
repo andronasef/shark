@@ -624,3 +624,11 @@
 "Drag the top edge" = "Arrastrar el borde superior";
 "Resize the drawer." = "Cambia el tamaño del cajón.";
 "Customize Toolbar…" = "Personalizar barra de herramientas…";
+"Sidebar" = "Barra lateral";
+"Sidebar Style:" = "Estilo de la barra lateral:";
+"Folder Tree" = "Árbol de carpetas";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "El árbol de carpetas muestra una lista expandible de carpetas, como el Explorador de archivos, en lugar de Ubicaciones y Etiquetas.";
+"Collapse" = "Contraer";
+"Expand" = "Expandir";
+"Add to Favorites" = "Añadir a favoritos";
+"Refresh" = "Actualizar";

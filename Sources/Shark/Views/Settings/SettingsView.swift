@@ -4,6 +4,7 @@ public struct SettingsView: View {
     @ObservedObject var settings = SharkSettings.shared
     @AppStorage(AppLocalization.preferenceKey) private var language = AppLanguage.system.rawValue
     @AppStorage("openImagesInShark") private var openImagesInShark = false
+    @AppStorage(SidebarStyle.storageKey) private var sidebarStyle = SidebarStyle.places.rawValue
 
     public init() {}
 
@@ -52,6 +53,15 @@ public struct SettingsView: View {
                     }
                 }
                 Text(L10n.text("Restart Shark to apply a language change."))
+                    .font(.caption).foregroundColor(.secondary)
+            }
+            Section(L10n.text("Sidebar")) {
+                Picker(L10n.text("Sidebar Style:"), selection: $sidebarStyle) {
+                    ForEach(SidebarStyle.allCases) { style in
+                        Text(style.displayName).tag(style.rawValue)
+                    }
+                }
+                Text(L10n.text("Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags."))
                     .font(.caption).foregroundColor(.secondary)
             }
             Section {
