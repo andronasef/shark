@@ -650,3 +650,6 @@
 "Find…" = "查找…";
 "Filter Current Folder" = "过滤当前文件夹";
 "Filter" = "过滤";
+"Restart Shark to apply the language?" = "要重新启动 Shark 以应用语言吗？";
+"Your tabs are restored after restarting. Commands running in the terminal will stop." = "重新启动后会恢复你的标签页。终端中正在运行的命令将停止。";
+"Restart Now" = "立即重新启动";

@@ -72,4 +72,20 @@ final class LocalizationTests: XCTestCase {
             String(value[Range($0.range, in: value)!])
         }.sorted()
     }
+
+    func testRelaunchTargetsTheEnclosingAppBundleOrTheExecutable() {
+        let app = URL(fileURLWithPath: "/Applications/Shark.app")
+        XCTAssertEqual(AppLocalization.relaunchTarget(bundleURL: app, executableURL: nil), app)
+        let bare = URL(fileURLWithPath: "/tmp/build/debug")
+        let exec = bare.appendingPathComponent("Shark")
+        XCTAssertEqual(AppLocalization.relaunchTarget(bundleURL: bare, executableURL: exec), exec)
+    }
+
+    func testRelaunchWaitsForThisProcessAndQuotesThePath() {
+        let args = AppLocalization.relaunchScript(pid: 4242, target: URL(fileURLWithPath: "/Apps/My Shark.app"))
+        XCTAssertEqual(args.first, "-c")
+        XCTAssertTrue(args[1].contains("kill -0 4242"), "reopen only after this process exits")
+        XCTAssertTrue(args[1].contains("/usr/bin/open \"$1\""))
+        XCTAssertEqual(args.last, "/Apps/My Shark.app", "path is passed as an argument, never spliced into the script")
+    }
 }

@@ -55,9 +55,8 @@ public struct SettingsView: View {
                 .onChange(of: language) { oldVal, newVal in
                     guard oldVal != newVal else { return }
                     AppLocalization.updateProcessArguments()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        AppLocalization.relaunchApp()
-                    }
+                    // Let the picker finish updating before the modal question.
+                    DispatchQueue.main.async { AppLocalization.confirmRelaunch() }
                 }
 
                 HStack {

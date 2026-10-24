@@ -78,36 +78,42 @@ public enum AppLocalization {
         UserDefaults.standard.setVolatileDomain(arguments, forName: UserDefaults.argumentDomain)
     }
 
-    @MainActor
-    public static func relaunchApp() {
-        var appBundleURL: URL? = nil
-        var current = Bundle.main.bundleURL
+    /// The app bundle (or bare executable, for `swift run`) to start again.
+    static func relaunchTarget(bundleURL: URL, executableURL: URL?) -> URL? {
+        var current = bundleURL
         while current.path != "/" {
-            if current.pathExtension == "app" {
-                appBundleURL = current
-                break
-            }
+            if current.pathExtension == "app" { return current }
             current = current.deletingLastPathComponent()
         }
+        return executableURL
+    }
 
-        if let appBundleURL {
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-            process.arguments = ["-n", appBundleURL.path]
-            try? process.run()
-        } else if let execURL = Bundle.main.executableURL {
-            let process = Process()
-            process.executableURL = execURL
-            process.arguments = Array(CommandLine.arguments.dropFirst())
-            try? process.run()
-        } else {
-            let exec = CommandLine.arguments[0]
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: exec)
-            process.arguments = Array(CommandLine.arguments.dropFirst())
-            try? process.run()
-        }
+    /// Waits (up to 10 s) for this process to exit before reopening, so two copies never run at
+    /// once and a cancelled quit doesn't leave a second instance behind.
+    static func relaunchScript(pid: Int32, target: URL) -> [String] {
+        let launch = target.pathExtension == "app" ? "/usr/bin/open \"$1\"" : "\"$1\" &"
+        return ["-c", "for i in $(seq 100); do kill -0 \(pid) 2>/dev/null || { \(launch); exit 0; }; sleep 0.1; done", "relaunch", target.path]
+    }
+
+    @MainActor
+    public static func relaunchApp() {
+        guard let target = relaunchTarget(bundleURL: Bundle.main.bundleURL, executableURL: Bundle.main.executableURL) else { return }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/sh")
+        process.arguments = relaunchScript(pid: ProcessInfo.processInfo.processIdentifier, target: target)
+        do { try process.run() } catch { return }
         NSApp.terminate(nil)
+    }
+
+    /// Offers to restart now; a running terminal command would end, so it is never automatic.
+    @MainActor
+    public static func confirmRelaunch() {
+        let alert = NSAlert()
+        alert.messageText = L10n.text("Restart Shark to apply the language?")
+        alert.informativeText = L10n.text("Your tabs are restored after restarting. Commands running in the terminal will stop.")
+        alert.addButton(withTitle: L10n.text("Restart Now"))
+        alert.addButton(withTitle: L10n.text("Later"))
+        if alert.runModal() == .alertFirstButtonReturn { relaunchApp() }
     }
 
     public static func bundle(for language: AppLanguage) -> Bundle {

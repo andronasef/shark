@@ -650,3 +650,6 @@
 "Find…" = "検索…";
 "Filter Current Folder" = "現在のフォルダを絞り込む";
 "Filter" = "絞り込む";
+"Restart Shark to apply the language?" = "言語を適用するために Shark を再起動しますか？";
+"Your tabs are restored after restarting. Commands running in the terminal will stop." = "再起動後にタブは復元されます。ターミナルで実行中のコマンドは停止します。";
+"Restart Now" = "今すぐ再起動";

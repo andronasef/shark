@@ -650,3 +650,6 @@
 "Find…" = "Find…";
 "Filter Current Folder" = "Filter Current Folder";
 "Filter" = "Filter";
+"Restart Shark to apply the language?" = "Restart Shark to apply the language?";
+"Your tabs are restored after restarting. Commands running in the terminal will stop." = "Your tabs are restored after restarting. Commands running in the terminal will stop.";
+"Restart Now" = "Restart Now";

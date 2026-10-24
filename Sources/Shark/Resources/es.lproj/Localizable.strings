@@ -650,3 +650,6 @@
 "Find…" = "Buscar…";
 "Filter Current Folder" = "Filtrar carpeta actual";
 "Filter" = "Filtrar";
+"Restart Shark to apply the language?" = "¿Reiniciar Shark para aplicar el idioma?";
+"Your tabs are restored after restarting. Commands running in the terminal will stop." = "Tus pestañas se restauran tras reiniciar. Los comandos en ejecución en el terminal se detendrán.";
+"Restart Now" = "Reiniciar ahora";
