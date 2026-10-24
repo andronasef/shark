@@ -24,7 +24,12 @@ private final class FileDragRegistry {
         case .leftMouseDown:
             candidate = views.allObjects.first { view in
                 guard view.window === event.window, !view.isHiddenOrHasHiddenAncestor else { return false }
-                return view.visibleRect.contains(view.convert(event.locationInWindow, from: nil))
+                // SwiftUI hosts report a bogus, far larger visibleRect, so test the real bounds and
+                // then the enclosing scroll view's visible area (cells can sit partly scrolled away).
+                let point = view.convert(event.locationInWindow, from: nil)
+                guard view.bounds.contains(point) else { return false }
+                guard let scroll = view.enclosingScrollView else { return true }
+                return scroll.documentVisibleRect.contains(view.convert(point, to: scroll.documentView))
             }
             start = event.locationInWindow
         case .leftMouseUp: candidate = nil
