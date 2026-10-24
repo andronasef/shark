@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Open With no longer looks up every selected file on the main thread when the menu opens (one cached query per file type), is hidden when folders are selected so it can't open them in an app, and says when no app can open all the files.
 - Dragging a selected file now moves or copies the whole selection (icons, list, columns), not just one item; dragging an unselected item carries only that item. A batch move that cannot fully roll back after a failure now reports where the remaining items are.
 - Terminal keys: with the terminal focused, arrow keys, history, Tab, Ctrl-C/D/Z and ⌘C/⌘V/⌘A go to the shell instead of the file list or file shortcuts, and clicking a file returns the keys to the files. Type-to-select and the other file shortcuts no longer fire in another window.
 - Hover previews no longer extend below or beyond the screen: they flip to the other side of the pointer, shrink to fit, and recompute when content finishes loading, on secondary displays, or when displays change.

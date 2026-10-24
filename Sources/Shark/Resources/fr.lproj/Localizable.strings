@@ -645,3 +645,5 @@
 "Drop files onto a sidebar folder" = "Déposer des fichiers sur un dossier de la barre latérale";
 "Right-click a place or folder" = "Clic droit sur un emplacement ou un dossier";
 "Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "Ouvrir dans un nouvel onglet, afficher dans le Finder, ajouter aux favoris ou actualiser l’arborescence.";
+"No app opens all of these files" = "Aucune app n’ouvre tous ces fichiers";
+"No compatible apps" = "Aucune app compatible";

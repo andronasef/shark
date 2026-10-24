@@ -15,9 +15,28 @@ enum OpenWithService {
             .sorted { $0.deletingPathExtension().lastPathComponent.localizedStandardCompare($1.deletingPathExtension().lastPathComponent) == .orderedAscending }
     }
 
+    /// Open With is offered only when every target is a file.
+    static func canOpenWith(_ items: [FileItem]) -> Bool { !items.isEmpty && items.allSatisfy { !$0.isDirectory } }
+
+    /// One Launch Services query per distinct content type, cached, so building a menu for a large
+    /// selection never touches each file. A type's handlers rarely change while Shark runs.
+    /// ponytail: process-lifetime cache; clear it on NSWorkspace app install notifications if stale lists show up.
+    private static var applicationsByType: [String: [URL]] = [:]
+
     static func applications(for items: [FileItem]) -> [URL] {
-        guard !items.isEmpty, items.allSatisfy({ !$0.isDirectory }) else { return [] }
-        return commonApplications(items.map { NSWorkspace.shared.urlsForApplications(toOpen: $0.url) })
+        guard canOpenWith(items) else { return [] }
+        let types = Set(items.map { contentTypeKey(for: $0.url) })
+        return commonApplications(types.map { key in
+            if let cached = applicationsByType[key] { return cached }
+            let apps = UTType(key).map { NSWorkspace.shared.urlsForApplications(toOpen: $0) } ?? []
+            applicationsByType[key] = apps
+            return apps
+        })
+    }
+
+    /// Derived from the file name (no disk read); unknown extensions fall back to generic data.
+    nonisolated static func contentTypeKey(for url: URL) -> String {
+        (UTType(filenameExtension: url.pathExtension) ?? .data).identifier
     }
 
     static func open(_ urls: [URL], with app: URL, onError: @escaping @MainActor @Sendable (String) -> Void) {

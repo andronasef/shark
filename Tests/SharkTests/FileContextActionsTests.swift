@@ -16,4 +16,18 @@ struct FileContextActionsTests {
         #expect(OpenWithService.commonApplications([[a,b],[b]]) == [b])
         #expect(OpenWithService.commonApplications([[a],[]]).isEmpty)
     }
+
+    @MainActor @Test func openWithRequiresOnlyFiles() {
+        let file = FileItem(url: URL(fileURLWithPath: "/tmp/a.txt"), name: "a.txt", isDirectory: false)
+        let folder = FileItem(url: URL(fileURLWithPath: "/tmp/f"), name: "f", isDirectory: true)
+        #expect(OpenWithService.canOpenWith([file]))
+        #expect(!OpenWithService.canOpenWith([file, folder]), "a mixed selection must not offer to open folders in an app")
+        #expect(!OpenWithService.canOpenWith([]))
+        #expect(OpenWithService.applications(for: [file, folder]).isEmpty)
+    }
+
+    @Test func contentTypeComesFromTheNameNotTheDisk() {
+        #expect(OpenWithService.contentTypeKey(for: URL(fileURLWithPath: "/missing/photo.JPG")) == "public.jpeg")
+        #expect(OpenWithService.contentTypeKey(for: URL(fileURLWithPath: "/missing/noext")) == "public.data")
+    }
 }

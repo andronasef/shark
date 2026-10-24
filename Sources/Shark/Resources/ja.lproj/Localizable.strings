@@ -645,3 +645,5 @@
 "Drop files onto a sidebar folder" = "サイドバーのフォルダにファイルをドロップ";
 "Right-click a place or folder" = "場所またはフォルダを右クリック";
 "Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "新しいタブで開く、Finder で表示、お気に入りに追加、またはツリーを更新します。";
+"No app opens all of these files" = "これらすべてのファイルを開けるアプリはありません";
+"No compatible apps" = "対応するアプリはありません";

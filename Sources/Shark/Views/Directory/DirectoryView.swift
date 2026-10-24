@@ -523,9 +523,13 @@ public struct DirectoryView: View {
         Button(isMultiple ? L10n.format("Open %d Items", targets.count) : L10n.text("Open"), systemImage: "arrow.up.forward.app") {
             openContextItems(targets)
         }
-        if !item.isDirectory {
+        if OpenWithService.canOpenWith(targets) {
             Menu(L10n.text("Open With"), systemImage: "arrow.up.forward.square") {
-                ForEach(OpenWithService.applications(for: targets), id: \.self) { app in
+                let apps = OpenWithService.applications(for: targets)
+                if apps.isEmpty {
+                    Text(isMultiple ? L10n.text("No app opens all of these files") : L10n.text("No compatible apps"))
+                }
+                ForEach(apps, id: \.self) { app in
                     Button(app.deletingPathExtension().lastPathComponent) {
                         OpenWithService.open(urls, with: app) { navigationState.operationError = $0 }
                     }
@@ -535,6 +539,8 @@ public struct DirectoryView: View {
                     OpenWithService.chooseApplication(for: urls) { navigationState.operationError = $0 }
                 }
             }
+        }
+        if !item.isDirectory {
             if targets.allSatisfy({ PhotoViewerWindowController.supports(url: $0.url) }) {
                 Button(L10n.text("Open in Shark Photo Viewer"), systemImage: "photo.on.rectangle") {
                     PhotoViewerWindowController.open(items: navigationState.filteredAndSortedItems, initialURL: item.url)

@@ -645,3 +645,5 @@
 "Drop files onto a sidebar folder" = "أفلت ملفات على مجلد في الشريط الجانبي";
 "Right-click a place or folder" = "انقر بزر الماوس الأيمن على مكان أو مجلد";
 "Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "افتح في علامة تبويب جديدة، أو اعرض في Finder، أو أضف إلى المفضلة، أو حدّث الشجرة.";
+"No app opens all of these files" = "لا يوجد تطبيق يفتح كل هذه الملفات";
+"No compatible apps" = "لا توجد تطبيقات متوافقة";

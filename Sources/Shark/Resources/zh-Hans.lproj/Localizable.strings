@@ -645,3 +645,5 @@
 "Drop files onto a sidebar folder" = "将文件放到边栏文件夹上";
 "Right-click a place or folder" = "右键点按位置或文件夹";
 "Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "在新标签页中打开、在访达中显示、添加到个人收藏或刷新文件夹树。";
+"No app opens all of these files" = "没有应用可以打开所有这些文件";
+"No compatible apps" = "没有兼容的应用";
