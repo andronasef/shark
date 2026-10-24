@@ -43,6 +43,13 @@ cp Resources/Info.plist "$app/Contents/"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $version" -c "Set :CFBundleVersion ${BUILD_NUMBER:-$version}" "$app/Contents/Info.plist"
 cp "$bin/Shark" "$app/Contents/MacOS/"
 cp -R Assets/Icons "$app/Contents/Resources/Icons"
+# SwiftPM's resource bundle backs L10n (and Bundle.module, which traps if missing); the same
+# .lproj folders in the app's own Resources let SwiftUI string literals resolve.
+for bundle in "$bin"/Shark_*.bundle; do
+    [ -d "$bundle" ] || continue
+    cp -R "$bundle" "$app/Contents/Resources/"
+    cp -R "$bundle"/Contents/Resources/*.lproj "$app/Contents/Resources/"
+done
 scripts/make-icon.sh "$app"
 
 # Extract release dSYM debug symbols for crash reporting
