@@ -22,6 +22,9 @@ public final class WorkspaceState {
     public var embeddedTerminalRequest: EmbeddedTerminalRequest?
     public var isCommandPalettePresented: Bool = false
 
+    /// Incremented by Edit › Find; the toolbar search field takes focus when it changes.
+    public var searchFocusRequest = 0
+
     public func openEmbeddedTerminal(at url: URL, from source: NavigationState) throws {
         let directory = try TerminalOpener.directory(for: url)
         if let owner = tabs.first(where: { $0.primaryPane === source || $0.secondaryPane === source }) {

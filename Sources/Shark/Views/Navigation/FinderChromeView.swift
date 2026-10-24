@@ -118,6 +118,8 @@ struct FinderToolbarSymbol: View {
 
 struct FinderSearchField: View {
     @Binding var text: String
+    var focusRequest = 0
+    @FocusState private var focused: Bool
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
@@ -131,6 +133,8 @@ struct FinderSearchField: View {
                 .font(.system(size: 12))
                 .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.95) : Color.primary)
                 .accessibilityLabel(L10n.text("Search files in current folder"))
+                .focused($focused)
+                .onChange(of: focusRequest) { focused = true }
             if !text.isEmpty {
                 Button { text = "" } label: {
                     Image(systemName: "xmark.circle.fill")

@@ -224,7 +224,7 @@ public struct ContentView: View {
 
         ToolbarItem(id: "search", placement: .primaryAction) {
             FinderToolbarCaption("Search") {
-                FinderSearchField(text: Bindable(activeState).filterText)
+                FinderSearchField(text: Bindable(activeState).filterText, focusRequest: workspaceState.searchFocusRequest)
             }
         }
         .customizableFinderChromeItem()

@@ -194,6 +194,24 @@ struct ExplorerCommands: Commands {
         workspace.activeNavigationState
     }
 
+    /// Focuses the toolbar filter; if the user removed it from the toolbar, asks for the text instead.
+    private func findInCurrentFolder() {
+        let window = NSApp.keyWindow ?? NSApp.mainWindow
+        if window?.toolbar?.items.contains(where: { $0.itemIdentifier.rawValue == "search" }) == true {
+            workspace.searchFocusRequest += 1
+            return
+        }
+        let alert = NSAlert()
+        alert.messageText = L10n.text("Filter Current Folder")
+        let field = NSTextField(string: nav.filterText)
+        field.frame = NSRect(x: 0, y: 0, width: 260, height: 24)
+        alert.accessoryView = field
+        alert.addButton(withTitle: L10n.text("Filter"))
+        alert.addButton(withTitle: L10n.text("Cancel"))
+        alert.window.initialFirstResponder = field
+        if alert.runModal() == .alertFirstButtonReturn { nav.filterText = field.stringValue }
+    }
+
     var body: some Commands {
         CommandGroup(replacing: .newItem) {
             Button("New Tab") {
@@ -232,9 +250,30 @@ struct ExplorerCommands: Commands {
         }
 
         CommandGroup(after: .toolbar) {
+            // Menu homes for toolbar commands, so removing a toolbar item never removes the command.
+            Menu(L10n.text("Sort By")) {
+                Picker(L10n.text("Sort By"), selection: Binding(get: { nav.sortField }, set: { nav.sortField = $0 })) {
+                    ForEach(SortField.allCases) { field in Text(L10n.text(field.rawValue)).tag(field) }
+                }
+                .pickerStyle(.inline)
+                .labelsHidden()
+                Divider()
+                Toggle(L10n.text("Ascending"), isOn: Binding(get: { nav.sortAscending }, set: { nav.sortAscending = $0 }))
+            }
+            Button(L10n.text("Share…")) {
+                let urls = nav.selectedItems.map(\.url)
+                guard !urls.isEmpty, let view = (NSApp.keyWindow ?? NSApp.mainWindow)?.contentView else { return }
+                NSSharingServicePicker(items: urls).show(relativeTo: CGRect(x: view.bounds.midX, y: view.bounds.maxY - 40, width: 1, height: 1), of: view, preferredEdge: .minY)
+            }
+            .disabled(nav.selectedItemIDs.isEmpty)
             Button(L10n.text("Customize Toolbar…")) {
                 (NSApp.keyWindow ?? NSApp.mainWindow)?.toolbar?.runCustomizationPalette(nil)
             }
+        }
+
+        CommandGroup(after: .textEditing) {
+            Button(L10n.text("Find…")) { findInCurrentFolder() }
+                .keyboardShortcut("f", modifiers: .command)
         }
 
         CommandGroup(replacing: .undoRedo) {

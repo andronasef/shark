@@ -463,7 +463,7 @@
 "Share Selection" = "مشاركة الاختيار";
 "Share anonymous usage statistics" = "مشاركة إحصائيات الاستخدام المجهولة";
 "Shared" = "مشترك";
-"Share…" = "يشارك…";
+"Share…" = "مشاركة…";
 "Shark" = "Shark";
 "Shark %@ is available" = "Shark %@ متاح";
 "Shark %@ is the newest version." = "Shark %@ هو الإصدار الأحدث.";
@@ -647,3 +647,6 @@
 "Open in a new tab, show in Finder, add to Favorites, or refresh the tree." = "افتح في علامة تبويب جديدة، أو اعرض في Finder، أو أضف إلى المفضلة، أو حدّث الشجرة.";
 "No app opens all of these files" = "لا يوجد تطبيق يفتح كل هذه الملفات";
 "No compatible apps" = "لا توجد تطبيقات متوافقة";
+"Find…" = "بحث…";
+"Filter Current Folder" = "تصفية المجلد الحالي";
+"Filter" = "تصفية";
