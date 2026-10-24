@@ -36,7 +36,7 @@ public struct ContentView: View {
         // Separate navigation items can straddle the sidebar tracking separator at launch.
         ToolbarItem(id: "navigation-location", placement: .navigation) {
             HStack(alignment: .center, spacing: 8) {
-                FinderToolbarCaption("Navigation") {
+                FinderToolbarCaption("Navigation", namesItem: false) {
                     HStack(spacing: 0) {
                         Button { activeState.goBack() } label: {
                             Image(systemName: "chevron.left").frame(width: 27, height: 28)

@@ -82,16 +82,25 @@ extension ToolbarContent {
 
 struct FinderToolbarCaption<Content: View>: View {
     let title: String
+    let namesItem: Bool
     @ViewBuilder let content: Content
 
-    init(_ title: String, @ViewBuilder content: () -> Content) {
+    /// `namesItem: false` for a control that shares a toolbar item with a more descriptive one.
+    init(_ title: String, namesItem: Bool = true, @ViewBuilder content: () -> Content) {
         self.title = title
+        self.namesItem = namesItem
         self.content = content()
     }
 
     var body: some View {
-        content
-            .accessibilityLabel(L10n.text(title))
+        if namesItem {
+            // SwiftUI names customizable toolbar items (palette and "Icon and Text") from a Label's title.
+            Label { Text(L10n.text(title)) } icon: { content }
+                .labelStyle(.iconOnly)
+                .accessibilityLabel(L10n.text(title))
+        } else {
+            content.accessibilityLabel(L10n.text(title))
+        }
     }
 }
 

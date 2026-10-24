@@ -48,6 +48,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Customize Toolbar names every item again (Location, Path, View, Group, Share, Split, Terminal, Action, Search) using SwiftUI's own labels, without the delegate hack that crashed.
 - Photo viewer: a zoomed-in photo no longer spills over the file name, details line and thumbnail strip, and the window no longer shows a focus ring along its top edge.
 - ⌘L and ⌘F now move the keyboard into the path field and the search field. Before, they showed or targeted the field but typing went nowhere while the sidebar had focus.
 - Toolbar crashes: Shark no longer replaces SwiftUI's toolbar delegate or restyles AppKit's private toolbar and sheet views, which crashed item insertion and broke the Icon and Text layout. Both display modes use native item labels.
