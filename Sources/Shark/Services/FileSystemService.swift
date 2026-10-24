@@ -50,7 +50,7 @@ public actor FileSystemService {
                 let fileSize = Int64(resourceValues.fileSize ?? 0)
                 let dateModified = resourceValues.contentModificationDate ?? .distantPast
                 let dateCreated = resourceValues.creationDate ?? .distantPast
-                let kindDescription = resourceValues.localizedTypeDescription ?? (isDirectory ? "Folder" : "File")
+                let kindDescription = resourceValues.localizedTypeDescription ?? (isDirectory ? L10n.text("Folder") : L10n.text("File"))
 
                 // One lstat for the mode bits; attributesOfItem built a dictionary and looked up
                 // owner and group names per item, which nothing in the listing shows.
@@ -96,7 +96,7 @@ public actor FileSystemService {
         // Home
         let homeURL = fileManager.homeDirectoryForCurrentUser
         places.append(SidebarItem(
-            name: "Home",
+            name: L10n.text("Home"),
             url: homeURL,
             iconName: "house",
             section: .places
@@ -105,7 +105,7 @@ public actor FileSystemService {
         // Desktop
         if let desktopURL = fileManager.urls(for: .desktopDirectory, in: .userDomainMask).first {
             places.append(SidebarItem(
-                name: "Desktop",
+                name: L10n.text("Desktop"),
                 url: desktopURL,
                 iconName: "macwindow",
                 section: .places
@@ -115,7 +115,7 @@ public actor FileSystemService {
         // Documents
         if let docsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
             places.append(SidebarItem(
-                name: "Documents",
+                name: L10n.text("Documents"),
                 url: docsURL,
                 iconName: "doc",
                 section: .places
@@ -125,7 +125,7 @@ public actor FileSystemService {
         // Downloads
         if let downURL = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first {
             places.append(SidebarItem(
-                name: "Downloads",
+                name: L10n.text("Downloads"),
                 url: downURL,
                 iconName: "arrow.down.circle",
                 section: .places
@@ -135,7 +135,7 @@ public actor FileSystemService {
         // Applications
         if let appURL = fileManager.urls(for: .applicationDirectory, in: .localDomainMask).first {
             places.append(SidebarItem(
-                name: "Applications",
+                name: L10n.text("Applications"),
                 url: appURL,
                 iconName: "app.badge",
                 section: .places

@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var sessionStore: SessionStore?
 
     override init() {
+        AppLocalization.configureAtStartup()
         let store = SessionStore()
         if let restored = store.restore() {
             self.workspace = restored
@@ -67,6 +68,8 @@ struct SharkApp: App {
         // window would only mirror the first one's tabs. Use tabs (⌘T) for more locations.
         Window("Shark", id: "main") {
             MainWindowView(appDelegate: appDelegate, onboarding: onboarding)
+                .environment(\.locale, AppLocalization.locale)
+                .environment(\.layoutDirection, AppLocalization.layoutDirection)
                 .frame(minWidth: 850, minHeight: 550)
         }
         .windowStyle(.titleBar)
@@ -80,10 +83,14 @@ struct SharkApp: App {
 
         Window("Shark Help", id: "help") {
             HelpView()
+                .environment(\.locale, AppLocalization.locale)
+                .environment(\.layoutDirection, AppLocalization.layoutDirection)
         }
 
         Settings {
             SettingsView()
+                .environment(\.locale, AppLocalization.locale)
+                .environment(\.layoutDirection, AppLocalization.layoutDirection)
         }
     }
 }
@@ -225,13 +232,13 @@ struct ExplorerCommands: Commands {
 
         CommandGroup(replacing: .undoRedo) {
             // Not disabled when the file history is empty: text fields still need ⌘Z.
-            Button("Undo \(FileUndoService.shared.currentUndoDescription ?? "")") {
+            Button(FileUndoService.shared.currentUndoDescription.map { L10n.format("Undo: %@", $0) } ?? L10n.text("Undo")) {
                 if forwardToTextEditor(Selector(("undo:"))) { return }
                 Task { await nav.undo() }
             }
             .keyboardShortcut("z", modifiers: .command)
 
-            Button("Redo \(FileUndoService.shared.currentRedoDescription ?? "")") {
+            Button(FileUndoService.shared.currentRedoDescription.map { L10n.format("Redo: %@", $0) } ?? L10n.text("Redo")) {
                 if forwardToTextEditor(Selector(("redo:"))) { return }
                 Task { await nav.redo() }
             }

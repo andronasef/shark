@@ -6,7 +6,7 @@ struct OnboardingView: View {
     @State private var step = 0
     @State private var service = DefaultFolderAppService.shared
 
-    private let titles = ["Welcome to Shark", "Your everyday tools, closer", "Make Shark feel at home"]
+    private let titles = [L10n.text("Welcome to Shark"), L10n.text("Your everyday tools, closer"), L10n.text("Make Shark feel at home")]
     private let subtitles = [
         "A familiar Mac file manager with more room to work.",
         "Keep your folders together and move through your work.",
@@ -23,7 +23,7 @@ struct OnboardingView: View {
                 Text(titles[step])
                     .font(.system(size: 26, weight: .bold))
                     .accessibilityAddTraits(.isHeader)
-                Text(subtitles[step])
+                Text(L10n.text(subtitles[step]))
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -47,19 +47,19 @@ struct OnboardingView: View {
             Divider()
             HStack(spacing: 12) {
                 if step > 0 {
-                    Button("Back") { step -= 1 }
+                    Button(L10n.text("Back")) { step -= 1 }
                         .disabled(service.isChanging)
                 }
-                Text("Step \(step + 1) of 3")
+                Text(L10n.format("Step %d of 3", step + 1))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .accessibilityLabel("Welcome, step \(step + 1) of 3")
+                    .accessibilityLabel(L10n.format("Welcome, step %d of 3", step + 1))
                 Spacer()
                 if step < 2 {
-                    Button("Skip Setup") { dismiss() }
+                    Button(L10n.text("Skip Setup")) { dismiss() }
                         .keyboardShortcut(.cancelAction)
                 }
-                Button(step == 2 ? "Start Using Shark" : "Continue") {
+                Button(step == 2 ? L10n.text("Start Using Shark") : L10n.text("Continue")) {
                     if step == 2 { dismiss() } else { step += 1 }
                 }
                 .keyboardShortcut(.defaultAction)
@@ -74,12 +74,12 @@ struct OnboardingView: View {
 
     private var welcome: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Your files. A clearer workspace.")
+            Text(L10n.text("Your files. A clearer workspace."))
                 .font(.title3.weight(.semibold))
-            Text("Shark brings folder tabs, side-by-side browsing, quick previews, and a built-in terminal to a native Mac window.")
+            Text(L10n.text("Shark brings folder tabs, side-by-side browsing, quick previews, and a built-in terminal to a native Mac window."))
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
-            Text("Browse local folders and mounted drives, organize files, and pick up where you left off. Your tabs and layout are remembered.")
+            Text(L10n.text("Browse local folders and mounted drives, organize files, and pick up where you left off. Your tabs and layout are remembered."))
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -97,10 +97,10 @@ struct OnboardingView: View {
             feature("Built-in terminal", symbol: "terminal", shortcut: "⌃`",
                     detail: "Work in a shell right beneath your files.")
             VStack(alignment: .leading, spacing: 6) {
-                Text("See everything Shark can do in Help → All Features.")
+                Text(L10n.text("See everything Shark can do in Help → All Features."))
                     .font(.callout)
                     .foregroundStyle(.secondary)
-                Link("View All Features", destination: AppLinks.features)
+                Link(L10n.text("View All Features"), destination: AppLinks.features)
                     .font(.callout)
             }
         }
@@ -115,12 +115,12 @@ struct OnboardingView: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(title).font(.headline)
+                    Text(L10n.text(title)).font(.headline)
                     Spacer()
-                    Text(shortcut).font(.system(.caption, design: .monospaced))
+                    Text(L10n.text(shortcut)).font(.system(.caption, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
-                Text(detail).font(.callout).foregroundStyle(.secondary)
+                Text(L10n.text(detail)).font(.callout).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -129,15 +129,15 @@ struct OnboardingView: View {
     private var setup: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Default folder app").font(.headline)
+                Text(L10n.text("Default folder app")).font(.headline)
                 DefaultFolderAppControls()
             }
             Divider()
             VStack(alignment: .leading, spacing: 8) {
-                Text("Full Disk Access").font(.headline)
+                Text(L10n.text("Full Disk Access")).font(.headline)
                 FullDiskAccessControls()
             }
-            Text("Change these later in Settings. Revisit this welcome from the Help menu.")
+            Text(L10n.text("Change these later in Settings. Revisit this welcome from the Help menu."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

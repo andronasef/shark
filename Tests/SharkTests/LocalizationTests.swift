@@ -20,6 +20,11 @@ final class LocalizationTests: XCTestCase {
         for language in AppLanguage.allCases where language != .system {
             let translated = try AppLocalization.catalog(for: language)
             XCTAssertEqual(Set(english.keys), Set(translated.keys), language.rawValue)
+            XCTAssertTrue(translated.values.allSatisfy { !$0.isEmpty }, language.rawValue)
+            if language != .en {
+                let changed = translated.filter { english[$0.key] != $0.value }.count
+                XCTAssertGreaterThan(changed, english.count / 2, "Catalog must contain translations, not English placeholders: \(language.rawValue)")
+            }
             for (key, value) in english {
                 XCTAssertEqual(formatTokens(value), formatTokens(translated[key] ?? ""), "\(language.rawValue): \(key)")
             }

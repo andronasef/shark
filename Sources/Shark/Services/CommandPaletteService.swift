@@ -53,8 +53,8 @@ public final class CommandPaletteService {
         // MARK: - Actions
         items.append(CommandPaletteItem(
             id: "action-toggle-split",
-            title: "Toggle Dual Split View",
-            subtitle: "Open or close side-by-side pane",
+            title: L10n.text("Toggle Dual Split View"),
+            subtitle: L10n.text("Open or close side-by-side pane"),
             iconName: "rectangle.split.2x1",
             category: .actions,
             shortcut: "F3 / ⌥⌘S",
@@ -63,8 +63,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-toggle-terminal",
-            title: "Toggle Embedded Terminal Drawer",
-            subtitle: "Open interactive bottom terminal shell",
+            title: L10n.text("Toggle Embedded Terminal Drawer"),
+            subtitle: L10n.text("Open interactive bottom terminal shell"),
             iconName: "terminal",
             category: .actions,
             shortcut: "F4",
@@ -73,8 +73,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-new-tab",
-            title: "New Tab",
-            subtitle: "Open a new tab at home directory",
+            title: L10n.text("New Tab"),
+            subtitle: L10n.text("Open a new tab at home directory"),
             iconName: "plus.rectangle",
             category: .actions,
             shortcut: "⌘T",
@@ -83,7 +83,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-reopen-tab",
-            title: "Reopen Closed Tab",
+            title: L10n.text("Reopen Closed Tab"),
             subtitle: workspace.closedTabs.first?.tab.primary.url.path,
             iconName: "arrow.uturn.backward.circle",
             category: .actions,
@@ -93,7 +93,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-close-tab",
-            title: "Close Active Tab",
+            title: L10n.text("Close Active Tab"),
             subtitle: workspace.activeTab.title,
             iconName: "xmark.square",
             category: .actions,
@@ -103,8 +103,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-duplicate-tab",
-            title: "Duplicate Tab",
-            subtitle: "Clone current tab and its navigation state",
+            title: L10n.text("Duplicate Tab"),
+            subtitle: L10n.text("Clone current tab and its navigation state"),
             iconName: "plus.square.on.square",
             category: .actions,
             action: { workspace.duplicateTab(id: workspace.activeTabID) }
@@ -112,8 +112,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-pin-tab",
-            title: workspace.activeTab.isPinned ? "Unpin Tab" : "Pin Tab",
-            subtitle: "Pin or unpin active tab to the left",
+            title: workspace.activeTab.isPinned ? L10n.text("Unpin Tab") : L10n.text("Pin Tab"),
+            subtitle: L10n.text("Pin or unpin active tab to the left"),
             iconName: workspace.activeTab.isPinned ? "pin.slash" : "pin",
             category: .actions,
             action: { workspace.togglePin(id: workspace.activeTabID) }
@@ -121,8 +121,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-lock-tab",
-            title: workspace.activeTab.isLocked ? "Unlock Tab" : "Lock Tab",
-            subtitle: "Lock tab address or allow navigation",
+            title: workspace.activeTab.isLocked ? L10n.text("Unlock Tab") : L10n.text("Lock Tab"),
+            subtitle: L10n.text("Lock tab address or allow navigation"),
             iconName: workspace.activeTab.isLocked ? "lock.slash" : "lock",
             category: .actions,
             action: { workspace.toggleLock(id: workspace.activeTabID) }
@@ -130,8 +130,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-show-hidden",
-            title: nav.showHiddenFiles ? "Hide Hidden Files" : "Show Hidden Files",
-            subtitle: "Toggle visibility of dotfiles and hidden folders",
+            title: nav.showHiddenFiles ? L10n.text("Hide Hidden Files") : L10n.text("Show Hidden Files"),
+            subtitle: L10n.text("Toggle visibility of dotfiles and hidden folders"),
             iconName: "eye",
             category: .actions,
             shortcut: "⇧⌘.",
@@ -140,8 +140,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-path-bar",
-            title: nav.isBottomPathBarVisible ? "Hide Path Bar" : "Show Path Bar",
-            subtitle: "Toggle Finder bottom path bar",
+            title: nav.isBottomPathBarVisible ? L10n.text("Hide Path Bar") : L10n.text("Show Path Bar"),
+            subtitle: L10n.text("Toggle Finder bottom path bar"),
             iconName: "chart.bar.doc.horizontal",
             category: .actions,
             shortcut: "⌥⌘P",
@@ -150,8 +150,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-view-icons",
-            title: "View as Icons",
-            subtitle: "Grid view mode",
+            title: L10n.text("View as Icons"),
+            subtitle: L10n.text("Grid view mode"),
             iconName: "square.grid.2x2",
             category: .actions,
             shortcut: "⌘1",
@@ -160,8 +160,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-view-details",
-            title: "View as Details / List",
-            subtitle: "Multi-column details table",
+            title: L10n.text("View as Details / List"),
+            subtitle: L10n.text("Multi-column details table"),
             iconName: "list.bullet",
             category: .actions,
             shortcut: "⌘2",
@@ -170,8 +170,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-view-compact",
-            title: "View as Columns / Compact",
-            subtitle: "Compact column browser",
+            title: L10n.text("View as Columns / Compact"),
+            subtitle: L10n.text("Compact column browser"),
             iconName: "rectangle.split.3x1",
             category: .actions,
             shortcut: "⌘3",
@@ -180,8 +180,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-view-gallery",
-            title: "View as Gallery",
-            subtitle: "Large visual preview gallery",
+            title: L10n.text("View as Gallery"),
+            subtitle: L10n.text("Large visual preview gallery"),
             iconName: "macwindow",
             category: .actions,
             shortcut: "⌘4",
@@ -190,8 +190,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-zoom-in",
-            title: "Zoom In",
-            subtitle: "Increase icon and thumbnail size",
+            title: L10n.text("Zoom In"),
+            subtitle: L10n.text("Increase icon and thumbnail size"),
             iconName: "plus.magnifyingglass",
             category: .actions,
             shortcut: "⌘+",
@@ -200,8 +200,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-zoom-out",
-            title: "Zoom Out",
-            subtitle: "Decrease icon and thumbnail size",
+            title: L10n.text("Zoom Out"),
+            subtitle: L10n.text("Decrease icon and thumbnail size"),
             iconName: "minus.magnifyingglass",
             category: .actions,
             shortcut: "⌘-",
@@ -210,8 +210,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-zoom-reset",
-            title: "Actual Size (Reset Zoom)",
-            subtitle: "Restore default icon size",
+            title: L10n.text("Actual Size (Reset Zoom)"),
+            subtitle: L10n.text("Restore default icon size"),
             iconName: "1.magnifyingglass",
             category: .actions,
             shortcut: "⌘0",
@@ -220,8 +220,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-cut",
-            title: "Cut Selected",
-            subtitle: "Stage items to move",
+            title: L10n.text("Cut Selected"),
+            subtitle: L10n.text("Stage items to move"),
             iconName: "scissors",
             category: .actions,
             shortcut: "⌘X",
@@ -230,8 +230,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-copy",
-            title: "Copy Selected",
-            subtitle: "Stage items to copy",
+            title: L10n.text("Copy Selected"),
+            subtitle: L10n.text("Stage items to copy"),
             iconName: "doc.on.doc",
             category: .actions,
             shortcut: "⌘C",
@@ -240,8 +240,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-paste",
-            title: "Paste",
-            subtitle: "Paste files into current folder",
+            title: L10n.text("Paste"),
+            subtitle: L10n.text("Paste files into current folder"),
             iconName: "doc.on.clipboard",
             category: .actions,
             shortcut: "⌘V",
@@ -250,8 +250,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-undo",
-            title: "Undo: \(FileUndoService.shared.currentUndoDescription ?? "Last Action")",
-            subtitle: "Revert the last file operation",
+            title: L10n.format("Undo: %@", FileUndoService.shared.currentUndoDescription ?? L10n.text("Last Action")),
+            subtitle: L10n.text("Revert the last file operation"),
             iconName: "arrow.uturn.backward",
             category: .actions,
             shortcut: "⌘Z",
@@ -260,8 +260,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-redo",
-            title: "Redo: \(FileUndoService.shared.currentRedoDescription ?? "Last Action")",
-            subtitle: "Reapply previously undone operation",
+            title: L10n.format("Redo: %@", FileUndoService.shared.currentRedoDescription ?? L10n.text("Last Action")),
+            subtitle: L10n.text("Reapply previously undone operation"),
             iconName: "arrow.uturn.forward",
             category: .actions,
             shortcut: "⇧⌘Z",
@@ -270,8 +270,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-select-all",
-            title: "Select All",
-            subtitle: "Select all items in folder",
+            title: L10n.text("Select All"),
+            subtitle: L10n.text("Select all items in folder"),
             iconName: "checklist",
             category: .actions,
             shortcut: "⌘A",
@@ -280,7 +280,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-copy-path",
-            title: "Copy Current Path",
+            title: L10n.text("Copy Current Path"),
             subtitle: nav.currentURL.path,
             iconName: "doc.text",
             category: .actions,
@@ -293,8 +293,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-calculate-sizes",
-            title: "Calculate All Folder Sizes",
-            subtitle: "Compute recursive directory sizes in background",
+            title: L10n.text("Calculate All Folder Sizes"),
+            subtitle: L10n.text("Compute recursive directory sizes in background"),
             iconName: "scalemass",
             category: .actions,
             action: {
@@ -306,8 +306,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-new-folder",
-            title: "New Folder",
-            subtitle: "Create a new folder in current directory",
+            title: L10n.text("New Folder"),
+            subtitle: L10n.text("Create a new folder in current directory"),
             iconName: "folder.badge.plus",
             category: .actions,
             shortcut: "⇧⌘N",
@@ -316,8 +316,8 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "action-new-file",
-            title: "New File",
-            subtitle: "Create an empty file in current directory",
+            title: L10n.text("New File"),
+            subtitle: L10n.text("Create an empty file in current directory"),
             iconName: "doc.badge.plus",
             category: .actions,
             action: { nav.requestedNewItemType = .file }
@@ -333,7 +333,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "place-home",
-            title: "Home",
+            title: L10n.text("Home"),
             subtitle: home.path,
             iconName: "house",
             category: .navigation,
@@ -343,7 +343,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "place-desktop",
-            title: "Desktop",
+            title: L10n.text("Desktop"),
             subtitle: desktop.path,
             iconName: "desktopcomputer",
             category: .navigation,
@@ -353,7 +353,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "place-documents",
-            title: "Documents",
+            title: L10n.text("Documents"),
             subtitle: documents.path,
             iconName: "doc.text",
             category: .navigation,
@@ -363,7 +363,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "place-downloads",
-            title: "Downloads",
+            title: L10n.text("Downloads"),
             subtitle: downloads.path,
             iconName: "arrow.down.circle",
             category: .navigation,
@@ -373,7 +373,7 @@ public final class CommandPaletteService {
 
         items.append(CommandPaletteItem(
             id: "place-apps",
-            title: "Applications",
+            title: L10n.text("Applications"),
             subtitle: applications.path,
             iconName: "app.badge",
             category: .navigation,
@@ -419,8 +419,8 @@ public final class CommandPaletteService {
         for group in TabGroupService.shared.groups {
             items.append(CommandPaletteItem(
                 id: "tabgroup-\(group.id)",
-                title: "Restore Group: \(group.name)",
-                subtitle: "\(group.tabs.count) tabs (\(group.tabs.map { URL(fileURLWithPath: $0.primaryPath).lastPathComponent }.joined(separator: ", ")))",
+                title: L10n.format("Restore Group: %@", L10n.literal(group.name)),
+                subtitle: L10n.format("%@ (%@)", L10n.tabs(group.tabs.count), L10n.literal(group.tabs.map { URL(fileURLWithPath: $0.primaryPath).lastPathComponent }.joined(separator: ", "))),
                 iconName: "square.stack.3d.up",
                 category: .tabGroups,
                 action: { TabGroupService.shared.restore(group: group, into: workspace, replace: false) }
@@ -446,8 +446,8 @@ public final class CommandPaletteService {
 
             let pathItem = CommandPaletteItem(
                 id: "custom-path-navigate",
-                title: "Go to: \(trimmed)",
-                subtitle: exists ? (isDir.boolValue ? "Directory exists" : "File exists") : "Path: \(expandedPath)",
+                title: L10n.format("Go to: %@", L10n.literal(trimmed)),
+                subtitle: exists ? (isDir.boolValue ? L10n.text("Directory exists") : L10n.text("File exists")) : L10n.format("Path: %@", L10n.literal(expandedPath)),
                 iconName: isDir.boolValue ? "folder" : "arrow.right.circle",
                 category: .path,
                 shortcut: "↵",

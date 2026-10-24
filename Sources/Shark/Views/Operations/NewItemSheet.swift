@@ -55,14 +55,14 @@ public struct NewItemSheet: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(type.title)
                         .font(.headline)
-                    Text("In: \(parentURL.lastPathComponent)")
+                    Text(L10n.format("In: %@", L10n.literal(parentURL.lastPathComponent)))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
             }
 
-            TextField("Item name", text: $itemName)
+            TextField(L10n.text("Item name"), text: $itemName)
                 .textFieldStyle(.roundedBorder)
                 .onSubmit {
                     createItem()
@@ -76,12 +76,12 @@ public struct NewItemSheet: View {
 
             HStack {
                 Spacer()
-                Button("Cancel") {
+                Button(L10n.text("Cancel")) {
                     dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
 
-                Button("Create") {
+                Button(L10n.text("Create")) {
                     createItem()
                 }
                 .keyboardShortcut(.defaultAction)

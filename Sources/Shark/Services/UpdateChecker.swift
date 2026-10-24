@@ -158,15 +158,15 @@ enum UpdateChecker {
     private static func check(manual: Bool) async {
         guard let current = currentVersion else {
             if manual {
-                showInfo("Update checking is unavailable in development builds.",
-                         "This build’s version is “\(rawVersion ?? "missing")”, which is not a release version.")
+                showInfo(L10n.text("Update checking is unavailable in development builds."),
+                         L10n.format("This build’s version is “%@”, which is not a release version.", rawVersion ?? L10n.text("missing")))
             }
             return
         }
         let channel = installChannel
         do {
             guard let update = try await newestUpdate(for: channel, current: current) else {
-                if manual { showInfo("You’re up to date", "Shark \(current) is the newest version.") }
+                if manual { showInfo(L10n.text("You’re up to date"), L10n.format("Shark %@ is the newest version.", String(describing: current))) }
                 return
             }
             // Only the automatic check honours a skipped version.
@@ -203,20 +203,20 @@ enum UpdateChecker {
     private static func showUpdateAlert(latest: SemanticVersion, current: SemanticVersion,
                                         channel: InstallChannel, actionURL: URL, notes: String?) {
         let alert = NSAlert()
-        alert.messageText = "Shark \(latest) is available"
-        alert.informativeText = "You have \(current)."
+        alert.messageText = L10n.format("Shark %@ is available", String(describing: latest))
+        alert.informativeText = L10n.format("You have %@.", String(describing: current))
         if let notes = releaseNotes(notes) { alert.accessoryView = notesView(notes) }
         switch channel {
         case .appStore:
-            alert.addButton(withTitle: "Open App Store")
+            alert.addButton(withTitle: L10n.text("Open App Store"))
         case .homebrew:
-            alert.informativeText += " Run \(brewCommand) in Terminal to update."
-            alert.addButton(withTitle: "Copy Command")
+            alert.informativeText += L10n.format(" Run %@ in Terminal to update.", L10n.literal(brewCommand))
+            alert.addButton(withTitle: L10n.text("Copy Command"))
         case .dmg:
-            alert.addButton(withTitle: "Download")
+            alert.addButton(withTitle: L10n.text("Download"))
         }
-        alert.addButton(withTitle: "Skip This Version")
-        alert.addButton(withTitle: "Later")
+        alert.addButton(withTitle: L10n.text("Skip This Version"))
+        alert.addButton(withTitle: L10n.text("Later"))
 
         switch alert.runModal() {
         case .alertFirstButtonReturn:

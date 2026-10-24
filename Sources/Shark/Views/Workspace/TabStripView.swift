@@ -63,8 +63,8 @@ public struct TabStripView: View {
                 }
                 .buttonStyle(.plain)
                 .finderGlass()
-                .help("New Tab (⌘T); right-click for Tab Groups")
-                .accessibilityLabel("New Tab")
+                .help(L10n.text("New Tab (⌘T); right-click for Tab Groups"))
+                .accessibilityLabel(L10n.text("New Tab"))
                 .contextMenu { tabGroupCommands }
             }
             .finderGlassContainer()
@@ -81,20 +81,20 @@ public struct TabStripView: View {
         }
         .sheet(isPresented: $isShowingSaveGroupAlert) {
             VStack(spacing: 16) {
-                Text("Save Current Tabs as Group")
+                Text(L10n.text("Save Current Tabs as Group"))
                     .font(.headline)
 
-                TextField("Group Name", text: $newGroupName)
+                TextField(L10n.text("Group Name"), text: $newGroupName)
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 240)
 
                 HStack {
-                    Button("Cancel") {
+                    Button(L10n.text("Cancel")) {
                         isShowingSaveGroupAlert = false
                     }
                     .keyboardShortcut(.cancelAction)
 
-                    Button("Save") {
+                    Button(L10n.text("Save")) {
                         if !newGroupName.trimmingCharacters(in: .whitespaces).isEmpty {
                             _ = TabGroupService.shared.saveGroup(name: newGroupName, tabs: workspace.tabs)
                         }
@@ -129,22 +129,22 @@ public struct TabStripView: View {
 
     @ViewBuilder
     private var tabGroupCommands: some View {
-        Button("Save Tabs as Group...") {
-            newGroupName = "Group \(TabGroupService.shared.groups.count + 1)"
+        Button(L10n.text("Save Tabs as Group...")) {
+            newGroupName = L10n.format("Group %d", TabGroupService.shared.groups.count + 1)
             isShowingSaveGroupAlert = true
         }
         if !TabGroupService.shared.groups.isEmpty {
             Divider()
             ForEach(TabGroupService.shared.groups) { group in
                 Menu(group.name) {
-                    Button("Restore (Replace)") {
+                    Button(L10n.text("Restore (Replace)")) {
                         TabGroupService.shared.restore(group: group, into: workspace, replace: true)
                     }
-                    Button("Append Tabs") {
+                    Button(L10n.text("Append Tabs")) {
                         TabGroupService.shared.restore(group: group, into: workspace, replace: false)
                     }
                     Divider()
-                    Button("Delete Group", role: .destructive) {
+                    Button(L10n.text("Delete Group"), role: .destructive) {
                         TabGroupService.shared.deleteGroup(id: group.id)
                     }
                 }

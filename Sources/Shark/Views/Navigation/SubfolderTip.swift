@@ -34,8 +34,8 @@ struct SubfolderTip: View {
                     .contentShape(Circle())
             }
             .buttonStyle(.plain)
-            .help("Browse subfolders of \(item.name)")
-            .accessibilityLabel("Browse subfolders of \(item.name)")
+            .help(L10n.format("Browse subfolders of %@", L10n.literal(item.name)))
+            .accessibilityLabel(L10n.format("Browse subfolders of %@", L10n.literal(item.name)))
         }
     }
 

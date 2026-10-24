@@ -42,14 +42,14 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
             includingPropertiesForKeys: [.isDirectoryKey, .localizedNameKey],
             options: options
         ) else {
-            let emptyItem = NSMenuItem(title: "(Unable to read)", action: nil, keyEquivalent: "")
+            let emptyItem = NSMenuItem(title: L10n.text("(Unable to read)"), action: nil, keyEquivalent: "")
             emptyItem.isEnabled = false
             menu.addItem(emptyItem)
             return
         }
 
         if contents.isEmpty {
-            let emptyItem = NSMenuItem(title: "(Empty)", action: nil, keyEquivalent: "")
+            let emptyItem = NSMenuItem(title: L10n.text("(Empty)"), action: nil, keyEquivalent: "")
             emptyItem.isEnabled = false
             menu.addItem(emptyItem)
             return
@@ -92,7 +92,7 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
                 menuURLs[ObjectIdentifier(submenu)] = itemURL
 
                 // Add a dummy placeholder item so the submenu chevron ▸ appears immediately
-                let placeholder = NSMenuItem(title: "Loading...", action: nil, keyEquivalent: "")
+                let placeholder = NSMenuItem(title: L10n.text("Loading..."), action: nil, keyEquivalent: "")
                 placeholder.isEnabled = false
                 submenu.addItem(placeholder)
 
@@ -104,7 +104,7 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
 
         if sorted.count > Self.maxItems {
             menu.addItem(.separator())
-            let more = NSMenuItem(title: "Open “\(dirURL.lastPathComponent)” to See All \(sorted.count) Items",
+            let more = NSMenuItem(title: L10n.format("Open “%@” to See All %@", L10n.literal(dirURL.lastPathComponent), L10n.items(sorted.count)),
                                   action: #selector(menuItemClicked(_:)), keyEquivalent: "")
             more.target = self
             more.representedObject = dirURL

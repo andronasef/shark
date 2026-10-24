@@ -41,7 +41,7 @@ final class DefaultFolderAppService {
     }
 
     var currentApplicationName: String {
-        guard let currentApplicationURL else { return "Unknown" }
+        guard let currentApplicationURL else { return L10n.text("Unknown") }
         return FileManager.default.displayName(atPath: currentApplicationURL.path)
     }
 
@@ -57,7 +57,7 @@ final class DefaultFolderAppService {
     @discardableResult
     func restoreFinder() async -> Bool {
         guard let finder = findFinder() else {
-            errorMessage = "Finder could not be found. Try again after reopening Shark."
+            errorMessage = L10n.text("Finder could not be found. Try again after reopening Shark.")
             return false
         }
         return await changeDefault(to: finder)
@@ -87,11 +87,11 @@ final class DefaultFolderAppService {
             let status = failure.userInfo[NSUnderlyingErrorKey] as? NSError ?? failure
             if status.domain == NSOSStatusErrorDomain, status.code == -50 {
                 requiresManualSetup = true
-                errorMessage = "macOS rejected one-click setup. Manual Setup is a separate option that requires restarting your Mac and may not work on this macOS version."
+                errorMessage = L10n.text("macOS rejected one-click setup. Manual Setup is a separate option that requires restarting your Mac and may not work on this macOS version.")
                 return false
             }
         }
-        var message = "The default folder app was not changed. You can try again here."
+        var message = L10n.text("The default folder app was not changed. You can try again here.")
         if let requestError {
             message += " \(requestError.localizedDescription)"
         }

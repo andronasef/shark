@@ -17,7 +17,8 @@ public struct BreadcrumbBarView: View {
                     Image(systemName: "folder")
                         .foregroundColor(.secondary)
 
-                    TextField("Path (e.g. ~/Documents or /Users)", text: $navigationState.pathInputText)
+                    TextField(L10n.text("Path (e.g. ~/Documents or /Users)"), text: $navigationState.pathInputText)
+                        .environment(\.layoutDirection, .leftToRight)
                         .textFieldStyle(.plain)
                         .font(.system(.body, design: .monospaced))
                         .focused($isFieldFocused)
@@ -126,7 +127,7 @@ public struct BreadcrumbBarView: View {
                         )
                 }
                 .buttonStyle(.plain)
-                .help("Edit Path (⌘L)")
+                .help(L10n.text("Edit Path (⌘L)"))
             }
         }
         .onChange(of: navigationState.isEditingPath) { _, isEditing in

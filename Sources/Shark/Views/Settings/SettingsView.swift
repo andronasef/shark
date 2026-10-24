@@ -2,6 +2,8 @@ import SwiftUI
 
 public struct SettingsView: View {
     @ObservedObject var settings = SharkSettings.shared
+    @AppStorage(AppLocalization.preferenceKey) private var language = AppLanguage.system.rawValue
+    @AppStorage("openImagesInShark") private var openImagesInShark = false
 
     public init() {}
 
@@ -43,6 +45,15 @@ public struct SettingsView: View {
 
     private var generalTab: some View {
         Form {
+            Section(L10n.text("Language")) {
+                Picker(L10n.text("App Language:"), selection: $language) {
+                    ForEach(AppLanguage.allCases, id: \.rawValue) { language in
+                        Text(language.displayName).tag(language.rawValue)
+                    }
+                }
+                Text(L10n.text("Restart Shark to apply a language change."))
+                    .font(.caption).foregroundColor(.secondary)
+            }
             Section {
                 Picker("Default View Mode:", selection: $settings.defaultViewMode) {
                     ForEach(DefaultViewModeSetting.allCases) { mode in
@@ -134,6 +145,11 @@ public struct SettingsView: View {
 
     private var previewsTab: some View {
         Form {
+            Section(L10n.text("Photo Viewer")) {
+                Toggle(L10n.text("Open images in Shark Photo Viewer on double-click"), isOn: $openImagesInShark)
+                Text(L10n.text("Space continues to open Quick Look. You can always open the photo viewer from an image’s context menu."))
+                    .font(.caption).foregroundColor(.secondary)
+            }
             Section {
                 Toggle("Enable hover quick-previews for images, text, video, and audio", isOn: $settings.hoverPreviewEnabled)
 

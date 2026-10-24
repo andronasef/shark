@@ -66,7 +66,7 @@ public struct CommandPaletteView: View {
                         Image(systemName: "questionmark.folder")
                             .font(.system(size: 32))
                             .foregroundColor(.secondary)
-                        Text("No matching commands or places")
+                        Text(L10n.text("No matching commands or places"))
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.secondary)
                         Spacer()
@@ -100,14 +100,14 @@ public struct CommandPaletteView: View {
 
                 // Footer Hints
                 HStack {
-                    Text("\(items.count) result\(items.count == 1 ? "" : "s")")
+                    Text(L10n.results(items.count))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                     Spacer()
                     HStack(spacing: 12) {
-                        Label("Navigate", systemImage: "arrow.up.and.down")
-                        Label("Select", systemImage: "return")
-                        Label("Close", systemImage: "escape")
+                        Label(L10n.text("Navigate"), systemImage: "arrow.up.and.down")
+                        Label(L10n.text("Select"), systemImage: "return")
+                        Label(L10n.text("Close"), systemImage: "escape")
                     }
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
@@ -176,7 +176,7 @@ public struct CommandPaletteView: View {
                     )
                     .foregroundColor(isSelected ? .white : .secondary)
             } else {
-                Text(item.category.rawValue)
+                Text(L10n.text(item.category.rawValue))
                     .font(.system(size: 10))
                     .foregroundColor(isSelected ? Color.white.opacity(0.7) : Color.secondary.opacity(0.6))
             }

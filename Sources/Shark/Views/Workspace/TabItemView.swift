@@ -15,7 +15,7 @@ extension TabColor {
     }
 
     public var displayName: String {
-        rawValue.capitalized
+        L10n.text(rawValue.capitalized)
     }
 }
 
@@ -265,24 +265,24 @@ public struct TabItemView: View {
 
     @ViewBuilder
     private var tabContextMenu: some View {
-        Button("New Tab") {
+        Button(L10n.text("New Tab")) {
             workspace.newTab(placement: .afterActive)
         }
 
-        Button("Duplicate Tab") {
+        Button(L10n.text("Duplicate Tab")) {
             workspace.duplicateTab(id: tab.id)
         }
 
-        Button(tab.isPinned ? "Unpin Tab" : "Pin Tab") {
+        Button(tab.isPinned ? L10n.text("Unpin Tab") : L10n.text("Pin Tab")) {
             workspace.togglePin(id: tab.id)
         }
 
-        Button(tab.isLocked ? "Unlock Tab" : "Lock Tab") {
+        Button(tab.isLocked ? L10n.text("Unlock Tab") : L10n.text("Lock Tab")) {
             workspace.toggleLock(id: tab.id)
         }
 
-        Menu("Colour") {
-            Button("None") {
+        Menu(L10n.text("Colour")) {
+            Button(L10n.text("None")) {
                 workspace.setColor(nil, for: tab.id)
             }
             Divider()
@@ -302,26 +302,26 @@ public struct TabItemView: View {
 
         Divider()
 
-        Button("Copy Path") {
+        Button(L10n.text("Copy Path")) {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(tab.activeNavigationState.currentURL.path, forType: .string)
         }
 
         Divider()
 
-        Button("Close Tab") {
+        Button(L10n.text("Close Tab")) {
             workspace.closeTab(id: tab.id)
         }
 
-        Button("Close Other Tabs") {
+        Button(L10n.text("Close Other Tabs")) {
             workspace.closeOtherTabs(id: tab.id)
         }
 
-        Button("Close Tabs to the Right") {
+        Button(L10n.text("Close Tabs to the Right")) {
             workspace.closeTabsToRight(id: tab.id)
         }
 
-        Button("Reopen Closed Tab") {
+        Button(L10n.text("Reopen Closed Tab")) {
             workspace.reopenClosedTab()
         }
         .disabled(workspace.closedTabs.isEmpty)

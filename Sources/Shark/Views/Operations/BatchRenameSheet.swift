@@ -33,43 +33,43 @@ public struct BatchRenameSheet: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Batch Rename (\(items.count) items)")
+            Text(L10n.format("Batch Rename (%@)", L10n.items(items.count)))
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 10) {
                 // Find and Replace
                 HStack {
-                    Text("Find:")
+                    Text(L10n.text("Find:"))
                         .frame(width: 70, alignment: .trailing)
-                    TextField("Text to replace", text: $findText)
+                    TextField(L10n.text("Text to replace"), text: $findText)
                 }
 
                 HStack {
-                    Text("Replace:")
+                    Text(L10n.text("Replace:"))
                         .frame(width: 70, alignment: .trailing)
-                    TextField("Replacement text", text: $replaceText)
+                    TextField(L10n.text("Replacement text"), text: $replaceText)
                 }
 
                 Divider()
 
                 // Prefix & Suffix
                 HStack {
-                    Text("Prefix:")
+                    Text(L10n.text("Prefix:"))
                         .frame(width: 70, alignment: .trailing)
-                    TextField("Prepend to name", text: $prefix)
+                    TextField(L10n.text("Prepend to name"), text: $prefix)
 
-                    Text("Suffix:")
-                    TextField("Append to name", text: $suffix)
+                    Text(L10n.text("Suffix:"))
+                    TextField(L10n.text("Append to name"), text: $suffix)
                 }
 
                 Divider()
 
                 // Sequential Numbering
-                Toggle("Add sequential numbering", isOn: $useNumbering)
+                Toggle(L10n.text("Add sequential numbering"), isOn: $useNumbering)
 
                 if useNumbering {
                     HStack {
-                        Text("Start at:")
+                        Text(L10n.text("Start at:"))
                             .frame(width: 70, alignment: .trailing)
                         TextField("1", value: $startingNumber, format: .number)
                             .frame(width: 60)
@@ -78,7 +78,7 @@ public struct BatchRenameSheet: View {
             }
             .font(.system(size: 12))
 
-            Text("Preview:")
+            Text(L10n.text("Preview:"))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
@@ -114,12 +114,12 @@ public struct BatchRenameSheet: View {
             // Action Buttons
             HStack {
                 Spacer()
-                Button("Cancel") {
+                Button(L10n.text("Cancel")) {
                     dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
 
-                Button("Rename \(items.count) Items") {
+                Button(L10n.format("Rename %@", L10n.items(items.count))) {
                     performBatchRename()
                 }
                 .buttonStyle(.borderedProminent)

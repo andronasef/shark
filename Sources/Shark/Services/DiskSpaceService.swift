@@ -18,7 +18,7 @@ public final class DiskSpaceService: Sendable {
         }
 
         public var summary: String {
-            "\(formattedAvailable) available"
+            L10n.format("%@ available", formattedAvailable)
         }
     }
 

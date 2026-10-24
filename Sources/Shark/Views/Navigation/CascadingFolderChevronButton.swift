@@ -27,7 +27,7 @@ public struct CascadingFolderChevronButton: NSViewRepresentable {
         button.contentTintColor = tint
         button.target = context.coordinator
         button.action = #selector(Coordinator.buttonClicked(_:))
-        button.toolTip = "Browse Subfolders"
+        button.toolTip = L10n.text("Browse Subfolders")
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
         return button
@@ -37,7 +37,7 @@ public struct CascadingFolderChevronButton: NSViewRepresentable {
         nsView.image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Browse subfolders")?
             .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: pointSize, weight: weight))
         nsView.contentTintColor = tint
-        nsView.toolTip = "Browse subfolders of \(url.lastPathComponent.isEmpty ? "Macintosh HD" : url.lastPathComponent)"
+        nsView.toolTip = L10n.format("Browse subfolders of %@", L10n.literal(url.lastPathComponent.isEmpty ? "Macintosh HD" : url.lastPathComponent))
         context.coordinator.url = url
         context.coordinator.onNavigate = onNavigate
     }

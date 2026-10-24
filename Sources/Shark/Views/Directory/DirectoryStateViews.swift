@@ -23,7 +23,7 @@ public struct DirectoryEmptyStateView: View {
                 .font(.system(size: 44, weight: .light))
                 .foregroundColor(.secondary.opacity(0.6))
 
-            Text(isFilterActive ? "No Matching Items" : "This Folder is Empty")
+            Text(isFilterActive ? L10n.text("No Matching Items") : L10n.text("This Folder is Empty"))
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.primary)
 
@@ -38,14 +38,14 @@ public struct DirectoryEmptyStateView: View {
 
             HStack(spacing: 10) {
                 if isFilterActive {
-                    Button("Clear Filter") {
+                    Button(L10n.text("Clear Filter")) {
                         onClearFilter()
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
                 } else {
                     Button(action: onNewFolder) {
-                        Label("New Folder", systemImage: "folder.badge.plus")
+                        Label(L10n.text("New Folder"), systemImage: "folder.badge.plus")
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
@@ -55,7 +55,7 @@ public struct DirectoryEmptyStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(isFilterActive ? "No matching items in directory filter" : "Folder is empty")
+        .accessibilityLabel(isFilterActive ? L10n.text("No matching items in directory filter") : L10n.text("Folder is empty"))
     }
 }
 
@@ -89,7 +89,7 @@ public struct DirectoryErrorStateView: View {
                 .font(.system(size: 46, weight: .light))
                 .foregroundColor(isPermissionError ? .orange : .red.opacity(0.85))
 
-            Text(isPermissionError ? "Access Restricted" : "Cannot Open Folder")
+            Text(isPermissionError ? L10n.text("Access Restricted") : L10n.text("Cannot Open Folder"))
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.primary)
 
@@ -105,13 +105,13 @@ public struct DirectoryErrorStateView: View {
             HStack(spacing: 12) {
                 if isPermissionError {
                     if let onGrantAccess {
-                        Button("Grant Access...", action: onGrantAccess)
+                        Button(L10n.text("Grant Access..."), action: onGrantAccess)
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)
                     }
 
                     if onGrantAccess == nil {
-                        Button("Open Privacy Settings") {
+                        Button(L10n.text("Open Privacy Settings")) {
                             if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
                                 NSWorkspace.shared.open(url)
                             }
@@ -119,7 +119,7 @@ public struct DirectoryErrorStateView: View {
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
                     } else {
-                        Button("Open Privacy Settings") {
+                        Button(L10n.text("Open Privacy Settings")) {
                             if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
                                 NSWorkspace.shared.open(url)
                             }
@@ -128,15 +128,15 @@ public struct DirectoryErrorStateView: View {
                         .controlSize(.small)
                     }
 
-                    Button("Go to Home", action: onGoHome)
+                    Button(L10n.text("Go to Home"), action: onGoHome)
                         .buttonStyle(.bordered)
                         .controlSize(.small)
                 } else {
-                    Button("Try Again", action: onRetry)
+                    Button(L10n.text("Try Again"), action: onRetry)
                         .buttonStyle(.borderedProminent)
                         .controlSize(.small)
 
-                    Button("Go to Home", action: onGoHome)
+                    Button(L10n.text("Go to Home"), action: onGoHome)
                         .buttonStyle(.bordered)
                         .controlSize(.small)
                 }
@@ -145,7 +145,7 @@ public struct DirectoryErrorStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(isPermissionError ? "Permission denied. Open System Settings to grant Full Disk Access." : "Error: \(errorMessage)")
+        .accessibilityLabel(isPermissionError ? L10n.text("Permission denied. Open System Settings to grant Full Disk Access.") : L10n.format("Error: %@", errorMessage))
     }
 }
 
@@ -160,12 +160,12 @@ public struct DirectoryLoadingStateView: View {
             ProgressView()
                 .scaleEffect(0.85)
 
-            Text("Loading folder contents...")
+            Text(L10n.text("Loading folder contents..."))
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: true)
-        .accessibilityLabel("Loading folder contents")
+        .accessibilityLabel(L10n.text("Loading folder contents"))
     }
 }

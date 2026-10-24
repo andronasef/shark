@@ -39,19 +39,20 @@ public struct BottomPathBarView: View {
         if navigationState.isEditingPath {
             HStack(spacing: 6) {
                 Image(systemName: "folder").foregroundStyle(.secondary)
-                TextField("Go to folder", text: $navigationState.pathInputText)
+                TextField(L10n.text("Go to folder"), text: $navigationState.pathInputText)
+                    .environment(\.layoutDirection, .leftToRight)
                     .textFieldStyle(.plain)
                     .font(.system(size: 12))
                     .focused($isPathFocused)
                     .onAppear { isPathFocused = true }
                     .onSubmit { navigationState.commitPathInput() }
                     .onExitCommand { cancelEditing() }
-                    .accessibilityLabel("Folder Path")
+                    .accessibilityLabel(L10n.text("Folder Path"))
                 Button { cancelEditing() } label: {
                     Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Cancel Path Editing")
+                .accessibilityLabel(L10n.text("Cancel Path Editing"))
             }
             .padding(.horizontal, 10)
         } else {
@@ -63,11 +64,11 @@ public struct BottomPathBarView: View {
                     }
             }
             .contextMenu {
-                Button("Edit Path (⌘L)") {
+                Button(L10n.text("Edit Path (⌘L)")) {
                     navigationState.pathInputText = navigationState.currentURL.path
                     navigationState.isEditingPath = true
                 }
-                Button("Copy Path") {
+                Button(L10n.text("Copy Path")) {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(navigationState.currentURL.path, forType: .string)
                 }
@@ -126,10 +127,10 @@ public struct BottomPathBarView: View {
                             workspace?.open(seg.url, from: navigationState, newTab: true)
                         }
                         .contextMenu {
-                            Button("Open in New Tab") {
+                            Button(L10n.text("Open in New Tab")) {
                                 workspace?.open(seg.url, from: navigationState, newTab: true)
                             }
-                            Button("Copy Path") {
+                            Button(L10n.text("Copy Path")) {
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(seg.url.path, forType: .string)
                             }

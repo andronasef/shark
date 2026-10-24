@@ -141,8 +141,8 @@ public final class SecurityScopedBookmarkManager {
     /// Under App Sandbox, user selection through NSOpenPanel grants temporary access and allows creating a persistent bookmark.
     public func promptUserForAccess(to targetURL: URL, message: String? = nil) async -> Bool {
         let panel = NSOpenPanel()
-        panel.message = message ?? "Grant Shark access to browse and manage files in this folder."
-        panel.prompt = "Grant Access"
+        panel.message = message ?? L10n.text("Grant Shark access to browse and manage files in this folder.")
+        panel.prompt = L10n.text("Grant Access")
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false

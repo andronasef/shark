@@ -65,7 +65,7 @@ public struct InspectorPanelView: View {
 
     private var headerBar: some View {
         HStack {
-            Label("Information", systemImage: "info.circle")
+            Label(L10n.text("Information"), systemImage: "info.circle")
                 .font(.system(size: 12, weight: .semibold))
 
             Spacer()
@@ -78,7 +78,7 @@ public struct InspectorPanelView: View {
                     .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
-            .help("Close Inspector (F11)")
+            .help(L10n.text("Close Inspector (F11)"))
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -117,10 +117,10 @@ public struct InspectorPanelView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("General")
 
-            metadataRow("Size", meta.isDirectory ? "--" : "\(meta.formattedSize) (\(meta.fileSize.formatted()) bytes)")
+            metadataRow(L10n.text("Size"), meta.isDirectory ? "--" : L10n.format("%@ (%@ bytes)", meta.formattedSize, meta.fileSize.formatted(.number.locale(AppLocalization.locale))))
 
             HStack(alignment: .top) {
-                Text("Where")
+                Text(L10n.text("Where"))
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .frame(width: 65, alignment: .leading)
@@ -141,17 +141,17 @@ public struct InspectorPanelView: View {
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Copy Path")
+                .help(L10n.text("Copy Path"))
             }
 
             if let mod = meta.dateModified {
-                metadataRow("Modified", mod.formatted(date: .abbreviated, time: .shortened))
+                metadataRow(L10n.text("Modified"), mod.formatted(date: .abbreviated, time: .shortened))
             }
             if let crt = meta.dateCreated {
-                metadataRow("Created", crt.formatted(date: .abbreviated, time: .shortened))
+                metadataRow(L10n.text("Created"), crt.formatted(date: .abbreviated, time: .shortened))
             }
             if let acc = meta.dateAccessed {
-                metadataRow("Accessed", acc.formatted(date: .abbreviated, time: .shortened))
+                metadataRow(L10n.text("Accessed"), acc.formatted(date: .abbreviated, time: .shortened))
             }
         }
     }
@@ -160,9 +160,9 @@ public struct InspectorPanelView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("POSIX Permissions")
 
-            metadataRow("Mode", "\(meta.octalPermissions) (\(meta.symbolicPermissions))")
-            metadataRow("Owner", meta.ownerName)
-            metadataRow("Group", meta.groupName)
+            metadataRow(L10n.text("Mode"), "\(meta.octalPermissions) (\(meta.symbolicPermissions))")
+            metadataRow(L10n.text("Owner"), meta.ownerName)
+            metadataRow(L10n.text("Group"), meta.groupName)
         }
     }
 
@@ -170,7 +170,7 @@ public struct InspectorPanelView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionHeader("Media Details")
 
-            metadataRow("Dimensions", "\(Int(dimensions.width)) × \(Int(dimensions.height)) px")
+            metadataRow(L10n.text("Dimensions"), "\(Int(dimensions.width)) × \(Int(dimensions.height)) px")
         }
     }
 
@@ -194,7 +194,7 @@ public struct InspectorPanelView: View {
                                 .foregroundColor(.secondary)
                         }
                         .buttonStyle(.plain)
-                        .help("Copy SHA-256")
+                        .help(L10n.text("Copy SHA-256"))
                     }
                     Text(hash)
                         .font(.system(size: 10, design: .monospaced))
@@ -205,12 +205,12 @@ public struct InspectorPanelView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .scaleEffect(0.7)
-                    Text("Calculating SHA-256...")
+                    Text(L10n.text("Calculating SHA-256..."))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
             } else {
-                Button("Calculate SHA-256") {
+                Button(L10n.text("Calculate SHA-256")) {
                     calculateHash()
                 }
                 .buttonStyle(.bordered)
@@ -220,14 +220,14 @@ public struct InspectorPanelView: View {
     }
 
     private func sectionHeader(_ title: String) -> some View {
-        Text(title)
+        Text(L10n.text(title))
             .font(.system(size: 11, weight: .semibold))
             .foregroundColor(.secondary)
     }
 
     private func metadataRow(_ label: String, _ value: String) -> some View {
         HStack(alignment: .top) {
-            Text(label)
+            Text(L10n.text(label))
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
                 .frame(width: 65, alignment: .leading)
