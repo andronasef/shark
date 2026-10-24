@@ -65,6 +65,9 @@ final class HoverPreviewPanel {
             guard self?.generation == generation else { return }
             self?.fit(size)
         })
+        // The hosting view would otherwise resize the panel from its top-left corner as content
+        // loads, past the clamped frame. Placement owns the frame.
+        view.sizingOptions = []
         view.onHoverChange = { [weak self] inside in
             self?.isMouseInside = inside
             if !inside { self?.onDismiss?() }
@@ -74,6 +77,11 @@ final class HoverPreviewPanel {
         panel.contentView = view
         place(panel, size: view.fittingSize)
         panel.orderFrontRegardless()
+        // Backstop: after the first layout pass, make sure nothing left the usable screen.
+        DispatchQueue.main.async { [weak self, weak panel] in
+            guard let self, let panel, panel.isVisible, self.generation == generation else { return }
+            self.place(panel, size: panel.frame.size)
+        }
     }
 
     /// No-op unless `url` still owns the panel, so a stale row can't close a newer preview.
