@@ -643,113 +643,55 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private var directoryBackgroundContextMenu: some View {
-        let hasSelection = !navigationState.selectedItemIDs.isEmpty
-        let selectedCount = navigationState.selectedItemIDs.count
+        // Same actions, labels and icons as the item menu, applied to the current selection.
+        let selected = navigationState.selectedItems
+        let urls = selected.map(\.url)
+        let count = selected.count
 
-        if hasSelection {
-            Button(selectedCount == 1 ? "Open" : "Open (\(selectedCount) items)") {
-                for item in navigationState.selectedItems {
-                    handleActivate(item)
-                }
+        if count > 0 {
+            Button(count == 1 ? L10n.text("Open") : L10n.format("Open %d Items", count), systemImage: "arrow.up.forward.app") {
+                openContextItems(selected)
             }
-
-            Button("Quick Look") {
-                QuickLookCoordinator.shared.toggleQuickLook(for: navigationState.selectedItems.map(\.url))
-            }
-
-            Button("Show in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting(navigationState.selectedItems.map(\.url))
-            }
-
+            Button(L10n.text("Quick Look"), systemImage: "eye") { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
+            Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting(urls) }
             Divider()
-
-            Button("Cut") {
-                navigationState.cutSelected()
-            }
-
-            Button("Copy") {
-                navigationState.copySelected()
-            }
-
+            Button(L10n.text("Cut"), systemImage: "scissors") { FileClipboardService.shared.cut(urls) }
+            Button(L10n.text("Copy"), systemImage: "doc.on.doc") { FileClipboardService.shared.copy(urls) }
             Divider()
-
-            if selectedCount == 1, let singleItem = navigationState.selectedItems.first {
-                Button("Rename") {
-                    navigationState.startRenaming(url: singleItem.url)
-                }
-            } else {
-                Button("Batch Rename...") {
-                    showingBatchRenameSheet = true
-                }
+            Button(count == 1 ? L10n.text("Rename") : L10n.text("Batch Rename…"), systemImage: "pencil") {
+                if count == 1, let only = selected.first { navigationState.startRenaming(url: only.url) }
+                else { contextRenameItems = selected; showingBatchRenameSheet = true }
             }
-
-            Button("Duplicate") {
-                Task { await navigationState.duplicateSelected() }
-            }
-
-            Button(selectedCount == 1 ? "Compress" : "Compress \(selectedCount) Items") {
-                Task {
-                    await navigationState.compressSelected()
-                }
-            }
-
+            Button(L10n.text("Duplicate"), systemImage: "plus.square.on.square") { performContextOperation(.duplicate, urls: urls) }
+            Button(L10n.text("Compress"), systemImage: "archivebox") { performContextOperation(.compress, urls: urls) }
             Divider()
-
-            Button(selectedCount == 1 ? "Move to Trash" : "Move \(selectedCount) Items to Trash", role: .destructive) {
-                Task {
-                    await navigationState.trashSelected()
-                }
+            Button(count == 1 ? L10n.text("Move to Trash") : L10n.format("Move %d Items to Trash", count), systemImage: "trash", role: .destructive) {
+                performContextOperation(.trash, urls: urls)
             }
-
             Divider()
         }
 
-        Button("New Folder", systemImage: "folder.badge.plus") {
-            showingNewItemSheet = .folder
-        }
-
-        Button("New File", systemImage: "doc.badge.plus") {
-            showingNewItemSheet = .file
-        }
-
+        Button(L10n.text("New Folder"), systemImage: "folder.badge.plus") { showingNewItemSheet = .folder }
+        Button(L10n.text("New File"), systemImage: "doc.badge.plus") { showingNewItemSheet = .file }
         if FileClipboardService.shared.hasItemsToPaste {
-            Button("Paste", systemImage: "doc.on.clipboard") {
-                Task {
-                    await navigationState.paste()
-                }
-            }
+            Button(L10n.text("Paste"), systemImage: "doc.on.clipboard") { Task { await navigationState.paste() } }
         }
-
         Divider()
-
         TerminalMenuItems(url: navigationState.currentURL, workspace: workspace, source: navigationState)
-
-        Button("Reload", systemImage: "arrow.clockwise") {
-            Task {
-                await navigationState.reloadCurrentDirectory()
-            }
+        Button(L10n.text("Reload"), systemImage: "arrow.clockwise") {
+            Task { await navigationState.reloadCurrentDirectory() }
         }
-
-        Button("Show Hidden Files", systemImage: "eye") {
+        Button(navigationState.showHiddenFiles ? L10n.text("Hide Hidden Files") : L10n.text("Show Hidden Files"),
+               systemImage: navigationState.showHiddenFiles ? "eye.slash" : "eye") {
             navigationState.showHiddenFiles.toggle()
         }
-
         Divider()
-
-        Menu("Copy Path", systemImage: "link") {
-            Button("Full Path") {
-                NSPasteboard.general.clearContents()
-                let paths = hasSelection
-                    ? navigationState.selectedItems.map(\.url.path).joined(separator: "\n")
-                    : navigationState.currentURL.path
-                NSPasteboard.general.setString(paths, forType: .string)
+        Menu(L10n.text("Copy Path"), systemImage: "link") {
+            Button(L10n.text("Full Path")) {
+                copyContextText(count > 0 ? urls.map(\.path).joined(separator: "\n") : navigationState.currentURL.path)
             }
-            Button("POSIX Quoted Path") {
-                NSPasteboard.general.clearContents()
-                let quoted = hasSelection
-                    ? navigationState.selectedItems.map(\.url.path.shellQuoted).joined(separator: " ")
-                    : navigationState.currentURL.path.shellQuoted
-                NSPasteboard.general.setString(quoted, forType: .string)
+            Button(L10n.text("POSIX Quoted Path")) {
+                copyContextText(count > 0 ? urls.map { $0.path.shellQuoted }.joined(separator: " ") : navigationState.currentURL.path.shellQuoted)
             }
         }
     }
