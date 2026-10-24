@@ -383,7 +383,7 @@ public struct PlacesSidebarView: View {
         .onKeyPress(.return) { activate(); return .handled }
         .onHover { hoveredRow = $0 ? rowID : nil }
         .onKeyPress(.leftArrow) {
-            guard section != L10n.text("Top") else { return .ignored }
+            guard section != "Top" else { return .ignored }
             sidebarFocus = "\(section):header"
             return .handled
         }
