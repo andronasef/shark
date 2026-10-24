@@ -53,14 +53,16 @@ private struct MediaPlayerView: NSViewRepresentable {
 
 public struct HoverPreviewCard: View {
     public let item: FileItem
+    private let availableSize: CGSize
     @State private var previewData: HoverPreviewData = .unsupported
     @State private var isLoading = true
     @AppStorage("hoverPreviewAutoplay") private var autoplay = true
 
     private static let maxImageSize = CGSize(width: 480, height: 360)
 
-    public init(item: FileItem) {
+    public init(item: FileItem, availableSize: CGSize = CGSize(width: 1000, height: 1000)) {
         self.item = item
+        self.availableSize = availableSize
     }
 
     public var body: some View {
@@ -114,21 +116,24 @@ public struct HoverPreviewCard: View {
 
                     case .text(let lines, let totalLines, let encoding, let sizeFormatted, let truncated):
                         VStack(alignment: .leading, spacing: 4) {
-                            VStack(alignment: .leading, spacing: 2) {
+                            ScrollView(.vertical) {
+                              VStack(alignment: .leading, spacing: 2) {
                                 ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
                                     Text(line.isEmpty ? " " : line)
                                         .font(.system(size: 10, design: .monospaced))
                                         .foregroundColor(.primary.opacity(0.9))
                                         .lineLimit(1)
                                 }
+                              }
                             }
+                            .frame(height: min(CGFloat(lines.count) * 14 + 16, max(50, availableSize.height - 120)))
                             .padding(8)
-                            .frame(width: 440, alignment: .leading)
+                            .frame(width: min(440, max(80, availableSize.width - 40)), alignment: .leading)
                             .background(Color.black.opacity(0.12))
                             .clipShape(RoundedRectangle(cornerRadius: 6))
 
                             HStack {
-                                Text("\(totalLines)\(truncated ? "+" : "") lines · \(encoding)")
+                                Text(L10n.format("%@ lines · %@", totalLines.formatted(.number.locale(AppLocalization.locale)) + (truncated ? "+" : ""), encoding))
                                     .font(.system(size: 10))
                                     .foregroundColor(.secondary)
                                 Spacer()
@@ -141,7 +146,7 @@ public struct HoverPreviewCard: View {
                     case .media(let url, let isVideo, let sizeFormatted):
                         VStack(alignment: .leading, spacing: 6) {
                             MediaPlayerView(url: url, autoplay: autoplay)
-                                .frame(width: isVideo ? 400 : 320, height: isVideo ? 240 : 64)
+                                .frame(width: min(isVideo ? 400 : 320, max(80, availableSize.width - 40)), height: min(isVideo ? 240 : 64, max(64, availableSize.height - 120)))
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                             Text(sizeFormatted)
                                 .font(.system(size: 10, design: .monospaced))
@@ -153,7 +158,7 @@ public struct HoverPreviewCard: View {
                             Image(systemName: "doc")
                                 .font(.system(size: 24))
                                 .foregroundColor(.secondary)
-                            Text("No preview available")
+                            Text(L10n.text("No preview available"))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -167,6 +172,7 @@ public struct HoverPreviewCard: View {
         .task(id: item.url) {
             isLoading = true
             previewData = await HoverPreviewService.shared.fetchPreview(for: item.url)
+            guard !Task.isCancelled else { return }
             isLoading = false
         }
     }
@@ -176,8 +182,9 @@ public struct HoverPreviewCard: View {
     /// of an unreadable sliver.
     private func fitted(_ size: CGSize) -> CGSize {
         guard size.width > 0, size.height > 0 else { return CGSize(width: 160, height: 120) }
-        if Self.isExtreme(size) { return CGSize(width: 360, height: 360) }
-        let scale = min(1, Self.maxImageSize.width / size.width, Self.maxImageSize.height / size.height)
+        let width = min(Self.maxImageSize.width - 24, max(50, availableSize.width - 40))
+        let height = min(Self.maxImageSize.height, max(50, availableSize.height - 120))
+        let scale = min(1, width / size.width, height / size.height)
         return CGSize(width: size.width * scale, height: size.height * scale)
     }
 
@@ -190,11 +197,6 @@ public struct HoverPreviewCard: View {
     private func imageView(_ image: NSImage, size: CGSize) -> some View {
         if image.isAnimated {
             AnimatedImageView(image: image)
-        } else if Self.isExtreme(image.size) {
-            // Fill the window and show the start of the image (top of a page, left of a banner).
-            Image(nsImage: image).resizable().scaledToFill()
-                .frame(width: size.width, height: size.height, alignment: image.size.height > image.size.width ? .top : .leading)
-                .clipped()
         } else {
             Image(nsImage: image).resizable().aspectRatio(contentMode: .fit)
         }

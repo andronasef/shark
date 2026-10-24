@@ -8,11 +8,12 @@ private struct PreviewSizeKey: PreferenceKey {
 
 private struct HoverPreviewPanelRoot: View {
     let item: FileItem
+    let availableSize: CGSize
     let onSize: (CGSize) -> Void
 
     var body: some View {
-        HoverPreviewCard(item: item)
-            .frame(maxWidth: 480)
+        HoverPreviewCard(item: item, availableSize: availableSize)
+            .frame(maxWidth: min(480, availableSize.width), maxHeight: availableSize.height)
             .fixedSize()
             .background(GeometryReader { Color.clear.preference(key: PreviewSizeKey.self, value: $0.size) })
             .onPreferenceChange(PreviewSizeKey.self, perform: onSize)
@@ -57,7 +58,13 @@ final class HoverPreviewPanel {
         self.onDismiss = onDismiss
         isMouseInside = false
 
-        let view = TrackingHostingView(rootView: HoverPreviewPanelRoot(item: item) { [weak self] in self?.fit($0) })
+        let bounds = screenBounds
+        let generation = UUID()
+        self.generation = generation
+        let view = TrackingHostingView(rootView: HoverPreviewPanelRoot(item: item, availableSize: bounds.size) { [weak self] size in
+            guard self?.generation == generation else { return }
+            self?.fit(size)
+        })
         view.onHoverChange = { [weak self] inside in
             self?.isMouseInside = inside
             if !inside { self?.onDismiss?() }
@@ -73,6 +80,7 @@ final class HoverPreviewPanel {
     func hide(ownerURL url: URL) {
         guard ownerURL == url else { return }
         ownerURL = nil
+        generation = nil
         onDismiss = nil
         isMouseInside = false
         panel?.orderOut(nil)
@@ -100,11 +108,11 @@ final class HoverPreviewPanel {
     }
 
     private func place(_ panel: NSPanel, size: CGSize) {
-        let bounds = (NSScreen.screens.first { $0.frame.contains(anchor) } ?? NSScreen.main)?.visibleFrame ?? .zero
-        let gap: CGFloat = 16
-        var x = anchor.x + gap
-        if x + size.width > bounds.maxX { x = anchor.x - gap - size.width }
-        let y = max(bounds.minY, min(anchor.y - gap - size.height, bounds.maxY - size.height))
-        panel.setFrame(NSRect(x: max(bounds.minX, x), y: y, width: size.width, height: size.height), display: true)
+        panel.setFrame(PreviewPlacement.frame(anchor: anchor, desiredSize: size, visibleFrame: screenBounds), display: true)
+    }
+
+    private var generation: UUID?
+    private var screenBounds: CGRect {
+        (NSScreen.screens.first { $0.frame.contains(anchor) } ?? NSScreen.main)?.visibleFrame ?? CGRect(x: 0, y: 0, width: 800, height: 600)
     }
 }
