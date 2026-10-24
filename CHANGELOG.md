@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- An open hover preview refits when a display is connected, disconnected, or resized.
 - The folder-background menu now matches the item menu: with several folders selected, Open gives each its own tab instead of navigating one pane repeatedly. Every action has an icon and a translated label, and Show/Hide Hidden Files reflects the current state.
 - Open With no longer looks up every selected file on the main thread when the menu opens (one cached query per file type), is hidden when folders are selected so it can't open them in an app, and says when no app can open all the files.
 - Dragging a selected file now moves or copies the whole selection (icons, list, columns), not just one item; dragging an unselected item carries only that item. A batch move that cannot fully roll back after a failure now reports where the remaining items are.

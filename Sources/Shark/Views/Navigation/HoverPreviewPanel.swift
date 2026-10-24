@@ -110,6 +110,13 @@ final class HoverPreviewPanel: NSObject, NSWindowDelegate {
         NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.onDismiss?() }
         }
+        // A display was added, removed, resized or its Dock/menu bar moved: refit to the new bounds.
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, let panel = self.panel, panel.isVisible else { return }
+                self.place(panel, size: panel.frame.size)
+            }
+        }
         return panel
     }
 
