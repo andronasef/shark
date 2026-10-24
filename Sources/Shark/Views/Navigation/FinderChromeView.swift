@@ -89,13 +89,8 @@ struct FinderToolbarCaption<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            content
-            Text(L10n.text(title))
-                .font(.system(size: 9, weight: .regular))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-        }
+        content
+            .accessibilityLabel(L10n.text(title))
     }
 }
 

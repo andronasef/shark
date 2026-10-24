@@ -33,7 +33,7 @@ public struct ContentView: View {
         // AppKit must place these together while the restored window is first measured.
         // Separate navigation items can straddle the sidebar tracking separator at launch.
         ToolbarItem(id: "navigation-location", placement: .navigation) {
-            HStack(alignment: .top, spacing: 8) {
+            HStack(alignment: .center, spacing: 8) {
                 FinderToolbarCaption("Navigation") {
                     HStack(spacing: 0) {
                         Button { activeState.goBack() } label: {

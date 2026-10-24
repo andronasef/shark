@@ -48,6 +48,14 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
 
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
+            if let toolbar = window?.toolbar {
+                if #available(macOS 15.0, *) {
+                    toolbar.allowsDisplayModeCustomization = false
+                }
+                if toolbar.displayMode != .iconOnly {
+                    toolbar.displayMode = .iconOnly
+                }
+            }
             if !observed {
                 observed = true
                 NotificationCenter.default.addObserver(self, selector: #selector(itemsChanged(_:)), name: NSToolbar.willAddItemNotification, object: nil)
@@ -80,8 +88,13 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                let allowed = toolbar.delegate?.toolbarAllowedItemIdentifiers?(toolbar) {
                 configuration["TB Item Identifiers"] = ToolbarConfiguration.validatedIdentifiers(identifiers, allowed: Set(allowed.map(\.rawValue)))
             }
+            configuration["TB Display Mode"] = NSToolbar.DisplayMode.iconOnly.rawValue
             applying = true
             toolbar.setConfiguration(configuration)
+            if #available(macOS 15.0, *) {
+                    toolbar.allowsDisplayModeCustomization = false
+                }
+            toolbar.displayMode = .iconOnly
             applying = false
             scheduleMeasurement()
         }
@@ -95,6 +108,29 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 guard let toolbar = self.window?.toolbar else { return }
                 toolbar.allowsUserCustomization = true
                 toolbar.autosavesConfiguration = true
+                if #available(macOS 15.0, *) {
+                    toolbar.allowsDisplayModeCustomization = false
+                }
+                if toolbar.displayMode != .iconOnly {
+                    toolbar.displayMode = .iconOnly
+                }
+                let itemLabels: [String: String] = [
+                    "navigation-location": L10n.text("Location"),
+                    "path": L10n.text("Path"),
+                    "view-mode": L10n.text("View"),
+                    "group-sort": L10n.text("Group"),
+                    "share": L10n.text("Share"),
+                    "split": L10n.text("Split"),
+                    "terminal": L10n.text("Terminal"),
+                    "actions": L10n.text("Action"),
+                    "search": L10n.text("Search")
+                ]
+                for item in toolbar.items {
+                    if let label = itemLabels[item.itemIdentifier.rawValue] {
+                        item.paletteLabel = label
+                        item.label = label
+                    }
+                }
                 let others = toolbar.items.filter {
                     !$0.itemIdentifier.rawValue.contains("navigation-location") &&
                     !$0.itemIdentifier.rawValue.contains("flexible-space") &&
