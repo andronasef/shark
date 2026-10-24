@@ -9,9 +9,10 @@ final class HoverPreviewTests: XCTestCase {
         let controller = HoverPreviewController()
         controller.update(isHovering: true, enabled: true, url: URL(fileURLWithPath: "/sample.txt"),
                           isDirectory: false, delayMilliseconds: 80)
+        let scheduledAt = ContinuousClock.now
         XCTAssertFalse(controller.isPresented)
-        try await Task.sleep(for: .milliseconds(140))
-        XCTAssertTrue(controller.isPresented)
+        try await waitForPresentation(controller)
+        XCTAssertGreaterThanOrEqual(scheduledAt.duration(to: .now), .milliseconds(80))
         controller.cancel()
         XCTAssertFalse(controller.isPresented)
     }
@@ -40,8 +41,7 @@ final class HoverPreviewTests: XCTestCase {
         let controller = HoverPreviewController()
         let url = URL(fileURLWithPath: "/sample.pdf")
         controller.update(isHovering: true, enabled: true, url: url, isDirectory: false, delayMilliseconds: 0)
-        try await Task.sleep(for: .milliseconds(20))
-        XCTAssertTrue(controller.isPresented)
+        try await waitForPresentation(controller)
         controller.update(isHovering: true, enabled: false, url: url, isDirectory: false, delayMilliseconds: 0)
         XCTAssertFalse(controller.isPresented)
     }
@@ -85,16 +85,27 @@ final class HoverPreviewTests: XCTestCase {
         let controller = HoverPreviewController()
         let url = URL(fileURLWithPath: "/sample.txt")
         controller.update(isHovering: true, enabled: true, url: url, isDirectory: false, delayMilliseconds: 0)
-        try await Task.sleep(for: .milliseconds(20))
+        try await waitForPresentation(controller)
         controller.update(isHovering: false, enabled: true, url: url, isDirectory: false, delayMilliseconds: 0)
         XCTAssertTrue(controller.isPresented)
         controller.update(isHovering: true, enabled: true, url: url, isDirectory: false, delayMilliseconds: 0)
         try await Task.sleep(for: .milliseconds(350))
         XCTAssertTrue(controller.isPresented, "Re-entering the row keeps the preview")
         controller.update(isHovering: false, enabled: true, url: url, isDirectory: false, delayMilliseconds: 0)
-        try await Task.sleep(for: .milliseconds(350))
-        XCTAssertFalse(controller.isPresented)
+        try await waitForPresentation(controller, presented: false)
     }
+
+    /// Task.sleep is a minimum delay, not a guarantee that another main-actor task has run.
+    /// Poll the observable result with a deadline so a busy CI executor cannot race the assertion.
+    private func waitForPresentation(_ controller: HoverPreviewController, presented: Bool = true,
+                                     file: StaticString = #filePath, line: UInt = #line) async throws {
+        let deadline = ContinuousClock.now + .seconds(5)
+        while controller.isPresented != presented && ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(controller.isPresented, presented, "Preview did not reach its expected state", file: file, line: line)
+    }
+
     func testLargeImageIsDownsampledAndCacheIsByteBounded() async throws {
         let service = HoverPreviewService.shared
         service.clearCache()

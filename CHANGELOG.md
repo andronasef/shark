@@ -50,6 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- Hover-preview timing tests wait for observable state with a deadline instead of assuming a busy CI executor resumes tasks within 140 ms. Manual release runs use the corrected hover tests against unchanged tagged app sources and skip repeat App Store uploads unless requested.
 - Release CI now uses preinstalled Xcode 27.0 / Swift 6.4 for tests and both package jobs, matching the local toolchain instead of compiling with Xcode 16. The package declares its Swift 6.2 minimum for actor-isolated cleanup. A manual Release action can rebuild an existing tag with repaired CI settings without moving the tag.
 - Directory status counts and selected-item summaries now use the chosen app language, including Arabic plurals.
 - Reordering favorites by dragging works: the shortcut drag type is now declared in Info.plist, so the sidebar's drop gaps accept it. Releasing a favorite anywhere outside the sidebar removes it reliably.

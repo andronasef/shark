@@ -10,6 +10,11 @@ on:
         description: Existing version tag to build and publish
         required: true
         type: string
+      upload_appstore:
+        description: Upload another App Store build (leave off if already uploaded)
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -64,6 +69,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --silent
+
+      - name: Use corrected hover timing tests for an existing tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          # Only the test harness comes from this workflow revision; app sources stay at the tag.
+          git fetch --no-tags origin "$GITHUB_SHA"
+          git show "$GITHUB_SHA:Tests/SharkTests/HoverPreviewTests.swift" > Tests/SharkTests/HoverPreviewTests.swift
 
       - name: Run tests
         run: swift test
@@ -153,7 +165,7 @@ jobs:
     runs-on: xcode-27
     timeout-minutes: 60
     env:
-      ENABLED: ${{ secrets.APPSTORE_P12_BASE64 != '' }}
+      ENABLED: ${{ secrets.APPSTORE_P12_BASE64 != '' && (github.event_name != 'workflow_dispatch' || inputs.upload_appstore) }}
     steps:
       - uses: actions/checkout@v4
         with:

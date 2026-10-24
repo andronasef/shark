@@ -37,7 +37,7 @@ Keep certificates, private keys, and passwords out of Git. The action imports th
 
 The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.dmg` and `Shark-<version>.dmg.sha256` with generated release notes (marked as prerelease when appropriate). A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
 
-For a workflow-only repair, use **Actions › Release › Run workflow** on `main` and enter the existing version tag in `release_tag`. This uses the repaired workflow from `main` but checks out and builds the existing tag; the tag is never moved. CLI equivalent: `gh workflow run release.yml --ref main -f release_tag=v1.0.0-alpha.2`.
+For a workflow-only repair, use **Actions › Release › Run workflow** on `main` and enter the existing version tag in `release_tag`. This uses the repaired workflow from `main` but checks out and builds the existing tag; the tag is never moved. For the hover timing regression, only `HoverPreviewTests.swift` is taken from the workflow revision; all app sources remain at the tag. Manual runs skip App Store uploads by default to avoid duplicating an already successful upload; opt in with `upload_appstore=true` when needed. CLI equivalent: `gh workflow run release.yml --ref main -f release_tag=v1.0.0-alpha.2`.
 
 To check a download, put the file and its `.sha256` in the same directory and run:
 
