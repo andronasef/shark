@@ -7,9 +7,11 @@ public struct DirectoryView: View {
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let pane: PaneIdentifier
 
+    @State private var owningWindowNumber: Int?
     @State private var fseventsWatcher = FSEventsWatcher()
     @State private var showingNewItemSheet: NewItemType? = nil
     @State private var showingBatchRenameSheet: Bool = false
+    @State private var contextRenameItems: [FileItem]?
     @State private var previewItem: FileItem? = nil
     @State private var lastClickedURL: URL? = nil
     @State private var lastClickTime: TimeInterval = 0
@@ -30,7 +32,8 @@ public struct DirectoryView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .dropDestination(for: URL.self) { urls, _ in
                     let modifiers = NSEvent.modifierFlags
-                    Task { await navigationState.drop(urls, into: navigationState.currentURL, modifiers: modifiers) }
+                    let destination = navigationState.currentURL
+                    Task { await navigationState.drop(urls, into: destination, modifiers: modifiers) }
                     return true
                 }
                 .onCommandScrollZoom { delta in
@@ -57,9 +60,11 @@ public struct DirectoryView: View {
         } message: {
             Text(navigationState.operationError ?? "")
         }
+        .background(WindowNumberReader { owningWindowNumber = $0 })
         .onAppear {
             if typeToSelectMonitor == nil {
                 typeToSelectMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                    guard event.windowNumber == owningWindowNumber else { return event }
                     if workspace?.sidebarHasKeyboardFocus == true { return event }
                     if let ws = workspace, ws.activeNavigationState !== navigationState {
                         return event
@@ -108,8 +113,8 @@ public struct DirectoryView: View {
                 }
             )
         }
-        .sheet(isPresented: $showingBatchRenameSheet) {
-            let selectedItems = navigationState.items.filter { navigationState.selectedItemIDs.contains($0.id) }
+        .sheet(isPresented: $showingBatchRenameSheet, onDismiss: { contextRenameItems = nil }) {
+            let selectedItems = contextRenameItems ?? navigationState.items.filter { navigationState.selectedItemIDs.contains($0.id) }
             BatchRenameSheet(
                 items: selectedItems,
                 onRenameComplete: {
@@ -123,7 +128,7 @@ public struct DirectoryView: View {
         .background {
             // Only the active pane registers shortcuts. An inactive pane must
             // not win SwiftUI's duplicate-key-equivalent lookup.
-            if workspace?.sidebarHasKeyboardFocus != true && (workspace == nil || workspace?.activeNavigationState === navigationState) {
+            if !TerminalKeyboardOwnership.shared.isFocused(in: NSApp.keyWindow) && workspace?.sidebarHasKeyboardFocus != true && (workspace == nil || workspace?.activeNavigationState === navigationState) {
                 // Local fallback keyboard shortcuts for instant responsiveness
                 Group {
                     Button("") { navigationState.zoomIn() }
@@ -226,6 +231,11 @@ public struct DirectoryView: View {
                 .allowsHitTesting(false)
             }
         }
+        .simultaneousGesture(TapGesture().onEnded {
+            if TerminalKeyboardOwnership.ownsFirstResponder(in: NSApp.keyWindow) {
+                NSApp.keyWindow?.makeFirstResponder(NSApp.keyWindow?.contentView)
+            }
+        })
         .enableInjection()
     }
 
@@ -336,8 +346,8 @@ public struct DirectoryView: View {
             if let item = selectedItem {
                 VStack(spacing: 12) {
                     Spacer()
-                    FileItemIconView(item: item, size: 180)
-                        .frame(maxWidth: 180, maxHeight: 180)
+                    FileThumbnailView(item: item, size: 320)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
 
                     Text(item.name)
@@ -361,7 +371,7 @@ public struct DirectoryView: View {
                     ForEach(navigationState.filteredAndSortedItems) { item in
                         let isSelected = navigationState.selectedItemIDs.contains(item.id)
                         VStack(spacing: 4) {
-                            FileItemIconView(item: item, size: 48)
+                            FileThumbnailView(item: item, size: 48)
                                 .frame(width: 48, height: 48)
 
                             Text(item.name)
@@ -389,6 +399,18 @@ public struct DirectoryView: View {
                             handleActivate(item)
                         }
                         .fileItemAccessibility(item, isSelected: isSelected) { handleActivate(item) }
+                        .fileDragSource(item: item, navigationState: navigationState)
+                        .onRightClickSelect {
+                            if !navigationState.selectedItemIDs.contains(item.url) {
+                                navigationState.selectedItemIDs = [item.url]
+                            }
+                        }
+                        .dropDestination(for: URL.self) { urls, _ in
+                            guard item.isNavigableDirectory else { return false }
+                            let modifiers = NSEvent.modifierFlags
+                            Task { await navigationState.drop(urls, into: item.url, modifiers: modifiers) }
+                            return true
+                        }
                         .onMiddleClick {
                             if item.isNavigableDirectory {
                                 workspace?.open(item.url, from: navigationState, newTab: true)
@@ -448,8 +470,8 @@ public struct DirectoryView: View {
                                 .foregroundColor(.secondary)
                         }
                         .buttonStyle(.plain)
-                        .help("Stop")
-                        .accessibilityLabel("Stop \(title)")
+                        .help(L10n.text("Stop"))
+                        .accessibilityLabel(L10n.format("Stop: %@", title))
                     }
                 }
             }
@@ -486,6 +508,8 @@ public struct DirectoryView: View {
             } else {
                 navigationState.navigateTo(item.url)
             }
+        } else if UserDefaults.standard.bool(forKey: "openImagesInShark"), PhotoViewerWindowController.supports(url: item.url) {
+            PhotoViewerWindowController.open(items: navigationState.filteredAndSortedItems, initialURL: item.url)
         } else {
             NSWorkspace.shared.open(item.url)
         }
@@ -493,132 +517,121 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
-        let isMultiple = navigationState.selectedItemIDs.count > 1 && navigationState.selectedItemIDs.contains(item.id)
-        let selectedCount = navigationState.selectedItemIDs.count
-
-        if isMultiple {
-            Button("Open (\(selectedCount) items)") {
-                for selItem in navigationState.selectedItems {
-                    handleActivate(selItem)
-                }
-            }
-        } else {
-            Button("Open") {
-                handleActivate(item)
-            }
+        let targets = FileContextSelection.items(clicked: item, selected: navigationState.selectedItemIDs, ordered: navigationState.filteredAndSortedItems)
+        let urls = targets.map(\.url)
+        let isMultiple = targets.count > 1
+        Button(isMultiple ? L10n.format("Open %d Items", targets.count) : L10n.text("Open")) {
+            openContextItems(targets)
         }
-
-        if !isMultiple && item.isNavigableDirectory {
-            Button("Open in New Tab") {
-                workspace?.open(item.url, from: navigationState, newTab: true)
-            }
-            Button("Browse Subfolders...") {
-                let builder = SubfolderMenuBuilder { targetURL, inNewTab in
-                    if inNewTab, let workspace {
-                        workspace.open(targetURL, from: navigationState, newTab: true)
-                    } else {
-                        navigationState.navigateTo(targetURL)
+        if !item.isDirectory {
+            Menu(L10n.text("Open With")) {
+                ForEach(OpenWithService.applications(for: targets), id: \.self) { app in
+                    Button(app.deletingPathExtension().lastPathComponent) {
+                        OpenWithService.open(urls, with: app) { navigationState.operationError = $0 }
                     }
                 }
-                let menu = builder.buildMenu(for: item.url)
-                if let event = NSApp.currentEvent {
-                    NSMenu.popUpContextMenu(menu, with: event, for: NSApp.keyWindow?.contentView ?? NSView())
+                Divider()
+                Button(L10n.text("Other…")) {
+                    OpenWithService.chooseApplication(for: urls) { navigationState.operationError = $0 }
                 }
             }
-        } else if !isMultiple {
-            Button("Quick Preview (QT-03)") {
-                previewItem = item
+            if targets.allSatisfy({ PhotoViewerWindowController.supports(url: $0.url) }) {
+                Button(L10n.text("Open in Shark Photo Viewer")) {
+                    PhotoViewerWindowController.open(items: navigationState.filteredAndSortedItems, initialURL: item.url)
+                }
+                if isMultiple {
+                    Button(L10n.text("View Selected Photos")) {
+                        PhotoViewerWindowController.open(items: targets, initialURL: item.url, selectedURLs: Set(urls))
+                    }
+                }
+            }
+            if !isMultiple { Button(L10n.text("Shark Preview")) { previewItem = item } }
+        }
+        if !isMultiple && item.isNavigableDirectory {
+            Button(L10n.text("Open in New Tab")) { workspace?.newTab(url: item.url) }
+            Button(L10n.text("Browse Subfolders…")) {
+                let builder = SubfolderMenuBuilder { url, inNewTab in
+                    if inNewTab { workspace?.open(url, from: navigationState, newTab: true) }
+                    else { navigationState.navigateTo(url) }
+                }
+                if let event = NSApp.currentEvent, let view = NSApp.keyWindow?.contentView {
+                    NSMenu.popUpContextMenu(builder.buildMenu(for: item.url), with: event, for: view)
+                }
             }
         }
-
+        Button(L10n.text("Quick Look")) { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
+        Button(L10n.text("Share…")) { OpenWithService.share(urls) }
+        Button(L10n.text("Show in Finder")) { NSWorkspace.shared.activateFileViewerSelecting(urls) }
+        Divider()
         TerminalMenuItems(url: isMultiple ? navigationState.currentURL : item.url, workspace: workspace, source: navigationState)
-
-        Button("Quick Look") {
-            let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
-            QuickLookCoordinator.shared.toggleQuickLook(for: urls)
-        }
-
-        Button("Show in Finder") {
-            let urls = isMultiple ? navigationState.selectedItems.map(\.url) : [item.url]
-            NSWorkspace.shared.activateFileViewerSelecting(urls)
-        }
-
         Divider()
-
-        Button("Cut") {
-            navigationState.cutSelected()
+        Button(L10n.text("Cut")) { FileClipboardService.shared.cut(urls) }
+        Button(L10n.text("Copy")) { FileClipboardService.shared.copy(urls) }
+        if !isMultiple && item.isNavigableDirectory && FileClipboardService.shared.hasItemsToPaste {
+            Button(L10n.text("Paste into Folder")) {
+                Task { await navigationState.paste(into: item.url) }
+            }
         }
-
-        Button("Copy") {
-            navigationState.copySelected()
-        }
-
         Divider()
-
-        if !isMultiple {
-            Button("Rename") {
-                navigationState.startRenaming(url: item.url)
-            }
-        } else {
-            Button("Batch Rename...") {
-                showingBatchRenameSheet = true
-            }
+        Button(isMultiple ? L10n.text("Batch Rename…") : L10n.text("Rename")) {
+            if isMultiple { contextRenameItems = targets; showingBatchRenameSheet = true }
+            else { navigationState.startRenaming(url: item.url) }
         }
-
-        Button("Duplicate") {
-            Task { await navigationState.duplicateSelected() }
+        Button(L10n.text("Duplicate")) { performContextOperation(.duplicate, urls: urls) }
+        Button(L10n.text("Compress")) { performContextOperation(.compress, urls: urls) }
+        Menu(L10n.text("Copy Path")) {
+            Button(L10n.text("Full Path")) { copyContextText(urls.map(\.path).joined(separator: "\n")) }
+            Button(L10n.text("Relative Path")) { copyContextText(targets.map(\.name).joined(separator: "\n")) }
+            Button(L10n.text("POSIX Quoted Path")) { copyContextText(urls.map { $0.path.shellQuoted }.joined(separator: " ")) }
         }
-
-        if isMultiple {
-            Button("Compress \(selectedCount) Items") {
-                Task {
-                    await navigationState.compressSelected()
-                }
-            }
-        } else {
-            Button("Compress \"\(item.name.middleTruncated(to: 24))\"") {
-                Task {
-                    await navigationState.compressSelected()
-                }
-            }
-        }
-
-        Menu("Copy Path") {
-            Button("Full Path") {
-                NSPasteboard.general.clearContents()
-                let paths = isMultiple
-                    ? navigationState.selectedItems.map(\.url.path).joined(separator: "\n")
-                    : item.url.path
-                NSPasteboard.general.setString(paths, forType: .string)
-            }
-            Button("Relative Path") {
-                NSPasteboard.general.clearContents()
-                let names = isMultiple
-                    ? navigationState.selectedItems.map(\.name).joined(separator: "\n")
-                    : item.name
-                NSPasteboard.general.setString(names, forType: .string)
-            }
-            Button("POSIX Quoted Path") {
-                NSPasteboard.general.clearContents()
-                let quoted = isMultiple
-                    ? navigationState.selectedItems.map(\.url.path.shellQuoted).joined(separator: " ")
-                    : item.url.path.shellQuoted
-                NSPasteboard.general.setString(quoted, forType: .string)
-            }
-        }
-
         if !isMultiple && item.isDirectory {
-            Button("Calculate Size") {
-                FolderSizeCalculator.shared.requestSize(for: item.url)
-            }
+            Button(L10n.text("Calculate Size")) { FolderSizeCalculator.shared.requestSize(for: item.url) }
         }
-
         Divider()
+        Button(isMultiple ? L10n.format("Move %d Items to Trash", targets.count) : L10n.text("Move to Trash"), role: .destructive) {
+            performContextOperation(.trash, urls: urls)
+        }
+    }
 
-        Button(isMultiple ? "Move \(selectedCount) Items to Trash" : "Move to Trash", role: .destructive) {
-            Task {
-                await navigationState.trashSelected()
-            }
+    private func copyContextText(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+    }
+
+    private func openContextItems(_ items: [FileItem]) {
+        if items.count > 20 {
+            let alert = NSAlert()
+            alert.messageText = L10n.format("Open %d Items?", items.count)
+            alert.informativeText = L10n.text("This may open many application windows.")
+            alert.addButton(withTitle: L10n.text("Open"))
+            alert.addButton(withTitle: L10n.text("Cancel"))
+            guard alert.runModal() == .alertFirstButtonReturn else { return }
+        }
+        for item in items {
+            if items.count > 1 && item.isNavigableDirectory { workspace?.newTab(url: item.url, select: false) }
+            else { handleActivate(item) }
+        }
+    }
+
+    private enum ContextOperation { case duplicate, compress, trash }
+    private func performContextOperation(_ operation: ContextOperation, urls: [URL]) {
+        guard !urls.isEmpty else { return }
+        Task {
+            do {
+                switch operation {
+                case .duplicate:
+                    let created = try await FileOperationsService.shared.duplicate(items: urls)
+                    FileUndoService.shared.record(.create(urls: created, name: L10n.text("Duplicate")))
+                case .compress:
+                    let archive = try await FileOperationsService.shared.compress(items: urls)
+                    FileUndoService.shared.record(.create(urls: [archive], name: L10n.text("Compress")))
+                case .trash:
+                    let restored = try await FileOperationsService.shared.trash(items: urls)
+                    FileUndoService.shared.record(.trash(restorations: restored))
+                    navigationState.selectedItemIDs.subtract(urls)
+                }
+            } catch { navigationState.operationError = error.localizedDescription }
+            await navigationState.reloadCurrentDirectory()
         }
     }
 
