@@ -44,10 +44,7 @@ actor PhotoImageDecoder {
         // Permit full resolution only within the same 64 MiB decoded-raster budget.
         let fullResolutionFits = Self.fitsRasterBudget(width: width, height: height)
         let requestedEdge = actualSize && fullResolutionFits ? max(width, height) : min(max(maxPixel, 1), 4096)
-        let options: [CFString: Any] = [kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true, kCGImageSourceThumbnailMaxPixelSize: requestedEdge,
-            kCGImageSourceShouldCacheImmediately: true]
-        guard let image = CGImageSourceCreateThumbnailAtIndex(source, index, options as CFDictionary) else {
+        guard let image = ImageDownsampler.image(from: source, at: index, maxPixel: requestedEdge) else {
             return failure(L10n.text("This photo could not be decoded. You can continue to the next photo."))
         }
         let gif = props[kCGImagePropertyGIFDictionary] as? [CFString: Any] ?? [:]
@@ -61,5 +58,17 @@ actor PhotoImageDecoder {
         if !details.isEmpty { metadata += " · " + details.joined(separator: " · ") }
         let animated = CGImageSourceGetType(source).map { UTType($0 as String)?.conforms(to: .gif) == true } ?? false
         return Result(image: image, pixels: pixels, frameCount: animated ? count : 1, duration: max(delay, 0.02), metadata: metadata, error: nil, detailLimited: actualSize && !fullResolutionFits)
+    }
+}
+
+/// Bounded, orientation-correct decode shared by the photo viewer and hover previews.
+enum ImageDownsampler {
+    nonisolated static func image(from source: CGImageSource, at index: Int = 0, maxPixel: Int) -> CGImage? {
+        CGImageSourceCreateThumbnailAtIndex(source, index, [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxPixel,
+            kCGImageSourceShouldCacheImmediately: true
+        ] as CFDictionary)
     }
 }

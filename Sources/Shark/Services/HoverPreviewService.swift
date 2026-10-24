@@ -134,12 +134,8 @@ public final class HoverPreviewService {
            let image = NSImage(contentsOf: url), !Task.isCancelled {
             return .image(image, dimensions: dimensions, fileSizeFormatted: formatFileSize(for: url))
         }
-        guard !Task.isCancelled, let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: imagePixelLimit,
-            kCGImageSourceShouldCacheImmediately: true
-        ] as CFDictionary), !Task.isCancelled else { return .unsupported }
+        guard !Task.isCancelled, let thumbnail = ImageDownsampler.image(from: source, maxPixel: imagePixelLimit),
+              !Task.isCancelled else { return .unsupported }
         return .image(NSImage(cgImage: thumbnail, size: .zero), dimensions: dimensions,
                       fileSizeFormatted: formatFileSize(for: url))
     }
