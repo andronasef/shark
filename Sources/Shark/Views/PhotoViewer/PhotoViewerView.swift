@@ -39,7 +39,10 @@ struct PhotoViewerView: View {
                             }.onEnded { _ in magnifyOrigin = nil })
                     }
                     if state.loading { ProgressView().controlSize(.large) }
-                }.clipped()
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                // The zoomed image is larger than the viewport; keep it inside so it never covers the info and strip.
+                .clipped()
             }
             VStack(spacing: 4) {
                 HStack {
@@ -57,6 +60,7 @@ struct PhotoViewerView: View {
         }
         .background(WindowScaleReader(scale: $scale).frame(width: 0, height: 0))
         .focusable()
+        .focusEffectDisabled()
         .focused($viewerFocused)
         .onAppear { viewerFocused = true }
         .onDisappear { state.stop() }
