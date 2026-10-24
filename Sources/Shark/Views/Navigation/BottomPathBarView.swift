@@ -48,6 +48,7 @@ public struct BottomPathBarView: View {
                     .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.95) : Color.primary)
                     .focused($isPathFocused)
                     .onAppear { isPathFocused = true }
+                    .background(PathFieldFocuser())
                     .onSubmit { navigationState.commitPathInput() }
                     .onExitCommand { cancelEditing() }
                     .accessibilityLabel(L10n.text("Folder Path"))
@@ -190,6 +191,45 @@ public struct BottomPathBarView: View {
                 title = url.lastPathComponent
             }
             return PathSeg(title: title, url: url, isRoot: isRoot, isLast: isLast)
+        }
+    }
+}
+
+/// SwiftUI focus requests don't reach a toolbar item while another hosting view (such as the
+/// sidebar) holds AppKit focus, so ⌘L would show the field without moving the keyboard into it.
+/// When the field appears, make its AppKit text field the window's first responder directly.
+private struct PathFieldFocuser: NSViewRepresentable {
+    func makeNSView(context: Context) -> Probe { Probe() }
+    func updateNSView(_ view: Probe, context: Context) {}
+
+    final class Probe: NSView {
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard window != nil else { return }
+            DispatchQueue.main.async { [weak self] in
+                guard let self, let window = self.window, let field = self.nearestTextField() else { return }
+                if window.firstResponder !== field.currentEditor() { window.makeFirstResponder(field) }
+            }
+        }
+
+        /// The TextField is a sibling in the same small hosting subtree; search a few levels up.
+        private func nearestTextField() -> NSTextField? {
+            var ancestor = superview
+            for _ in 0..<6 {
+                guard let current = ancestor else { return nil }
+                if let field = Self.firstTextField(in: current) { return field }
+                ancestor = current.superview
+            }
+            return nil
+        }
+
+        private static func firstTextField(in view: NSView) -> NSTextField? {
+            for sub in view.subviews {
+                if let field = sub as? NSTextField, field.isEditable { return field }
+                if let found = firstTextField(in: sub) { return found }
+            }
+            return nil
         }
     }
 }

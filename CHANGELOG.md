@@ -48,6 +48,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Refreshed marketing screenshots (README, website, App Store, Product Hunt) in dark mode with fuller demo content: a new tabs-and-split shot, a new terminal shot, and a list-view slide replacing the subfolder slide in the App Store and Product Hunt sets. Both sets have a new macOS-wallpaper style with shorter headlines and come from one generator, `scripts/generate-screenshots.swift`; `generate-producthunt.swift` is removed.
 
 ### Fixed
+- ⌘L now moves the keyboard into the path field. Before, it showed the field but typing went nowhere while the sidebar had focus.
 - Toolbar crashes: Shark no longer replaces SwiftUI's toolbar delegate or restyles AppKit's private toolbar and sheet views, which crashed item insertion and broke the Icon and Text layout. Both display modes use native item labels.
 - Changing the language no longer restarts Shark without asking (which would end running terminal commands); it offers Restart Now or Later, and the restart waits for the old copy to quit.
 - An open hover preview refits when a display is connected, disconnected, or resized.
