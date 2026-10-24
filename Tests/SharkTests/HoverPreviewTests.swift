@@ -155,4 +155,21 @@ final class HoverPreviewTests: XCTestCase {
         XCTAssertEqual(lines, ["After with a different size"])
     }
 
+    func testHoverPreviewPanelSizingIsNotTinyDot() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("hover-\(UUID().uuidString).txt")
+        defer {
+            try? FileManager.default.removeItem(at: url)
+            HoverPreviewPanel.shared.hide(ownerURL: url)
+        }
+        try "Line 1\nLine 2\nLine 3".write(to: url, atomically: true, encoding: .utf8)
+        let item = FileItem(url: url, name: url.lastPathComponent, isDirectory: false)
+
+        HoverPreviewPanel.shared.show(item) {}
+        try await Task.sleep(for: .milliseconds(200))
+
+        let panel = Mirror(reflecting: HoverPreviewPanel.shared).children.first { $0.label == "panel" }?.value as? NSPanel
+        let unwrappedPanel = try XCTUnwrap(panel)
+        XCTAssertGreaterThan(unwrappedPanel.frame.width, 100, "Panel width must not be a tiny dot: \(unwrappedPanel.frame)")
+        XCTAssertGreaterThan(unwrappedPanel.frame.height, 60, "Panel height must not be a tiny dot: \(unwrappedPanel.frame)")
+    }
 }

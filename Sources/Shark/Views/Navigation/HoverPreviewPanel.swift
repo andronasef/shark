@@ -40,7 +40,7 @@ private final class TrackingHostingView: NSHostingView<HoverPreviewPanelRoot> {
 /// One floating, non-activating preview shared by every row. Because it can never become key,
 /// showing it leaves keyboard focus (rename fields, the terminal, another app) untouched.
 @MainActor
-final class HoverPreviewPanel {
+final class HoverPreviewPanel: NSObject, NSWindowDelegate {
     static let shared = HoverPreviewPanel()
 
     private(set) var isMouseInside = false
@@ -48,8 +48,11 @@ final class HoverPreviewPanel {
     private var anchor = NSPoint.zero
     private var ownerURL: URL?
     private var onDismiss: (() -> Void)?
+    private var isRepositioning = false
 
-    private init() {}
+    private override init() {
+        super.init()
+    }
 
     /// Shows the preview beside the pointer. `onDismiss` runs when the pointer leaves the panel.
     func show(_ item: FileItem, onDismiss: @escaping () -> Void) {
@@ -65,9 +68,6 @@ final class HoverPreviewPanel {
             guard self?.generation == generation else { return }
             self?.fit(size)
         })
-        // The hosting view would otherwise resize the panel from its top-left corner as content
-        // loads, past the clamped frame. Placement owns the frame.
-        view.sizingOptions = []
         view.onHoverChange = { [weak self] inside in
             self?.isMouseInside = inside
             if !inside { self?.onDismiss?() }
@@ -75,7 +75,9 @@ final class HoverPreviewPanel {
         let panel = panel ?? makePanel()
         self.panel = panel
         panel.contentView = view
-        place(panel, size: view.fittingSize)
+        let initialFitting = view.fittingSize
+        let size = (initialFitting.width > 0 && initialFitting.height > 0) ? initialFitting : CGSize(width: 264, height: 144)
+        place(panel, size: size)
         panel.orderFrontRegardless()
         // Backstop: after the first layout pass, make sure nothing left the usable screen.
         DispatchQueue.main.async { [weak self, weak panel] in
@@ -104,10 +106,23 @@ final class HoverPreviewPanel {
         panel.hasShadow = true
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.transient, .ignoresCycle, .fullScreenAuxiliary]
+        panel.delegate = self
         NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.onDismiss?() }
         }
         return panel
+    }
+
+    nonisolated func windowDidResize(_ notification: Notification) {
+        Task { @MainActor in
+            guard !self.isRepositioning, let panel = self.panel, panel.isVisible else { return }
+            self.isRepositioning = true
+            let targetFrame = PreviewPlacement.frame(anchor: self.anchor, desiredSize: panel.frame.size, visibleFrame: self.screenBounds)
+            if panel.frame != targetFrame {
+                panel.setFrame(targetFrame, display: true)
+            }
+            self.isRepositioning = false
+        }
     }
 
     private func fit(_ size: CGSize) {
