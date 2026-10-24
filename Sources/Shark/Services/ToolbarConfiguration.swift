@@ -6,6 +6,25 @@ import SwiftUI
 enum ToolbarConfiguration {
     static let identifier = "shark-main-toolbar"
 
+    static let itemLabels: [String: String] = [
+        "navigation-location": L10n.text("Location"),
+        "path": L10n.text("Path"),
+        "view-mode": L10n.text("View"),
+        "group-sort": L10n.text("Group"),
+        "share": L10n.text("Share"),
+        "split": L10n.text("Split"),
+        "terminal": L10n.text("Terminal"),
+        "actions": L10n.text("Action"),
+        "search": L10n.text("Search")
+    ]
+
+    static func configureItem(_ item: NSToolbarItem) {
+        if let label = itemLabels[item.itemIdentifier.rawValue] {
+            item.paletteLabel = label
+            item.label = label
+        }
+    }
+
     static func locationWidth(availableWidth: CGFloat, otherItemWidths: [CGFloat]) -> CGFloat {
         // Navigation is inseparable from Location (83 pt plus its internal gap). Reserve
         // native group spacing and end margins using the actual installed item count.
@@ -15,6 +34,33 @@ enum ToolbarConfiguration {
     static func validatedIdentifiers(_ identifiers: [String], allowed: Set<String>) -> [String] {
         var seen = Set<String>()
         return identifiers.filter { allowed.contains($0) && seen.insert($0).inserted }
+    }
+}
+
+final class ToolbarDelegateProxy: NSObject, NSToolbarDelegate {
+    nonisolated(unsafe) weak var originalDelegate: (any NSToolbarDelegate)?
+
+    init(original: (any NSToolbarDelegate)?) {
+        self.originalDelegate = original
+        super.init()
+    }
+
+    override func responds(to aSelector: Selector!) -> Bool {
+        if super.responds(to: aSelector) { return true }
+        return originalDelegate?.responds(to: aSelector) ?? false
+    }
+
+    override func forwardingTarget(for aSelector: Selector!) -> Any? {
+        originalDelegate
+    }
+
+    @MainActor
+    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+        let item = originalDelegate?.toolbar?(toolbar, itemForItemIdentifier: itemIdentifier, willBeInsertedIntoToolbar: flag)
+        if let item {
+            ToolbarConfiguration.configureItem(item)
+        }
+        return item
     }
 }
 
@@ -44,7 +90,15 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
         private var pending = false
         private var applying = false
         private var observed = false
+        private var delegateProxy: ToolbarDelegateProxy?
         private static let layoutChanged = Notification.Name("SharkNativeToolbarLayoutChanged")
+
+        private func attachDelegateProxy(to toolbar: NSToolbar) {
+            guard let delegate = toolbar.delegate, !(delegate is ToolbarDelegateProxy) else { return }
+            let proxy = ToolbarDelegateProxy(original: delegate)
+            self.delegateProxy = proxy
+            toolbar.delegate = proxy
+        }
 
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
@@ -55,6 +109,7 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 if toolbar.displayMode != .iconOnly {
                     toolbar.displayMode = .iconOnly
                 }
+                attachDelegateProxy(to: toolbar)
             }
             if !observed {
                 observed = true
@@ -114,22 +169,9 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 if toolbar.displayMode != .iconOnly {
                     toolbar.displayMode = .iconOnly
                 }
-                let itemLabels: [String: String] = [
-                    "navigation-location": L10n.text("Location"),
-                    "path": L10n.text("Path"),
-                    "view-mode": L10n.text("View"),
-                    "group-sort": L10n.text("Group"),
-                    "share": L10n.text("Share"),
-                    "split": L10n.text("Split"),
-                    "terminal": L10n.text("Terminal"),
-                    "actions": L10n.text("Action"),
-                    "search": L10n.text("Search")
-                ]
+                self.attachDelegateProxy(to: toolbar)
                 for item in toolbar.items {
-                    if let label = itemLabels[item.itemIdentifier.rawValue] {
-                        item.paletteLabel = label
-                        item.label = label
-                    }
+                    ToolbarConfiguration.configureItem(item)
                 }
                 let others = toolbar.items.filter {
                     !$0.itemIdentifier.rawValue.contains("navigation-location") &&

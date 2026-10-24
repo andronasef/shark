@@ -27,4 +27,11 @@ struct ToolbarConfigurationTests {
         toolbar.displayMode = .iconOnly
         #expect(toolbar.displayMode == .iconOnly)
     }
+
+    @Test @MainActor func configureItemSetsPaletteLabelAndLabel() {
+        let item = NSToolbarItem(itemIdentifier: NSToolbarItem.Identifier("search"))
+        ToolbarConfiguration.configureItem(item)
+        #expect(item.paletteLabel == L10n.text("Search"))
+        #expect(item.label == L10n.text("Search"))
+    }
 }

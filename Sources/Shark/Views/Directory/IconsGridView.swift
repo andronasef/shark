@@ -1,6 +1,34 @@
 import SwiftUI
 import AppKit
 
+@Observable
+@MainActor
+private final class MarqueeState {
+    var rect: CGRect? = nil
+    var isDragging = false
+    var dragStartPoint: CGPoint? = nil
+    var initialSelection: Set<URL> = []
+    var itemFrames: [URL: CGRect] = [:]
+}
+
+private struct MarqueeBoxView: View {
+    let marquee: MarqueeState
+
+    var body: some View {
+        if let rect = marquee.rect, rect.width > 2 || rect.height > 2 {
+            Rectangle()
+                .fill(Color.accentColor.opacity(0.18))
+                .overlay(
+                    Rectangle()
+                        .stroke(Color.accentColor.opacity(0.65), lineWidth: 1)
+                )
+                .frame(width: rect.width, height: rect.height)
+                .offset(x: rect.minX, y: rect.minY)
+                .allowsHitTesting(false)
+        }
+    }
+}
+
 public struct IconsGridView: View {
     @Bindable var navigationState: NavigationState
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
@@ -8,10 +36,7 @@ public struct IconsGridView: View {
     let contextMenuBuilder: (FileItem) -> AnyView
 
     // Rubberband marquee selection state
-    @State private var dragStart: CGPoint? = nil
-    @State private var dragCurrent: CGPoint? = nil
-    @State private var initialSelectionBeforeDrag: Set<URL> = []
-    @State private var itemFrames: [URL: CGRect] = [:]
+    @State private var marqueeState = MarqueeState()
 
     // Track click timestamp and target for double-click detection
     @State private var lastClickedURL: URL? = nil
@@ -25,15 +50,6 @@ public struct IconsGridView: View {
         self.navigationState = navigationState
         self.onActivate = onActivate
         self.contextMenuBuilder = { AnyView(contextMenu($0)) }
-    }
-
-    private var marqueeRect: CGRect? {
-        guard let start = dragStart, let current = dragCurrent else { return nil }
-        let x = min(start.x, current.x)
-        let y = min(start.y, current.y)
-        let w = abs(current.x - start.x)
-        let h = abs(current.y - start.y)
-        return CGRect(x: x, y: y, width: w, height: h)
     }
 
     public var body: some View {
@@ -57,21 +73,28 @@ public struct IconsGridView: View {
                         .gesture(
                             DragGesture(minimumDistance: 4, coordinateSpace: .named("IconGridCoordinateSpace"))
                                 .onChanged { value in
-                                    if dragStart == nil {
-                                        dragStart = value.startLocation
+                                    if marqueeState.dragStartPoint == nil {
+                                        marqueeState.dragStartPoint = value.startLocation
+                                        marqueeState.isDragging = true
                                         let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
-                                        initialSelectionBeforeDrag = isShiftOrCmd ? navigationState.selectedItemIDs : []
+                                        marqueeState.initialSelection = isShiftOrCmd ? navigationState.selectedItemIDs : []
                                     }
-                                    dragCurrent = value.location
-
-                                    if let rect = marqueeRect {
-                                        updateMarqueeSelection(rect: rect)
-                                    }
+                                    let start = marqueeState.dragStartPoint ?? value.startLocation
+                                    let current = value.location
+                                    let rect = CGRect(
+                                        x: min(start.x, current.x),
+                                        y: min(start.y, current.y),
+                                        width: abs(current.x - start.x),
+                                        height: abs(current.y - start.y)
+                                    )
+                                    marqueeState.rect = rect
+                                    updateMarqueeSelection(rect: rect)
                                 }
                                 .onEnded { _ in
-                                    dragStart = nil
-                                    dragCurrent = nil
-                                    initialSelectionBeforeDrag = []
+                                    marqueeState.dragStartPoint = nil
+                                    marqueeState.rect = nil
+                                    marqueeState.isDragging = false
+                                    marqueeState.initialSelection = []
                                 }
                         )
 
@@ -141,22 +164,13 @@ public struct IconsGridView: View {
                     .padding(20)
 
                     // Finder Rubberband Marquee Drag Selection Rectangle
-                    if let rect = marqueeRect, rect.width > 2 || rect.height > 2 {
-                        Rectangle()
-                            .fill(Color.accentColor.opacity(0.18))
-                            .overlay(
-                                Rectangle()
-                                    .stroke(Color.accentColor.opacity(0.65), lineWidth: 1)
-                            )
-                            .frame(width: rect.width, height: rect.height)
-                            .offset(x: rect.minX, y: rect.minY)
-                            .allowsHitTesting(false)
-                    }
+                    MarqueeBoxView(marquee: marqueeState)
                 }
                 .frame(maxWidth: .infinity, minHeight: containerGeo.size.height, alignment: .topLeading)
                 .coordinateSpace(name: "IconGridCoordinateSpace")
                 .onPreferenceChange(ItemFramePreferenceKey.self) { frames in
-                    itemFrames = frames
+                    guard !marqueeState.isDragging else { return }
+                    marqueeState.itemFrames = frames
                 }
                 .onAppear {
                     updateGridColumnCount(width: containerGeo.size.width)
@@ -204,17 +218,19 @@ public struct IconsGridView: View {
     }
 
     private func updateMarqueeSelection(rect: CGRect) {
-        var newlySelected = initialSelectionBeforeDrag
+        var newlySelected = marqueeState.initialSelection
 
-        for (url, frame) in itemFrames {
+        for (url, frame) in marqueeState.itemFrames {
             if rect.intersects(frame) {
                 newlySelected.insert(url)
-            } else if !initialSelectionBeforeDrag.contains(url) {
+            } else if !marqueeState.initialSelection.contains(url) {
                 newlySelected.remove(url)
             }
         }
 
-        navigationState.selectedItemIDs = newlySelected
+        if newlySelected != navigationState.selectedItemIDs {
+            navigationState.selectedItemIDs = newlySelected
+        }
     }
 }
 
