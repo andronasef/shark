@@ -229,7 +229,7 @@ public final class NavigationState {
         if let resolved = fileSystemService.resolvePath(pathInputText) {
             navigateTo(resolved)
         } else {
-            errorMessage = "Path not found: \(pathInputText)"
+            errorMessage = L10n.format("Path not found: %@", L10n.literal(pathInputText))
         }
     }
 
@@ -300,9 +300,9 @@ public final class NavigationState {
         selectedItemIDs = Set(filteredAndSortedItems.map(\.id))
     }
 
-    public func paste() async {
+    public func paste(into destination: URL? = nil) async {
         guard let (urls, mode) = FileClipboardService.shared.getPasteableURLs(), !urls.isEmpty else { return }
-        let targetDir = currentURL
+        let targetDir = destination ?? currentURL
 
         do {
             if mode == .cut {
@@ -311,10 +311,11 @@ public final class NavigationState {
                 FileClipboardService.shared.clear()
             } else {
                 let created = try await FileOperationsService.shared.copy(items: urls, to: targetDir)
-                FileUndoService.shared.record(.create(urls: created, name: "Copy"))
+                FileUndoService.shared.record(.create(urls: created, name: L10n.text("Copy")))
             }
         } catch {
-            operationError = "Paste failed: \(error.localizedDescription)"
+            if let partial = error as? PartialMoveError { FileUndoService.shared.record(.move(pairs: partial.remainingMoves)) }
+            operationError = L10n.format("Paste failed: %@", error.localizedDescription)
         }
         await reloadCurrentDirectory()
     }
@@ -322,19 +323,21 @@ public final class NavigationState {
     /// Drops `urls` into `directory`. Like Finder, a drop moves within a volume and copies across
     /// volumes; ⌥ forces a copy and ⌘ forces a move.
     public func drop(_ urls: [URL], into directory: URL, modifiers: NSEvent.ModifierFlags) async {
+        let urls = FileDragSelection.normalized(urls)
         guard !urls.isEmpty else { return }
         let crossesVolume = urls.contains { !FileOperationsService.isSameVolume($0, directory) }
         let copies = modifiers.contains(.option) || (crossesVolume && !modifiers.contains(.command))
         do {
             if copies {
                 let created = try await FileOperationsService.shared.copy(items: urls, to: directory)
-                FileUndoService.shared.record(.create(urls: created, name: "Copy"))
+                FileUndoService.shared.record(.create(urls: created, name: L10n.text("Copy")))
             } else {
                 let pairs = try await FileOperationsService.shared.move(items: urls, to: directory)
                 if !pairs.isEmpty { FileUndoService.shared.record(.move(pairs: pairs)) }
             }
         } catch {
-            operationError = "\(copies ? "Copy" : "Move") failed: \(error.localizedDescription)"
+            if let partial = error as? PartialMoveError { FileUndoService.shared.record(.move(pairs: partial.remainingMoves)) }
+            operationError = L10n.format("%@ failed: %@", L10n.text(copies ? "Copy" : "Move"), error.localizedDescription)
         }
         await reloadCurrentDirectory()
     }
@@ -344,11 +347,11 @@ public final class NavigationState {
         guard !urls.isEmpty else { return }
         do {
             let created = try await FileOperationsService.shared.duplicate(items: urls)
-            FileUndoService.shared.record(.create(urls: created, name: "Duplicate"))
+            FileUndoService.shared.record(.create(urls: created, name: L10n.text("Duplicate")))
             await reloadCurrentDirectory()
             selectedItemIDs = Set(created.map(\.standardizedFileURL))
         } catch {
-            operationError = "Duplicate failed: \(error.localizedDescription)"
+            operationError = L10n.format("Duplicate failed: %@", error.localizedDescription)
             await reloadCurrentDirectory()
         }
     }
@@ -358,7 +361,7 @@ public final class NavigationState {
         do {
             try await FileUndoService.shared.undo()
         } catch {
-            operationError = "Undo failed: \(error.localizedDescription)"
+            operationError = L10n.format("Undo failed: %@", error.localizedDescription)
         }
         await reloadCurrentDirectory()
     }
@@ -368,7 +371,7 @@ public final class NavigationState {
         do {
             try await FileUndoService.shared.redo()
         } catch {
-            operationError = "Redo failed: \(error.localizedDescription)"
+            operationError = L10n.format("Redo failed: %@", error.localizedDescription)
         }
         await reloadCurrentDirectory()
     }
@@ -390,7 +393,7 @@ public final class NavigationState {
             selectedItemIDs = [newURL]
             selectionAnchorID = newURL
         } catch {
-            self.operationError = "Rename failed: \(error.localizedDescription)"
+            self.operationError = L10n.format("Rename failed: %@", error.localizedDescription)
             renamingItemURL = nil
         }
     }
@@ -403,7 +406,7 @@ public final class NavigationState {
         guard cancelActiveOperation == nil else { return }
         let urls = selectedItems.map(\.url)
         guard !urls.isEmpty else { return }
-        activeOperationTitle = "Compressing..."
+        activeOperationTitle = L10n.text("Compressing...")
         activeOperationProgress = 0.5
         let task = Task { try await FileOperationsService.shared.compress(items: urls) }
         cancelActiveOperation = { task.cancel() }
@@ -414,13 +417,13 @@ public final class NavigationState {
         }
         do {
             let archiveURL = try await task.value
-            FileUndoService.shared.record(.create(urls: [archiveURL], name: "Compress"))
+            FileUndoService.shared.record(.create(urls: [archiveURL], name: L10n.text("Compress")))
             await reloadCurrentDirectory()
             selectedItemIDs = [archiveURL]
         } catch is CancellationError {
             await reloadCurrentDirectory()
         } catch {
-            self.operationError = "Compress failed: \(error.localizedDescription)"
+            self.operationError = L10n.format("Compress failed: %@", error.localizedDescription)
         }
     }
 
@@ -432,7 +435,7 @@ public final class NavigationState {
             FileUndoService.shared.record(.trash(restorations: restorations))
             selectedItemIDs.removeAll()
         } catch {
-            self.operationError = "Move to Trash failed: \(error.localizedDescription)"
+            self.operationError = L10n.format("Move to Trash failed: %@", error.localizedDescription)
         }
         await reloadCurrentDirectory()
     }

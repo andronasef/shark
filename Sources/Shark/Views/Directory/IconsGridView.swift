@@ -108,7 +108,7 @@ public struct IconsGridView: View {
                                 }
                             )
                             .contentShape(Rectangle())
-                            .draggable(item.url)
+                            .fileDragSource(item: item, navigationState: navigationState)
                             .dropDestination(for: URL.self) { droppedURLs, _ in
                                 guard item.isNavigableDirectory else { return false }
                                 let modifiers = NSEvent.modifierFlags
@@ -233,6 +233,7 @@ private struct IconGridItemView: View {
     let onSubfolderNavigate: (URL, Bool) -> Void
 
     @State private var thumbnail: NSImage? = nil
+    @Environment(\.displayScale) private var displayScale
     @State private var isHovering = false
 
     var body: some View {
@@ -287,9 +288,12 @@ private struct IconGridItemView: View {
         // sibling on top: reaching it ended the cell's hover, hid the arrow, restarted the hover,
         // and the arrow flickered.
         .onHover { isHovering = $0 }
-        .task {
+        .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(iconSize)|\(displayScale)") {
+            thumbnail = nil
             if !item.isDirectory {
-                thumbnail = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: iconSize * 2, height: iconSize * 2))
+                let image = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: iconSize, height: iconSize), scale: displayScale)
+                guard !Task.isCancelled else { return }
+                thumbnail = image
             }
         }
     }

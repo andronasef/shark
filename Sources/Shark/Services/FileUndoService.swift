@@ -13,9 +13,9 @@ public enum FileUndoAction: Sendable {
 
     public var actionDescription: String {
         switch self {
-        case .move: return "Move"
-        case .rename, .batchRename: return "Rename"
-        case .trash: return "Trash"
+        case .move: return L10n.text("Move")
+        case .rename, .batchRename: return L10n.text("Rename")
+        case .trash: return L10n.text("Trash")
         case .create(_, let name), .restoreCreated(_, let name): return name
         }
     }

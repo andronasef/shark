@@ -63,7 +63,7 @@ public struct DetailsTableView: View {
                 }
                 .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
                 .contentShape(Rectangle())
-                .draggable(item.url)
+                .fileDragSource(item: item, navigationState: navigationState)
                 .dropDestination(for: URL.self) { droppedURLs, _ in
                     guard item.isNavigableDirectory else { return false }
                     let modifiers = NSEvent.modifierFlags

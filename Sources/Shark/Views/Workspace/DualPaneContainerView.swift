@@ -14,10 +14,10 @@ public struct DualPaneContainerView: View {
                 singlePaneView(for: tab.primaryPane, identifier: .primary)
             } else {
                 HSplitView {
-                    paneWrapper(for: tab.primaryPane, identifier: .primary, title: "Left Pane")
+                    paneWrapper(for: tab.primaryPane, identifier: .primary, title: L10n.text("Left Pane"))
                         .frame(minWidth: 240)
 
-                    paneWrapper(for: tab.secondaryPane, identifier: .secondary, title: "Right Pane")
+                    paneWrapper(for: tab.secondaryPane, identifier: .secondary, title: L10n.text("Right Pane"))
                         .frame(minWidth: 240)
                 }
             }
@@ -64,7 +64,7 @@ public struct DualPaneContainerView: View {
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .help("Close Split View (F3)")
+                .help(L10n.text("Close Split View (F3)"))
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)

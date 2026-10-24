@@ -73,23 +73,31 @@ public enum FileOperationError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .invalidName(let name):
-            return "“\(name)” can’t be used as a name. Names can’t be empty, “.” or “..”, contain “/” or “:”, or be longer than 255 bytes."
+            return L10n.format("“%@” can’t be used as a name. Names can’t be empty, “.” or “..”, contain “/” or “:”, or be longer than 255 bytes.", L10n.literal(name))
         case .alreadyExists(let name):
-            return "An item named “\(name)” already exists in this location."
+            return L10n.format("An item named “%@” already exists in this location.", L10n.literal(name))
         case .intoItself(let name):
-            return "“\(name)” can’t be moved or copied into itself."
+            return L10n.format("“%@” can’t be moved or copied into itself.", L10n.literal(name))
         case .duplicateResult(let name):
-            return "More than one item would be named “\(name)”."
+            return L10n.format("More than one item would be named “%@”.", L10n.literal(name))
         }
+    }
+}
+
+struct PartialMoveError: LocalizedError, Sendable {
+    let reason: String
+    let remainingMoves: [(source: URL, destination: URL)]
+    var errorDescription: String? {
+        L10n.format("%@ Some files could not be returned to their original locations. Use Undo to retry recovery. Current locations:\n", reason) + remainingMoves.map { L10n.literal($0.destination.path) }.joined(separator: "\n")
     }
 }
 
 public actor FileOperationsService {
     public static let shared = FileOperationsService()
 
-    private let fileManager = FileManager.default
+    private let fileManager: FileManager
 
-    private init() {}
+    init(fileManager: FileManager = .default) { self.fileManager = fileManager }
 
     /// Rejects names the file system would misread as paths or refuse outright.
     public nonisolated static func validateName(_ name: String) throws {
@@ -283,7 +291,12 @@ public actor FileOperationsService {
             do {
                 try fileManager.moveItem(at: move.source, to: move.destination)
             } catch {
-                for entry in done.reversed() { try? fileManager.moveItem(at: entry.destination, to: entry.source) }
+                var remaining: [(source: URL, destination: URL)] = []
+                for entry in done.reversed() {
+                    do { try fileManager.moveItem(at: entry.destination, to: entry.source) }
+                    catch { remaining.append(entry) }
+                }
+                if !remaining.isEmpty { throw PartialMoveError(reason: error.localizedDescription, remainingMoves: remaining.reversed()) }
                 throw error
             }
             done.append(move)
@@ -293,7 +306,7 @@ public actor FileOperationsService {
 
     public func compress(items: [URL]) async throws -> URL {
         guard let first = items.first else {
-            throw NSError(domain: "FileOperationsError", code: 2, userInfo: [NSLocalizedDescriptionKey: "No items to compress"])
+            throw NSError(domain: "FileOperationsError", code: 2, userInfo: [NSLocalizedDescriptionKey: L10n.text("No items to compress")])
         }
         let parentDir = first.deletingLastPathComponent()
         let archiveName: String
@@ -371,7 +384,7 @@ public actor FileOperationsService {
         }
         try Task.checkCancellation()
         guard status == 0 else {
-            throw NSError(domain: "FileOperationsError", code: Int(status), userInfo: [NSLocalizedDescriptionKey: "Compression failed with status \(status)"])
+            throw NSError(domain: "FileOperationsError", code: Int(status), userInfo: [NSLocalizedDescriptionKey: L10n.format("Compression failed with status %d", status)])
         }
     }
 

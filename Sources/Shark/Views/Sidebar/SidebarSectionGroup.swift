@@ -30,7 +30,7 @@ struct SidebarSectionGroup<Content: View>: View {
         VStack(alignment: .leading, spacing: 0) {
             Button { focus = headerID; setExpanded(!expanded) } label: {
                 HStack {
-                    Text(title)
+                    Text(L10n.text(title))
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 10, weight: .semibold))
@@ -60,9 +60,9 @@ struct SidebarSectionGroup<Content: View>: View {
             .onKeyPress(.return) { setExpanded(!expanded); return .handled }
             .onKeyPress(.space) { setExpanded(!expanded); return .handled }
             .accessibilityAddTraits(.isHeader)
-            .accessibilityLabel(title)
-            .accessibilityValue(expanded ? "Expanded" : "Collapsed")
-            .help(expanded ? "Collapse \(title)" : "Expand \(title)")
+            .accessibilityLabel(L10n.text(title))
+            .accessibilityValue(L10n.text(expanded ? "Expanded" : "Collapsed"))
+            .help(expanded ? L10n.format("Collapse %@", L10n.text(title)) : L10n.format("Expand %@", L10n.text(title)))
             if expanded {
                 content
                     .transition(reduceMotion ? .identity : .opacity)

@@ -8,6 +8,7 @@ public struct MillerColumnsView: View {
     let onActivate: (FileItem) -> Void
     let contextMenuBuilder: (FileItem) -> AnyView
 
+    @State private var owningWindowNumber: Int?
     @State private var coordinator = MillerColumnsCoordinator()
     @State private var eventMonitor: Any?
 
@@ -56,6 +57,7 @@ public struct MillerColumnsView: View {
                 }
             }
         }
+        .background(WindowNumberReader { owningWindowNumber = $0 })
         .onAppear {
             coordinator.reset(rootDirectory: navigationState.currentURL)
             setupKeyMonitor()
@@ -79,7 +81,7 @@ public struct MillerColumnsView: View {
                     Spacer()
                     ProgressView()
                         .scaleEffect(0.8)
-                    Text("Loading...")
+                    Text(L10n.text("Loading..."))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                         .padding(.top, 4)
@@ -89,7 +91,7 @@ public struct MillerColumnsView: View {
             } else if column.items.isEmpty {
                 VStack {
                     Spacer()
-                    Text("Empty")
+                    Text(L10n.text("Empty"))
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                     Spacer()
@@ -139,6 +141,16 @@ public struct MillerColumnsView: View {
                                     onActivate(item)
                                 }
                             )
+                            .fileDragSource(item: item, navigationState: navigationState, orderedItems: column.items)
+                            .onRightClickSelect {
+                                navigationState.selectedItemIDs = [item.url]
+                            }
+                            .dropDestination(for: URL.self) { urls, _ in
+                                guard item.isNavigableDirectory else { return false }
+                                let modifiers = NSEvent.modifierFlags
+                                Task { await navigationState.drop(urls, into: item.url, modifiers: modifiers) }
+                                return true
+                            }
                             .contextMenu {
                                 contextMenuBuilder(item)
                             }
@@ -169,7 +181,7 @@ public struct MillerColumnsView: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
 
-                Text(item.kindDescription.isEmpty ? (item.isDirectory ? "Folder" : "Document") : item.kindDescription)
+                Text(item.kindDescription.isEmpty ? (item.isDirectory ? L10n.text("Folder") : L10n.text("Document")) : item.kindDescription)
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
             }
@@ -180,11 +192,11 @@ public struct MillerColumnsView: View {
 
             // Metadata Grid
             VStack(alignment: .leading, spacing: 8) {
-                metadataRow(label: "Size", value: item.formattedSize)
-                metadataRow(label: "Modified", value: formatDate(item.dateModified))
-                metadataRow(label: "Created", value: formatDate(item.dateCreated))
-                metadataRow(label: "Permissions", value: String(format: "%o", item.posixPermissions))
-                metadataRow(label: "Where", value: item.url.deletingLastPathComponent().path)
+                metadataRow(label: L10n.text("Size"), value: item.formattedSize)
+                metadataRow(label: L10n.text("Modified"), value: formatDate(item.dateModified))
+                metadataRow(label: L10n.text("Created"), value: formatDate(item.dateCreated))
+                metadataRow(label: L10n.text("Permissions"), value: String(format: "%o", item.posixPermissions))
+                metadataRow(label: L10n.text("Where"), value: item.url.deletingLastPathComponent().path)
             }
             .font(.system(size: 11))
             .padding(.horizontal, 16)
@@ -196,7 +208,7 @@ public struct MillerColumnsView: View {
                 Button(action: {
                     QuickLookCoordinator.shared.toggleQuickLook(for: [item.url])
                 }) {
-                    Label("Quick Look", systemImage: "eye")
+                    Label(L10n.text("Quick Look"), systemImage: "eye")
                         .font(.system(size: 11))
                 }
                 .buttonStyle(.bordered)
@@ -204,7 +216,7 @@ public struct MillerColumnsView: View {
                 Button(action: {
                     onActivate(item)
                 }) {
-                    Label("Open", systemImage: "arrow.up.forward.app")
+                    Label(L10n.text("Open"), systemImage: "arrow.up.forward.app")
                         .font(.system(size: 11))
                 }
                 .buttonStyle(.borderedProminent)

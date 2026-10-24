@@ -63,7 +63,7 @@ public struct PlacesSidebarView: View {
                         favoriteInsertion(at: index + 1)
                     }
                     Button { addFavorite() } label: {
-                        Label("Add Favorite…", systemImage: "plus")
+                        Label(L10n.text("Add Favorite…"), systemImage: "plus")
                             .font(.system(size: 12))
                             .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
                     }
@@ -116,18 +116,18 @@ public struct PlacesSidebarView: View {
                             .padding(.horizontal, 10)
                             .modifier(SidebarRowFeedback(isFocused: sidebarFocus == "Tab Groups:" + group.id.uuidString))
                             .contextMenu {
-                                Button("Restore (Replace All)") {
+                                Button(L10n.text("Restore (Replace All)")) {
                                     if let ws = workspace {
                                         TabGroupService.shared.restore(group: group, into: ws, replace: true)
                                     }
                                 }
-                                Button("Append Tabs") {
+                                Button(L10n.text("Append Tabs")) {
                                     if let ws = workspace {
                                         TabGroupService.shared.restore(group: group, into: ws, replace: false)
                                     }
                                 }
                                 Divider()
-                                Button("Delete Group", role: .destructive) {
+                                Button(L10n.text("Delete Group"), role: .destructive) {
                                     TabGroupService.shared.deleteGroup(id: group.id)
                                 }
                             }
@@ -159,7 +159,7 @@ public struct PlacesSidebarView: View {
                                     .fill(tag.color)
                                     .frame(width: 13, height: 13)
                                     .frame(width: 22)
-                                Text(tag.name)
+                                Text(L10n.text(tag.name))
                                     .font(.system(size: 14))
                                 Spacer()
                             }
@@ -184,7 +184,7 @@ public struct PlacesSidebarView: View {
                             .frame(width: 18, height: 12)
                             .frame(width: 22)
                             .accessibilityHidden(true)
-                            Text("All Tags...")
+                            Text(L10n.text("All Tags..."))
                                 .font(.system(size: 14))
                                 .foregroundColor(.primary)
                             Spacer()
@@ -326,7 +326,7 @@ public struct PlacesSidebarView: View {
                 .foregroundStyle(.primary)
                 .accessibilityHidden(true)
 
-                Text(name)
+                Text(favorite == nil && ["Recents", "Shared", "Trash"].contains(name) ? L10n.text(name) : name)
                     .font(.system(size: 14, weight: isSelected ? .medium : .regular))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
@@ -335,10 +335,10 @@ public struct PlacesSidebarView: View {
                     Image(systemName: "exclamationmark.triangle")
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
-                        .accessibilityLabel("Folder unavailable")
+                        .accessibilityLabel(L10n.text("Folder unavailable"))
                 } else if isAncestor && !isSelected {
                     Circle().fill(Color.accentColor.opacity(0.7)).frame(width: 5, height: 5)
-                        .accessibilityLabel("Contains current folder")
+                        .accessibilityLabel(L10n.text("Contains current folder"))
                 }
             }
             .opacity(available ? 1 : 0.55)
@@ -367,27 +367,27 @@ public struct PlacesSidebarView: View {
         .onKeyPress(.return) { activate(); return .handled }
         .onHover { hoveredRow = $0 ? rowID : nil }
         .onKeyPress(.leftArrow) {
-            guard section != "Top" else { return .ignored }
+            guard section != L10n.text("Top") else { return .ignored }
             sidebarFocus = "\(section):header"
             return .handled
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
-        .help(available ? url.path : "Folder unavailable. Click to locate it.")
+        .help(available ? url.path : L10n.text("Folder unavailable. Click to locate it."))
         .onMiddleClick {
             guard available else { return }
             workspace?.open(url, from: navigationState, newTab: true)
         }
         .contextMenu {
-            Button("Open in New Tab") {
+            Button(L10n.text("Open in New Tab")) {
                 workspace?.open(url, from: navigationState, newTab: true)
             }
             .disabled(!available)
-            Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+            Button(L10n.text("Show in Finder")) { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                 .disabled(!available)
             if let favorite {
-                Button("Locate Folder…") { locateFavorite(favorite) }
+                Button(L10n.text("Locate Folder…")) { locateFavorite(favorite) }
                 Divider()
-                Button("Remove from Favorites") { favoritesStore.remove(favorite.id) }
+                Button(L10n.text("Remove from Favorites")) { favoritesStore.remove(favorite.id) }
             }
         }
         .dropDestination(for: URL.self) { urls, _ in
@@ -431,11 +431,11 @@ public struct PlacesSidebarView: View {
 
     private func addFavorite() {
         let panel = NSOpenPanel()
-        panel.title = "Add Folder to Favorites"
+        panel.title = L10n.text("Add Folder to Favorites")
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = true
-        panel.prompt = "Add"
+        panel.prompt = L10n.text("Add")
         panel.begin { response in
             if response == .OK { _ = favoritesStore.insert(panel.urls, at: favoritesStore.items.count) }
         }
@@ -443,10 +443,10 @@ public struct PlacesSidebarView: View {
 
     private func locateFavorite(_ favorite: SidebarFavorite) {
         let panel = NSOpenPanel()
-        panel.title = "Locate \(favorite.name)"
+        panel.title = L10n.format("Locate %@", L10n.literal(favorite.name))
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
-        panel.prompt = "Choose"
+        panel.prompt = L10n.text("Choose")
         panel.begin { response in
             if response == .OK, let url = panel.url { favoritesStore.relocate(favorite.id, to: url) }
         }
