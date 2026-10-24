@@ -1,11 +1,15 @@
 import SwiftUI
+import AppKit
 
 public struct TerminalDrawerContainerView: View {
     @Bindable var session: PTYSession
     @Binding var isPresented: Bool
     @State private var drawerHeight: CGFloat = 220
+    @State private var resizeStartHeight: CGFloat?
+    let currentDirectory: URL
 
-    public init(session: PTYSession, isPresented: Binding<Bool>) {
+    public init(session: PTYSession, isPresented: Binding<Bool>, currentDirectory: URL = FileManager.default.homeDirectoryForCurrentUser) {
+        self.currentDirectory = currentDirectory
         self.session = session
         self._isPresented = isPresented
     }
@@ -31,16 +35,31 @@ public struct TerminalDrawerContainerView: View {
                 .background(Color.orange.opacity(0.12))
             }
 
-            // Terminal NSView
             TerminalView(session: session)
                 .frame(height: drawerHeight)
+                .overlay(alignment: .bottom) {
+                    if !session.isRunning {
+                        HStack {
+                            Text("Shell exited")
+                            if let code = session.exitCode { Text("(\(code))") }
+                            Button("Restart") { session.restart() }
+                        }
+                        .font(.system(size: 12))
+                        .padding(8)
+                        .background(.regularMaterial)
+                    }
+                }
         }
         .background(Color(white: 0.1))
-        .onAppear {
-            if !session.isRunning {
-                session.start()
-            }
-        }
+    }
+
+    private func confirmTermination() -> Bool {
+        let alert = NSAlert()
+        alert.messageText = "Terminate this terminal session?"
+        alert.informativeText = "This stops the shell and its running commands."
+        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: "Terminate")
+        return alert.runModal() == .alertSecondButtonReturn
     }
 
     private var resizeHandle: some View {
@@ -51,9 +70,12 @@ public struct TerminalDrawerContainerView: View {
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        let newHeight = drawerHeight - value.translation.height
-                        drawerHeight = min(max(newHeight, 120), 500)
+                        if resizeStartHeight == nil { resizeStartHeight = drawerHeight }
+                        let newHeight = (resizeStartHeight ?? drawerHeight) - value.translation.height
+                        let available = session.terminalView?.window?.contentView?.bounds.height ?? 720
+                        drawerHeight = min(max(newHeight, 100), max(100, available - 180))
                     }
+                    .onEnded { _ in resizeStartHeight = nil }
             )
             .cursor(.resizeUpDown)
     }
@@ -68,7 +90,7 @@ public struct TerminalDrawerContainerView: View {
                 .font(.system(size: 11, weight: .semibold))
 
             // Working directory badge
-            Text(session.currentWorkingDirectory.path)
+            Text((session.hasReportedDirectory ? "" : "Started in: ") + session.currentWorkingDirectory.path)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundColor(.secondary)
                 .lineLimit(1)
@@ -81,6 +103,37 @@ public struct TerminalDrawerContainerView: View {
                 )
 
             Spacer()
+
+            Button("Use Current Folder") {
+                do {
+                    let command = try session.useDirectory(currentDirectory)
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(command, forType: .string)
+                    let alert = NSAlert()
+                    alert.messageText = "Directory command copied"
+                    alert.informativeText = "Paste the copied cd command into an empty shell prompt when you are ready. The terminal's existing input and running commands are preserved."
+                    alert.runModal()
+                    session.focus()
+                } catch { NSAlert(error: error).runModal() }
+            }
+            .font(.system(size: 10))
+            .help("Copy a quoted cd command for the current folder")
+
+            Menu {
+                Button("Restart Shell…") {
+                    if !session.isRunning || confirmTermination() { session.restart() }
+                }
+                Button("Terminate Shell…") {
+                    if confirmTermination() { session.terminate() }
+                }
+                .disabled(!session.isRunning)
+                Divider()
+                Button("Increase Text Size") { session.adjustFontSize(by: 1) }
+                Button("Decrease Text Size") { session.adjustFontSize(by: -1) }
+                Button("Reset Text Size") { session.resetFontSize() }
+            } label: { Image(systemName: "ellipsis.circle") }
+            .menuStyle(.borderlessButton)
+            .frame(width: 20)
 
             // Clear button
             Button(action: {

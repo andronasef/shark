@@ -6,6 +6,32 @@ import XCTest
 
 @MainActor
 final class TerminalKeyboardTests: XCTestCase {
+    func testTerminalOwnershipAndFontShortcuts() throws {
+        _ = NSApplication.shared
+        let session = PTYSession(preferences: UserDefaults(suiteName: "TerminalKeyboard." + UUID().uuidString)!)
+        let terminal = session.makeTerminalView()
+        let window = KeyboardTestWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
+                                        styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = terminal
+        XCTAssertTrue(window.makeFirstResponder(terminal))
+        XCTAssertTrue(TerminalKeyboardOwnership.ownsFirstResponder(in: window))
+        TerminalKeyboardOwnership.shared.refresh(in: window)
+        XCTAssertTrue(TerminalKeyboardOwnership.shared.isFocused(in: window))
+        for (character, expected) in [("+", 13.0), ("-", 12.0), ("0", 12.0)] {
+            let event = try XCTUnwrap(NSEvent.keyEvent(with: .keyDown, location: .zero,
+                modifierFlags: .command, timestamp: 0, windowNumber: window.windowNumber,
+                context: nil, characters: character, charactersIgnoringModifiers: character,
+                isARepeat: false, keyCode: 0))
+            XCTAssertTrue(terminal.performKeyEquivalent(with: event))
+            XCTAssertEqual(session.fontSize, expected)
+        }
+        XCTAssertFalse(TerminalKeyboardOwnership.ownsFirstResponder(in: nil))
+        TerminalKeyboardOwnership.shared.clear(in: window)
+        XCTAssertFalse(TerminalKeyboardOwnership.shared.isFocused(in: window))
+        session.terminate()
+    }
+
     func testDirectoryMonitorLeavesTerminalTypingAlone() throws {
         _ = NSApplication.shared
         var delivered = false

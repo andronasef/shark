@@ -322,7 +322,8 @@ public struct ContentView: View {
                 if workspaceState.isTerminalVisible {
                     TerminalDrawerContainerView(
                         session: terminalSession,
-                        isPresented: terminalVisibleBinding
+                        isPresented: terminalVisibleBinding,
+                        currentDirectory: activeState.currentURL
                     )
                 }
             }
@@ -333,23 +334,18 @@ public struct ContentView: View {
             .toolbar { finderToolbar(for: activeState) }
         }
         .environment(workspaceState)
-        .onChange(of: activeState.currentURL) { _, newURL in
-            if workspaceState.isTerminalVisible {
-                // A new terminal request may activate another pane in this same
-                // update. Let its target win over the pane's current directory.
-                if let request = workspaceState.embeddedTerminalRequest,
-                   request.id != lastHandledTerminalRequestID { return }
-                workspaceState.embeddedTerminalRequest = nil
-                terminalSession.syncDirectory(to: newURL)
-            }
-        }
         .onChange(of: workspaceState.isTerminalVisible) { _, visible in
             TelemetryService.shared.logTerminalToggled(isVisible: visible)
             if visible {
-                if workspaceState.embeddedTerminalRequest == nil {
-                    terminalSession.syncDirectory(to: activeState.currentURL)
+                if !terminalSession.hasStarted, let request = workspaceState.embeddedTerminalRequest {
+                    lastHandledTerminalRequestID = request.id
                 }
+                terminalSession.prepareInitialDirectory(workspaceState.embeddedTerminalRequest?.directory ?? activeState.currentURL)
+                terminalSession.start()
+                DispatchQueue.main.async { terminalSession.focus() }
             } else {
+                TerminalKeyboardOwnership.shared.clear(in: terminalSession.terminalView?.window)
+                terminalSession.terminalView?.window?.makeFirstResponder(nil)
                 workspaceState.embeddedTerminalRequest = nil
             }
         }
@@ -357,9 +353,19 @@ public struct ContentView: View {
             TelemetryService.shared.logViewModeChanged(mode: newMode.rawValue)
         }
         .onChange(of: workspaceState.embeddedTerminalRequest) { _, request in
-            if let request {
-                terminalSession.syncDirectory(to: request.directory)
+            if let request, request.id != lastHandledTerminalRequestID {
+                if !terminalSession.hasStarted {
+                    terminalSession.prepareInitialDirectory(request.directory)
+                } else if let command = try? terminalSession.useDirectory(request.directory) {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(command, forType: .string)
+                    let alert = NSAlert()
+                    alert.messageText = "Directory command copied"
+                    alert.informativeText = "The terminal session is already open. Paste the copied cd command when you are ready to change folders. Your current input and running commands are preserved."
+                    alert.runModal()
+                }
                 lastHandledTerminalRequestID = request.id
+                DispatchQueue.main.async { terminalSession.focus() }
             }
         }
         .sheet(item: Binding(

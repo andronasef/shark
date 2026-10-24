@@ -64,7 +64,7 @@ final class TerminalOpeningTests: XCTestCase {
 
     @MainActor
     func testEmbeddedDirectoryCommandPreservesLiteralShellCharacters() throws {
-        let folder = directory.appendingPathComponent("folder 'quoted' $HOME `literal`")
+        let folder = directory.appendingPathComponent("مجلد folder 'quoted' $HOME `literal`")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")

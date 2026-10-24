@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Shark",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
@@ -26,7 +27,8 @@ let package = Package(
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk")
             ],
-            path: "Sources/Shark"
+            path: "Sources/Shark",
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "SharkTests",
