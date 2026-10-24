@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.0-alpha.2] - 2026-10-25
+
 ### Added
 - The toolbar can show icons only or icons with labels (right-click the toolbar).
 - View › Sort By, View › Share… and Edit › Find… (⌘F) keep sorting, sharing and filtering available even after their toolbar buttons are removed. ⌘F focuses the toolbar filter, or asks for the filter text when the search field isn't in the toolbar.
