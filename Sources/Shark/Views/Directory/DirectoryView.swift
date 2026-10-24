@@ -437,14 +437,14 @@ public struct DirectoryView: View {
 
             HStack(spacing: 6) {
                 if !navigationState.filterText.isEmpty {
-                    Text("\(filtered) of \(total) items")
+                    Text(L10n.format("%d of %d", filtered, total))
                 } else {
-                    Text("\(total) items")
+                    Text(L10n.items(total))
                 }
 
                 if selectedCount > 0 {
                     let sizeStr = ByteCountFormatter.string(fromByteCount: navigationState.selectedTotalSize, countStyle: .file)
-                    Text("• \(selectedCount) selected (\(sizeStr))")
+                    Text("• " + L10n.format("%@ (%@)", L10n.format("%d selected", selectedCount), sizeStr))
                         .foregroundColor(.primary)
                 }
 
