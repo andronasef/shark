@@ -44,6 +44,7 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(DefaultViewModeSetting(rawValue: "Details (List)"), .list)
     }
 
+    @MainActor
     func testDynamicLanguageResolutionFromUserDefaults() {
         let original = UserDefaults.standard.string(forKey: AppLocalization.preferenceKey)
         defer {
@@ -56,7 +57,7 @@ final class LocalizationTests: XCTestCase {
 
         UserDefaults.standard.set(AppLanguage.ar.rawValue, forKey: AppLocalization.preferenceKey)
         XCTAssertEqual(AppLocalization.language, .ar)
-        XCTAssertEqual(AppLocalization.layoutDirection, .rightToLeft)
+        XCTAssertEqual(AppLocalization.layoutDirection, (NSApp?.userInterfaceLayoutDirection == .rightToLeft) ? .rightToLeft : .leftToRight)
         XCTAssertEqual(L10n.text("General"), "عام")
 
         UserDefaults.standard.set(AppLanguage.de.rawValue, forKey: AppLocalization.preferenceKey)

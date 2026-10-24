@@ -40,7 +40,19 @@ public enum AppLocalization {
     }
 
     public static var locale: Locale { Locale(identifier: language.rawValue) }
-    public static var layoutDirection: LayoutDirection { language.isRightToLeft ? .rightToLeft : .leftToRight }
+
+    /// Window-level layout direction must remain coherent with the host macOS WindowServer.
+    /// On macOS, window controls (traffic lights), sidebar tracking separator, and NSToolbar
+    /// are strictly anchored to the top-left unless the host OS itself runs in RTL (e.g. Arabic macOS).
+    /// If macOS is LTR, forcing .rightToLeft onto NavigationSplitView detaches the sidebar from
+    /// the traffic lights and collapses toolbar items into the overflow chevron.
+    @MainActor
+    public static var layoutDirection: LayoutDirection {
+        if language.isRightToLeft && NSApp?.userInterfaceLayoutDirection == .rightToLeft {
+            return .rightToLeft
+        }
+        return .leftToRight
+    }
 
     public static func resolvedLanguage(preference: AppLanguage, preferredLanguages: [String]) -> AppLanguage {
         if preference != .system { return preference }

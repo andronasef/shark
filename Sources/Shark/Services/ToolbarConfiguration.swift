@@ -6,20 +6,23 @@ import SwiftUI
 enum ToolbarConfiguration {
     static let identifier = "shark-main-toolbar"
 
-    static let itemLabels: [String: String] = [
-        "navigation-location": L10n.text("Location"),
-        "path": L10n.text("Path"),
-        "view-mode": L10n.text("View"),
-        "group-sort": L10n.text("Group"),
-        "share": L10n.text("Share"),
-        "split": L10n.text("Split"),
-        "terminal": L10n.text("Terminal"),
-        "actions": L10n.text("Action"),
-        "search": L10n.text("Search")
-    ]
+    static func itemLabel(for identifier: String) -> String? {
+        switch identifier {
+        case "navigation-location": L10n.text("Location")
+        case "path": L10n.text("Path")
+        case "view-mode": L10n.text("View")
+        case "group-sort": L10n.text("Group")
+        case "share": L10n.text("Share")
+        case "split": L10n.text("Split")
+        case "terminal": L10n.text("Terminal")
+        case "actions": L10n.text("Action")
+        case "search": L10n.text("Search")
+        default: nil
+        }
+    }
 
     static func configureItem(_ item: NSToolbarItem) {
-        if let label = itemLabels[item.itemIdentifier.rawValue] {
+        if let label = itemLabel(for: item.itemIdentifier.rawValue) {
             item.paletteLabel = label
             item.label = label
         }
