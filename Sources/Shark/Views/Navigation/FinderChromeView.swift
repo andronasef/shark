@@ -8,6 +8,7 @@ struct FinderGlassModifier: ViewModifier {
     @AppStorage("liquidGlassTranslucency") private var translucency = true
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.colorScheme) private var colorScheme
 
     func body(content: Content) -> some View {
         if !enabled {
@@ -15,7 +16,7 @@ struct FinderGlassModifier: ViewModifier {
         } else if !translucency || reduceTransparency || contrast == .increased {
             content
                 .background(Color(nsColor: isSelected ? .selectedControlColor : .controlBackgroundColor), in: Capsule())
-                .overlay(Capsule().strokeBorder(Color.primary.opacity(0.25), lineWidth: 0.75))
+                .overlay(Capsule().strokeBorder(colorScheme == .dark ? Color.white.opacity(0.3) : Color.primary.opacity(0.25), lineWidth: 0.75))
         } else {
             glassOrMaterial(content)
         }
@@ -26,7 +27,7 @@ struct FinderGlassModifier: ViewModifier {
 #if compiler(>=6.2)
         if #available(macOS 26, *) {
             content.glassEffect(
-                .regular.tint(isSelected ? Color.primary.opacity(0.14) : nil).interactive(interactive),
+                .regular.tint(isSelected ? (colorScheme == .dark ? Color.white.opacity(0.18) : Color.primary.opacity(0.14)) : nil).interactive(interactive),
                 in: Capsule()
             )
         } else {
@@ -40,8 +41,8 @@ struct FinderGlassModifier: ViewModifier {
     private func fallbackMaterial(_ content: Content) -> some View {
         content
             .background(.thinMaterial, in: Capsule())
-            .background(isSelected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
-            .overlay(Capsule().strokeBorder(Color.primary.opacity(0.14), lineWidth: 0.75))
+            .background(isSelected ? (colorScheme == .dark ? Color.white.opacity(0.18) : Color.primary.opacity(0.12)) : Color.clear, in: Capsule())
+            .overlay(Capsule().strokeBorder(colorScheme == .dark ? Color.white.opacity(0.25) : Color.primary.opacity(0.14), lineWidth: 0.75))
     }
 }
 
@@ -82,6 +83,7 @@ extension ToolbarContent {
 struct FinderToolbarCaption<Content: View>: View {
     let title: String
     @ViewBuilder let content: Content
+    @Environment(\.colorScheme) private var colorScheme
 
     init(_ title: String, @ViewBuilder content: () -> Content) {
         self.title = title
@@ -94,7 +96,7 @@ struct FinderToolbarCaption<Content: View>: View {
             if ToolbarDisplayState.shared.showsLabels {
                 Text(L10n.text(title))
                     .font(.system(size: 10, weight: .regular))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.8) : Color.secondary)
                     .lineLimit(1)
                     .fixedSize()
             }
@@ -106,6 +108,7 @@ struct FinderToolbarCaption<Content: View>: View {
 struct FinderToolbarSymbol: View {
     let symbol: String
     var disclosure = false
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         HStack(spacing: 4) {
@@ -116,8 +119,8 @@ struct FinderToolbarSymbol: View {
                     .font(.system(size: 7, weight: .semibold))
             }
         }
-        // Explicit, so the Customize Toolbar palette doesn't render the symbols in its dimmed default.
-        .foregroundStyle(.primary)
+        // Explicit high contrast so Customize Toolbar palette and dark mode sheets never render dim symbols.
+        .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.9) : Color.primary)
         .frame(width: disclosure ? 42 : 30, height: 28)
         .contentShape(Capsule())
     }
@@ -125,21 +128,23 @@ struct FinderToolbarSymbol: View {
 
 struct FinderSearchField: View {
     @Binding var text: String
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.75) : Color.secondary)
             TextField(L10n.text("Search"), text: $text)
                 .environment(\.layoutDirection, .leftToRight)
                 .textFieldStyle(.plain)
                 .font(.system(size: 12))
+                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.95) : Color.primary)
                 .accessibilityLabel(L10n.text("Search files in current folder"))
             if !text.isEmpty {
                 Button { text = "" } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.75) : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(L10n.text("Clear Search"))

@@ -20,6 +20,8 @@ public struct ContentView: View {
     @State private var isShowingGroupPopover = false
     @State private var isShowingActionPopover = false
 
+    @Environment(\.colorScheme) private var colorScheme
+
     public init(workspaceState: WorkspaceState = WorkspaceState()) {
         self.workspaceState = workspaceState
     }
@@ -61,6 +63,7 @@ public struct ContentView: View {
                         .accessibilityLabel("Navigate Up")
                     }
                     .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.88) : Color.primary)
                     .buttonStyle(.plain)
                     .finderGlass()
                     .contextMenu {
@@ -77,6 +80,7 @@ public struct ContentView: View {
                         } else {
                             Text(activeState.currentURL.lastPathComponent.isEmpty ? "Macintosh HD" : activeState.currentURL.lastPathComponent)
                                 .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.95) : Color.primary)
                                 .lineLimit(1)
                                 .frame(height: 28)
                         }
@@ -230,10 +234,11 @@ public struct ContentView: View {
         Button { activeState.viewMode = mode } label: {
             Image(systemName: symbol)
                 .font(.system(size: 15))
+                .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.9) : Color.primary)
                 .frame(width: 27, height: 24)
                 .background {
                     if activeState.viewMode == mode {
-                        Capsule().fill(Color.primary.opacity(0.15))
+                        Capsule().fill(colorScheme == .dark ? Color.white.opacity(0.2) : Color.primary.opacity(0.15))
                     }
                 }
                 .contentShape(Capsule())

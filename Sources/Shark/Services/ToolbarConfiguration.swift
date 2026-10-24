@@ -50,6 +50,28 @@ enum ToolbarConfiguration {
             // FinderToolbarCaption renders the compact 10pt secondary caption instead.
             item.label = ""
         }
+        let appAppearance = NSApp.keyWindow?.effectiveAppearance ?? NSApp.effectiveAppearance
+        if let view = item.view {
+            view.appearance = appAppearance
+            enhancePaletteHierarchy(view, appearance: appAppearance)
+        }
+    }
+
+    @MainActor
+    static func enhancePaletteHierarchy(_ root: NSView?, appearance: NSAppearance) {
+        guard let root else { return }
+        root.appearance = appearance
+        let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        for subview in root.subviews {
+            subview.appearance = appearance
+            if let tf = subview as? NSTextField {
+                tf.appearance = appearance
+                if isDark {
+                    tf.textColor = .labelColor
+                }
+            }
+            enhancePaletteHierarchy(subview, appearance: appearance)
+        }
     }
 
     static func locationWidth(availableWidth: CGFloat, otherItemWidths: [CGFloat]) -> CGFloat {
@@ -86,6 +108,11 @@ final class ToolbarDelegateProxy: NSObject, NSToolbarDelegate {
         let item = originalDelegate?.toolbar?(toolbar, itemForItemIdentifier: itemIdentifier, willBeInsertedIntoToolbar: flag)
         if let item {
             ToolbarConfiguration.configureItem(item)
+            let appearance = NSApp.keyWindow?.effectiveAppearance ?? NSApp.effectiveAppearance
+            if let view = item.view {
+                view.appearance = appearance
+                ToolbarConfiguration.enhancePaletteHierarchy(view, appearance: appearance)
+            }
         }
         return item
     }
@@ -156,6 +183,7 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
                 NotificationCenter.default.addObserver(self, selector: #selector(itemsChanged(_:)), name: NSToolbar.willAddItemNotification, object: nil)
                 NotificationCenter.default.addObserver(self, selector: #selector(itemsChanged(_:)), name: NSToolbar.didRemoveItemNotification, object: nil)
                 NotificationCenter.default.addObserver(self, selector: #selector(receiveLayout(_:)), name: Self.layoutChanged, object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(sheetWillBegin(_:)), name: NSWindow.willBeginSheetNotification, object: nil)
             }
             scheduleMeasurement()
         }
@@ -163,6 +191,22 @@ struct ToolbarLayoutObserver: NSViewRepresentable {
         deinit {
             displayModeObservation?.invalidate()
             NotificationCenter.default.removeObserver(self)
+        }
+
+        @objc private func sheetWillBegin(_ notification: Notification) {
+            guard let hostWindow = window,
+                  let sheet = notification.userInfo?["NSWindow"] as? NSWindow ?? hostWindow.sheets.first else { return }
+            let appearance = hostWindow.effectiveAppearance
+            sheet.appearance = appearance
+            ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak sheet] in
+                guard let sheet else { return }
+                ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak sheet] in
+                guard let sheet else { return }
+                ToolbarConfiguration.enhancePaletteHierarchy(sheet.contentView, appearance: appearance)
+            }
         }
 
         @objc private func itemsChanged(_ notification: Notification) {

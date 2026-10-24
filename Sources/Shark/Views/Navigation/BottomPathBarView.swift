@@ -5,6 +5,7 @@ public struct BottomPathBarView: View {
     var workspace: WorkspaceState?
     var inToolbar: Bool
     @FocusState private var isPathFocused: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     public init(navigationState: NavigationState, workspace: WorkspaceState? = nil, inToolbar: Bool = false) {
         self.navigationState = navigationState
@@ -38,18 +39,21 @@ public struct BottomPathBarView: View {
     private var pathContent: some View {
         if navigationState.isEditingPath {
             HStack(spacing: 6) {
-                Image(systemName: "folder").foregroundStyle(.secondary)
+                Image(systemName: "folder")
+                    .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.8) : Color.secondary)
                 TextField(L10n.text("Go to folder"), text: $navigationState.pathInputText)
                     .environment(\.layoutDirection, .leftToRight)
                     .textFieldStyle(.plain)
                     .font(.system(size: 12))
+                    .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.95) : Color.primary)
                     .focused($isPathFocused)
                     .onAppear { isPathFocused = true }
                     .onSubmit { navigationState.commitPathInput() }
                     .onExitCommand { cancelEditing() }
                     .accessibilityLabel(L10n.text("Folder Path"))
                 Button { cancelEditing() } label: {
-                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(colorScheme == .dark ? Color.white.opacity(0.75) : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(L10n.text("Cancel Path Editing"))
@@ -99,11 +103,11 @@ public struct BottomPathBarView: View {
                                     Image(systemName: seg.isRoot ? "internaldrive" : (seg.isLast ? "folder.fill" : "folder"))
                                         .font(.system(size: 11))
                                         .frame(width: 14)
-                                        .foregroundStyle(inToolbar ? Color.secondary : (seg.isLast ? Color.accentColor : Color.secondary))
+                                        .foregroundStyle(inToolbar ? (colorScheme == .dark ? Color.white.opacity(0.8) : Color.secondary) : (seg.isLast ? Color.accentColor : Color.secondary))
                                 }
                                 Text(seg.title)
                                     .font(.system(size: inToolbar ? 12 : 11, weight: seg.isLast ? .semibold : .regular))
-                                    .foregroundStyle(seg.isLast ? Color.primary : Color.secondary)
+                                    .foregroundStyle(seg.isLast ? (colorScheme == .dark ? Color.white : Color.primary) : (colorScheme == .dark ? Color.white.opacity(0.8) : Color.secondary))
                                     .lineLimit(1)
                                     .truncationMode(.middle)
                                     .frame(maxWidth: inToolbar ? 180 : nil)
@@ -114,7 +118,7 @@ public struct BottomPathBarView: View {
                             .background {
                                 if seg.isLast {
                                     if inToolbar {
-                                        Capsule().fill(Color.primary.opacity(0.08))
+                                        Capsule().fill(colorScheme == .dark ? Color.white.opacity(0.18) : Color.primary.opacity(0.08))
                                     } else {
                                         RoundedRectangle(cornerRadius: 3).fill(Color.accentColor.opacity(0.12))
                                     }
@@ -141,7 +145,7 @@ public struct BottomPathBarView: View {
                         CascadingFolderChevronButton(url: seg.url, symbol: inToolbar && !seg.isLast ? "chevron.right" : "chevron.down",
                                                     pointSize: inToolbar ? 7 : 8,
                                                     weight: inToolbar ? .medium : .bold,
-                                                    tint: inToolbar ? .tertiaryLabelColor : .labelColor) { targetURL, inNewTab in
+                                                    tint: inToolbar ? (colorScheme == .dark ? .labelColor : .tertiaryLabelColor) : .labelColor) { targetURL, inNewTab in
                             if inNewTab, let workspace {
                                 workspace.open(targetURL, from: navigationState, newTab: true)
                             } else {
