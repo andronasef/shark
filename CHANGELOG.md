@@ -6,8 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- Appearance setting in Settings › General: choose between System Default, Light, and Dark appearance. Applies instantly across all windows, sheets, dialogs, and the Shark Photo Viewer, and persists across launches. Full localization across all 8 supported languages.
+- Website dark mode support: automatic matching of system dark mode preference (`prefers-color-scheme: dark`) with zero flash on initial load, a theme toggle in the navigation header, and `localStorage` persistence.
 
 ### Changed
+- Scrolling: thumbnails load only after scrolling settles, for the cells left on screen; cells keep their plain icon while moving. The icon grid is measured once per frame instead of twice, item frames are tracked only during a marquee drag, and context menus are built when opened rather than for every visible cell. File rows create hover-preview state on first hover, and Date Modified reuses one formatter.
 - The command palette retains results and checks paths off the rendering path; tabs render lazily with retained pinned artwork, and batch rename avoids copying the selection on each edit.
 - Large drags use indexed ancestor checks and limit custom pile artwork to six items. Mounted rows and tabs share one middle-click event monitor.
 - Photo viewers reuse their current image source and metadata; filmstrips use bounded cached thumbnails. A shared permit keeps full-image decoding serial across windows.
@@ -17,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Folder Tree reuses its row projection, renders rows lazily, and restores remembered expanded descendants after hidden-file refreshes without reading collapsed branches.
 
 ### Fixed
+- Details view: right-clicking a file name now opens the file menu (not the folder menu); the menu is attached to the table row, which also removes per-cell menu setup while scrolling.
 - Canceled thumbnail requests release retained queue keys even while renderer slots are occupied; mixed backlogs compact when canceled keys dominate.
 - Inspector loads reject canceled results, and closing or changing the target cancels checksum work. Hashing no longer occupies the metadata actor.
 - Folder-size results return to the requesting calculator. At most two scans run at once; clearing the cache cancels work and rejects late results.

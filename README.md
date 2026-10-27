@@ -14,6 +14,7 @@
 <p align="center">macOS 14+ · Apple silicon & Intel · Built with Swift and SwiftUI</p>
 <p align="center">
   <a href="https://shark.andronasef.com/">Website</a> ·
+  <a href="https://youtu.be/SoQqCcbbE1c">Trailer</a> ·
   <a href="https://github.com/andronasef/shark">GitHub</a> ·
   <a href="https://userhq.increasinglabs.com/increasing-labs/shark">Feedback & Feature Requests</a> ·
   Created by <a href="https://andronasef.com/">Andrew Nasef</a>
