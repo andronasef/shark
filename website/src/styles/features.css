@@ -1,12 +1,28 @@
 @layer components {
   .catalog-hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 56px; padding-block: 88px 80px; }
   .catalog-hero h1 { font-size: clamp(44px, 4.6vw, 64px); line-height: 1.06; }
-  .catalog-hero h1 span { color: #516f88; }
+  .catalog-hero h1 span { color: var(--hero-span); }
   .catalog-hero-copy > p { margin-top: 24px; color: var(--secondary); font-size: 16px; line-height: 1.8; }
   .catalog-hero-copy > a { margin-top: 24px; }
   .catalog-preview { margin: 0; padding: 32px 24px 18px; border-radius: 16px; }
   .catalog-preview img { width: 100%; border-radius: 7px; box-shadow: 0 16px 28px -12px #1d314f59; }
   .catalog-preview figcaption { margin-top: 19px; color: #3d5d7a; text-align: center; font-size: 12px; }
+  html.dark .catalog-preview.blue,
+  [data-theme="dark"] .catalog-preview.blue {
+    background: #132238;
+  }
+  html.dark .catalog-preview figcaption,
+  [data-theme="dark"] .catalog-preview figcaption {
+    color: var(--secondary);
+  }
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) .catalog-preview.blue {
+      background: #132238;
+    }
+    html:not([data-theme="light"]) .catalog-preview figcaption {
+      color: var(--secondary);
+    }
+  }
   .catalog-layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); gap: 70px; align-items: start; padding-bottom: 80px; }
   .catalog-index { position: sticky; top: 120px; }
   .catalog-index nav > p { font-size: 15px; font-weight: 600; margin-bottom: 17px; }

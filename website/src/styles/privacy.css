@@ -8,7 +8,7 @@
     line-height: 1.08;
   }
   .privacy-hero h1 span {
-    color: #516f88;
+    color: var(--hero-span);
   }
   .privacy-meta {
     margin-top: 18px;
@@ -62,6 +62,17 @@
     border-radius: 12px;
     padding: 20px 24px;
     margin: 20px 0;
+  }
+  html.dark .privacy-highlight,
+  [data-theme="dark"] .privacy-highlight {
+    background: rgba(56, 139, 253, 0.12);
+    border-color: rgba(56, 139, 253, 0.3);
+  }
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) .privacy-highlight {
+      background: rgba(56, 139, 253, 0.12);
+      border-color: rgba(56, 139, 253, 0.3);
+    }
   }
   .privacy-highlight p {
     margin-bottom: 0;
