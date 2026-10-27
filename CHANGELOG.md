@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Directory filtering reuses sorted results and indexed selection; refreshes reject stale requests and coalesce filesystem events. Columns reuse the root listing and cancel obsolete loads.
 - Folder Tree reuses its row projection, renders rows lazily, and restores remembered expanded descendants after hidden-file refreshes without reading collapsed branches.
 
+### Fixed
+- Folder-size results return to the requesting calculator. At most two scans run at once; clearing the cache cancels work and rejects late results.
+
 ## [1.0.0-alpha.2] - 2026-10-25
 
 ### Added
