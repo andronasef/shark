@@ -14,7 +14,7 @@ final class SubfolderMenuTests: XCTestCase {
     }
 
     @MainActor
-    func testMenuCascadesSixLevelsDeepAndListsTheFileAtTheBottom() throws {
+    func testMenuCascadesSixLevelsDeepAndListsTheFileAtTheBottom() async throws {
         var deepest = root!
         for level in 1...6 { deepest.appendPathComponent("level\(level)", isDirectory: true) }
         try FileManager.default.createDirectory(at: deepest, withIntermediateDirectories: true)
@@ -22,10 +22,12 @@ final class SubfolderMenuTests: XCTestCase {
 
         let builder = SubfolderMenuBuilder { _, _ in }
         var menu = builder.buildMenu(for: root)
+        await builder.loadContents(of: menu)
         for level in 1...6 {
             let item = try XCTUnwrap(menu.items.first { $0.title == "level\(level)" }, "level \(level)")
             let submenu = try XCTUnwrap(item.submenu)
             builder.menuNeedsUpdate(submenu) // AppKit calls this when the submenu opens
+            await builder.loadContents(of: submenu)
             menu = submenu
         }
         XCTAssertEqual(menu.items.map(\.title), ["target.txt"])

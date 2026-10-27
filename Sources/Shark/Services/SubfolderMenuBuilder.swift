@@ -8,6 +8,13 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
     private let navigationHandler: NavigationHandler
     private let showHiddenFiles: Bool
     private var menuURLs: [ObjectIdentifier: URL] = [:]
+    // Keep identities alive for this popup's lifetime; addresses can otherwise be reused by submenus.
+    private var menus: [ObjectIdentifier: NSMenu] = [:]
+    private var loads: [ObjectIdentifier: Task<Void, Never>] = [:]
+    private var populated: Set<ObjectIdentifier> = []
+    private struct Entry: Sendable { let url: URL; let isDirectory: Bool }
+
+    isolated deinit { for task in loads.values { task.cancel() } }
     /// Menus past this size take seconds to build and are unusable anyway.
     static let maxItems = 500
 
@@ -22,51 +29,70 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
         menu.delegate = self
         menu.autoenablesItems = false
         menuURLs[ObjectIdentifier(menu)] = url
-        populateMenu(menu, withContentsOf: url)
+        menus[ObjectIdentifier(menu)] = menu
+        let placeholder = NSMenuItem(title: L10n.text("Loading..."), action: nil, keyEquivalent: "")
+        placeholder.isEnabled = false
+        menu.addItem(placeholder)
+        _ = loadTask(for: menu)
         return menu
     }
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
-        guard let url = menuURLs[ObjectIdentifier(menu)] else { return }
-        populateMenu(menu, withContentsOf: url)
+        _ = loadTask(for: menu)
     }
 
-    private func populateMenu(_ menu: NSMenu, withContentsOf dirURL: URL) {
-        menu.removeAllItems()
+    /// The same asynchronous loading operation used by the menu delegate.
+    func loadContents(of menu: NSMenu) async {
+        await loadTask(for: menu)?.value
+    }
 
-        let fm = FileManager.default
-        let options: FileManager.DirectoryEnumerationOptions = showHiddenFiles ? [] : [.skipsHiddenFiles]
-
-        guard let contents = try? fm.contentsOfDirectory(
-            at: dirURL,
-            includingPropertiesForKeys: [.isDirectoryKey, .localizedNameKey],
-            options: options
-        ) else {
-            let emptyItem = NSMenuItem(title: L10n.text("(Unable to read)"), action: nil, keyEquivalent: "")
-            emptyItem.isEnabled = false
-            menu.addItem(emptyItem)
-            return
+    private func loadTask(for menu: NSMenu) -> Task<Void, Never>? {
+        let id = ObjectIdentifier(menu)
+        guard !populated.contains(id), let url = menuURLs[id] else { return nil }
+        if let task = loads[id] { return task }
+        let hidden = showHiddenFiles
+        let task = Task { [weak self, weak menu] in
+            let entries = await Self.readEntries(at: url, showHidden: hidden)
+            guard !Task.isCancelled, let self, let menu else { return }
+            await self.populateMenu(menu, withContentsOf: url, entries: entries)
+            if !Task.isCancelled { self.populated.insert(id) }
+            self.loads.removeValue(forKey: id)
         }
+        loads[id] = task
+        return task
+    }
 
-        if contents.isEmpty {
-            let emptyItem = NSMenuItem(title: L10n.text("(Empty)"), action: nil, keyEquivalent: "")
-            emptyItem.isEnabled = false
-            menu.addItem(emptyItem)
-            return
+    @concurrent private static func readEntries(at url: URL, showHidden: Bool) async -> [Entry]? {
+        guard !Task.isCancelled,
+              let contents = try? FileManager.default.contentsOfDirectory(at: url,
+                includingPropertiesForKeys: [.isDirectoryKey], options: showHidden ? [] : [.skipsHiddenFiles]) else { return nil }
+        var entries: [Entry] = []
+        entries.reserveCapacity(contents.count)
+        for url in contents {
+            guard !Task.isCancelled else { return nil }
+            entries.append(Entry(url: url, isDirectory: (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false))
         }
-
-        // Sort: folders first, then alphabetically
-        let entries = contents.map { url in
-            (url: url, isDir: (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false)
-        }
-        let sorted = entries.sorted { a, b in
-            if a.isDir != b.isDir {
-                return a.isDir
-            }
+        entries.sort { a, b in
+            if a.isDirectory != b.isDirectory { return a.isDirectory }
             return a.url.lastPathComponent.localizedStandardCompare(b.url.lastPathComponent) == .orderedAscending
         }
+        return entries
+    }
 
-        for (itemURL, isDir) in sorted.prefix(Self.maxItems) {
+    private func populateMenu(_ menu: NSMenu, withContentsOf dirURL: URL, entries: [Entry]?) async {
+        guard let entries, !entries.isEmpty else {
+            menu.removeAllItems()
+            let empty = NSMenuItem(title: L10n.text(entries == nil ? "(Unable to read)" : "(Empty)"), action: nil, keyEquivalent: "")
+            empty.isEnabled = false
+            menu.addItem(empty)
+            return
+        }
+        var menuItems: [NSMenuItem] = []
+        for (index, entry) in entries.prefix(Self.maxItems).enumerated() {
+            if index.isMultiple(of: 16) { await Task.yield() }
+            guard !Task.isCancelled else { return }
+            let itemURL = entry.url
+            let isDir = entry.isDirectory
             let displayName = itemURL.lastPathComponent
 
             let menuItem = NSMenuItem(
@@ -90,6 +116,7 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
                 let submenu = NSMenu(title: displayName)
                 submenu.delegate = self
                 menuURLs[ObjectIdentifier(submenu)] = itemURL
+                menus[ObjectIdentifier(submenu)] = submenu
 
                 // Add a dummy placeholder item so the submenu chevron ▸ appears immediately
                 let placeholder = NSMenuItem(title: L10n.text("Loading..."), action: nil, keyEquivalent: "")
@@ -99,17 +126,20 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
                 menuItem.submenu = submenu
             }
 
-            menu.addItem(menuItem)
+            menuItems.append(menuItem)
         }
 
-        if sorted.count > Self.maxItems {
-            menu.addItem(.separator())
-            let more = NSMenuItem(title: L10n.format("Open “%@” to See All %@", L10n.literal(dirURL.lastPathComponent), L10n.items(sorted.count)),
+        if entries.count > Self.maxItems {
+            menuItems.append(.separator())
+            let more = NSMenuItem(title: L10n.format("Open “%@” to See All %@", L10n.literal(dirURL.lastPathComponent), L10n.items(entries.count)),
                                   action: #selector(menuItemClicked(_:)), keyEquivalent: "")
             more.target = self
             more.representedObject = dirURL
-            menu.addItem(more)
+            menuItems.append(more)
         }
+        guard !Task.isCancelled else { return }
+        menu.removeAllItems()
+        for item in menuItems { menu.addItem(item) }
     }
 
     @objc private func menuItemClicked(_ sender: NSMenuItem) {

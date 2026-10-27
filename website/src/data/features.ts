@@ -46,7 +46,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'sidebar-sections', title: 'Collapsible sidebar sections', description: 'Keep the sections you use open. Expansion is remembered, headings support the keyboard, and collapsed sections can open temporarily during a drag.' },
       { id: 'folder-tree', title: 'File Explorer folder tree option', description: 'Switch the sidebar to an expandable folder tree, like Windows File Explorer, in place of Locations and Tags. Folders load lazily, reveal your active path automatically, and support keyboard and drag-and-drop navigation.' },
       { id: 'recent-frequent', title: 'Recent & frequent folders', description: 'Revisit your working locations from the Go menu or the command palette.' },
-      { id: 'subfolder-menus', title: 'Cascading subfolder menus', description: 'Use the arrow on a hovered folder or path segment to browse nested folders. Click to open, Command-click a folder for a new tab, or Option-click to copy. Switch the hovered-folder arrow off in Settings › Previews.' },
+      { id: 'subfolder-menus', title: 'Cascading subfolder menus', description: 'Use the arrow on a hovered folder or path segment to browse nested folders. Contents load asynchronously so browsing can stay responsive on large folders. Click to open, Command-click a folder for a new tab, or Option-click to copy. Switch the hovered-folder arrow off in Settings › Previews.' },
       { id: 'local-volumes', title: 'Local folders & mounted volumes', description: 'Browse your Mac and volumes mounted in macOS from the sidebar. Shark does not include a built-in remote-protocol or cloud-account client.' },
     ],
   },

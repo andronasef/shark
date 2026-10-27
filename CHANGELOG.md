@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 
 ### Changed
+- Cascading folder menus load and sort off the main actor, share each popup listing, and prepare artwork in batches while preserving the 500-item cap.
 - Thumbnail requests reuse 32-point size steps during zoom, keep valid artwork while replacements load, and avoid repeatedly shifting or filtering the scheduling queue.
 - Directory filtering reuses sorted results and indexed selection; refreshes reject stale requests and coalesce filesystem events. Columns reuse the root listing and cancel obsolete loads.
 - Folder Tree reuses its row projection, renders rows lazily, and restores remembered expanded descendants after hidden-file refreshes without reading collapsed branches.

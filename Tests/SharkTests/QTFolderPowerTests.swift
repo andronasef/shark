@@ -79,7 +79,7 @@ final class QTFolderPowerTests: XCTestCase {
         XCTAssertEqual(service.groups.count, 0)
     }
 
-    func testSubfolderMenuBuilder() {
+    func testSubfolderMenuBuilder() async {
         let subA = tempDirectory.appendingPathComponent("SubDirA")
         let subB = tempDirectory.appendingPathComponent("SubDirB")
         let file1 = tempDirectory.appendingPathComponent("z_file.txt")
@@ -93,6 +93,7 @@ final class QTFolderPowerTests: XCTestCase {
         let builder = SubfolderMenuBuilder { _, _ in }
 
         let menu = builder.buildMenu(for: tempDirectory)
+        await builder.loadContents(of: menu)
         XCTAssertEqual(menu.items.count, 4)
 
         // Directories appear first
