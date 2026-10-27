@@ -11,7 +11,6 @@ struct FolderTreeRows: View {
     @FocusState.Binding var focus: String?
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var hovered: String?
     @State private var dropTarget: String?
 
     private var rows: [FolderTreeModel.Row] { tree.rows(for: roots) }
@@ -19,7 +18,7 @@ struct FolderTreeRows: View {
 
     var body: some View {
         ScrollViewReader { proxy in
-            VStack(alignment: .leading, spacing: 0) {
+            LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(rows) { row in treeRow(row).id(row.id) }
             }
             .task(id: navigationState.currentURL) {
@@ -28,6 +27,11 @@ struct FolderTreeRows: View {
                 let id = FolderTree.key(navigationState.currentURL)
                 if rows.contains(where: { $0.id == id }) {
                     withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) { proxy.scrollTo(id) }
+                }
+            }
+            .onChange(of: focus) { _, target in
+                if let target, target.hasPrefix("Tree:") {
+                    proxy.scrollTo(String(target.dropFirst(5)))
                 }
             }
             .task(id: showHidden) { await tree.reloadExpanded(showHidden: showHidden) }
@@ -48,11 +52,12 @@ struct FolderTreeRows: View {
             else { navigationState.navigateTo(row.url) }
         }
         let toggle: () -> Void = { Task { await tree.toggle(row.url, showHidden: showHidden) } }
-        return rowContent(row, rowID: rowID, isSelected: isSelected, activate: activate, toggle: toggle)
+        return HoverReveal { hovering in
+            rowContent(row, rowID: rowID, isSelected: isSelected, isHovered: hovering, activate: activate, toggle: toggle)
+        }
             .focusable()
             .focusEffectDisabled()
             .focused($focus, equals: rowID)
-            .onHover { hovered = $0 ? rowID : nil }
             .onKeyPress(.return) { activate(); return .handled }
             .onKeyPress(.space) { activate(); return .handled }
             .onKeyPress(.rightArrow) { moveRight(row, toggle: toggle); return .handled }
@@ -73,9 +78,9 @@ struct FolderTreeRows: View {
             }
     }
 
-    private func rowContent(_ row: FolderTreeModel.Row, rowID: String, isSelected: Bool,
+    private func rowContent(_ row: FolderTreeModel.Row, rowID: String, isSelected: Bool, isHovered: Bool,
                             activate: @escaping () -> Void, toggle: @escaping () -> Void) -> some View {
-        let tint = Color.primary.opacity(isSelected ? 0.09 : (hovered == rowID ? 0.045 : 0))
+        let tint = Color.primary.opacity(isSelected ? 0.09 : (isHovered ? 0.045 : 0))
         return HStack(spacing: 2) {
             Color.clear.frame(width: CGFloat(row.depth) * 12, height: 1)
             Button(action: toggle) { chevron(row) }
@@ -158,12 +163,14 @@ struct FolderTreeRows: View {
     private var layoutIsLTR: Bool { AppLocalization.layoutDirection == .leftToRight }
 
     private func firstChild(of row: FolderTreeModel.Row) -> FolderTreeModel.Row? {
+        let rows = rows
         guard let index = rows.firstIndex(where: { $0.id == row.id }), rows.indices.contains(index + 1),
               rows[index + 1].depth == row.depth + 1 else { return nil }
         return rows[index + 1]
     }
 
     private func parent(of row: FolderTreeModel.Row) -> FolderTreeModel.Row? {
+        let rows = rows
         guard row.depth > 0, let index = rows.firstIndex(where: { $0.id == row.id }) else { return nil }
         return rows[..<index].last { $0.depth == row.depth - 1 }
     }

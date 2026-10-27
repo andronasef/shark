@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+
+### Changed
+- Folder Tree reuses its row projection, renders rows lazily, and restores remembered expanded descendants after hidden-file refreshes without reading collapsed branches.
+
+
 ## [1.0.0-alpha.2] - 2026-10-25
 
 ### Added

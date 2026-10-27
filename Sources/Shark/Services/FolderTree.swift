@@ -24,15 +24,18 @@ enum FolderTree {
         let keys: [URLResourceKey] = [.isDirectoryKey, .isPackageKey, .isSymbolicLinkKey]
         let options: FileManager.DirectoryEnumerationOptions = showHidden ? [] : [.skipsHiddenFiles]
         guard let urls = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: keys, options: options) else { return [] }
-        return urls.filter { child in
-            let values = try? child.resourceValues(forKeys: Set(keys))
-            if values?.isPackage == true { return false }
-            if values?.isSymbolicLink == true {
-                return (try? child.resolvingSymlinksInPath().resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
-            }
-            return values?.isDirectory == true
+        let keySet = Set(keys)
+        var folders: [URL] = []
+        for child in urls {
+            guard !Task.isCancelled else { return [] }
+            let values = try? child.resourceValues(forKeys: keySet)
+            if values?.isPackage == true { continue }
+            let directory = values?.isSymbolicLink == true
+                ? (try? child.resolvingSymlinksInPath().resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+                : values?.isDirectory == true
+            if directory { folders.append(child) }
         }
-        .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
+        return folders.sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
     }
 
     nonisolated static func key(_ url: URL) -> String { url.standardizedFileURL.path }
@@ -68,12 +71,19 @@ final class FolderTreeModel {
         let depth: Int
         let isExpanded: Bool
         let canExpand: Bool
-        var id: String { FolderTree.key(url) }
+        let id: String
     }
 
     static let defaultsKey = "folderTree.expanded"
-    private(set) var expanded: Set<String>
-    private(set) var children: [String: [URL]] = [:]
+    private(set) var expanded: Set<String> { didSet { revision &+= 1 } }
+    private(set) var children: [String: [URL]] = [:] { didSet { revision &+= 1 } }
+    private var revision = 0
+    @ObservationIgnored private var cachedRevision = -1
+    @ObservationIgnored private var cachedRoots: [FolderTreeRoot] = []
+    @ObservationIgnored private var cachedRows: [Row] = []
+    @ObservationIgnored private var loads: [String: (id: UUID, task: Task<[URL], Never>)] = [:]
+    @ObservationIgnored private var listingHidden: Bool?
+    @ObservationIgnored private var visibilityGeneration = UUID()
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -88,10 +98,30 @@ final class FolderTreeModel {
     }
 
     func expand(_ url: URL, showHidden: Bool) async {
+        guard listingHidden == nil || listingHidden == showHidden else { return }
+        let generation = visibilityGeneration
         let key = FolderTree.key(url)
         expanded.insert(key)
         persist()
         await load(url, showHidden: showHidden)
+        guard generation == visibilityGeneration else { return }
+        await loadRememberedDescendants(below: url, showHidden: showHidden)
+    }
+
+    private func loadRememberedDescendants(below root: URL, showHidden: Bool) async {
+        let generation = visibilityGeneration
+        var pending = children[FolderTree.key(root)] ?? []
+        var index = 0
+        var visited: Set<String> = []
+        while index < pending.count {
+            guard !Task.isCancelled, isExpanded(root), generation == visibilityGeneration else { return }
+            let url = pending[index]
+            index += 1
+            let key = FolderTree.key(url)
+            guard expanded.contains(key), visited.insert(key).inserted else { continue }
+            if children[key] == nil { await load(url, showHidden: showHidden) }
+            pending.append(contentsOf: children[key] ?? [])
+        }
     }
 
     func collapse(_ url: URL) {
@@ -99,24 +129,56 @@ final class FolderTreeModel {
         persist()
     }
 
-    /// Re-reads a folder (new or removed subfolders, or a changed hidden-files setting).
+    /// Newer requests own publication; cancellation also stops enumeration cooperatively.
     func load(_ url: URL, showHidden: Bool) async {
-        let listing = await Task.detached(priority: .userInitiated) {
-            FolderTree.childFolders(of: url, showHidden: showHidden)
-        }.value
-        guard !Task.isCancelled else { return }
-        children[FolderTree.key(url)] = listing
+        guard listingHidden == nil || listingHidden == showHidden else { return }
+        let key = FolderTree.key(url)
+        loads[key]?.task.cancel()
+        let id = UUID()
+        let task = Task { await Self.list(url, showHidden: showHidden) }
+        loads[key] = (id, task)
+        let listing = await withTaskCancellationHandler { await task.value } onCancel: { task.cancel() }
+        guard loads[key]?.id == id else { return }
+        loads.removeValue(forKey: key)
+        guard !Task.isCancelled, !task.isCancelled else { return }
+        children[key] = listing
+    }
+
+    @concurrent private static func list(_ url: URL, showHidden: Bool) async -> [URL] {
+        FolderTree.childFolders(of: url, showHidden: showHidden)
     }
 
     func reloadExpanded(showHidden: Bool) async {
-        for path in expanded.sorted() { await load(URL(fileURLWithPath: path, isDirectory: true), showHidden: showHidden) }
+        // Invalidate hidden descendants too, without reading them while collapsed.
+        listingHidden = showHidden
+        let generation = UUID()
+        visibilityGeneration = generation
+        for load in loads.values { load.task.cancel() }
+        loads.removeAll()
+        children.removeAll()
+        // Roots remembered by rows(for:) determine which expansion paths are reachable.
+        let roots = cachedRoots
+        var pending = roots.map(\.url)
+        var index = 0
+        var visited: Set<String> = []
+        while index < pending.count {
+            guard !Task.isCancelled, visibilityGeneration == generation else { return }
+            let url = pending[index]
+            index += 1
+            let key = FolderTree.key(url)
+            guard expanded.contains(key), visited.insert(key).inserted else { continue }
+            await load(url, showHidden: showHidden)
+            pending.append(contentsOf: children[key] ?? [])
+        }
     }
 
     /// Opens every folder between the root and `target` so the target's row exists.
     func reveal(_ target: URL, roots: [URL], showHidden: Bool) async {
+        let generation = visibilityGeneration
+        guard listingHidden == nil || listingHidden == showHidden else { return }
         guard let root = FolderTree.root(containing: target, among: roots) else { return }
         for folder in FolderTree.ancestors(of: target, below: root) {
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled, generation == visibilityGeneration else { return }
             let key = FolderTree.key(folder)
             if !expanded.contains(key) { expanded.insert(key); persist() }
             if children[key] == nil { await load(folder, showHidden: showHidden) }
@@ -124,16 +186,20 @@ final class FolderTreeModel {
     }
 
     func rows(for roots: [FolderTreeRoot]) -> [Row] {
+        if cachedRevision == revision, cachedRoots == roots { return cachedRows }
         var result: [Row] = []
         func add(_ url: URL, name: String, icon: String, depth: Int) {
             let key = FolderTree.key(url)
             let open = expanded.contains(key)
             let known = children[key]
-            result.append(Row(url: url, name: name, icon: icon, depth: depth, isExpanded: open, canExpand: known.map { !$0.isEmpty } ?? true))
+            result.append(Row(url: url, name: name, icon: icon, depth: depth, isExpanded: open, canExpand: known.map { !$0.isEmpty } ?? true, id: key))
             guard open, let known else { return }
             for child in known { add(child, name: child.lastPathComponent, icon: "folder", depth: depth + 1) }
         }
         for root in roots { add(root.url, name: root.name, icon: root.icon, depth: 0) }
+        cachedRoots = roots
+        cachedRows = result
+        cachedRevision = revision
         return result
     }
 
