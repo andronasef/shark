@@ -259,7 +259,7 @@ public struct MillerColumnsView: View {
     private func setupKeyMonitor() {
         guard eventMonitor == nil else { return }
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [self] event in
-            guard workspace?.sidebarHasKeyboardFocus != true else { return event }
+            guard workspace?.sidebarHasKeyboardFocus != true, workspace?.isCommandPalettePresented != true else { return event }
             guard workspace == nil || workspace?.activeNavigationState === navigationState,
                   event.modifierFlags.intersection([.command, .option, .control]).isEmpty else { return event }
             // Don't intercept if user is typing in a text field

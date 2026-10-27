@@ -131,7 +131,8 @@ public struct DirectoryView: View {
         .background {
             // Only the active pane registers shortcuts. An inactive pane must
             // not win SwiftUI's duplicate-key-equivalent lookup.
-            if !TerminalKeyboardOwnership.shared.isFocused(in: NSApp.keyWindow) && workspace?.sidebarHasKeyboardFocus != true && (workspace == nil || workspace?.activeNavigationState === navigationState) {
+            // The command palette owns the keyboard while open, including the arrow keys.
+            if workspace?.isCommandPalettePresented != true && !TerminalKeyboardOwnership.shared.isFocused(in: NSApp.keyWindow) && workspace?.sidebarHasKeyboardFocus != true && (workspace == nil || workspace?.activeNavigationState === navigationState) {
                 // Local fallback keyboard shortcuts for instant responsiveness
                 Group {
                     Button("") { navigationState.zoomIn() }
