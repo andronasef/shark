@@ -49,16 +49,85 @@ public struct IconsGridView: View {
     ) {
         self.navigationState = navigationState
         self.onActivate = onActivate
-        self.contextMenuBuilder = { AnyView(contextMenu($0)) }
+        self.contextMenuBuilder = { item in AnyView(DeferredMenu { contextMenu(item) }) }
     }
 
     public var body: some View {
         GeometryReader { containerGeo in
             ScrollView {
-                ZStack(alignment: .topLeading) {
+                let currentIconSize = navigationState.iconSize
+                let cellMinWidth = max(currentIconSize + 28, 96)
+                let cellMaxWidth = cellMinWidth + 32
+
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: cellMinWidth, maximum: cellMaxWidth), spacing: 20)],
+                    spacing: 24
+                ) {
+                    ForEach(navigationState.filteredAndSortedItems) { item in
+                        let isSelected = navigationState.selectedItemIDs.contains(item.id)
+                        IconGridItemView(
+                            item: item,
+                            iconSize: currentIconSize,
+                            isSelected: isSelected,
+                            navigationState: navigationState,
+                            onSubfolderNavigate: { targetURL, inNewTab in
+                                if inNewTab, let workspace {
+                                    workspace.open(targetURL, from: navigationState, newTab: true)
+                                } else {
+                                    navigationState.navigateTo(targetURL)
+                                }
+                            }
+                        )
+                        .background {
+                            // Frames are only needed during a marquee drag; reporting them on every
+                            // scroll frame merged a URL-keyed dictionary across all visible cells.
+                            if marqueeState.isDragging {
+                                GeometryReader { itemGeo in
+                                    Color.clear
+                                        .preference(
+                                            key: ItemFramePreferenceKey.self,
+                                            value: [item.url: itemGeo.frame(in: .named("IconGridCoordinateSpace"))]
+                                        )
+                                }
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .fileDragSource(item: item, navigationState: navigationState)
+                        .dropDestination(for: URL.self) { droppedURLs, _ in
+                            guard item.isNavigableDirectory else { return false }
+                            let modifiers = NSEvent.modifierFlags
+                            Task { await navigationState.drop(droppedURLs, into: item.url, modifiers: modifiers) }
+                            return true
+                        }
+                        .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
+                        .onTapGesture {
+                            handleItemTap(item)
+                        }
+                        .onRightClickSelect {
+                            if !navigationState.selectedItemIDs.contains(item.id) {
+                                navigationState.selectedItemIDs = [item.id]
+                            }
+                        }
+                        .onMiddleClick {
+                            if item.isNavigableDirectory {
+                                workspace?.open(item.url, from: navigationState, newTab: true)
+                            }
+                        }
+                        .contextMenu {
+                            contextMenuBuilder(item)
+                        }
+                        .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
+                        .fileItemAccessibility(item, isSelected: isSelected, isRenaming: navigationState.renamingItemURL == item.url) {
+                            onActivate(item)
+                        }
+                    }
+                }
+                .padding(20)
+                // One measured child: a ZStack around the lazy grid sized all items twice per scroll frame.
+                .frame(maxWidth: .infinity, minHeight: containerGeo.size.height, alignment: .topLeading)
+                .background {
                     // Empty background for canvas drag and canvas click
                     Color.clear
-                        .frame(maxWidth: .infinity, minHeight: containerGeo.size.height)
                         .contentShape(Rectangle())
                         .simultaneousGesture(TapGesture(count: 2).onEnded {
                             if MouseSetting.marginDoubleClickUp.isEnabled { navigationState.goUp() }
@@ -97,79 +166,11 @@ public struct IconsGridView: View {
                                     marqueeState.initialSelection = []
                                 }
                         )
-
-                    let currentIconSize = navigationState.iconSize
-                    let cellMinWidth = max(currentIconSize + 28, 96)
-                    let cellMaxWidth = cellMinWidth + 32
-
-                    LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: cellMinWidth, maximum: cellMaxWidth), spacing: 20)],
-                        spacing: 24
-                    ) {
-                        ForEach(navigationState.filteredAndSortedItems) { item in
-                            let isSelected = navigationState.selectedItemIDs.contains(item.id)
-                            IconGridItemView(
-                                item: item,
-                                iconSize: currentIconSize,
-                                isSelected: isSelected,
-                                navigationState: navigationState,
-                                onSubfolderNavigate: { targetURL, inNewTab in
-                                    if inNewTab, let workspace {
-                                        workspace.open(targetURL, from: navigationState, newTab: true)
-                                    } else {
-                                        navigationState.navigateTo(targetURL)
-                                    }
-                                }
-                            )
-                            .background(
-                                GeometryReader { itemGeo in
-                                    Color.clear
-                                        .preference(
-                                            key: ItemFramePreferenceKey.self,
-                                            value: [item.url: itemGeo.frame(in: .named("IconGridCoordinateSpace"))]
-                                        )
-                                }
-                            )
-                            .contentShape(Rectangle())
-                            .fileDragSource(item: item, navigationState: navigationState)
-                            .dropDestination(for: URL.self) { droppedURLs, _ in
-                                guard item.isNavigableDirectory else { return false }
-                                let modifiers = NSEvent.modifierFlags
-                                Task { await navigationState.drop(droppedURLs, into: item.url, modifiers: modifiers) }
-                                return true
-                            }
-                            .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
-                            .onTapGesture {
-                                handleItemTap(item)
-                            }
-                            .onRightClickSelect {
-                                if !navigationState.selectedItemIDs.contains(item.id) {
-                                    navigationState.selectedItemIDs = [item.id]
-                                }
-                            }
-                            .onMiddleClick {
-                                if item.isNavigableDirectory {
-                                    workspace?.open(item.url, from: navigationState, newTab: true)
-                                }
-                            }
-                            .contextMenu {
-                                contextMenuBuilder(item)
-                            }
-                            .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
-                            .fileItemAccessibility(item, isSelected: isSelected, isRenaming: navigationState.renamingItemURL == item.url) {
-                                onActivate(item)
-                            }
-                        }
-                    }
-                    .padding(20)
-
-                    // Finder Rubberband Marquee Drag Selection Rectangle
-                    MarqueeBoxView(marquee: marqueeState)
                 }
-                .frame(maxWidth: .infinity, minHeight: containerGeo.size.height, alignment: .topLeading)
+                // Finder Rubberband Marquee Drag Selection Rectangle
+                .overlay(alignment: .topLeading) { MarqueeBoxView(marquee: marqueeState) }
                 .coordinateSpace(name: "IconGridCoordinateSpace")
                 .onPreferenceChange(ItemFramePreferenceKey.self) { frames in
-                    guard !marqueeState.isDragging else { return }
                     marqueeState.itemFrames = frames
                 }
                 .onAppear {

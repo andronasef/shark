@@ -420,7 +420,7 @@ public struct DirectoryView: View {
                             }
                         }
                         .contextMenu {
-                            contextMenu(for: item)
+                            DeferredMenu { contextMenu(for: item) }
                         }
                         .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
                     }

@@ -51,3 +51,10 @@ public extension View {
         modifier(RightClickSelectModifier(onRightClick: action))
     }
 }
+
+/// Runs a context-menu builder only when SwiftUI evaluates the menu, not when each cell is made.
+/// Building every visible cell's menu (selection, Open With, photo support, labels) dominated scrolling.
+struct DeferredMenu<Content: View>: View {
+    let build: () -> Content
+    var body: some View { build() }
+}

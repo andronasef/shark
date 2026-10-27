@@ -16,7 +16,7 @@ public struct DetailsTableView: View {
     ) {
         self.navigationState = navigationState
         self.onActivate = onActivate
-        self.contextMenuBuilder = { AnyView(contextMenu($0)) }
+        self.contextMenuBuilder = { item in AnyView(DeferredMenu { contextMenu(item) }) }
     }
 
     public var body: some View {
