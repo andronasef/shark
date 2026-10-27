@@ -10,6 +10,7 @@ struct FileThumbnailView: View {
     @State private var thumbnailURL: URL?
 
     private var requestSize: CGFloat { ThumbnailService.requestDimension(size) }
+    private var isScrolling: Bool { ScrollActivity.shared.isScrolling }
 
     var body: some View {
         Group {
@@ -20,10 +21,13 @@ struct FileThumbnailView: View {
             }
         }
         .frame(width: size, height: size)
-        .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(item.fileSize)|\(item.isDirectory)|\(requestSize)|\(displayScale)") {
+        .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(item.fileSize)|\(item.isDirectory)|\(requestSize)|\(displayScale)|\(isScrolling)") {
             if thumbnailURL != item.url { thumbnail = nil }
             guard !item.isDirectory else { thumbnail = nil; return }
-            guard let image = await ThumbnailService.shared.settledThumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale) else { return }
+            // A loaded preview stays; new cells keep their icon until scrolling stops.
+            guard !isScrolling else { return }
+            let image = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale)
+            guard !Task.isCancelled else { return }
             thumbnail = image
             thumbnailURL = item.url
         }

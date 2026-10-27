@@ -238,14 +238,6 @@ public final class ThumbnailService {
 
     func statistics() async -> ThumbnailScheduler.Statistics { await scheduler.statistics() }
 
-    /// Waits briefly before requesting, so cells that scroll past never queue a render.
-    /// Cancellation (the cell leaving the screen) during the wait costs nothing.
-    func settledThumbnail(for url: URL, size: CGSize, scale: CGFloat) async -> NSImage? {
-        do { try await Task.sleep(for: .milliseconds(80)) } catch { return nil }
-        let image = await thumbnail(for: url, size: size, scale: scale)
-        return Task.isCancelled ? nil : image
-    }
-
     public func thumbnail(for url: URL, size: CGSize = CGSize(width: 128, height: 128), scale: CGFloat? = nil) async -> NSImage {
         let displayScale = max(scale ?? NSScreen.main?.backingScaleFactor ?? 2, 1)
         let key = await scheduler.key(url: url, size: size, scale: displayScale)
@@ -255,5 +247,38 @@ public final class ThumbnailService {
         }
         // Failures remain retryable; a temporary permission/decode error never poisons the cache.
         return NSImage(systemSymbolName: "doc", accessibilityDescription: nil) ?? NSImage(size: size)
+    }
+}
+
+/// True while any scroll view in the app is moving (wheel, trackpad, or momentum).
+/// Thumbnail cells show their plain icon until scrolling settles, then only the cells
+/// left on screen request previews; cells scrolled past never queue a render.
+@MainActor
+@Observable
+final class ScrollActivity {
+    static let shared = ScrollActivity()
+    private(set) var isScrolling = false
+    @ObservationIgnored private var monitor: Any?
+    @ObservationIgnored private var settle: Task<Void, Never>?
+
+    private init() {
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
+            MainActor.assumeIsolated { ScrollActivity.shared.noteScroll() }
+            return event
+        }
+    }
+
+    /// Tests drive `noteScroll` directly without installing an event monitor.
+    init(monitoring: Bool) {}
+
+    /// Called for every scroll event; scrolling ends once events stop for `settleMilliseconds`.
+    func noteScroll(settleMilliseconds: Int = 150) {
+        if !isScrolling { isScrolling = true }
+        settle?.cancel()
+        settle = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(settleMilliseconds))
+            guard !Task.isCancelled else { return }
+            self?.isScrolling = false
+        }
     }
 }
