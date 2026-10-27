@@ -46,6 +46,7 @@ actor ThumbnailScheduler {
     }
     typealias Renderer = @Sendable (ThumbnailKey) async -> ThumbnailRaster?
     private struct Work {
+        let id = UUID()
         var consumers: [UUID: CheckedContinuation<ThumbnailRaster?, Never>]
         var task: Task<Void, Never>?
     }
@@ -55,7 +56,9 @@ actor ThumbnailScheduler {
     private let byteLimit: Int
     private let countLimit: Int
     private var work: [ThumbnailKey: Work] = [:]
-    private var queue: [ThumbnailKey] = []
+    private var queue: [(key: ThumbnailKey, id: UUID)] = []
+    private var queueIndex = 0
+    private var queuedCount = 0
     private var cache: [ThumbnailKey: Entry] = [:]
     private var bytes = 0
     private var clock: UInt64 = 0
@@ -76,7 +79,7 @@ actor ThumbnailScheduler {
     }
     func statistics() -> Statistics {
         var snapshot = stats
-        snapshot.active = active; snapshot.queued = queue.count
+        snapshot.active = active; snapshot.queued = queuedCount
         snapshot.cachedBytes = bytes; snapshot.cachedEntries = cache.count
         return snapshot
     }
@@ -97,8 +100,10 @@ actor ThumbnailScheduler {
                     stats.coalesced += 1
                     work[key]?.consumers[id] = continuation
                 } else {
-                    work[key] = Work(consumers: [id: continuation])
-                    queue.append(key)
+                    let job = Work(consumers: [id: continuation])
+                    work[key] = job
+                    queue.append((key, job.id))
+                    queuedCount += 1
                 }
                 drain()
             }
@@ -118,21 +123,32 @@ actor ThumbnailScheduler {
                 task.cancel()
                 work[key] = job
             } else {
-                work.removeValue(forKey: key); queue.removeAll { $0 == key }
+                work.removeValue(forKey: key)
+                queuedCount -= 1
                 drain()
             }
         } else { work[key] = job }
     }
     private func drain() {
-        while active < concurrency, !queue.isEmpty {
-            let key = queue.removeFirst()
-            guard work[key] != nil else { continue }
+        while active < concurrency, queueIndex < queue.count {
+            let queued = queue[queueIndex]
+            queueIndex += 1
+            let key = queued.key
+            guard work[key]?.id == queued.id else { continue }
+            queuedCount -= 1
             active += 1; stats.generated += 1; stats.peakActive = max(stats.peakActive, active)
             let renderer = renderer
             work[key]?.task = Task {
                 let result = await renderer(key)
                 self.finish(key: key, result: Task.isCancelled ? nil : result)
             }
+        }
+        if queueIndex == queue.count {
+            queue.removeAll(keepingCapacity: true)
+            queueIndex = 0
+        } else if queueIndex > 1024, queueIndex > queue.count / 2 {
+            queue.removeFirst(queueIndex)
+            queueIndex = 0
         }
     }
     private func finish(key: ThumbnailKey, result: ThumbnailRaster?) {
@@ -193,6 +209,11 @@ public final class ThumbnailService {
     public static let shared = ThumbnailService()
     private let scheduler = ThumbnailScheduler { key in await ThumbnailRequest(key: key).run() }
     private init() {}
+
+    nonisolated static func requestDimension(_ points: CGFloat) -> CGFloat {
+        guard points.isFinite else { return 128 }
+        return min(4096, max(32, (points / 32).rounded(.up) * 32))
+    }
 
     func statistics() async -> ThumbnailScheduler.Statistics { await scheduler.statistics() }
 

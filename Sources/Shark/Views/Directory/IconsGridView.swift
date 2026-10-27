@@ -252,10 +252,12 @@ private struct IconGridItemView: View {
     @Environment(\.displayScale) private var displayScale
     @State private var isHovering = false
 
+    private var requestSize: CGFloat { ThumbnailService.requestDimension(iconSize) }
+
     var body: some View {
         VStack(spacing: 6) {
             ZStack {
-                if let thumb = thumbnail {
+                if let thumb = thumbnail, !item.isDirectory {
                     Image(nsImage: thumb)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -304,12 +306,13 @@ private struct IconGridItemView: View {
         // sibling on top: reaching it ended the cell's hover, hid the arrow, restarted the hover,
         // and the arrow flickered.
         .onHover { isHovering = $0 }
-        .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(iconSize)|\(displayScale)") {
-            thumbnail = nil
+        .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(item.fileSize)|\(item.isDirectory)|\(requestSize)|\(displayScale)") {
             if !item.isDirectory {
-                let image = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: iconSize, height: iconSize), scale: displayScale)
+                let image = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale)
                 guard !Task.isCancelled else { return }
                 thumbnail = image
+            } else {
+                thumbnail = nil
             }
         }
     }
