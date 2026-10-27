@@ -9,6 +9,8 @@ public struct InspectorPanelView: View {
     @State private var thumbnail: NSImage?
     @State private var sha256: String?
     @State private var isCalculatingHash = false
+    @State private var hashTask: Task<Void, Never>?
+    @State private var hashID = UUID()
 
     public init(targetURL: URL, isPresented: Binding<Bool>) {
         self.targetURL = targetURL
@@ -61,6 +63,7 @@ public struct InspectorPanelView: View {
         .task(id: targetURL) {
             await loadMetadata()
         }
+        .onDisappear { cancelHash() }
     }
 
     private var headerBar: some View {
@@ -239,22 +242,37 @@ public struct InspectorPanelView: View {
     }
 
     private func loadMetadata() async {
-        self.sha256 = nil
-        let meta = await MetadataExtractor.shared.extractMetadata(for: targetURL)
-        self.metadata = meta
+        cancelHash()
+        sha256 = nil
+        metadata = nil
+        thumbnail = nil
+        let url = targetURL
+        let meta = await MetadataExtractor.shared.extractMetadata(for: url)
+        guard !Task.isCancelled else { return }
+        metadata = meta
+        let thumb = await ThumbnailService.shared.thumbnail(for: url, size: CGSize(width: 192, height: 192))
+        guard !Task.isCancelled else { return }
+        thumbnail = thumb
+    }
 
-        let thumb = await ThumbnailService.shared.thumbnail(for: targetURL, size: CGSize(width: 192, height: 192))
-        self.thumbnail = thumb
+    private func cancelHash() {
+        hashTask?.cancel()
+        hashTask = nil
+        hashID = UUID()
+        isCalculatingHash = false
     }
 
     private func calculateHash() {
+        cancelHash()
+        let id = hashID
+        let url = targetURL
         isCalculatingHash = true
-        Task {
-            let hash = await MetadataExtractor.shared.computeSHA256(for: targetURL)
-            await MainActor.run {
-                self.sha256 = hash
-                self.isCalculatingHash = false
-            }
+        hashTask = Task {
+            let hash = await MetadataExtractor.shared.computeSHA256(for: url)
+            guard !Task.isCancelled, hashID == id else { return }
+            sha256 = hash
+            isCalculatingHash = false
+            hashTask = nil
         }
     }
 }

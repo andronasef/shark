@@ -72,7 +72,8 @@ public actor MetadataExtractor {
         )
     }
 
-    public func computeSHA256(for url: URL) async -> String? {
+    @concurrent public nonisolated func computeSHA256(for url: URL) async -> String? {
+        guard !Task.isCancelled else { return nil }
         guard let fileHandle = try? FileHandle(forReadingFrom: url) else {
             return nil
         }
@@ -80,6 +81,7 @@ public actor MetadataExtractor {
 
         var hasher = SHA256()
         while true {
+            guard !Task.isCancelled else { return nil }
             let data = fileHandle.readData(ofLength: 64 * 1024)
             if data.isEmpty { break }
             hasher.update(data: data)
