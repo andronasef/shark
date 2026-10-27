@@ -55,6 +55,16 @@ public struct FileItem: Identifiable, Hashable, Sendable {
         isDirectory && !isPackage
     }
 
+    /// One formatter for every row; building a format style per cell dominated scrolling cost.
+    nonisolated(unsafe) private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
+    public var formattedDateModified: String { Self.dateFormatter.string(from: dateModified) }
+
     public var formattedSize: String {
         if isDirectory && !isPackage {
             return "--"

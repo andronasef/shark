@@ -50,41 +50,42 @@ final class HoverPreviewController {
 private struct FileHoverPreviewModifier: ViewModifier {
     let item: FileItem
     let isRenaming: Bool
-    @AppStorage("hoverPreviewEnabled") private var enabled = true
-    @AppStorage("hoverPreviewDelayMs") private var delayMilliseconds = 350.0
-    @AppStorage("hoverPreviewRequiresShift") private var requiresShift = false
     @State private var isHovering = false
-    @State private var controller = HoverPreviewController()
+    // Created on first hover: most rows scroll past without ever owning a controller or settings observers.
+    @State private var controller: HoverPreviewController?
 
     func body(content: Content) -> some View {
         content
             .onHover { hovering in
                 isHovering = hovering
+                if hovering, controller == nil { controller = HoverPreviewController() }
                 updatePreview()
             }
-            .onChange(of: enabled) { _, _ in updatePreview() }
-            .onChange(of: delayMilliseconds) { _, _ in updatePreview() }
-            .onChange(of: requiresShift) { _, _ in updatePreview() }
             .onChange(of: isRenaming) { _, _ in updatePreview() }
-            .onChange(of: item.url) { _, _ in controller.cancel() }
-            .simultaneousGesture(TapGesture().onEnded { controller.cancel() })
-            .onChange(of: controller.isPresented) { _, presented in
+            .onChange(of: item.url) { _, _ in controller?.cancel() }
+            .simultaneousGesture(TapGesture().onEnded { controller?.cancel() })
+            .onChange(of: controller?.isPresented ?? false) { _, presented in
                 if presented {
-                    HoverPreviewPanel.shared.show(item) { [controller] in controller.cancel() }
+                    HoverPreviewPanel.shared.show(item) { [controller] in controller?.cancel() }
                 } else {
                     HoverPreviewPanel.shared.hide(ownerURL: item.url)
                 }
             }
             .onDisappear {
-                controller.cancel()
+                controller?.cancel()
                 HoverPreviewPanel.shared.hide(ownerURL: item.url)
             }
     }
 
     private func updatePreview() {
+        guard let controller else { return }
+        let defaults = UserDefaults.standard
+        let enabled = defaults.object(forKey: "hoverPreviewEnabled") as? Bool ?? true
+        let delay = defaults.object(forKey: "hoverPreviewDelayMs") as? Double ?? 350
+        let requiresShift = defaults.object(forKey: "hoverPreviewRequiresShift") as? Bool ?? false
         controller.update(isHovering: isHovering, enabled: enabled && !isRenaming,
                           url: item.url, isDirectory: item.isDirectory,
-                          delayMilliseconds: delayMilliseconds, requireShift: requiresShift)
+                          delayMilliseconds: delay, requireShift: requiresShift)
     }
 }
 

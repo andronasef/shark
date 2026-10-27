@@ -117,7 +117,7 @@ public struct DetailsTableView: View {
             .width(min: 80, ideal: 100)
 
             TableColumn("Date Modified", value: \.dateModified) { item in
-                Text(item.dateModified.formatted(date: .abbreviated, time: .shortened))
+                Text(item.formattedDateModified)
                     .foregroundColor(.secondary)
                     .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
             }

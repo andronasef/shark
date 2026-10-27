@@ -18,10 +18,11 @@ struct SubfolderTip: View {
     let isHovering: Bool
     var size: CGFloat = 18
     let onNavigate: (URL, Bool) -> Void
-    @AppStorage("subfolderTipEnabled") private var enabled = true
 
     var body: some View {
-        if enabled, isHovering, item.isNavigableDirectory {
+        // Read the setting only while hovering: an @AppStorage per row observes defaults for every row.
+        if isHovering, item.isNavigableDirectory,
+           UserDefaults.standard.object(forKey: "subfolderTipEnabled") as? Bool ?? true {
             // A SwiftUI button, not the AppKit chevron: an embedded NSView takes the pointer away
             // from the cell's hover tracking and the arrow would vanish as soon as it is reached.
             Button(action: showMenu) {

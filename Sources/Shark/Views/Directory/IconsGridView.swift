@@ -308,8 +308,7 @@ private struct IconGridItemView: View {
         .onHover { isHovering = $0 }
         .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(item.fileSize)|\(item.isDirectory)|\(requestSize)|\(displayScale)") {
             if !item.isDirectory {
-                let image = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale)
-                guard !Task.isCancelled else { return }
+                guard let image = await ThumbnailService.shared.settledThumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale) else { return }
                 thumbnail = image
             } else {
                 thumbnail = nil

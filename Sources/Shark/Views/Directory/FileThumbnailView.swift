@@ -23,8 +23,7 @@ struct FileThumbnailView: View {
         .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(item.fileSize)|\(item.isDirectory)|\(requestSize)|\(displayScale)") {
             if thumbnailURL != item.url { thumbnail = nil }
             guard !item.isDirectory else { thumbnail = nil; return }
-            let image = await ThumbnailService.shared.thumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale)
-            guard !Task.isCancelled else { return }
+            guard let image = await ThumbnailService.shared.settledThumbnail(for: item.url, size: CGSize(width: requestSize, height: requestSize), scale: displayScale) else { return }
             thumbnail = image
             thumbnailURL = item.url
         }

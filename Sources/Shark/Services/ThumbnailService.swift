@@ -238,6 +238,14 @@ public final class ThumbnailService {
 
     func statistics() async -> ThumbnailScheduler.Statistics { await scheduler.statistics() }
 
+    /// Waits briefly before requesting, so cells that scroll past never queue a render.
+    /// Cancellation (the cell leaving the screen) during the wait costs nothing.
+    func settledThumbnail(for url: URL, size: CGSize, scale: CGFloat) async -> NSImage? {
+        do { try await Task.sleep(for: .milliseconds(80)) } catch { return nil }
+        let image = await thumbnail(for: url, size: size, scale: scale)
+        return Task.isCancelled ? nil : image
+    }
+
     public func thumbnail(for url: URL, size: CGSize = CGSize(width: 128, height: 128), scale: CGFloat? = nil) async -> NSImage {
         let displayScale = max(scale ?? NSScreen.main?.backingScaleFactor ?? 2, 1)
         let key = await scheduler.key(url: url, size: size, scale: displayScale)
