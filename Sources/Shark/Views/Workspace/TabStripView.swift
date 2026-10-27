@@ -15,8 +15,10 @@ public struct TabStripView: View {
 
     public var body: some View {
         GeometryReader { geo in
-            let pinnedCount = workspace.pinnedCount
-            let unpinnedCount = workspace.unpinnedTabs.count
+            let pinnedTabs = workspace.pinnedTabs
+            let unpinnedTabs = workspace.unpinnedTabs
+            let pinnedCount = pinnedTabs.count
+            let unpinnedCount = unpinnedTabs.count
             let pinnedWidth = CGFloat(pinnedCount * 40 + max(0, pinnedCount - 1) * 3)
             let groupSpacing: CGFloat = pinnedCount > 0 ? 6 : 0
             let available = max(0, geo.size.width - 34 - pinnedWidth - groupSpacing)
@@ -26,7 +28,7 @@ public struct TabStripView: View {
             HStack(spacing: 6) {
                 if pinnedCount > 0 {
                     HStack(spacing: 3) {
-                        ForEach(workspace.pinnedTabs) { tab in
+                        ForEach(pinnedTabs) { tab in
                             tabView(tab, width: 40)
                         }
                     }
@@ -34,8 +36,8 @@ public struct TabStripView: View {
                 if unpinnedCount > 0 {
                     ScrollViewReader { proxy in
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 3) {
-                                ForEach(workspace.unpinnedTabs) { tab in
+                            LazyHStack(spacing: 3) {
+                                ForEach(unpinnedTabs) { tab in
                                     tabView(tab, width: width)
                                 }
                             }

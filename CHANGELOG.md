@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 
 ### Changed
+- The command palette retains results and checks paths off the rendering path; tabs render lazily with retained pinned artwork, and batch rename avoids copying the selection on each edit.
 - Large drags use indexed ancestor checks and limit custom pile artwork to six items. Mounted rows and tabs share one middle-click event monitor.
 - Photo viewers reuse their current image source and metadata; filmstrips use bounded cached thumbnails. A shared permit keeps full-image decoding serial across windows.
 - Cascading folder menus load and sort off the main actor, share each popup listing, and prepare artwork in batches while preserving the 500-item cap.

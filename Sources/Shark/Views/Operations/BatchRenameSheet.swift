@@ -84,7 +84,8 @@ public struct BatchRenameSheet: View {
 
             // Preview List
             List {
-                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                ForEach(items.indices, id: \.self) { index in
+                    let item = items[index]
                     let newName = currentRule.apply(to: item.name, index: index)
                     HStack {
                         Text(item.name)

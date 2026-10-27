@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import SwiftUI
 import AppKit
 
@@ -430,25 +431,32 @@ public final class CommandPaletteService {
         return items
     }
 
-    /// Filters and ranks items based on user query
-    public func filter(query: String, for workspace: WorkspaceState) -> [CommandPaletteItem] {
+    enum PathStatus: Sendable { case missing, file, directory }
+
+    @concurrent static func pathStatus(for query: String) async -> PathStatus? {
+        let path = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard path.hasPrefix("/") || path.hasPrefix("~"), !Task.isCancelled else { return nil }
+        var directory: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: (path as NSString).expandingTildeInPath, isDirectory: &directory)
+        return exists ? (directory.boolValue ? .directory : .file) : .missing
+    }
+
+    /// Filters and ranks items without filesystem reads on the rendering path.
+    func filter(query: String, for workspace: WorkspaceState, pathStatus: PathStatus? = nil) -> [CommandPaletteItem] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Path navigation mode (starts with / or ~)
         if trimmed.hasPrefix("/") || trimmed.hasPrefix("~") {
             let expandedPath = (trimmed as NSString).expandingTildeInPath
             let url = URL(fileURLWithPath: expandedPath)
-            var exists = false
-            var isDir: ObjCBool = false
-            if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) {
-                exists = true
-            }
+            let exists = pathStatus == .file || pathStatus == .directory
+            let isDir = pathStatus == .directory
 
             let pathItem = CommandPaletteItem(
                 id: "custom-path-navigate",
                 title: L10n.format("Go to: %@", L10n.literal(trimmed)),
-                subtitle: exists ? (isDir.boolValue ? L10n.text("Directory exists") : L10n.text("File exists")) : L10n.format("Path: %@", L10n.literal(expandedPath)),
-                iconName: isDir.boolValue ? "folder" : "arrow.right.circle",
+                subtitle: exists ? (isDir ? L10n.text("Directory exists") : L10n.text("File exists")) : L10n.format("Path: %@", L10n.literal(expandedPath)),
+                iconName: isDir ? "folder" : "arrow.right.circle",
                 category: .path,
                 shortcut: "↵",
                 action: {
@@ -504,5 +512,60 @@ public final class CommandPaletteService {
             targetIndex = target.index(after: foundIndex)
         }
         return true
+    }
+}
+
+/// Owns one presented palette's result snapshot and its query-dependent disk work.
+@MainActor @Observable
+final class CommandPaletteResults {
+    private(set) var items: [CommandPaletteItem] = []
+    @ObservationIgnored private weak var workspace: WorkspaceState?
+    @ObservationIgnored private var query = ""
+    @ObservationIgnored private var pathStatus: CommandPaletteService.PathStatus?
+    @ObservationIgnored private var pathTask: Task<Void, Never>?
+    @ObservationIgnored private var observationID = UUID()
+    @ObservationIgnored private var active = false
+
+    init(workspace: WorkspaceState) { self.workspace = workspace }
+    isolated deinit { pathTask?.cancel() }
+
+    func start(query: String) {
+        active = true
+        update(query: query)
+    }
+
+    func stop() {
+        active = false
+        pathTask?.cancel()
+        pathTask = nil
+        observationID = UUID()
+    }
+
+    func update(query: String) {
+        guard active else { return }
+        self.query = query
+        pathStatus = nil
+        pathTask?.cancel()
+        rebuild()
+        pathTask = Task { [weak self] in
+            let status = await CommandPaletteService.pathStatus(for: query)
+            guard !Task.isCancelled, let self, self.active, self.query == query, let status else { return }
+            self.pathStatus = status
+            self.rebuild()
+        }
+    }
+
+    private func rebuild() {
+        guard active, let workspace else { return }
+        let id = UUID()
+        observationID = id
+        items = withObservationTracking {
+            CommandPaletteService.shared.filter(query: query, for: workspace, pathStatus: pathStatus)
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, self.active, self.observationID == id else { return }
+                self.rebuild()
+            }
+        }
     }
 }

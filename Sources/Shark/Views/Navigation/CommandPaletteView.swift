@@ -7,12 +7,12 @@ public struct CommandPaletteView: View {
     @State private var selectedIndex: Int = 0
     @State private var eventMonitor: Any?
 
-    private var items: [CommandPaletteItem] {
-        CommandPaletteService.shared.filter(query: query, for: workspace)
-    }
+    @State private var results: CommandPaletteResults
+    private var items: [CommandPaletteItem] { results.items }
 
     public init(workspace: WorkspaceState) {
         self.workspace = workspace
+        _results = State(initialValue: CommandPaletteResults(workspace: workspace))
     }
 
     public var body: some View {
@@ -76,7 +76,8 @@ public struct CommandPaletteView: View {
                     ScrollViewReader { proxy in
                         ScrollView {
                             LazyVStack(spacing: 2) {
-                                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                                ForEach(items.indices, id: \.self) { index in
+                                    let item = items[index]
                                     paletteRow(item: item, isSelected: index == selectedIndex)
                                         .id(index)
                                         .onTapGesture {
@@ -130,14 +131,20 @@ public struct CommandPaletteView: View {
             .offset(y: -40)
         }
         .onAppear {
+            results.start(query: query)
             installEventMonitor()
             selectedIndex = 0
         }
         .onDisappear {
+            results.stop()
             removeEventMonitor()
         }
         .onChange(of: query) { _, _ in
             selectedIndex = 0
+            results.update(query: query)
+        }
+        .onChange(of: results.items.count) { _, count in
+            selectedIndex = max(0, min(selectedIndex, count - 1))
         }
     }
 

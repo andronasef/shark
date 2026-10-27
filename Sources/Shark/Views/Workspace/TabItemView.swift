@@ -88,6 +88,7 @@ public struct TabItemView: View {
 
     @State private var isHovered = false
     @State private var isCloseHovered = false
+    @State private var pinnedIcon: NSImage?
 
     public init(
         tab: WorkspaceTab,
@@ -107,11 +108,6 @@ public struct TabItemView: View {
         self._dropBefore = dropBefore
     }
 
-    private var folderIcon: NSImage {
-        let path = tab.activeNavigationState.currentURL.path
-        return NSWorkspace.shared.icon(forFile: path)
-    }
-
     public var body: some View {
         Group {
             if tab.isPinned {
@@ -119,6 +115,9 @@ public struct TabItemView: View {
             } else {
                 unpinnedTabBody
             }
+        }
+        .task(id: "\(tab.isPinned)|\(tab.activeNavigationState.currentURL.path)") {
+            pinnedIcon = tab.isPinned ? NSWorkspace.shared.icon(forFile: tab.activeNavigationState.currentURL.path) : nil
         }
         .frame(height: 28)
         .contentShape(Rectangle())
@@ -174,7 +173,7 @@ public struct TabItemView: View {
     private var pinnedTabBody: some View {
         ZStack {
             ZStack(alignment: .bottomTrailing) {
-                Image(nsImage: folderIcon)
+                Image(nsImage: pinnedIcon ?? NSImage())
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 14, height: 14)
