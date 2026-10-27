@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.0-alpha.3] - 2026-10-27
+
 ### Added
 - Appearance setting in Settings › General: choose between System Default, Light, and Dark appearance. Applies instantly across all windows, sheets, dialogs, and the Shark Photo Viewer, and persists across launches. Full localization across all 8 supported languages.
 - Website dark mode support: automatic matching of system dark mode preference (`prefers-color-scheme: dark`) with zero flash on initial load, a theme toggle in the navigation header, and `localStorage` persistence.
