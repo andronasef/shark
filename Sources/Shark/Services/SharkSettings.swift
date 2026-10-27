@@ -1,4 +1,30 @@
 import SwiftUI
+import AppKit
+
+public enum AppAppearance: String, CaseIterable, Identifiable, Sendable {
+    case system = "System Default"
+    case light = "Light"
+    case dark = "Dark"
+
+    public var id: String { rawValue }
+    public var displayName: String { L10n.text(rawValue) }
+
+    public var nsAppearance: NSAppearance? {
+        switch self {
+        case .system: return nil
+        case .light: return NSAppearance(named: .aqua)
+        case .dark: return NSAppearance(named: .darkAqua)
+        }
+    }
+
+    public var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
+}
 
 public enum DefaultStartupLocation: String, CaseIterable, Identifiable, Sendable {
     case home = "Home"
@@ -48,6 +74,7 @@ public enum DefaultViewModeSetting: String, CaseIterable, Identifiable, Sendable
 public final class SharkSettings: ObservableObject {
     public static let shared = SharkSettings()
 
+    @AppStorage("appAppearance") public var appAppearance: String = AppAppearance.system.rawValue
     @AppStorage("defaultViewMode") public var defaultViewMode: String = DefaultViewModeSetting.list.rawValue
     @AppStorage("startupLocation") public var startupLocation: String = DefaultStartupLocation.home.rawValue
     @AppStorage("showHiddenFilesByDefault") public var showHiddenFilesByDefault: Bool = false
@@ -62,6 +89,14 @@ public final class SharkSettings: ObservableObject {
     @AppStorage("isAnalyticsEnabled") public var isAnalyticsEnabled: Bool = true
     @AppStorage("isCrashReportingEnabled") public var isCrashReportingEnabled: Bool = true
     @AppStorage("automaticallyCheckForUpdates") public var automaticallyCheckForUpdates: Bool = true
+
+    public var selectedAppearance: AppAppearance {
+        AppAppearance(rawValue: appAppearance) ?? .system
+    }
+
+    public func applyAppearance() {
+        NSApp?.appearance = selectedAppearance.nsAppearance
+    }
 
     private init() {}
 }

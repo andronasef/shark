@@ -40,7 +40,7 @@ public struct SettingsView: View {
                 }
                 .tag(4)
         }
-        .frame(width: 480, height: 420)
+        .frame(width: 480, height: 440)
         .padding(20)
     }
 
@@ -68,6 +68,19 @@ public struct SettingsView: View {
                     }
                     .controlSize(.small)
                 }
+            }
+            Section(L10n.text("Appearance")) {
+                Picker(L10n.text("Appearance:"), selection: $settings.appAppearance) {
+                    ForEach(AppAppearance.allCases) { appearance in
+                        Text(appearance.displayName).tag(appearance.rawValue)
+                    }
+                }
+                .onChange(of: settings.appAppearance) { _, _ in
+                    settings.applyAppearance()
+                }
+
+                Text(L10n.text("Choose between System Default, Light, and Dark appearance."))
+                    .font(.caption).foregroundColor(.secondary)
             }
             Section(L10n.text("Sidebar")) {
                 Picker(L10n.text("Sidebar Style:"), selection: $sidebarStyle) {

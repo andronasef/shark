@@ -11,6 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
     override init() {
         AppLocalization.configureAtStartup()
+        SharkSettings.shared.applyAppearance()
         let store = SessionStore()
         if let restored = store.restore() {
             self.workspace = restored
@@ -22,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        SharkSettings.shared.applyAppearance()
         // Start debounced autosave
         sessionStore?.startAutosave(workspace)
         SideButtonNavigation.install(workspace: workspace)
@@ -63,6 +65,11 @@ struct SharkApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var onboarding = OnboardingState()
     @AppStorage(AppLocalization.preferenceKey) private var languagePreference = AppLanguage.system.rawValue
+    @AppStorage("appAppearance") private var appAppearance = AppAppearance.system.rawValue
+
+    private var preferredColorScheme: ColorScheme? {
+        AppAppearance(rawValue: appAppearance)?.colorScheme
+    }
 
     var body: some Scene {
         // One window: the menu commands and the session drive a single WorkspaceState, so a second
@@ -71,6 +78,7 @@ struct SharkApp: App {
             MainWindowView(appDelegate: appDelegate, onboarding: onboarding)
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
+                .preferredColorScheme(preferredColorScheme)
                 .frame(minWidth: 850, minHeight: 550)
         }
         .windowStyle(.titleBar)
@@ -86,12 +94,14 @@ struct SharkApp: App {
             HelpView()
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
+                .preferredColorScheme(preferredColorScheme)
         }
 
         Settings {
             SettingsView()
                 .environment(\.locale, AppLocalization.locale)
                 .environment(\.layoutDirection, AppLocalization.layoutDirection)
+                .preferredColorScheme(preferredColorScheme)
         }
     }
 }

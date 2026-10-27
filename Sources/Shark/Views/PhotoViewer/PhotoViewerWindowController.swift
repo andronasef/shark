@@ -31,9 +31,11 @@ final class PhotoViewerWindowController: NSWindowController, NSWindowDelegate {
         window.title = L10n.text("Shark Photo Viewer")
         window.minSize = NSSize(width: 600, height: 440)
         window.collectionBehavior.insert(.fullScreenPrimary)
+        window.appearance = SharkSettings.shared.selectedAppearance.nsAppearance
         window.contentView = NSHostingView(rootView: PhotoViewerView(state: state, toggleFullScreen: { [weak window] in window?.toggleFullScreen(nil) })
             .environment(\.locale, AppLocalization.locale)
-            .environment(\.layoutDirection, AppLocalization.layoutDirection))
+            .environment(\.layoutDirection, AppLocalization.layoutDirection)
+            .preferredColorScheme(SharkSettings.shared.selectedAppearance.colorScheme))
         window.delegate = self
         window.center()
         state.load()
