@@ -1,12 +1,40 @@
 import SwiftUI
 import Observation
 
+/// A right-click menu is the user's current focus: previews close when one opens and stay
+/// closed until it ends, even though the pointer still rests on the row.
+@MainActor
+final class MenuTracking {
+    static let shared = MenuTracking()
+    private(set) var isActive = false
+    private let controllers = NSHashTable<HoverPreviewController>.weakObjects()
+
+    private init() {
+        let center = NotificationCenter.default
+        center.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { MenuTracking.shared.begin() }
+        }
+        center.addObserver(forName: NSMenu.didEndTrackingNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { MenuTracking.shared.isActive = false }
+        }
+    }
+
+    func register(_ controller: HoverPreviewController) { controllers.add(controller) }
+
+    func begin() {
+        isActive = true
+        for controller in controllers.allObjects { controller.cancel() }
+    }
+}
+
 /// Owns one item's delayed preview; leaving or disabling it cancels pending work.
 @MainActor
 @Observable
 final class HoverPreviewController {
     var isPresented = false
     @ObservationIgnored private var pending: Task<Void, Never>?
+
+    init() { MenuTracking.shared.register(self) }
 
     /// How long a visible preview survives the pointer leaving its row, so the pointer can reach
     /// the preview itself (media controls need it).
@@ -26,7 +54,7 @@ final class HoverPreviewController {
             return
         }
         cancel()
-        guard isHovering, enabled, !isDirectory,
+        guard isHovering, enabled, !isDirectory, !MenuTracking.shared.isActive,
               HoverPreviewService.shared.supportsPreview(for: url) else { return }
         pending = Task { [weak self] in
             do {
@@ -35,7 +63,7 @@ final class HoverPreviewController {
                 while requireShift && !NSEvent.modifierFlags.contains(.shift) {
                     try await Task.sleep(for: .milliseconds(80))
                 }
-                self?.isPresented = true
+                if !MenuTracking.shared.isActive { self?.isPresented = true }
             } catch { /* Hover ended before the preview appeared. */ }
         }
     }

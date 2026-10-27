@@ -184,3 +184,25 @@ final class HoverPreviewTests: XCTestCase {
         XCTAssertGreaterThan(unwrappedPanel.frame.height, 60, "Panel height must not be a tiny dot: \(unwrappedPanel.frame)")
     }
 }
+
+@MainActor
+final class HoverPreviewMenuTests: XCTestCase {
+    func testOpeningAMenuClosesPendingPreviewsAndBlocksNewOnes() async throws {
+        let controller = HoverPreviewController()
+        let url = URL(fileURLWithPath: "/sample.txt")
+        controller.update(isHovering: true, enabled: true, url: url, isDirectory: false, delayMilliseconds: 40)
+        NotificationCenter.default.post(name: NSMenu.didBeginTrackingNotification, object: nil)
+        try await Task.sleep(for: .milliseconds(100))
+        XCTAssertFalse(controller.isPresented)
+
+        controller.update(isHovering: true, enabled: true, url: url, isDirectory: false, delayMilliseconds: 10)
+        try await Task.sleep(for: .milliseconds(60))
+        XCTAssertFalse(controller.isPresented)
+
+        NotificationCenter.default.post(name: NSMenu.didEndTrackingNotification, object: nil)
+        controller.update(isHovering: true, enabled: true, url: url, isDirectory: false, delayMilliseconds: 10)
+        try await Task.sleep(for: .milliseconds(80))
+        XCTAssertTrue(controller.isPresented)
+        controller.cancel()
+    }
+}
