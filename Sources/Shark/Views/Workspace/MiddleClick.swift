@@ -27,39 +27,48 @@ private struct MiddleClickRegion: NSViewRepresentable {
     }
 }
 
-private final class MiddleClickNSView: NSView {
-    var action: (() -> Void)?
+@MainActor
+private final class MiddleClickRegistry {
+    static let shared = MiddleClickRegistry()
+    private let views = NSHashTable<MiddleClickNSView>.weakObjects()
     private var monitor: Any?
 
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-        stopMonitoring()
-        guard window != nil else { return }
+    func register(_ view: MiddleClickNSView) {
+        views.add(view)
+        guard monitor == nil else { return }
         monitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
-            guard let self,
-                  event.buttonNumber == 2,
-                  event.window === self.window,
-                  !self.isHiddenOrHasHiddenAncestor,
-                  self.bounds.intersection(self.visibleRect).contains(self.convert(event.locationInWindow, from: nil)),
-                  let action = self.action else { return event }
-            // Use the actual click position, including after a tab closes under
-            // a stationary pointer. No global hover target can go stale.
-            action()
-            return nil
+            guard event.buttonNumber == 2, let self else { return event }
+            for view in self.views.allObjects {
+                guard view.window === event.window, !view.isHiddenOrHasHiddenAncestor,
+                      view.bounds.intersection(view.visibleRect).contains(view.convert(event.locationInWindow, from: nil)) else { continue }
+                if let scroll = view.enclosingScrollView,
+                   !scroll.documentVisibleRect.contains(view.convert(view.convert(event.locationInWindow, from: nil), to: scroll.documentView)) { continue }
+                guard let action = view.action else { continue }
+                action()
+                return nil
+            }
+            return event
         }
     }
 
-    func stopMonitoring() {
-        if let monitor {
+    func unregister(_ view: MiddleClickNSView) {
+        views.remove(view)
+        if views.allObjects.isEmpty, let monitor {
             NSEvent.removeMonitor(monitor)
             self.monitor = nil
         }
     }
+}
 
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        // Leave selection, context menus, and drag gestures with the content.
-        nil
+private final class MiddleClickNSView: NSView {
+    var action: (() -> Void)?
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        stopMonitoring()
+        if window != nil { MiddleClickRegistry.shared.register(self) }
     }
+    func stopMonitoring() { MiddleClickRegistry.shared.unregister(self) }
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }
 
 public extension View {

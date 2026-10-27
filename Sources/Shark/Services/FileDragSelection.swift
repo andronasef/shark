@@ -10,10 +10,14 @@ enum FileDragSelection {
     static func normalized(_ urls: [URL]) -> [URL] {
         var seen = Set<URL>()
         let unique = urls.filter(\.isFileURL).map(\.standardizedFileURL).filter { seen.insert($0).inserted }
+        let selectedPaths = Set(unique.map(\.path))
         return unique.filter { candidate in
-            !unique.contains { parent in
-                parent != candidate && candidate.path.hasPrefix(parent.path.hasSuffix("/") ? parent.path : parent.path + "/")
+            var path = candidate.path
+            while path != "/" && !path.isEmpty {
+                path = (path as NSString).deletingLastPathComponent
+                if selectedPaths.contains(path) { return false }
             }
+            return true
         }
     }
 }

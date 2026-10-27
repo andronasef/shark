@@ -66,9 +66,11 @@ private final class FileDragNSView: DragSourceNSView {
         let payload = urls()
         guard !payload.isEmpty else { return }
         let point = convert(event.locationInWindow, from: nil)
+        let fallback = NSImage(systemSymbolName: "doc", accessibilityDescription: nil)
         let items = payload.enumerated().map { index, url in
             let item = NSDraggingItem(pasteboardWriter: url as NSURL)
-            let icon = NSWorkspace.shared.icon(forFile: url.path)
+            // Only the front of a pile needs custom artwork; every URL remains in the payload.
+            let icon = index < 6 ? NSWorkspace.shared.icon(forFile: url.path) : fallback
             item.setDraggingFrame(CGRect(x: point.x + CGFloat(min(index, 5) * 3), y: point.y, width: 32, height: 32), contents: icon)
             return item
         }

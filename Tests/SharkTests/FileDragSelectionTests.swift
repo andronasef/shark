@@ -16,4 +16,14 @@ struct FileDragSelectionTests {
         let sibling = URL(fileURLWithPath: "/tmp/album-other")
         #expect(FileDragSelection.normalized([child, parent, parent, sibling]) == [parent, sibling])
     }
+    @Test func rootSuppressesDescendantsWithoutConfusingSiblingPrefixes() {
+        let urls = ["/tmp/a", "/", "/tmp/ab"].map { URL(fileURLWithPath: $0) }
+        #expect(FileDragSelection.normalized(urls) == [URL(fileURLWithPath: "/")])
+    }
+
+    @Test func largeFlatSelectionPreservesInputOrder() {
+        let urls = (0..<10_000).reversed().map { URL(fileURLWithPath: "/tmp/selection/file-\($0)") }
+        #expect(FileDragSelection.normalized(urls) == urls)
+    }
+
 }

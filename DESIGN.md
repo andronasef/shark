@@ -170,3 +170,4 @@ Shark uses the macOS San Francisco system font family with tabular figures where
 - Folder-size scans run at most two at once. Clearing the cache cancels pending and active work and prevents late results from repopulating it.
 - Cascading menus show the existing Loading… placeholder while directory discovery and sorting run off the main actor. Each menu loads once per popup; opening a new popup reads fresh contents. Menu artwork is prepared in batches of 16, with the existing 500-entry cap and Open to See All action.
 - Photo windows retain one ImageIO source each for the current photo. A shared permit keeps full-image raster decoding serial across windows; strip thumbnails use the separate bounded thumbnail scheduler. Existing raster size limits remain in force.
+- Middle-click routing uses one shared monitor for mounted targets; clipping, owning window, hidden state, and teardown decide which target can act. Mouse bindings do not change.
