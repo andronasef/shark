@@ -59,16 +59,24 @@ public struct MillerColumnsView: View {
         }
         .background(WindowNumberReader { owningWindowNumber = $0 })
         .onAppear {
-            coordinator.reset(rootDirectory: navigationState.currentURL)
+            coordinator.reset(rootDirectory: navigationState.currentURL, items: navigationState.filteredAndSortedItems,
+                              showHidden: navigationState.showHiddenFiles)
             setupKeyMonitor()
         }
         .onDisappear {
+            coordinator.cancelLoads()
             removeKeyMonitor()
         }
         .onChange(of: navigationState.currentURL) { _, newURL in
             if coordinator.columns.first?.directoryURL != newURL {
-                coordinator.reset(rootDirectory: newURL)
+                coordinator.reset(rootDirectory: newURL, items: [], showHidden: navigationState.showHiddenFiles)
             }
+        }
+        .onChange(of: navigationState.showHiddenFiles) { _, hidden in
+            coordinator.updateRoot(items: navigationState.filteredAndSortedItems, showHidden: hidden)
+        }
+        .onChange(of: navigationState.filteredAndSortedItems) { _, items in
+            coordinator.updateRoot(items: items, showHidden: navigationState.showHiddenFiles)
         }
     }
 

@@ -159,18 +159,19 @@ public struct DetailsTableView: View {
 
     private func handleSortChange(_ newOrder: [KeyPathComparator<FileItem>]) {
         guard let primary = newOrder.first else { return }
-        navigationState.sortAscending = (primary.order == .forward)
+        var field = navigationState.sortField
 
         if primary.keyPath == \FileItem.name {
-            navigationState.sortField = .name
+            field = .name
         } else if primary.keyPath == \FileItem.fileSize {
-            navigationState.sortField = .size
+            field = .size
         } else if primary.keyPath == \FileItem.dateModified {
-            navigationState.sortField = .dateModified
+            field = .dateModified
         } else if primary.keyPath == \FileItem.kindDescription {
-            navigationState.sortField = .kind
+            field = .kind
         } else if primary.keyPath == \FileItem.posixPermissions {
-            navigationState.sortField = .permissions
+            field = .permissions
         }
+        navigationState.setSort(field: field, ascending: primary.order == .forward)
     }
 }

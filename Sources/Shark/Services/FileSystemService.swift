@@ -24,7 +24,7 @@ public actor FileSystemService {
     /// Reads directory contents with pre-fetched resource keys.
     /// Nonisolated, so listings run in parallel: one slow network folder doesn't stall other panes.
     /// Stops early when the calling task is cancelled (the user navigated away).
-    public nonisolated func contentsOfDirectory(at url: URL, showHidden: Bool = false) async throws -> [FileItem] {
+    @concurrent public nonisolated func contentsOfDirectory(at url: URL, showHidden: Bool = false) async throws -> [FileItem] {
         let normalizedURL = url.standardizedFileURL.resolvingSymlinksInPath()
         let fileManager = FileManager.default
 

@@ -37,7 +37,7 @@ public final class NavigationState {
     public private(set) var forwardStack: [URL] = []
 
     public var items: [FileItem] = [] {
-        didSet { refreshVisibleItems() }
+        didSet { refreshSortedItems() }
     }
     /// `items` after the filter and sort, recomputed only when one of them changes.
     public private(set) var filteredAndSortedItems: [FileItem] = []
@@ -54,6 +54,7 @@ public final class NavigationState {
 
     public var showHiddenFiles: Bool = false {
         didSet {
+            guard oldValue != showHiddenFiles else { return }
             Task { await reloadCurrentDirectory() }
         }
     }
@@ -69,10 +70,10 @@ public final class NavigationState {
     public var iconSize: CGFloat = 80.0
 
     public var sortField: SortField = .name {
-        didSet { refreshVisibleItems() }
+        didSet { if oldValue != sortField && !updatingSort { refreshSortedItems() } }
     }
     public var sortAscending: Bool = true {
-        didSet { refreshVisibleItems() }
+        didSet { if oldValue != sortAscending && !updatingSort { refreshSortedItems() } }
     }
     public var gridColumnCount: Int = 1
 
@@ -87,6 +88,13 @@ public final class NavigationState {
 
     private let fileSystemService: FileSystemService
     private var lastRecordedVisit: URL?
+    @ObservationIgnored private var sortedItems: [FileItem] = []
+    @ObservationIgnored private var visibleIndices: [URL: Int] = [:]
+    @ObservationIgnored private var updatingSort = false
+    @ObservationIgnored private var reloadTask: Task<[FileItem], any Error>?
+    @ObservationIgnored private var reloadID = UUID()
+    @ObservationIgnored private var scheduledReload: Task<Void, Never>?
+    @ObservationIgnored private let readDirectory: @Sendable (URL, Bool) async throws -> [FileItem]
 
     public init(
         initialURL: URL? = nil,
@@ -95,7 +103,26 @@ public final class NavigationState {
         let initial = initialURL ?? FileManager.default.homeDirectoryForCurrentUser
         self.currentURL = initial.standardizedFileURL
         self.fileSystemService = fileSystemService
+        self.readDirectory = { url, hidden in
+            try await fileSystemService.contentsOfDirectory(at: url, showHidden: hidden)
+        }
         self.pathInputText = self.currentURL.path
+    }
+
+    init(initialURL: URL, readDirectory: @escaping @Sendable (URL, Bool) async throws -> [FileItem]) {
+        currentURL = initialURL.standardizedFileURL
+        fileSystemService = .shared
+        self.readDirectory = readDirectory
+        pathInputText = currentURL.path
+    }
+
+    public func setSort(field: SortField, ascending: Bool) {
+        guard field != sortField || ascending != sortAscending else { return }
+        updatingSort = true
+        sortField = field
+        sortAscending = ascending
+        updatingSort = false
+        refreshSortedItems()
     }
 
     public var canGoBack: Bool {
@@ -112,11 +139,15 @@ public final class NavigationState {
 
     /// Selected items in display order.
     public var selectedItems: [FileItem] {
-        filteredAndSortedItems.filter { selectedItemIDs.contains($0.url) }
+        if selectedItemIDs.count == filteredAndSortedItems.count,
+           selectedItemIDs.allSatisfy({ visibleIndices[$0] != nil }) { return filteredAndSortedItems }
+        return selectedItemIDs.compactMap { visibleIndices[$0] }.sorted().map { filteredAndSortedItems[$0] }
     }
 
     public var selectedTotalSize: Int64 {
-        selectedItems.reduce(0) { $0 + $1.fileSize }
+        selectedItemIDs.reduce(0) { total, id in
+            total + (visibleIndices[id].map { filteredAndSortedItems[$0].fileSize } ?? 0)
+        }
     }
 
     public func navigateTo(_ url: URL) {
@@ -181,38 +212,57 @@ public final class NavigationState {
         iconSize = 80.0
     }
 
+    /// Coalesces filesystem event bursts; explicit reloads still take effect immediately.
+    public func requestReload() {
+        scheduledReload?.cancel()
+        scheduledReload = Task { [weak self] in
+            do { try await Task.sleep(for: .milliseconds(150)) } catch { return }
+            guard !Task.isCancelled, let self else { return }
+            self.scheduledReload = nil
+            await self.reloadCurrentDirectory()
+        }
+    }
+
     public func reloadCurrentDirectory() async {
+        scheduledReload?.cancel()
+        scheduledReload = nil
+        reloadTask?.cancel()
+        let id = UUID()
+        reloadID = id
         isLoading = true
         errorMessage = nil
         isPermissionError = false
-
         let url = currentURL
+        let hidden = showHiddenFiles
         SecurityScopedBookmarkManager.shared.ensureAccess(to: url)
-
+        let reader = readDirectory
+        let task = Task { try await reader(url, hidden) }
+        reloadTask = task
+        defer {
+            if reloadID == id { isLoading = false; reloadTask = nil }
+        }
         do {
-            let fetchedItems = try await fileSystemService.contentsOfDirectory(
-                at: url,
-                showHidden: showHiddenFiles
-            )
-            // The user may have moved on while a slow folder was listing; drop the stale result.
-            guard url == currentURL else { return }
-            self.items = fetchedItems
-            // Count a visit once per arrival, not on every refresh (FSEvents reloads would
-            // otherwise rewrite the recents file and inflate Frequent Folders).
+            let fetchedItems = try await withTaskCancellationHandler {
+                try await task.value
+            } onCancel: { task.cancel() }
+            guard reloadID == id, url == currentURL, !Task.isCancelled, !task.isCancelled else { return }
+            items = fetchedItems
             if lastRecordedVisit != url {
                 lastRecordedVisit = url
                 RecentFoldersService.shared.recordVisit(to: url)
             }
         } catch {
-            guard url == currentURL, !(error is CancellationError) else { return }
-            self.errorMessage = error.localizedDescription
+            guard reloadID == id, url == currentURL, !Task.isCancelled, !(error is CancellationError) else { return }
+            errorMessage = error.localizedDescription
             let ns = error as NSError
             let underlying = ns.userInfo[NSUnderlyingErrorKey] as? NSError
-            self.isPermissionError = ns.code == NSFileReadNoPermissionError
-                || [ns, underlying].contains { $0?.domain == NSPOSIXErrorDomain && [EPERM, EACCES].contains(Int32($0!.code)) }
-            self.items = []
+            isPermissionError = ns.code == NSFileReadNoPermissionError
+                || [ns, underlying].contains { error in
+                    guard let error else { return false }
+                    return error.domain == NSPOSIXErrorDomain && [EPERM, EACCES].contains(Int32(error.code))
+                }
+            items = []
         }
-        self.isLoading = false
     }
 
     /// Requests user authorization to browse the current directory via NSOpenPanel.
@@ -233,13 +283,8 @@ public final class NavigationState {
         }
     }
 
-    private func refreshVisibleItems() {
+    private func refreshSortedItems() {
         var result = items
-
-        if !filterText.isEmpty {
-            result = result.filter { $0.name.localizedStandardContains(filterText) }
-        }
-
         let field = sortField
         let ascending = sortAscending
         result.sort { itemA, itemB in
@@ -268,13 +313,22 @@ public final class NavigationState {
             }
         }
 
+        sortedItems = result
+        refreshVisibleItems()
+    }
+
+    private func refreshVisibleItems() {
+        let result = filterText.isEmpty ? sortedItems : sortedItems.filter { $0.name.localizedStandardContains(filterText) }
         filteredAndSortedItems = result
+        var indices: [URL: Int] = [:]
+        indices.reserveCapacity(result.count)
+        for (index, item) in result.enumerated() { indices[item.id] = index }
+        visibleIndices = indices
 
         // Never keep hidden or vanished items selected: a later Trash or Cut would act on
         // files the user can't see.
-        let visibleIDs = Set(result.map(\.id))
-        if !selectedItemIDs.isSubset(of: visibleIDs) {
-            selectedItemIDs.formIntersection(visibleIDs)
+        if !selectedItemIDs.allSatisfy({ indices[$0] != nil }) {
+            selectedItemIDs = selectedItemIDs.filter { indices[$0] != nil }
         }
     }
 
@@ -451,7 +505,7 @@ public final class NavigationState {
                 selectedItemIDs.insert(item.id)
             }
             selectionAnchorID = item.id
-        } else if shift, let from = focusIndex(in: filteredAndSortedItems),
+        } else if shift, let from = focusIndex(),
                   let to = filteredAndSortedItems.firstIndex(where: { $0.id == item.id }) {
             selectedItemIDs.formUnion(filteredAndSortedItems[min(from, to)...max(from, to)].map(\.id))
         } else {
@@ -460,12 +514,11 @@ public final class NavigationState {
     }
 
     /// The anchor when it is still selected, otherwise the first selected item in display order.
-    private func focusIndex(in items: [FileItem]) -> Int? {
-        if let anchor = selectionAnchorID, selectedItemIDs.contains(anchor),
-           let index = items.firstIndex(where: { $0.id == anchor }) {
+    private func focusIndex() -> Int? {
+        if let anchor = selectionAnchorID, selectedItemIDs.contains(anchor), let index = visibleIndices[anchor] {
             return index
         }
-        return items.firstIndex { selectedItemIDs.contains($0.id) }
+        return selectedItemIDs.compactMap { visibleIndices[$0] }.min()
     }
 
     private func selectOnly(_ item: FileItem) {
@@ -478,7 +531,7 @@ public final class NavigationState {
     private func moveSelection(by offset: Int, clamp: Bool) {
         let items = filteredAndSortedItems
         guard !items.isEmpty else { return }
-        guard let current = focusIndex(in: items) else {
+        guard let current = focusIndex() else {
             selectOnly(items[0])
             return
         }

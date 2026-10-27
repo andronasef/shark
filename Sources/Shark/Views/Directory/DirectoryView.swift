@@ -43,11 +43,14 @@ public struct DirectoryView: View {
             statusBar
         }
         .task(id: navigationState.currentURL) {
-            await navigationState.reloadCurrentDirectory()
-            setupFSEventsWatcher()
             let url = navigationState.currentURL
+            await navigationState.reloadCurrentDirectory()
+            guard !Task.isCancelled, navigationState.currentURL == url else { return }
+            setupFSEventsWatcher()
             // Volume capacity can block on network volumes, so it is read once per folder, off main.
-            diskSpaceSummary = await Task.detached { DiskSpaceService.shared.getDiskSpace(for: url)?.summary }.value
+            let summary = await Task.detached { DiskSpaceService.shared.getDiskSpace(for: url)?.summary }.value
+            guard !Task.isCancelled, navigationState.currentURL == url else { return }
+            diskSpaceSummary = summary
         }
         .alert(
             "The operation couldn’t be completed",
@@ -242,7 +245,7 @@ public struct DirectoryView: View {
     private func setupFSEventsWatcher() {
         fseventsWatcher.watch(url: navigationState.currentURL) { [weak navigationState] in
             Task { @MainActor in
-                await navigationState?.reloadCurrentDirectory()
+                navigationState?.requestReload()
             }
         }
     }

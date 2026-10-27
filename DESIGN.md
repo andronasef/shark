@@ -165,3 +165,4 @@ Shark uses the macOS San Francisco system font family with tabular figures where
 ## Large collections and work lifetime
 
 - Folder Tree uses a retained flattened row projection and lazy rows. Hover feedback stays within a row. Reopening a branch restores remembered expanded descendants; hidden-file changes invalidate their listings, and collapsed branches are not read until reachable again. Keyboard focus and active-folder reveal scroll to offscreen rows.
+- Directory ordering is retained until items or sorting changes. Search filters that order; selection lookup and totals use the visible-item index. A sort-field/direction change is atomic. Filesystem notifications coalesce for `150` ms; explicit refresh is immediate, and only the latest request may publish results.
