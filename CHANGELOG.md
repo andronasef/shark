@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Folder Tree reuses its row projection, renders rows lazily, and restores remembered expanded descendants after hidden-file refreshes without reading collapsed branches.
 
 ### Fixed
+- Canceled thumbnail requests release retained queue keys even while renderer slots are occupied; mixed backlogs compact when canceled keys dominate.
 - Inspector loads reject canceled results, and closing or changing the target cancels checksum work. Hashing no longer occupies the metadata actor.
 - Folder-size results return to the requesting calculator. At most two scans run at once; clearing the cache cancels work and rejects late results.
 

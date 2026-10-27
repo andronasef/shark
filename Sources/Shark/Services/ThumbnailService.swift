@@ -41,6 +41,7 @@ actor ThumbnailScheduler {
         var peakActive = 0
         var active = 0
         var queued = 0
+        var retainedQueuedKeys = 0
         var cachedBytes = 0
         var cachedEntries = 0
     }
@@ -59,6 +60,7 @@ actor ThumbnailScheduler {
     private var queue: [(key: ThumbnailKey, id: UUID)] = []
     private var queueIndex = 0
     private var queuedCount = 0
+    private var canceledQueuedKeys = 0
     private var cache: [ThumbnailKey: Entry] = [:]
     private var bytes = 0
     private var clock: UInt64 = 0
@@ -80,6 +82,7 @@ actor ThumbnailScheduler {
     func statistics() -> Statistics {
         var snapshot = stats
         snapshot.active = active; snapshot.queued = queuedCount
+        snapshot.retainedQueuedKeys = queue.count - queueIndex
         snapshot.cachedBytes = bytes; snapshot.cachedEntries = cache.count
         return snapshot
     }
@@ -125,16 +128,33 @@ actor ThumbnailScheduler {
             } else {
                 work.removeValue(forKey: key)
                 queuedCount -= 1
+                canceledQueuedKeys += 1
+                compactCanceledQueue()
                 drain()
             }
         } else { work[key] = job }
     }
+    private func compactCanceledQueue() {
+        if queuedCount == 0 {
+            queue.removeAll()
+            queueIndex = 0
+            canceledQueuedKeys = 0
+        } else if canceledQueuedKeys > 1024, canceledQueuedKeys > queuedCount {
+            queue = queue.dropFirst(queueIndex).filter { work[$0.key]?.id == $0.id }
+            queueIndex = 0
+            canceledQueuedKeys = 0
+        }
+    }
+
     private func drain() {
         while active < concurrency, queueIndex < queue.count {
             let queued = queue[queueIndex]
             queueIndex += 1
             let key = queued.key
-            guard work[key]?.id == queued.id else { continue }
+            guard work[key]?.id == queued.id else {
+                canceledQueuedKeys -= 1
+                continue
+            }
             queuedCount -= 1
             active += 1; stats.generated += 1; stats.peakActive = max(stats.peakActive, active)
             let renderer = renderer
@@ -146,6 +166,7 @@ actor ThumbnailScheduler {
         if queueIndex == queue.count {
             queue.removeAll(keepingCapacity: true)
             queueIndex = 0
+            canceledQueuedKeys = 0
         } else if queueIndex > 1024, queueIndex > queue.count / 2 {
             queue.removeFirst(queueIndex)
             queueIndex = 0

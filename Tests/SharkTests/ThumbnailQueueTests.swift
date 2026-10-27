@@ -28,6 +28,7 @@ struct ThumbnailQueueTests {
         while await scheduler.statistics().queued < 1 { await Task.yield() }
         canceled.cancel()
         #expect(await canceled.value == nil)
+        #expect(await scheduler.statistics().retainedQueuedKeys == 0)
         let replacement = Task { await scheduler.image(for: queued) }
         while await scheduler.statistics().requests < 3 { await Task.yield() }
         await gate.finish(active, with: raster)
