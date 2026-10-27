@@ -21,7 +21,7 @@ public struct DetailsTableView: View {
 
     public var body: some View {
         Table(
-            navigationState.filteredAndSortedItems,
+            of: FileItem.self,
             selection: $navigationState.selectedItemIDs,
             sortOrder: Binding(
                 get: { [keyPathComparator] },
@@ -86,18 +86,10 @@ public struct DetailsTableView: View {
                         shift: NSEvent.modifierFlags.contains(.shift)
                     )
                 }
-                .onRightClickSelect {
-                    if !navigationState.selectedItemIDs.contains(item.id) {
-                        navigationState.selectedItemIDs = [item.id]
-                    }
-                }
                 .onMiddleClick {
                     if item.isNavigableDirectory {
                         workspace?.open(item.url, from: navigationState, newTab: true)
                     }
-                }
-                .contextMenu {
-                    contextMenuBuilder(item)
                 }
                 .fileHoverPreview(item, isRenaming: navigationState.renamingItemURL == item.url)
             }
@@ -137,6 +129,10 @@ public struct DetailsTableView: View {
                     .opacity(navigationState.isCut(item) ? 0.45 : 1.0)
             }
             .width(min: 120, ideal: 150)
+        } rows: {
+            ForEach(navigationState.filteredAndSortedItems) { item in
+                TableRow(item).contextMenu { contextMenuBuilder(item) }
+            }
         }
         .onTableMarginDoubleClick { navigationState.goUp() }
     }
