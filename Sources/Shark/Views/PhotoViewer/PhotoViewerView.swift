@@ -86,7 +86,8 @@ struct PhotoViewerView: View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 8) {
-                    ForEach(Array(state.urls.enumerated()), id: \.offset) { index, url in
+                    ForEach(state.urls.indices, id: \.self) { index in
+                        let url = state.urls[index]
                         Button { state.select(index) } label: {
                             PhotoStripThumbnail(url: url)
                                 .frame(width: 70, height: 54)
@@ -115,15 +116,15 @@ struct PhotoViewerView: View {
 
 private struct PhotoStripThumbnail: View {
     let url: URL
-    @State private var image: CGImage?
+    @State private var image: NSImage?
     var body: some View {
         Group {
-            if let image { Image(decorative: image, scale: 1).resizable().scaledToFit() }
+            if let image { Image(nsImage: image).resizable().scaledToFit() }
             else { Image(systemName: "photo").foregroundStyle(.secondary) }
         }.padding(3).task(id: url) {
-            let result = await PhotoImageDecoder.shared.decode(url: url, maxPixel: 140)
+            let result = await ThumbnailService.shared.thumbnail(for: url, size: CGSize(width: 70, height: 54))
             guard !Task.isCancelled else { return }
-            image = result.image
+            image = result
         }.onDisappear { image = nil }
     }
 }

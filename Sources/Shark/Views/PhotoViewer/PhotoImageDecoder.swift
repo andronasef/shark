@@ -2,9 +2,30 @@ import AppKit
 import ImageIO
 import UniformTypeIdentifiers
 
+/// All viewers share one active raster decode, while each retains its own source.
+private actor PhotoDecodeBudget {
+    static let shared = PhotoDecodeBudget()
+    private var occupied = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func acquire() async {
+        if !occupied { occupied = true; return }
+        await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func release() {
+        if waiters.isEmpty { occupied = false }
+        else { waiters.removeFirst().resume() }
+    }
+}
+
 /// Serial decoding bounds simultaneous raster allocation. Only the current frame is retained by a viewer.
 actor PhotoImageDecoder {
     static let shared = PhotoImageDecoder()
+    private var sourceURL: URL?
+    private var sourceRevision: String?
+    private var retainedSource: CGImageSource?
+    private var retainedMetadata: String?
 
     /// CGImage is immutable; no mutable ImageIO source escapes the decoder actor.
     struct Result: @unchecked Sendable {
@@ -22,7 +43,14 @@ actor PhotoImageDecoder {
         return width <= (16 * 1024 * 1024) / height
     }
 
-    func decode(url: URL, maxPixel: Int, frame: Int = 0, actualSize: Bool = false) -> Result {
+    func decode(url: URL, maxPixel: Int, frame: Int = 0, actualSize: Bool = false) async -> Result {
+        await PhotoDecodeBudget.shared.acquire()
+        let result = decodeFrame(url: url, maxPixel: maxPixel, frame: frame, actualSize: actualSize)
+        await PhotoDecodeBudget.shared.release()
+        return result
+    }
+
+    private func decodeFrame(url: URL, maxPixel: Int, frame: Int, actualSize: Bool) -> Result {
         func failure(_ message: String) -> Result {
             Result(image: nil, pixels: .zero, frameCount: 0, duration: 0.1, metadata: "", error: message, detailLimited: false)
         }
@@ -30,12 +58,24 @@ actor PhotoImageDecoder {
         guard FileManager.default.isReadableFile(atPath: url.path) else {
             return failure(L10n.text("This photo is missing or cannot be read. You can continue to the next photo."))
         }
-        guard let source = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary) else {
+        if sourceURL != url || frame == 0 {
+            var freshURL = url
+            freshURL.removeAllCachedResourceValues()
+            let values = try? freshURL.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey, .fileResourceIdentifierKey])
+            let revision = "\(String(describing: values?.contentModificationDate))|\(values?.fileSize ?? 0)|\(String(describing: values?.fileResourceIdentifier))"
+            if sourceURL != url || sourceRevision != revision || retainedSource == nil {
+                sourceURL = url
+                sourceRevision = revision
+                retainedMetadata = nil
+                retainedSource = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary)
+            }
+        }
+        guard let source = retainedSource else {
             return failure(L10n.text("This file is damaged or its image format is unsupported."))
         }
         let count = CGImageSourceGetCount(source)
         guard count > 0 else { return failure(L10n.text("This image contains no readable frames.")) }
-        let index = min(frame, count - 1)
+        let index = max(0, min(frame, count - 1))
         let props = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any] ?? [:]
         let width = props[kCGImagePropertyPixelWidth] as? Int ?? 0
         let height = props[kCGImagePropertyPixelHeight] as? Int ?? 0
@@ -49,13 +89,20 @@ actor PhotoImageDecoder {
         }
         let gif = props[kCGImagePropertyGIFDictionary] as? [CFString: Any] ?? [:]
         let delay = gif[kCGImagePropertyGIFUnclampedDelayTime] as? Double ?? gif[kCGImagePropertyGIFDelayTime] as? Double ?? 0.1
-        let type = CGImageSourceGetType(source).flatMap { UTType($0 as String)?.localizedDescription } ?? L10n.text("Image")
-        let bytes = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
-        var metadata = "\(Int(pixels.width)) × \(Int(pixels.height)) · \(type) · \(ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file))"
-        let exif = props[kCGImagePropertyExifDictionary] as? [CFString: Any] ?? [:]
-        let tiff = props[kCGImagePropertyTIFFDictionary] as? [CFString: Any] ?? [:]
-        let details = [tiff[kCGImagePropertyTIFFModel] as? String, exif[kCGImagePropertyExifDateTimeOriginal] as? String].compactMap { $0 }
-        if !details.isEmpty { metadata += " · " + details.joined(separator: " · ") }
+        let metadata: String
+        if let retainedMetadata {
+            metadata = retainedMetadata
+        } else {
+            let type = CGImageSourceGetType(source).flatMap { UTType($0 as String)?.localizedDescription } ?? L10n.text("Image")
+            let bytes = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+            var description = "\(Int(pixels.width)) × \(Int(pixels.height)) · \(type) · \(ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file))"
+            let exif = props[kCGImagePropertyExifDictionary] as? [CFString: Any] ?? [:]
+            let tiff = props[kCGImagePropertyTIFFDictionary] as? [CFString: Any] ?? [:]
+            let details = [tiff[kCGImagePropertyTIFFModel] as? String, exif[kCGImagePropertyExifDateTimeOriginal] as? String].compactMap { $0 }
+            if !details.isEmpty { description += " · " + details.joined(separator: " · ") }
+            retainedMetadata = description
+            metadata = description
+        }
         let animated = CGImageSourceGetType(source).map { UTType($0 as String)?.conforms(to: .gif) == true } ?? false
         return Result(image: image, pixels: pixels, frameCount: animated ? count : 1, duration: max(delay, 0.02), metadata: metadata, error: nil, detailLimited: actualSize && !fullResolutionFits)
     }

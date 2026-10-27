@@ -6,7 +6,7 @@ final class PhotoViewerState {
     let urls: [URL]
     private(set) var index: Int
     var zoom: CGFloat = 1
-    var actualSize = false { didSet { if oldValue != actualSize { load() } } }
+    var actualSize = false { didSet { if oldValue != actualSize && !resettingView { load() } } }
     var detailLimited = false
     var rotation: Double = 0
     var pan: CGSize = .zero
@@ -18,6 +18,8 @@ final class PhotoViewerState {
     var isPlaying = false
     var active = true
     private(set) var loadGeneration = UUID()
+    @ObservationIgnored private let decoder = PhotoImageDecoder()
+    @ObservationIgnored private var resettingView = false
     private var loader: Task<Void, Never>?
     private var slideshow: Task<Void, Never>?
 
@@ -38,9 +40,15 @@ final class PhotoViewerState {
         pause()
         guard urls.indices.contains(newIndex), newIndex != index else { return }
         index = newIndex
-        zoom = 1; actualSize = false; rotation = 0; pan = .zero
+        resetView()
         load()
     }
+    private func resetView() {
+        resettingView = true
+        zoom = 1; actualSize = false; rotation = 0; pan = .zero
+        resettingView = false
+    }
+
     func load() {
         loader?.cancel()
         let generation = UUID()
@@ -48,11 +56,12 @@ final class PhotoViewerState {
         image = nil; error = nil; detailLimited = false; loading = true
         guard let url = currentURL else { loading = false; return }
         let fullDetail = actualSize
+        let decoder = decoder
         loader = Task { [weak self] in
             var frame = 0
             repeat {
                 guard !Task.isCancelled else { return }
-                let result = await PhotoImageDecoder.shared.decode(url: url, maxPixel: 4096, frame: frame, actualSize: fullDetail)
+                let result = await decoder.decode(url: url, maxPixel: 4096, frame: frame, actualSize: fullDetail)
                 guard !Task.isCancelled, let self, self.acceptsLoad(generation: generation) else { return }
                 self.image = result.image; self.pixels = result.pixels
                 self.detailLimited = result.detailLimited
@@ -74,7 +83,7 @@ final class PhotoViewerState {
                 do { try await Task.sleep(for: .seconds(4)) } catch { return }
                 guard let self, self.isPlaying, self.active, self.error == nil, self.canGoNext else { self?.pause(); return }
                 self.index += 1
-                self.zoom = 1; self.actualSize = false; self.rotation = 0; self.pan = .zero
+                self.resetView()
                 self.load()
                 if !self.canGoNext { self.pause(); return }
             }
