@@ -1,12 +1,6 @@
 import AppKit
 import UniformTypeIdentifiers
 
-enum FileContextSelection {
-    static func items(clicked: FileItem, selected: Set<URL>, ordered: [FileItem]) -> [FileItem] {
-        selected.contains(clicked.url) ? ordered.filter { selected.contains($0.url) } : [clicked]
-    }
-}
-
 @MainActor
 enum OpenWithService {
     static func commonApplications(_ lists: [[URL]]) -> [URL] {
@@ -26,12 +20,15 @@ enum OpenWithService {
     static func applications(for items: [FileItem]) -> [URL] {
         guard canOpenWith(items) else { return [] }
         let types = Set(items.map { contentTypeKey(for: $0.url) })
-        return commonApplications(types.map { key in
+        let lists = types.map { key in
             if let cached = applicationsByType[key] { return cached }
             let apps = UTType(key).map { NSWorkspace.shared.urlsForApplications(toOpen: $0) } ?? []
-            applicationsByType[key] = apps
-            return apps
-        })
+            let sorted = commonApplications([apps])
+            applicationsByType[key] = sorted
+            return sorted
+        }
+        // Row creation asks repeatedly for one type. Its cached list is already sorted.
+        return lists.count == 1 ? lists[0] : commonApplications(lists)
     }
 
     /// Derived from the file name (no disk read); unknown extensions fall back to generic data.

@@ -3,11 +3,15 @@ import Testing
 @testable import Shark
 
 struct FileContextActionsTests {
-    @Test func contextUsesClickedItemOrWholeExistingSelection() {
+    @MainActor @Test func contextUsesClickedItemOrWholeExistingSelection() {
         let a = FileItem(url: URL(fileURLWithPath: "/tmp/a"), name: "a", isDirectory: false)
         let b = FileItem(url: URL(fileURLWithPath: "/tmp/b"), name: "b", isDirectory: false)
-        #expect(FileContextSelection.items(clicked: b, selected: [a.url], ordered: [a,b]) == [b])
-        #expect(FileContextSelection.items(clicked: b, selected: [a.url,b.url], ordered: [a,b]) == [a,b])
+        let navigation = NavigationState()
+        navigation.items = [a, b]
+        navigation.selectedItemIDs = [a.url]
+        #expect(navigation.contextItems(for: b) == [b])
+        navigation.selectedItemIDs = [a.url, b.url]
+        #expect(navigation.contextItems(for: b) == [a, b])
     }
 
     @MainActor @Test func mixedTypesOnlyOfferSharedApplications() {

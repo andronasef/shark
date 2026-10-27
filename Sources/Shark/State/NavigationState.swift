@@ -41,7 +41,9 @@ public final class NavigationState {
     }
     /// `items` after the filter and sort, recomputed only when one of them changes.
     public private(set) var filteredAndSortedItems: [FileItem] = []
-    public var selectedItemIDs: Set<URL> = []
+    public var selectedItemIDs: Set<URL> = [] {
+        didSet { invalidateSelectionSummary() }
+    }
     /// The item keyboard navigation and Shift-click ranges start from.
     public var selectionAnchorID: URL? = nil
     public var isLoading: Bool = false
@@ -90,6 +92,8 @@ public final class NavigationState {
     private var lastRecordedVisit: URL?
     @ObservationIgnored private var sortedItems: [FileItem] = []
     @ObservationIgnored private var visibleIndices: [URL: Int] = [:]
+    @ObservationIgnored private var cachedSelectedItems: [FileItem]?
+    @ObservationIgnored private var cachedSelectedSize: Int64?
     @ObservationIgnored private var updatingSort = false
     @ObservationIgnored private var reloadTask: Task<[FileItem], any Error>?
     @ObservationIgnored private var reloadID = UUID()
@@ -137,17 +141,39 @@ public final class NavigationState {
         currentURL.path != "/" && currentURL.deletingLastPathComponent().path != currentURL.path
     }
 
-    /// Selected items in display order.
+    /// Selected items in display order, reused until the selection or visible listing changes.
     public var selectedItems: [FileItem] {
-        if selectedItemIDs.count == filteredAndSortedItems.count,
-           selectedItemIDs.allSatisfy({ visibleIndices[$0] != nil }) { return filteredAndSortedItems }
-        return selectedItemIDs.compactMap { visibleIndices[$0] }.sorted().map { filteredAndSortedItems[$0] }
+        let selected = selectedItemIDs
+        let displayed = filteredAndSortedItems
+        if let cachedSelectedItems { return cachedSelectedItems }
+        let result: [FileItem]
+        if selected.count == displayed.count, selected.allSatisfy({ visibleIndices[$0] != nil }) {
+            result = displayed
+        } else {
+            result = selected.compactMap { visibleIndices[$0] }.sorted().map { displayed[$0] }
+        }
+        cachedSelectedItems = result
+        return result
     }
 
     public var selectedTotalSize: Int64 {
-        selectedItemIDs.reduce(0) { total, id in
-            total + (visibleIndices[id].map { filteredAndSortedItems[$0].fileSize } ?? 0)
+        let selected = selectedItemIDs
+        let displayed = filteredAndSortedItems
+        if let cachedSelectedSize { return cachedSelectedSize }
+        let size = selected.reduce(Int64(0)) { total, id in
+            total + (visibleIndices[id].map { displayed[$0].fileSize } ?? 0)
         }
+        cachedSelectedSize = size
+        return size
+    }
+
+    func contextItems(for clicked: FileItem) -> [FileItem] {
+        selectedItemIDs.contains(clicked.url) ? selectedItems : [clicked]
+    }
+
+    private func invalidateSelectionSummary() {
+        cachedSelectedItems = nil
+        cachedSelectedSize = nil
     }
 
     public func navigateTo(_ url: URL) {
@@ -318,6 +344,7 @@ public final class NavigationState {
     }
 
     private func refreshVisibleItems() {
+        invalidateSelectionSummary()
         let result = filterText.isEmpty ? sortedItems : sortedItems.filter { $0.name.localizedStandardContains(filterText) }
         filteredAndSortedItems = result
         var indices: [URL: Int] = [:]

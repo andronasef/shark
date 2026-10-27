@@ -520,7 +520,7 @@ public struct DirectoryView: View {
 
     @ViewBuilder
     private func contextMenu(for item: FileItem) -> some View {
-        let targets = FileContextSelection.items(clicked: item, selected: navigationState.selectedItemIDs, ordered: navigationState.filteredAndSortedItems)
+        let targets = navigationState.contextItems(for: item)
         let urls = targets.map(\.url)
         let isMultiple = targets.count > 1
         Button(isMultiple ? L10n.format("Open %d Items", targets.count) : L10n.text("Open"), systemImage: "arrow.up.forward.app") {

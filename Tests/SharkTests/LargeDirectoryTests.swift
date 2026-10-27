@@ -4,6 +4,25 @@ import Testing
 
 @MainActor
 struct LargeDirectoryTests {
+    @Test func repeatedSelectionReadsFollowReplacementMetadataAndOrder() {
+        let nav = NavigationState()
+        let a = URL(fileURLWithPath: "/tmp/summary/a")
+        let b = URL(fileURLWithPath: "/tmp/summary/b")
+        nav.items = [FileItem(url: a, name: "a", isDirectory: false, fileSize: 3),
+                     FileItem(url: b, name: "b", isDirectory: false, fileSize: 7)]
+        nav.selectedItemIDs = [a, b]
+        #expect(nav.selectedTotalSize == 10)
+        #expect(nav.selectedItems.map(\.name) == ["a", "b"])
+        nav.items = [FileItem(url: a, name: "a", isDirectory: false, fileSize: 30),
+                     FileItem(url: b, name: "b", isDirectory: false, fileSize: 70)]
+        #expect(nav.selectedTotalSize == 100)
+        nav.setSort(field: .name, ascending: false)
+        #expect(nav.selectedItems.map(\.name) == ["b", "a"])
+        nav.selectedItemIDs = [a]
+        #expect(nav.selectedItems.map(\.name) == ["a"])
+        #expect(nav.selectedTotalSize == 30)
+    }
+
     @Test func selectionKeepsDisplayOrderAndDropsFilteredFiles() {
         let nav = NavigationState()
         nav.items = (0..<10_000).map { index in
