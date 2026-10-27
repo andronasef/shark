@@ -1,0 +1,48 @@
+diff --git a/README-ja.md b/README-ja.md
+index 7735943..52e4348 100644
+--- a/README-ja.md
++++ b/README-ja.md
+@@ -1698,6 +1698,7 @@ Awesome Mac
+ * [Path Finder](http://www.cocoatech.com/pathfinder/) - ファイル管理アプリ。
+ * [QSpace](https://qspace.awehunt.com) - クリーンで効率的なマルチビューファイルマネージャー。 [![App Store][app-store Icon]](https://apps.apple.com/us/app/id1469774098?platform=mac)
+ * [RClick](https://github.com/wflixu/RClick) - macOS Finderのコンテキストメニューに新しい機能を追加。 [![Open-Source Software][OSS Icon]](https://github.com/wflixu/RClick) ![Freeware][Freeware Icon]
++* [Shark - Better Finder](https://shark.andronasef.com) - タブ、分割ペイン、内蔵ターミナル、ホバープレビューを備えたネイティブのファイルマネージャ。 [![Open-Source Software][OSS Icon]](https://github.com/andronasef/shark) ![Freeware][Freeware Icon] ![Native App][Native Icon]
+ * [Strata Files](https://stratafiles.app) - インスタント検索、リアルタイムのフォルダサイズ、ディスク使用量マップ、デュアルペインを備えたオープンソースのファイルマネージャー兼 Finder 代替。 [![Open-Source Software][OSS Icon]](https://github.com/cristipufu/strata-files) ![Freeware][Freeware Icon]
+ * [SwiftyMenu](https://apps.apple.com/us/app/swiftymenu/id1567748223?platform=mac) - 選択したファイルやフォルダを指定アプリですばやく開く Finder 拡張。
+ * [TotalFinder](http://totalfinder.binaryage.com/) - Chrome風のFinder代替。
+diff --git a/README-ko.md b/README-ko.md
+index 755e72a..893187f 100644
+--- a/README-ko.md
++++ b/README-ko.md
+@@ -1127,6 +1127,7 @@ Awesome Mac
+ * [cmd+x](https://apps.apple.com/app/cmd-x/id6754665762?platform=mac) - Ctrl+Opt+Delete로 활동 모니터를 실행하고 Finder에서 Cmd+X로 파일을 잘라 이동.
+ * [Oka Unarchiver](https://okaapps.com/product/1441507725) - RAR와 암호 보호 압축 파일까지 다루는 압축 해제 도구. [![App Store][app-store Icon]](https://apps.apple.com/app/id1441507725?pt=119209922&ct=github)
+ * [SaneClick](https://saneclick.com) - Finder 우클릭 메뉴에 파일 작업, 변환, 개발자 액션을 추가하는 확장. [![Open-Source Software][OSS Icon]](https://github.com/sane-apps/SaneClick) ![Freeware][Freeware Icon]
++* [Shark - Better Finder](https://shark.andronasef.com) - 탭, 분할 창, 내장 터미널, 호버 미리보기를 지원하는 네이티브 파일 관리자. [![Open-Source Software][OSS Icon]](https://github.com/andronasef/shark) ![Freeware][Freeware Icon] ![Native App][Native Icon]
+ * [Shuffle](https://shuffleapp.co) - Rust로 개발된 GPU 렌더링 고속 파일 관리자이자 Finder 대안. [![Open-Source Software][OSS Icon]](https://github.com/WizenPainter/shuffle) ![Freeware][Freeware Icon]
+ * [Strata Files](https://stratafiles.app) - 즉시 검색, 실시간 폴더 크기, 디스크 사용량 맵, 듀얼 패널을 갖춘 오픈 소스 파일 관리자이자 Finder 대안. [![Open-Source Software][OSS Icon]](https://github.com/cristipufu/strata-files) ![Freeware][Freeware Icon]
+ * [SwiftyMenu](https://apps.apple.com/us/app/swiftymenu/id1567748223?platform=mac) - 선택한 파일이나 폴더를 지정 앱으로 빠르게 여는 Finder 확장.
+diff --git a/README-zh.md b/README-zh.md
+index 2929e36..7614e23 100644
+--- a/README-zh.md
++++ b/README-zh.md
+@@ -1643,6 +1643,7 @@ Awesome Mac
+ * [QSpace](https://qspace.awehunt.com) - 一款简洁高效的多视图文件管理器。 [![App Store][app-store Icon]](https://apps.apple.com/cn/app/id1469774098?platform=mac)
+ * [RClick](https://github.com/wflixu/RClick) - 一款简洁实用的 Finder 右键菜单增强工具 [![Open-Source Software][OSS Icon]](https://github.com/wflixu/RClick) ![Freeware][Freeware Icon]
+ * [SaneClick](https://saneclick.com) - 为 Finder 右键菜单增加文件处理、转换和开发者操作。 [![Open-Source Software][OSS Icon]](https://github.com/sane-apps/SaneClick) ![Freeware][Freeware Icon]
++* [Shark - Better Finder](https://shark.andronasef.com) - 原生 macOS 文件管理器，支持标签页、分屏、内置终端和悬停预览。 [![Open-Source Software][OSS Icon]](https://github.com/andronasef/shark) ![Freeware][Freeware Icon] ![Native App][Native Icon]
+ * [Shuffle](https://shuffleapp.co) - 使用 Rust 构建的 GPU 渲染高速文件管理器，Finder 的替代品。 [![Open-Source Software][OSS Icon]](https://github.com/WizenPainter/shuffle) ![Freeware][Freeware Icon]
+ * [Strata Files](https://stratafiles.app) - 开源文件管理器和 Finder 替代品，支持即时搜索、实时文件夹大小、磁盘占用图和双栏视图。 [![Open-Source Software][OSS Icon]](https://github.com/cristipufu/strata-files) ![Freeware][Freeware Icon]
+ * [SwiftyMenu](https://apps.apple.com/us/app/swiftymenu/id1567748223?platform=mac) - 用常用应用快速打开所选文件或文件夹的 Finder 扩展。
+diff --git a/README.md b/README.md
+index 8023d42..4e0d542 100644
+--- a/README.md
++++ b/README.md
+@@ -1699,6 +1699,7 @@ If you have any suggestions, ideas, or discover excellent software, feel free to
+ * [Path Finder](https://www.cocoatech.com/) - File management app.
+ * [QSpace](https://qspace.awehunt.com) - A clean and efficient Multi-view File Manager. [![App Store][app-store Icon]](https://apps.apple.com/us/app/id1469774098?platform=mac)
+ * [RClick](https://github.com/wflixu/RClick) - Add new functionality to the macOS Finder context menu.  [![Open-Source Software][OSS Icon]](https://github.com/wflixu/RClick) ![Freeware][Freeware Icon]
++* [Shark - Better Finder](https://shark.andronasef.com) - Native file manager with tabs, split panes, a built-in terminal, and hover previews. [![Open-Source Software][OSS Icon]](https://github.com/andronasef/shark) ![Freeware][Freeware Icon] ![Native App][Native Icon]
+ * [Strata Files](https://stratafiles.app) - Open-source file manager and Finder alternative with instant search, live folder sizes, a disk usage map and dual pane. [![Open-Source Software][OSS Icon]](https://github.com/cristipufu/strata-files) ![Freeware][Freeware Icon]
+ * [SwiftyMenu](https://apps.apple.com/us/app/swiftymenu/id1567748223?platform=mac) - Finder extension for opening selected files or folders with custom app shortcuts.
+ * [TotalFinder](https://totalfinder.binaryage.com/) - Chrome-styled Finder substitute.
