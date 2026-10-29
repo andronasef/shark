@@ -3,6 +3,10 @@ title: How to open Terminal in the current folder on a Mac
 description: Five ways to open Terminal at the folder you're looking at in Finder, from the built-in "New Terminal at Folder" service to a terminal that lives inside your file manager.
 published: 2026-10-29
 updated: 2026-10-29
+image: ../../assets/terminal.webp
+imageAlt: "Shark with its terminal drawer open below the files in the current folder"
+tint: blue
+order: 5
 faq:
   - q: How do I open Terminal here from Finder?
     a: Right-click a folder and choose Services › New Terminal at Folder. If it's missing, turn it on in System Settings › Keyboard › Keyboard Shortcuts › Services, under Files and Folders.

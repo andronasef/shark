@@ -195,6 +195,10 @@ Open definition-list entries use a fine top separator and the catalog-entry padd
 
 Feature imagery sits on blue, mint, peach, or lavender panels with matching symbol tiles. Use only real app screenshots and the supplied Shark icon. Keep full screenshots intact and preserve aspect ratios. Raster origins are recorded in `ASSETS.md`; Astro generates responsive screenshot sizes. Do not recreate app UI as a fake screenshot.
 
+### Guide cards
+
+The Guides index is a two-column grid of cards (one column at 640px and below) with a 28px gap, 40px on mobile. Each card is one link: a tinted feature panel holding a full Shark screenshot (16:10, 28px by 24px padding), then a 25px title, a 15px description and a blue text link. The first guide is a featured card spanning both columns, image left and copy right with a 56px gap, stacking at 800px and below. Hovering lifts the panel 3px and deepens the screenshot shadow over 280ms; Reduce Motion removes both. Cards reuse the blue, mint, peach and lavender panel tints and their dark variants. Set a guide's card with `image`, `imageAlt`, `tint` and `order` in its frontmatter, using only Shark screenshots.
+
 ### Keyboard hints
 
 Shortcut labels use small bordered white keys with a subtle bottom shadow. Feature-story hints have a 25px minimum height and 28px minimum width; the denser dock hints use lighter fills.

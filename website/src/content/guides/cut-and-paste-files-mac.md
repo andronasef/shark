@@ -3,6 +3,10 @@ title: How to cut and paste files on a Mac (the Finder shortcut)
 description: Finder greys out Cut for files, but you can still move them with the keyboard. Here's the ⌥⌘V shortcut, how to undo a move, and other ways to move files on a Mac.
 published: 2026-10-29
 updated: 2026-10-29
+image: ../../assets/list-view.png
+imageAlt: "Shark in list view with a folder of files, sizes and dates, and a status bar"
+tint: peach
+order: 4
 faq:
   - q: Why is Cut greyed out in Finder?
     a: Finder only allows Cut for text, such as a file name you are editing. For files and folders, copy them with Command-C and then press Option-Command-V in the destination to move them.

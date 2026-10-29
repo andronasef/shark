@@ -3,6 +3,10 @@ title: "File Explorer for Mac: how to get Windows Explorer features on macOS"
 description: Moved from Windows? Here's the Mac equivalent of every File Explorer habit, from the address bar and cut and paste to the status bar, folder tree and keyboard shortcuts.
 published: 2026-10-29
 updated: 2026-10-29
+image: ../../assets/subfolder-menu.webp
+imageAlt: "Shark with its path bar and a cascading subfolder menu, like the File Explorer address bar"
+tint: mint
+order: 2
 faq:
   - q: What is the Mac version of File Explorer?
     a: Finder. It's the blue face icon at the left end of the Dock, and it's always running. Click it, or click the desktop and press Command-N, to open a new Finder window.

@@ -3,6 +3,10 @@ title: "The best Finder alternatives for Mac in 2026: 7 file managers compared"
 description: Looking to replace Finder? We compare seven Mac file managers, including Shark, ForkLift, Path Finder, Commander One, Marta, Nimble Commander and QSpace, on price, dual panes, terminals and remote servers.
 published: 2026-10-29
 updated: 2026-10-29
+image: ../../assets/hover-preview.webp
+imageAlt: "Shark file manager on a Mac showing a floating hover preview of a photo above a folder"
+tint: blue
+order: 1
 faq:
   - q: What is the best free Finder alternative for Mac?
     a: Shark, Marta and Nimble Commander are all free. Shark is the closest to Finder in look and feel and adds tabs, split panes and a built-in terminal. Marta is keyboard-first and configured with a text file. Nimble Commander is open source and follows the classic two-panel commander layout, with FTP and SFTP support.

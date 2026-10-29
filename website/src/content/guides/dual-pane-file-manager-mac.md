@@ -3,6 +3,10 @@ title: "Finder split screen: how to view two folders side by side on a Mac"
 description: Finder can't split one window into two panes. Here are four ways to see two folders side by side on macOS, from tiling Finder windows to a dual-pane file manager.
 published: 2026-10-29
 updated: 2026-10-29
+image: ../../assets/tabs-and-split.webp
+imageAlt: "Shark with folder tabs and two folders side by side in split panes"
+tint: lavender
+order: 3
 faq:
   - q: Does Finder have a split view?
     a: No. Finder shows one folder per window or tab. To see two folders at once, tile two Finder windows, or use a dual-pane file manager such as Shark, ForkLift or Commander One.
