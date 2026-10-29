@@ -1,6 +1,6 @@
 # Shark launch, Phase 1 drafts
 
-> Listing name everywhere: **Shark - Better Finder** (name fields, list entries, PR titles). Prose can say "Shark".
+> Listing name for new submissions: **Shark – File Manager**. The drafts and patches below were written, and the listings and pull requests submitted, under the old name "Shark - Better Finder"; they are kept as a record of what was posted. Prose can say "Shark".
 
 Nothing here has been submitted. Review, edit, then tell me which ones to send.
 

@@ -68,7 +68,7 @@ You only authorised Phase 1. Each of these needs a draft and your review first.
 
 | Platform | Angle |
 | --- | --- |
-| Show HN | "Show HN: Shark - Better Finder, a native Mac file manager with tabs, split panes and a terminal". Post on a weekday morning US time. Be ready to answer comments for a few hours. |
+| Show HN | "Show HN: Shark – File Manager, a native Mac file manager with tabs, split panes and a terminal". Post on a weekday morning US time. Be ready to answer comments for a few hours. |
 | r/macapps | Allowed to self-promote with disclosure. Lead with the story and a screenshot. |
 | r/macOS, r/MacOSApps, r/swift, r/opensource | Check each sidebar for self-promotion rules before posting. |
 | Indie Hackers | Product page plus a build story post. |

@@ -94,3 +94,9 @@ The Finder alternatives roundup also uses one official product screenshot per co
 Each guide also sets `image`, `imageAlt`, `tint` and `order` in its frontmatter for the Guides grid. Use a Shark screenshot there, never a third-party photo, so no credit is needed on the card.
 
 Only add other outside images with a free license (Commons, Unsplash, Pexels) and keep the credit line. Don't use competitors' screenshots or images from Google Images.
+
+## One name everywhere
+
+Use **Shark – File Manager** (with the en dash) in every new listing, post, directory entry and pull request. It is the Mac App Store name, the website's `SoftwareApplication` name and Open Graph site name, and the README heading. "Shark" alone is fine in running text. Listings submitted before 29 Oct 2026 still say "Shark - Better Finder"; when a directory lets you edit an entry (AlternativeTo, MacUpdate), switch it to the new name so mentions point to one product.
+
+Not renamed on purpose: the Mac App Store URL (`shark-better-finder`, set by Apple from the old name), the app bundle name (`Shark`), the screenshot alt text on the App Store review image (it shows the old name), and the already-opened pull requests.

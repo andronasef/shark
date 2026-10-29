@@ -14,8 +14,8 @@ const ogImage = abs('/og.png');
 const appJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Shark',
-  alternateName: 'Shark – File Manager',
+  name: 'Shark – File Manager',
+  alternateName: 'Shark',
   description,
   url: abs('/'),
   image: ogImage,
@@ -55,7 +55,7 @@ const appJsonLd = {
       openGraph={{
         basic: { title, type: ogType, image: ogImage, url: Astro.url.href },
         image: { width: 1200, height: 630, alt: 'Shark – File Manager, a native Mac file manager with folder tabs and two panes' },
-        optional: { description, siteName: 'Shark', locale: 'en_US' },
+        optional: { description, siteName: 'Shark – File Manager', locale: 'en_US' },
       }}
       twitter={{ card: 'summary_large_image', title, description, image: ogImage, imageAlt: 'Shark – File Manager, a native Mac file manager' }}
       extend={{

@@ -2,7 +2,7 @@
   <img src="Resources/AppIcon.png" width="112" alt="Shark app icon">
 </p>
 
-<h1 align="center">Shark</h1>
+<h1 align="center">Shark – File Manager</h1>
 <p align="center">
   <a href="https://github.com/andronasef/shark/releases"><img alt="Download the latest release" src="https://img.shields.io/github/v/release/andronasef/shark?include_prereleases&label=download&logo=github&color=0069d4"></a>
   <a href="https://github.com/andronasef/homebrew-shark"><img alt="Homebrew cask: andronasef/shark/shark" src="https://img.shields.io/badge/brew-andronasef%2Fshark%2Fshark-fbb040?logo=homebrew&logoColor=white"></a>
