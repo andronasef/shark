@@ -55,13 +55,25 @@ Next guide ideas: show hidden files on Mac, batch rename files on Mac, Total Com
 - Structured data: `SoftwareApplication` on every page, `FAQPage` on the home page, `Article` plus `BreadcrumbList` on guides.
 - `/llms.txt` lists the product, pages, guides and every feature. It is generated at build time, so it never goes stale.
 
-## Google Search Console (you do this)
+## Google Search Console
 
-1. Open https://search.google.com/search-console and add a **Domain** property for `shark.andronasef.com` (or `andronasef.com` to cover every subdomain).
-2. Add the TXT record Google gives you at your DNS provider, then click Verify. DNS verification needs no change to the site.
-3. In **Sitemaps**, submit `https://shark.andronasef.com/sitemap-index.xml`.
-4. In **URL Inspection**, request indexing for `/guides/finder-alternatives-mac/` and the other guides.
-5. Do the same at Bing Webmaster Tools (it can import from Search Console). Bing's index feeds ChatGPT search and Copilot.
+Done 29 Oct 2026 for the domain property `sc-domain:shark.andronasef.com` (verified owner):
+
+- Sitemap `https://shark.andronasef.com/sitemap-index.xml` submitted, status Success. Discovered pages show 0 until Google finishes processing it.
+- Indexing requested for all five guides. The home page was already indexed.
+- Search generative AI control: **Include** (inherited from `andronasef.com`). This is the setting you want for AI Overviews and AI Mode. Leave it.
+- Performance data is empty at first. Check back in a few days, then watch queries and pages for the guides.
+
+Still to do: Bing Webmaster Tools (it can import the site from Search Console). Bing's index feeds ChatGPT search and Copilot.
+
+## Cloudflare is adding to robots.txt
+
+The live `https://shark.andronasef.com/robots.txt` starts with a block that Cloudflare manages, not ours. It sets `Content-Signal: search=yes, ai-train=no` and disallows many AI training crawlers (GPTBot, ClaudeBot, anthropic-ai, Claude-Web, Google-Extended, CCBot, Applebot-Extended, Bytespider and others).
+
+- This does not block Google Search, AI Overviews or AI Mode. Google-Extended only controls Gemini training.
+- It does not block the search crawlers that power ChatGPT search or Perplexity (OAI-SearchBot, PerplexityBot are not listed).
+- It does stop those companies training future models on the site, so models may know less about Shark by name.
+- To change it, turn off "Block AI training bots" or the managed robots.txt in the Cloudflare dashboard for this zone. That's your call, since blocking training is a legitimate choice.
 
 ## AI search
 
@@ -78,5 +90,7 @@ Guides use Shark's own screenshots plus three freely licensed photos from Wikime
 - `website/src/assets/guides/macbook-air-keyboard.jpg`: TheumasNL, CC BY-SA 4.0
 
 The Finder alternatives roundup also uses one official product screenshot per competitor, credited and linked to its site: ForkLift (BinaryNights), Commander One (Electronic Team), Marta, Nimble Commander (Magnumbytes) and QSpace. These are in `website/src/assets/guides/alternatives/`. Path Finder has none yet, because its site has no image files to pull. If a developer asks for an image to come down, remove it.
+
+Each guide also sets `image`, `imageAlt`, `tint` and `order` in its frontmatter for the Guides grid. Use a Shark screenshot there, never a third-party photo, so no credit is needed on the card.
 
 Only add other outside images with a free license (Commons, Unsplash, Pexels) and keep the credit line. Don't use competitors' screenshots or images from Google Images.

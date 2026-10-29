@@ -47,6 +47,21 @@ Copy is drafted for all of these. None of the forms are opened yet. Each needs i
 
 Add "alternative to" links: Finder, Path Finder, ForkLift, Marta, Commander One, QTTabBar, Dolphin. This is only possible once the listing is approved.
 
+## Content: one article at a time
+
+Publish one article at a time, and make each one the most useful page on the web for its question. Quality over volume: one great guide beats five thin ones.
+
+For each article:
+
+1. Pick one real question people search (check volume and difficulty in Semrush; see [seo.md](seo.md)).
+2. Answer it in the first two sentences, then go deeper than the pages that rank today: steps, shortcuts, screenshots, edge cases, and an FAQ.
+3. Check every fact. Shark claims against the app; competitor claims against the developer's own site.
+4. Mention Shark only where it actually solves the problem.
+5. Publish under `website/src/content/guides/`, request indexing in Search Console, and share it where the question gets asked (Reddit, forums, social).
+6. Only start the next one when this one is done.
+
+Published so far: Finder alternatives comparison, File Explorer for Mac, Finder split screen, cut and paste files, open Terminal in a folder. Next candidates are in [seo.md](seo.md).
+
 ## Later phases (not started)
 
 You only authorised Phase 1. Each of these needs a draft and your review first.
