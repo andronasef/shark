@@ -9,6 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/partytown": "^2.1.9",
     "@astrojs/sitemap": "^3.7.4",
     "astro": "7.4.1",
     "astro-robots-txt": "^1.0.0",

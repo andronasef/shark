@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
+- Website: Google Analytics, loaded through Partytown so the tag runs in a web worker instead of slowing the page. The privacy policy has a new "This Website" section explaining what the website (not the app) collects and how to opt out.
 - Website: a custom 404 page with links to the home page, features and guides, kept out of search results with `noindex`.
 - Website: an HSTS header (`Strict-Transport-Security`) through Cloudflare's `_headers` file.
 - Website: a Guides section (`/guides/`) with five articles: a comparison of seven Finder alternatives (prices and features checked against each developer's site), File Explorer features on a Mac, Finder split screen, cutting and pasting files, and opening Terminal in a folder. Each guide ends with an FAQ that is also published as `FAQPage` structured data. Each guide has app screenshots credited, freely licensed photos from Wikimedia Commons, and credited official screenshots of the apps in the Finder alternatives roundup, `Article` and breadcrumb structured data, and appears in the sitemap. Images on the site now ship responsive sizes (`srcset`).

@@ -69,6 +69,13 @@ const appJsonLd = {
         meta: [{ name: 'author', content: 'Andrew Nasef' }],
       }}
     />
+    <script type="text/partytown" src="https://www.googletagmanager.com/gtag/js?id=G-D0WXGV3X7F"></script>
+    <script type="text/partytown">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-D0WXGV3X7F');
+    </script>
     <script type="application/ld+json" set:html={JSON.stringify(appJsonLd)} />
     {pageJsonLd && <script type="application/ld+json" set:html={JSON.stringify(pageJsonLd)} />}
   </head>
