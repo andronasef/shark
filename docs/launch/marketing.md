@@ -1,6 +1,8 @@
 # Marketing
 
-Listing name everywhere: **Shark - Better Finder**. Prose can say "Shark".
+Listing name from 29 Oct 2026: **Shark – File Manager** (matches the App Store after Apple rejected "Finder" in the name). Listings made before that use "Shark - Better Finder" and stay as they are. Prose can say "Shark".
+
+SEO keywords, guides and the Search Console steps: [seo.md](seo.md).
 
 Last updated 27 Oct 2026. Copy for every listing lives in [phase1-drafts.md](phase1-drafts.md).
 
@@ -24,7 +26,7 @@ Last updated 27 Oct 2026. Copy for every listing lives in [phase1-drafts.md](pha
 | MacUpdate | Submitted 27 Oct (by you) | In their review queue. Check the email linked to the Google account for approval or questions. |
 | awesome-mac | PR opened 27 Oct | https://github.com/jaywcjlove/awesome-mac/pull/3930 |
 | open-source-mac-os-apps | PR opened 27 Oct | https://github.com/serhii-londar/open-source-mac-os-apps/pull/1812 |
-| awesome-swift-macos-apps | PR opened 27 Oct | https://github.com/jaywcjlove/awesome-swift-macos-apps/pull/176 |
+| awesome-swift-macos-apps | Merged | https://github.com/jaywcjlove/awesome-swift-macos-apps/pull/176 |
 | README | Updated | Trailer link added to the top row. Not committed. |
 
 ## Remaining in Phase 1 (directories)
