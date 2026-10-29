@@ -1,0 +1,25 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import '../../styles/guides.css';
+
+const guides = (await getCollection('guides')).sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Layout title="Mac file management guides — Shark" description="Practical guides for managing files on a Mac: Finder alternatives, File Explorer habits, side-by-side folders, cut and paste, and opening Terminal in a folder.">
+  <SiteHeader currentPage="guides" />
+  <main id="main">
+    <section class="guide-hero container">
+      <h1>Guides<br /><span>Get more out of your Mac’s files.</span></h1>
+      <p>Short, practical answers to the questions people ask when Finder isn’t quite enough.</p>
+    </section>
+    <ul class="guide-list container">
+      {guides.map(g => (
+        <li><a href={`${base}/guides/${g.id}/`}><h2>{g.data.title}</h2><p>{g.data.description}</p></a></li>
+      ))}
+    </ul>
+  </main>
+  <SiteFooter />
+</Layout>

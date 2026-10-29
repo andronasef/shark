@@ -2,18 +2,20 @@
 import { SEO } from 'astro-seo';
 import '../styles/global.css';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-interface Props { title?: string; description?: string; }
+interface Props { title?: string; description?: string; ogType?: string; jsonLd?: object; }
 const {
-  title = 'Shark — A Better Finder for Mac with Tabs, Split Panes & Terminal',
-  description = 'A free, native Mac file manager with tabs, split panes, a built-in terminal, and quick previews. Familiar on the outside. More capable within.',
+  title = 'Shark – File Manager for Mac with Tabs, Split Panes & Terminal',
+  description = 'A free, native Mac file manager and Finder alternative with tabs, split panes, a built-in terminal, and quick previews. Familiar on the outside. More capable within.',
+  ogType = 'website',
+  jsonLd: pageJsonLd,
 } = Astro.props;
 const abs = (path: string) => new URL(`${base}${path}`, Astro.site).href;
 const ogImage = abs('/og.png');
-const jsonLd = {
+const appJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'Shark',
-  alternateName: 'Shark - Better Finder',
+  alternateName: 'Shark – File Manager',
   description,
   url: abs('/'),
   image: ogImage,
@@ -51,11 +53,11 @@ const jsonLd = {
       description={description}
       canonical={Astro.url.href}
       openGraph={{
-        basic: { title, type: 'website', image: ogImage, url: Astro.url.href },
-        image: { width: 1200, height: 630, alt: 'Shark - Better Finder, a native Mac file manager with folder tabs and two panes' },
+        basic: { title, type: ogType, image: ogImage, url: Astro.url.href },
+        image: { width: 1200, height: 630, alt: 'Shark – File Manager, a native Mac file manager with folder tabs and two panes' },
         optional: { description, siteName: 'Shark', locale: 'en_US' },
       }}
-      twitter={{ card: 'summary_large_image', title, description, image: ogImage, imageAlt: 'Shark - Better Finder, a native Mac file manager' }}
+      twitter={{ card: 'summary_large_image', title, description, image: ogImage, imageAlt: 'Shark – File Manager, a native Mac file manager' }}
       extend={{
         link: [
           { rel: 'icon', type: 'image/png', href: `${base}/icon.png` },
@@ -65,7 +67,8 @@ const jsonLd = {
         meta: [{ name: 'author', content: 'Andrew Nasef' }],
       }}
     />
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(appJsonLd)} />
+    {pageJsonLd && <script type="application/ld+json" set:html={JSON.stringify(pageJsonLd)} />}
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- Website: a Guides section (`/guides/`) with five articles: a comparison of seven Finder alternatives (prices and features checked against each developer's site), File Explorer features on a Mac, Finder split screen, cutting and pasting files, and opening Terminal in a folder. Each guide ends with an FAQ that is also published as `FAQPage` structured data. Each guide has app screenshots credited, freely licensed photos from Wikimedia Commons, and credited official screenshots of the apps in the Finder alternatives roundup, `Article` and breadcrumb structured data, and appears in the sitemap. Images on the site now ship responsive sizes (`srcset`).
+- Website: a generated `/llms.txt` for AI search tools, built from the guides and the feature catalog. The home FAQ now has `FAQPage` structured data and a "Does Shark replace Finder?" answer.
+
+### Changed
+- Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
+
 ## [1.0.0-alpha.3] - 2026-10-27
 
 ### Added

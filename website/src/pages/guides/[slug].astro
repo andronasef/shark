@@ -1,0 +1,70 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import DownloadLink from '../../components/DownloadLink.astro';
+import BrewCommand from '../../components/BrewCommand.astro';
+import '../../styles/guides.css';
+
+export async function getStaticPaths() {
+  return (await getCollection('guides')).map(guide => ({ params: { slug: guide.id }, props: { guide } }));
+}
+
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+const { title, description, published, updated, faq } = guide.data;
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const home = new URL('/', Astro.site).href;
+const article = {
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: published.toISOString(),
+  dateModified: (updated ?? published).toISOString(),
+  author: { '@type': 'Person', name: 'Andrew Nasef', url: 'https://andronasef.com/' },
+  publisher: { '@type': 'Person', name: 'Andrew Nasef' },
+  mainEntityOfPage: Astro.url.href,
+  image: new URL('/og.png', Astro.site).href,
+};
+const breadcrumb = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Shark', item: home },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: new URL('/guides/', Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: title, item: Astro.url.href },
+  ],
+};
+const faqPage = faq && {
+  '@type': 'FAQPage',
+  mainEntity: faq.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const jsonLd = { '@context': 'https://schema.org', '@graph': [article, breadcrumb, faqPage].filter(Boolean) };
+---
+<Layout title={`${title} — Shark`} description={description} ogType="article" jsonLd={jsonLd}>
+  <SiteHeader currentPage="guides" />
+  <main id="main">
+    <article class="guide container">
+      <header>
+        <a class="guide-back" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/guides/`}>All guides</a>
+        <h1>{title}</h1>
+        <p class="guide-meta">By Andrew Nasef · <time datetime={(updated ?? published).toISOString()}>{updated ? `Updated ${fmt(updated)}` : fmt(published)}</time></p>
+      </header>
+      <div class="guide-body">
+        <Content />
+        {faq && (
+          <section aria-labelledby="faq">
+            <h2 id="faq">Frequently asked questions</h2>
+            {faq.map(f => <><h3>{f.q}</h3><p>{f.a}</p></>)}
+          </section>
+        )}
+      </div>
+      <aside class="guide-cta">
+        <h2>Try Shark</h2>
+        <p>Free, open source, macOS 14 or later. Tabs, split panes, a built-in terminal and hover previews.</p>
+        <div class="cta-row"><DownloadLink /><BrewCommand /></div>
+      </aside>
+    </article>
+  </main>
+  <SiteFooter />
+</Layout>

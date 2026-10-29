@@ -1,0 +1,57 @@
+@layer components {
+  .guide-hero { padding-block: 88px 40px; max-width: 780px; }
+  .guide-hero h1, .guide h1 { font-size: clamp(36px, 4.5vw, 52px); line-height: 1.08; }
+  .guide-hero h1 span { color: var(--hero-span); }
+  .guide-hero p { margin-top: 18px; color: var(--secondary); }
+  .guide-list { max-width: 780px; padding-bottom: 96px; list-style: none; display: grid; gap: 16px; }
+  .guide-list a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px 28px; transition: border-color .2s var(--ease); }
+  .guide-list a:hover { border-color: var(--accent); }
+  .guide-list h2 { font-size: 22px; letter-spacing: -.02em; }
+  .guide-list p { margin-top: 8px; font-size: 15px; color: var(--secondary); }
+
+  .guide { max-width: 720px; padding-block: 72px 96px; }
+  .guide-back { font-size: 14px; color: var(--accent); }
+  .guide h1 { margin-top: 16px; }
+  .guide-meta { margin-top: 16px; font-size: 14px; color: var(--secondary); }
+  .guide-body { margin-top: 40px; font-size: 17px; line-height: 1.75; }
+  .guide-body > * + * { margin-top: 1.1em; }
+  .guide-body h2 { font-size: 28px; letter-spacing: -.02em; margin-top: 2em; }
+  .guide-body h3 { font-size: 21px; letter-spacing: -.015em; margin-top: 1.6em; }
+  .guide-body ul, .guide-body ol { padding-left: 1.3em; }
+  .guide-body li + li { margin-top: .4em; }
+  .guide-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .guide-body strong { font-weight: 600; }
+  .guide-body code { font: .88em ui-monospace, 'SF Mono', Menlo, monospace; padding: 1px 5px; border-radius: 5px; background: var(--blue); }
+  .guide-body pre { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; overflow-x: auto; }
+  .guide-body pre code { background: none; padding: 0; }
+  .guide-body table { width: 100%; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
+  .guide-body th, .guide-body td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .guide-body th { font-weight: 600; }
+  .guide-cta { margin-top: 56px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px 32px; }
+  .guide-cta h2 { font-size: 24px; }
+  .guide-cta p { margin: 10px 0 20px; color: var(--secondary); }
+  .guide-cta .cta-row { justify-content: flex-start; }
+}
+
+@layer responsive {
+  @media (max-width: 640px) {
+    .guide-hero { padding-block: 56px 28px; }
+    .guide { padding-block: 48px 72px; }
+    .guide-body { font-size: 16px; }
+    .guide-list a, .guide-cta { padding: 20px; border-radius: 12px; }
+  }
+}
+
+@layer components {
+  .guide-body img { display: block; width: 100%; height: auto; margin-block: 1.6em; border-radius: 12px; border: 1px solid var(--line); }
+}
+
+@layer components {
+  .guide-body img + .credit, .guide-body p:has(> img) + .credit { margin-top: -1em; font-size: 13px; color: var(--secondary); }
+  .guide-body .credit a { color: inherit; }
+}
+
+@layer components {
+  .guide-body section > * + * { margin-top: 1.1em; }
+  .guide-body section h3 + p { margin-top: .4em; }
+}

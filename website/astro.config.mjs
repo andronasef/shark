@@ -7,4 +7,5 @@ export default defineConfig({
   base: '/',
   output: 'static',
   integrations: [sitemap(), robotsTxt()],
+  image: { layout: 'constrained' },
 });

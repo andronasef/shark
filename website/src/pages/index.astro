@@ -14,6 +14,19 @@ import preview from '../assets/hover-preview.webp';
 import folders from '../assets/subfolder-menu.webp';
 
 const icon = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/icon.png`;
+const faqs = [
+  { q: "Is Shark free?", a: "Yes. Shark is free to download and use. You can also explore the source on <a href=\"https://github.com/andronasef/shark\">GitHub</a>." },
+  { q: "Does Shark replace Finder?", a: "It can sit alongside Finder or take over. Shark opens folders in its own window, and Show in Finder is always one click away. Settings › General can ask macOS to make Shark your default folder app, or restore Finder. macOS does not always allow the change." },
+  { q: "Will it work on my Mac?", a: "Shark requires macOS Sonoma 14 or later and supports Apple silicon and Intel Macs. Native Liquid Glass chrome is available on macOS 26; earlier versions use system materials." },
+  { q: "How do I install it?", a: "With Homebrew, run <code>brew install --cask andronasef/shark/shark</code>. Or download the latest Shark DMG, open it, and drag Shark.app to your Applications folder. The Mac App Store version is waiting for Apple’s review." },
+  { q: "Why does it ask for folder access?", a: "macOS protects folders such as Documents and Downloads. Allow access to the folders you want to browse when macOS asks. You can manage those permissions in System Settings." },
+  { q: "Can I use it with the keyboard?", a: "Yes. Open tabs with ⌘T, jump to a path with ⌘L, and open the command palette with ⌘K. F3 toggles split panes and F4 opens the terminal. Depending on your keyboard settings, hold Fn with the function keys." },
+];
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/<[^>]+>/g, '') } })),
+};
 const totalFeatures = featureGroups.reduce((acc, g) => acc + g.features.length, 0);
 const features = [
   { id: 'split', icon: 'split' as const, title: 'A little more room.\nA lot less back and forth.', description: 'Keep your project folders in tabs. Open a second pane to move files between locations. Pin the places you use all day, and pick up where you left off.', action: 'Two places. One window.', shortcut: 'F3', shortcutLabel: 'Split panes', image: split, alt: 'Shark with pinned folder tabs and two file panes side by side', tint: 'blue' },
@@ -28,7 +41,7 @@ const tools = [
   ['Make everyday work lighter', 'Batch rename, cut and paste, compress, and move files to the Trash.'],
 ];
 ---
-<Layout>
+<Layout jsonLd={faqJsonLd}>
   <SiteHeader />
 
   <main id="main">
@@ -83,11 +96,7 @@ const tools = [
     <section id="faq" class="faq container" aria-labelledby="faq-heading">
       <div><h2 id="faq-heading">A few things<br />you might ask.</h2><a class="text-link" href="https://userhq.increasinglabs.com/increasing-labs/shark">Have another question? <Icon name="arrow" size={17} /></a></div>
       <div class="faq-list">
-        <details><summary>Is Shark free?<span aria-hidden="true">+</span></summary><p>Yes. Shark is free to download and use. You can also explore the source on <a href="https://github.com/andronasef/shark">GitHub</a>.</p></details>
-        <details><summary>Will it work on my Mac?<span aria-hidden="true">+</span></summary><p>Shark requires macOS Sonoma 14 or later and supports Apple silicon and Intel Macs. Native Liquid Glass chrome is available on macOS 26; earlier versions use system materials.</p></details>
-        <details><summary>How do I install it?<span aria-hidden="true">+</span></summary><p>With Homebrew, run <code>brew install --cask andronasef/shark/shark</code>. Or download the latest Shark DMG, open it, and drag Shark.app to your Applications folder. The Mac App Store version is waiting for Apple’s review.</p></details>
-        <details><summary>Why does it ask for folder access?<span aria-hidden="true">+</span></summary><p>macOS protects folders such as Documents and Downloads. Allow access to the folders you want to browse when macOS asks. You can manage those permissions in System Settings.</p></details>
-        <details><summary>Can I use it with the keyboard?<span aria-hidden="true">+</span></summary><p>Yes. Open tabs with ⌘T, jump to a path with ⌘L, and open the command palette with ⌘K. F3 toggles split panes and F4 opens the terminal. Depending on your keyboard settings, hold Fn with the function keys.</p></details>
+        {faqs.map(f => <details><summary>{f.q}<span aria-hidden="true">+</span></summary><p set:html={f.a} /></details>)}
       </div>
     </section>
 
