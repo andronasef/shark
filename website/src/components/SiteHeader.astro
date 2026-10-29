@@ -1,16 +1,17 @@
 ---
+import { Image } from 'astro:assets';
 import DownloadLink from './DownloadLink.astro';
+import icon from '../assets/icon.png';
 import ThemeToggle from './ThemeToggle.astro';
 interface Props { currentPage?: 'home' | 'features' | 'guides' | 'privacy'; }
 const { currentPage = 'home' } = Astro.props;
 const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
-const icon = `${home}icon.png`;
 ---
 <header class="site-header">
   <nav class="nav glass" aria-label="Main navigation">
     <div class="nav-bar">
       <a class="brand" href={home} aria-label="Shark home">
-        <img src={icon} width="36" height="36" alt="" />
+        <Image src={icon} width={36} height={36} layout="fixed" loading="eager" alt="" />
         <span>Shark</span>
       </a>
       <div class="nav-actions">

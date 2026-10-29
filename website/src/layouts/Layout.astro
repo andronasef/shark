@@ -2,12 +2,13 @@
 import { SEO } from 'astro-seo';
 import '../styles/global.css';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-interface Props { title?: string; description?: string; ogType?: string; jsonLd?: object; }
+interface Props { title?: string; description?: string; ogType?: string; jsonLd?: object; noindex?: boolean; }
 const {
-  title = 'Shark – File Manager for Mac with Tabs, Split Panes & Terminal',
-  description = 'A free, native Mac file manager and Finder alternative with tabs, split panes, a built-in terminal, and quick previews. Familiar on the outside. More capable within.',
+  title = 'Shark – File Manager: Free Finder Alternative for macOS',
+  description = 'A free, open source file manager and Finder alternative for macOS, with tabs, split panes, a built-in terminal and hover previews. Familiar, but more capable.',
   ogType = 'website',
   jsonLd: pageJsonLd,
+  noindex = false,
 } = Astro.props;
 const abs = (path: string) => new URL(`${base}${path}`, Astro.site).href;
 const ogImage = abs('/og.png');
@@ -52,6 +53,7 @@ const appJsonLd = {
       title={title}
       description={description}
       canonical={Astro.url.href}
+      noindex={noindex}
       openGraph={{
         basic: { title, type: ogType, image: ogImage, url: Astro.url.href },
         image: { width: 1200, height: 630, alt: 'Shark – File Manager, a native Mac file manager with folder tabs and two panes' },

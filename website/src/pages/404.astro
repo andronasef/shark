@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import DownloadLink from '../components/DownloadLink.astro';
+import Icon from '../components/Icon.astro';
+import '../styles/privacy.css';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const links = [
+  { href: `${base}/`, label: 'Home', text: 'What Shark is and how to install it.' },
+  { href: `${base}/features/`, label: 'All features', text: 'Everything Shark does today.' },
+  { href: `${base}/guides/`, label: 'Guides', text: 'Practical answers for managing files on a Mac.' },
+];
+---
+<Layout title="Page not found — Shark – File Manager" description="This page doesn't exist. Head back to Shark's home page, features or guides." noindex>
+  <SiteHeader />
+  <main id="main">
+    <section class="privacy-hero container">
+      <h1>Page not found.<br /><span>This folder is empty.</span></h1>
+      <p class="privacy-meta">The link may be old, or the page has moved. Try one of these instead.</p>
+    </section>
+    <div class="privacy-layout container not-found">
+      <ul>
+        {links.map(l => <li><a class="text-link" href={l.href}>{l.label} <Icon name="arrow" size={16} /></a><span>{l.text}</span></li>)}
+      </ul>
+      <DownloadLink />
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>
+
+<style>
+  .not-found ul { list-style: none; padding: 0; display: grid; gap: 18px; margin-bottom: 36px; }
+  .not-found li { display: grid; gap: 4px; }
+  .not-found li a { font-size: 17px; width: fit-content; }
+  .not-found li span { color: var(--secondary); font-size: 15px; }
+</style>

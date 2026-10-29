@@ -9,11 +9,11 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { featureGroups } from '../data/features';
 import split from '../assets/tabs-and-split.webp';
+import icon from '../assets/icon.png';
 import terminal from '../assets/terminal.webp';
 import preview from '../assets/hover-preview.webp';
 import folders from '../assets/subfolder-menu.webp';
 
-const icon = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/icon.png`;
 const faqs = [
   { q: "Is Shark free?", a: "Yes. Shark is free to download and use. You can also explore the source on <a href=\"https://github.com/andronasef/shark\">GitHub</a>." },
   { q: "Does Shark replace Finder?", a: "It can sit alongside Finder or take over. Shark opens folders in its own window, and Show in Finder is always one click away. Settings › General can ask macOS to make Shark your default folder app, or restore Finder. macOS does not always allow the change." },
@@ -101,7 +101,7 @@ const tools = [
     </section>
 
     <section class="closing container" aria-labelledby="closing-heading">
-      <img src={icon} alt="" width="92" height="92" loading="lazy" />
+      <Image src={icon} alt="" width={92} height={92} layout="fixed" />
       <h2 id="closing-heading">Make room for<br />a better workflow.</h2>
       <p>Your next favorite place for your files.</p>
       <div class="cta-row"><DownloadLink /><MacAppStoreLink /><BrewCommand /></div>

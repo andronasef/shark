@@ -1,8 +1,10 @@
 ---
+import { Image } from 'astro:assets';
+import icon from '../assets/icon.png';
 const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 ---
 <footer class="footer container">
-  <a class="brand" href={home}><img src={`${home}icon.png`} width="28" height="28" alt="" /><span>Shark</span></a>
+  <a class="brand" href={home}><Image src={icon} width={28} height={28} layout="fixed" alt="" /><span>Shark</span></a>
   <p>A native Mac file manager by <a href="https://andronasef.com/" target="_blank" rel="noopener">Andrew Nasef</a>.</p>
   <div><a href={`${home}features/`}>All features</a><a href={`${home}guides/`}>Guides</a><a href={`${home}privacy/`}>Privacy</a><a href="https://github.com/andronasef/shark" target="_blank" rel="noopener">Source code</a><a href="https://github.com/andronasef/shark/releases" target="_blank" rel="noopener">Releases</a><a href="https://userhq.increasinglabs.com/increasing-labs/shark" target="_blank" rel="noopener">Feedback & feature requests</a></div>
 </footer>
