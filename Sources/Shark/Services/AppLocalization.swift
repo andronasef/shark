@@ -118,7 +118,10 @@ public enum AppLocalization {
 
     public static func bundle(for language: AppLanguage) -> Bundle {
         let selected = language == .system ? Self.language : language
-        guard let path = Bundle.module.path(forResource: selected.rawValue, ofType: "lproj"),
+        // SwiftPM native builds normalize region/script resource directories to lowercase.
+        let path = Bundle.module.path(forResource: selected.rawValue, ofType: "lproj")
+            ?? Bundle.module.path(forResource: selected.rawValue.lowercased(), ofType: "lproj")
+        guard let path,
               let bundle = Bundle(path: path) else { return Bundle.module }
         return bundle
     }

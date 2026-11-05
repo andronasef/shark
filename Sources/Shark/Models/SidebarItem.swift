@@ -16,6 +16,7 @@ public struct SidebarItem: Identifiable, Hashable, Sendable {
     public let url: URL
     public let iconName: String
     public let section: SidebarSection
+    public let isEjectable: Bool
     public let isRemovable: Bool
 
     public init(
@@ -24,7 +25,8 @@ public struct SidebarItem: Identifiable, Hashable, Sendable {
         url: URL,
         iconName: String,
         section: SidebarSection,
-        isRemovable: Bool = false
+        isRemovable: Bool = false,
+        isEjectable: Bool = false
     ) {
         self.id = id ?? url.path
         self.name = name
@@ -32,5 +34,6 @@ public struct SidebarItem: Identifiable, Hashable, Sendable {
         self.iconName = iconName
         self.section = section
         self.isRemovable = isRemovable
+        self.isEjectable = isEjectable
     }
 }

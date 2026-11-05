@@ -149,11 +149,14 @@ public actor FileSystemService {
     public func mountedVolumes() -> [SidebarItem] {
         var volumeItems: [SidebarItem] = []
 
-        let volumeKeys: [URLResourceKey] = [.volumeLocalizedNameKey, .isVolumeKey, .volumeIsRemovableKey]
+        let volumeKeys: [URLResourceKey] = [.volumeLocalizedNameKey, .isVolumeKey, .volumeIsRemovableKey, .volumeIsEjectableKey, .volumeIsInternalKey, .volumeIsLocalKey]
         if let volumeURLs = fileManager.mountedVolumeURLs(includingResourceValuesForKeys: volumeKeys, options: [.skipHiddenVolumes]) {
             for vURL in volumeURLs {
                 let name = (try? vURL.resourceValues(forKeys: [.volumeLocalizedNameKey]).volumeLocalizedName) ?? vURL.lastPathComponent
-                let isRemovable = (try? vURL.resourceValues(forKeys: [.volumeIsRemovableKey]).volumeIsRemovable) ?? false
+                let values = try? vURL.resourceValues(forKeys: Set(volumeKeys))
+                let isRemovable = values?.volumeIsRemovable ?? false
+                let isEjectable = VolumeEjectService.canEject(vURL, isEjectable: values?.volumeIsEjectable ?? false,
+                    isRemovable: isRemovable, isInternal: values?.volumeIsInternal, isLocal: values?.volumeIsLocal)
                 let icon = isRemovable ? "externaldrive" : "internaldrive"
                 
                 volumeItems.append(SidebarItem(
@@ -162,7 +165,8 @@ public actor FileSystemService {
                     url: vURL,
                     iconName: icon,
                     section: .volumes,
-                    isRemovable: isRemovable
+                    isRemovable: isRemovable,
+                    isEjectable: isEjectable
                 ))
             }
         }

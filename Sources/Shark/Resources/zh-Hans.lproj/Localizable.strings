@@ -689,3 +689,11 @@
 "File Inspector" = "文件检查器";
 
 "Help" = "帮助";
+
+"Eject “%@”" = "推出“%@”";
+
+"Could not eject “%@”: %@" = "无法推出“%@”：%@";
+
+"Right-click an ejectable volume" = "右键单击可推出的宗卷";
+
+"Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "推出宗卷。在“位置”和“文件夹树”中均可使用；如果宗卷正被使用，macOS 会报告错误。";

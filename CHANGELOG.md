@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [1.0.0-alpha.4] - 2026-11-05
 
 ### Added
+- Mounted volumes now offer Eject in the Places and Folder Tree context menus, with busy-volume errors and automatic sidebar refresh after mounting or unmounting. Startup and internal system volumes are excluded.
 - Open With lists each compatible application with its native app icon.
 - Occasional status-bar tips: each folder visit has a 10% chance of showing a localized shortcut reminder. Tips clear on selection or file operations, hide when space is tight, and can be disabled in Settings › General.
 - Full-featured Shark Photo Viewer: added horizontal & vertical image flipping, counter-clockwise rotation (⇧⌘R), an interactive zoom presets menu (Fit, 100%, 25%–400%), quick Copy Image to clipboard (⌘C), Open in Default App, Reveal in Finder, Move to Trash (⌘⌫), and dedicated toggle shortcuts for the thumbnail filmstrip (⌘T) and image metadata panel (⌘I), along with a canvas context menu.
@@ -27,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
 
 ### Fixed
+- Regional and script language catalogs now resolve when SwiftPM lowercases their resource directories, preserving Brazilian Portuguese and Simplified Chinese translations in native builds.
 - Long names in cascading folder menus use a middle ellipsis with the full path in the tooltip; header and bottom path segments now respect a 180 pt width limit.
 - Status bar selection totals now include calculated folder sizes and refresh after each calculation without reselecting the folder.
 - Photo Viewer: ⌘C copies the photo on screen. It used to copy the file selected in the folder window, which could be a different photo, and selected text in the info panel copies as text.

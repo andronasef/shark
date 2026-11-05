@@ -147,7 +147,8 @@ public struct PlacesSidebarView: View {
                 if isTree {
                     SidebarSectionGroup("Folders", focus: $sidebarFocus) {
                         FolderTreeRows(roots: treeRoots, navigationState: navigationState, tree: folderTree,
-                                       favoritesStore: favoritesStore, focus: $sidebarFocus)
+                                       favoritesStore: favoritesStore, focus: $sidebarFocus,
+                                       ejectableVolumes: Set(locations.filter(\.isEjectable).map(\.url)), onEject: ejectVolume)
                     }
                 }
 
@@ -158,7 +159,8 @@ public struct PlacesSidebarView: View {
                         sidebarRow(
                             name: item.name,
                             iconName: item.iconName,
-                            url: item.url
+                            url: item.url,
+                            isEjectable: item.isEjectable
                             )
                     }
                 }
@@ -231,6 +233,12 @@ public struct PlacesSidebarView: View {
         .task {
             await loadSidebarItems()
         }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didMountNotification)) { _ in
+            Task { await loadSidebarItems() }
+        }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didUnmountNotification)) { _ in
+            Task { await loadSidebarItems() }
+        }
         .onKeyPress(.downArrow) { moveSidebarFocus(by: 1); return .handled }
         .onKeyPress(.upArrow) { moveSidebarFocus(by: -1); return .handled }
         .onChange(of: sidebarFocus) { _, focus in
@@ -272,7 +280,8 @@ public struct PlacesSidebarView: View {
         name: String,
         iconName: String,
         url: URL,
-        favorite: SidebarFavorite? = nil
+        favorite: SidebarFavorite? = nil,
+        isEjectable: Bool = false
     ) -> some View {
         let section = favorite != nil ? "Favorites" : (name == "Recents" || name == "Shared" ? "Top" : "Locations")
         let rowID = "\(section):\(url.path)"
@@ -400,6 +409,11 @@ public struct PlacesSidebarView: View {
             .disabled(!available)
             Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                 .disabled(!available)
+            if isEjectable {
+                Divider()
+                Button(L10n.format("Eject “%@”", L10n.literal(name)), systemImage: "eject") { ejectVolume(url) }
+                    .disabled(VolumeEjectService.shared.ejecting.contains(url.standardizedFileURL))
+            }
             if let favorite {
                 Button(L10n.text("Locate Folder…"), systemImage: "folder.badge.questionmark") { locateFavorite(favorite) }
                 Divider()
@@ -493,6 +507,17 @@ public struct PlacesSidebarView: View {
             SidebarItem(name: L10n.text("AirDrop"), url: URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app"), iconName: "airdrop", section: .places),
             SidebarItem(name: L10n.text("Trash"), url: home.appendingPathComponent(".Trash"), iconName: "trash", section: .places)
         ]
+    }
+
+    private func ejectVolume(_ url: URL) {
+        Task {
+            do {
+                try await VolumeEjectService.shared.eject(url)
+                await loadSidebarItems()
+            } catch {
+                navigationState.operationError = L10n.format("Could not eject “%@”: %@", L10n.literal(url.lastPathComponent), error.localizedDescription)
+            }
+        }
     }
 
     private func loadSidebarItems() async {

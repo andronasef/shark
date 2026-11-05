@@ -689,3 +689,11 @@
 "File Inspector" = "Inspetor de arquivos";
 
 "Help" = "Ajuda";
+
+"Eject “%@”" = "Ejetar “%@”";
+
+"Could not eject “%@”: %@" = "Não foi possível ejetar “%@”: %@";
+
+"Right-click an ejectable volume" = "Clique com o botão direito em um volume ejetável";
+
+"Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "Ejetar o volume. Disponível em Locais e Árvore de pastas; o macOS informa um erro se ele estiver em uso.";

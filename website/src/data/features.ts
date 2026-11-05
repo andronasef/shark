@@ -47,7 +47,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'folder-tree', title: 'File Explorer folder tree option', description: 'Switch the sidebar to an expandable folder tree, like Windows File Explorer, in place of Locations and Tags. Folders load lazily, reveal your active path automatically, and support keyboard and drag-and-drop navigation.' },
       { id: 'recent-frequent', title: 'Recent & frequent folders', description: 'Revisit your working locations from the Go menu or the command palette.' },
       { id: 'subfolder-menus', title: 'Cascading subfolder menus', description: 'Use the arrow on a hovered folder or path segment to browse nested folders. Contents load asynchronously so browsing can stay responsive on large folders. Long names are shortened in the middle, with the full path available on hover. Click to open, Command-click a folder for a new tab, or Option-click to copy. Switch the hovered-folder arrow off in Settings › Previews.' },
-      { id: 'local-volumes', title: 'Local folders & mounted volumes', description: 'Browse your Mac and volumes mounted in macOS from the sidebar. Shark does not include a built-in remote-protocol or cloud-account client.' },
+      { id: 'local-volumes', title: 'Local folders & mounted volumes', description: 'Browse your Mac and volumes mounted in macOS from the sidebar. Right-click an ejectable, external, or network volume in Places or Folder Tree to eject it. Busy-volume failures are reported, and the sidebar updates when volumes mount or unmount. Shark does not include a built-in remote-protocol or cloud-account client.' },
     ],
   },
   // ViewMode, DetailsTableView, MillerColumnsView, IconsGridView, GalleryView, NavigationState.

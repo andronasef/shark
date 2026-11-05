@@ -689,3 +689,11 @@
 "File Inspector" = "Inspector de archivos";
 
 "Help" = "Ayuda";
+
+"Eject “%@”" = "Expulsar «%@»";
+
+"Could not eject “%@”: %@" = "No se pudo expulsar «%@»: %@";
+
+"Right-click an ejectable volume" = "Clic derecho en un volumen expulsable";
+
+"Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "Expulsar el volumen. Disponible en Lugares y Árbol de carpetas; macOS muestra un error si está en uso.";

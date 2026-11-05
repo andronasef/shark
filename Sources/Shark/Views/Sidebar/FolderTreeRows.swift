@@ -9,6 +9,8 @@ struct FolderTreeRows: View {
     let tree: FolderTreeModel
     let favoritesStore: SidebarFavoritesStore
     @FocusState.Binding var focus: String?
+    var ejectableVolumes: Set<URL> = []
+    var onEject: (URL) -> Void = { _ in }
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var dropTarget: String?
@@ -141,6 +143,11 @@ struct FolderTreeRows: View {
             _ = favoritesStore.insert([row.url], at: favoritesStore.items.count)
         }
         Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting([row.url]) }
+        if ejectableVolumes.contains(row.url) {
+            Divider()
+            Button(L10n.format("Eject “%@”", L10n.literal(row.name)), systemImage: "eject") { onEject(row.url) }
+                .disabled(VolumeEjectService.shared.ejecting.contains(row.url.standardizedFileURL))
+        }
         Button(L10n.text("Refresh"), systemImage: "arrow.clockwise") { Task { await tree.load(row.url, showHidden: showHidden) } }
     }
 

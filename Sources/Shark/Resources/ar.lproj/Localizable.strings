@@ -689,3 +689,11 @@
 "File Inspector" = "فاحص الملفات";
 
 "Help" = "مساعدة";
+
+"Eject “%@”" = "إخراج «%@»";
+
+"Could not eject “%@”: %@" = "تعذر إخراج «%@»: %@";
+
+"Right-click an ejectable volume" = "النقر بزر الفأرة الأيمن على وحدة تخزين قابلة للإخراج";
+
+"Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "إخراج وحدة التخزين. متاح في الأماكن وشجرة المجلدات؛ يعرض macOS خطأ إذا كانت قيد الاستخدام.";

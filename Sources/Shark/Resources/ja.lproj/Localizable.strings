@@ -689,3 +689,11 @@
 "File Inspector" = "ファイルインスペクタ";
 
 "Help" = "ヘルプ";
+
+"Eject “%@”" = "「%@」を取り出す";
+
+"Could not eject “%@”: %@" = "「%@」を取り出せませんでした：%@";
+
+"Right-click an ejectable volume" = "取り出し可能なボリュームを右クリック";
+
+"Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "ボリュームを取り出します。「場所」と「フォルダツリー」で利用できます。使用中の場合はmacOSがエラーを表示します。";

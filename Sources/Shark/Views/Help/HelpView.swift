@@ -82,6 +82,7 @@ enum MouseHelp {
                 HelpBinding(gesture: L10n.text("Drag a folder into Favorites"), action: L10n.text("Add it as a shortcut. Drop between favorites to choose its place.")),
                 HelpBinding(gesture: L10n.text("Drag a favorite"), action: L10n.text("Reorder it. Release it outside the sidebar to remove the shortcut; the folder stays.")),
                 HelpBinding(gesture: L10n.text("Drop files onto a sidebar folder"), action: L10n.text("Move it there, or copy it if the folder is on another disk. Hold ⌥ to copy, ⌘ to move.")),
+                HelpBinding(gesture: L10n.text("Right-click an ejectable volume"), action: L10n.text("Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy.")),
                 HelpBinding(gesture: L10n.text("Right-click a place or folder"), action: L10n.text("Open in a new tab, show in Finder, add to Favorites, or refresh the tree.")),
                 HelpBinding(gesture: L10n.text("Middle-click a place or path segment"), action: L10n.text("Open it in a new tab.")),
                 HelpBinding(gesture: L10n.text("⌘-click a path segment"), action: L10n.text("Open it in a new tab.")),
