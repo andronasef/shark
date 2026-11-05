@@ -54,30 +54,39 @@ public struct IconsGridView: View {
 
     public var body: some View {
         GeometryReader { containerGeo in
-            ScrollView {
-                let currentIconSize = navigationState.iconSize
-                let cellMinWidth = max(currentIconSize + 28, 96)
-                let cellMaxWidth = cellMinWidth + 32
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    let currentIconSize = navigationState.iconSize
+                    let cellMinWidth = max(currentIconSize + 28, 96)
+                    let cellMaxWidth = cellMinWidth + 32
 
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: cellMinWidth, maximum: cellMaxWidth), spacing: 20)],
-                    spacing: 24
-                ) {
-                    ForEach(navigationState.filteredAndSortedItems) { item in
-                        let isSelected = navigationState.selectedItemIDs.contains(item.id)
-                        IconGridItemView(
-                            item: item,
-                            iconSize: currentIconSize,
-                            isSelected: isSelected,
-                            navigationState: navigationState,
-                            onSubfolderNavigate: { targetURL, inNewTab in
-                                if inNewTab, let workspace {
-                                    workspace.open(targetURL, from: navigationState, newTab: true)
-                                } else {
-                                    navigationState.navigateTo(targetURL)
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: cellMinWidth, maximum: cellMaxWidth), spacing: 20)],
+                        spacing: 24
+                    ) {
+                        ForEach(navigationState.filteredAndSortedItems) { item in
+                            let isSelected = navigationState.selectedItemIDs.contains(item.id)
+                            IconGridItemView(
+                                item: item,
+                                iconSize: currentIconSize,
+                                isSelected: isSelected,
+                                isRenaming: navigationState.renamingItemURL == item.url,
+                                onCommitRename: { newName in
+                                    Task { await navigationState.commitRename(url: item.url, newName: newName) }
+                                },
+                                onCancelRename: {
+                                    navigationState.cancelRenaming()
+                                },
+                                onSubfolderNavigate: { targetURL, inNewTab in
+                                    if inNewTab, let workspace {
+                                        workspace.open(targetURL, from: navigationState, newTab: true)
+                                    } else {
+                                        navigationState.navigateTo(targetURL)
+                                    }
                                 }
-                            }
-                        )
+                            )
+                            .equatable()
+                            .id(item.url)
                         .background {
                             // Frames are only needed during a marquee drag; reporting them on every
                             // scroll frame merged a URL-keyed dictionary across all visible cells.
@@ -133,7 +142,7 @@ public struct IconsGridView: View {
                             if MouseSetting.marginDoubleClickUp.isEnabled { navigationState.goUp() }
                         })
                         .onTapGesture {
-                            let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
+                            let isShiftOrCmd = !NSEvent.clickModifiers.isDisjoint(with: [.shift, .command])
                             if !isShiftOrCmd {
                                 navigationState.selectedItemIDs.removeAll()
                             }
@@ -145,7 +154,7 @@ public struct IconsGridView: View {
                                     if marqueeState.dragStartPoint == nil {
                                         marqueeState.dragStartPoint = value.startLocation
                                         marqueeState.isDragging = true
-                                        let isShiftOrCmd = NSEvent.modifierFlags.contains(.shift) || NSEvent.modifierFlags.contains(.command)
+                                        let isShiftOrCmd = !NSEvent.clickModifiers.isDisjoint(with: [.shift, .command])
                                         marqueeState.initialSelection = isShiftOrCmd ? navigationState.selectedItemIDs : []
                                     }
                                     let start = marqueeState.dragStartPoint ?? value.startLocation
@@ -157,7 +166,7 @@ public struct IconsGridView: View {
                                         height: abs(current.y - start.y)
                                     )
                                     marqueeState.rect = rect
-                                    updateMarqueeSelection(rect: rect)
+                                    updateMarqueeSelection(rect: rect, containerWidth: containerGeo.size.width)
                                 }
                                 .onEnded { _ in
                                     marqueeState.dragStartPoint = nil
@@ -182,6 +191,31 @@ public struct IconsGridView: View {
                 .onChange(of: navigationState.iconSize) {
                     updateGridColumnCount(width: containerGeo.size.width)
                 }
+                .onChange(of: navigationState.scrollToURL) { _, targetURL in
+                    guard let targetURL else { return }
+                    scrollProxy.scrollTo(targetURL, anchor: nil)
+                }
+                .background {
+                    GridScrollSynchronizer(
+                        targetURL: navigationState.scrollToURL,
+                        items: navigationState.filteredAndSortedItems,
+                        iconSize: navigationState.iconSize,
+                        gridColumnCount: navigationState.gridColumnCount,
+                        containerWidth: containerGeo.size.width,
+                        containerHeight: containerGeo.size.height,
+                        isDragging: marqueeState.isDragging,
+                        onAutoScrollTick: { currentDocPoint in
+                            handleAutoScrollMarquee(currentDocPoint: currentDocPoint, containerWidth: containerGeo.size.width)
+                        },
+                        onDragEnded: {
+                            marqueeState.dragStartPoint = nil
+                            marqueeState.rect = nil
+                            marqueeState.isDragging = false
+                            marqueeState.initialSelection = []
+                        }
+                    )
+                }
+            }
             }
         }
         .enableInjection()
@@ -191,8 +225,7 @@ public struct IconsGridView: View {
         let currentIconSize = navigationState.iconSize
         let cellMinWidth = max(currentIconSize + 28, 96)
         let availableWidth = max(0, width - 40)
-        let colWidth = cellMinWidth + 20
-        let cols = max(1, Int(availableWidth / colWidth))
+        let cols = max(1, Int((availableWidth + 20) / (cellMinWidth + 20)))
         navigationState.gridColumnCount = cols
     }
 
@@ -213,24 +246,74 @@ public struct IconsGridView: View {
 
         navigationState.click(
             item,
-            command: NSEvent.modifierFlags.contains(.command),
-            shift: NSEvent.modifierFlags.contains(.shift)
+            command: NSEvent.clickModifiers.contains(.command),
+            shift: NSEvent.clickModifiers.contains(.shift)
         )
     }
 
-    private func updateMarqueeSelection(rect: CGRect) {
-        var newlySelected = marqueeState.initialSelection
+    private func handleAutoScrollMarquee(currentDocPoint: CGPoint, containerWidth: CGFloat) {
+        guard marqueeState.isDragging, let start = marqueeState.dragStartPoint else { return }
+        let rect = CGRect(
+            x: min(start.x, currentDocPoint.x),
+            y: min(start.y, currentDocPoint.y),
+            width: abs(currentDocPoint.x - start.x),
+            height: abs(currentDocPoint.y - start.y)
+        )
+        marqueeState.rect = rect
+        updateMarqueeSelection(rect: rect, containerWidth: containerWidth)
+    }
 
-        for (url, frame) in marqueeState.itemFrames {
-            if rect.intersects(frame) {
-                newlySelected.insert(url)
-            } else if !marqueeState.initialSelection.contains(url) {
-                newlySelected.remove(url)
+    private func updateMarqueeSelection(rect: CGRect, containerWidth: CGFloat) {
+        let items = navigationState.filteredAndSortedItems
+        guard !items.isEmpty else { return }
+
+        let cols = max(1, navigationState.gridColumnCount)
+        let currentIconSize = navigationState.iconSize
+        let cellMinWidth = max(currentIconSize + 28, 96)
+        let availableWidth = max(0, containerWidth - 40)
+        let colWidth = max(cellMinWidth, (availableWidth - CGFloat(cols - 1) * 20) / CGFloat(cols))
+        let colStride = colWidth + 20
+        let itemHeight = currentIconSize + 58
+        let rowStride = itemHeight + 24
+
+        let minRow = max(0, Int((rect.minY - 20) / rowStride))
+        let maxRow = max(0, Int((rect.maxY - 20) / rowStride))
+        let minCol = max(0, min(cols - 1, Int((rect.minX - 20) / colStride)))
+        let maxCol = max(0, min(cols - 1, Int((rect.maxX - 20) / colStride)))
+
+        var activeDragSelection = Set<URL>()
+
+        // 1. Mathematical grid intersection for visible and off-screen / incoming rows
+        if minRow <= maxRow && minCol <= maxCol {
+            for r in minRow...maxRow {
+                for c in minCol...maxCol {
+                    let idx = r * cols + c
+                    if idx >= 0 && idx < items.count {
+                        activeDragSelection.insert(items[idx].id)
+                    }
+                }
             }
         }
 
-        if newlySelected != navigationState.selectedItemIDs {
-            navigationState.selectedItemIDs = newlySelected
+        // 2. Exact frame matching for currently rendered items
+        for (url, frame) in marqueeState.itemFrames {
+            if rect.intersects(frame) {
+                activeDragSelection.insert(url)
+            }
+        }
+
+        var resultSelection = marqueeState.initialSelection
+        for url in activeDragSelection {
+            resultSelection.insert(url)
+        }
+
+        // Deselect items that were added in this drag session but left the marquee box
+        let previouslyAdded = navigationState.selectedItemIDs.subtracting(marqueeState.initialSelection)
+        let deselected = previouslyAdded.subtracting(activeDragSelection)
+        resultSelection.subtract(deselected)
+
+        if resultSelection != navigationState.selectedItemIDs {
+            navigationState.selectedItemIDs = resultSelection
         }
     }
 }
@@ -246,7 +329,9 @@ private struct IconGridItemView: View {
     let item: FileItem
     let iconSize: CGFloat
     let isSelected: Bool
-    @Bindable var navigationState: NavigationState
+    let isRenaming: Bool
+    let onCommitRename: (String) -> Void
+    let onCancelRename: () -> Void
     let onSubfolderNavigate: (URL, Bool) -> Void
 
     @State private var thumbnail: NSImage? = nil
@@ -273,15 +358,11 @@ private struct IconGridItemView: View {
             }
             .frame(width: iconSize, height: iconSize)
 
-            if navigationState.renamingItemURL == item.url {
+            if isRenaming {
                 InlineRenameField(
                     initialName: item.name,
-                    onCommit: { newName in
-                        Task { await navigationState.commitRename(url: item.url, newName: newName) }
-                    },
-                    onCancel: {
-                        navigationState.cancelRenaming()
-                    }
+                    onCommit: onCommitRename,
+                    onCancel: onCancelRename
                 )
                 .frame(width: 90, height: 20)
             } else {
@@ -319,5 +400,200 @@ private struct IconGridItemView: View {
                 thumbnail = nil
             }
         }
+    }
+}
+
+extension IconGridItemView: @preconcurrency Equatable {
+    static func == (lhs: IconGridItemView, rhs: IconGridItemView) -> Bool {
+        lhs.item.id == rhs.item.id &&
+        lhs.item.dateModified == rhs.item.dateModified &&
+        lhs.item.fileSize == rhs.item.fileSize &&
+        lhs.iconSize == rhs.iconSize &&
+        lhs.isSelected == rhs.isSelected &&
+        lhs.isRenaming == rhs.isRenaming
+    }
+}
+
+private struct GridScrollSynchronizer: NSViewRepresentable {
+    let targetURL: URL?
+    let items: [FileItem]
+    let iconSize: CGFloat
+    let gridColumnCount: Int
+    let containerWidth: CGFloat
+    let containerHeight: CGFloat
+    let isDragging: Bool
+    let onAutoScrollTick: (CGPoint) -> Void
+    let onDragEnded: () -> Void
+
+    final class Coordinator {
+        var lastTargetURL: URL?
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeNSView(context: Context) -> GridScrollNSView {
+        GridScrollNSView()
+    }
+
+    func updateNSView(_ nsView: GridScrollNSView, context: Context) {
+        nsView.items = items
+        nsView.iconSize = iconSize
+        nsView.gridColumnCount = gridColumnCount
+        nsView.containerWidth = containerWidth
+        nsView.containerHeight = containerHeight
+        nsView.isDragging = isDragging
+        nsView.onAutoScrollTick = onAutoScrollTick
+        nsView.onDragEnded = onDragEnded
+
+        if isDragging {
+            nsView.startAutoScrollIfNeeded()
+        } else {
+            nsView.stopAutoScroll()
+        }
+
+        if let targetURL, targetURL != context.coordinator.lastTargetURL {
+            context.coordinator.lastTargetURL = targetURL
+            nsView.scrollToTargetURL(targetURL)
+        } else if targetURL == nil {
+            context.coordinator.lastTargetURL = nil
+        }
+    }
+
+    static func dismantleNSView(_ nsView: GridScrollNSView, coordinator: Coordinator) {
+        nsView.stopAutoScroll()
+    }
+}
+
+private final class GridScrollNSView: NSView {
+    var items: [FileItem] = []
+    var iconSize: CGFloat = 64
+    var gridColumnCount: Int = 4
+    var containerWidth: CGFloat = 800
+    var containerHeight: CGFloat = 600
+    var isDragging: Bool = false
+    var onAutoScrollTick: ((CGPoint) -> Void)?
+    var onDragEnded: (() -> Void)?
+
+    private var autoScrollTimer: Timer?
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        nil
+    }
+
+    func startAutoScrollIfNeeded() {
+        guard autoScrollTimer == nil else { return }
+        let timer = Timer(timeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+            self?.handleAutoScrollTick()
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        autoScrollTimer = timer
+    }
+
+    func stopAutoScroll() {
+        autoScrollTimer?.invalidate()
+        autoScrollTimer = nil
+    }
+
+    private func handleAutoScrollTick() {
+        guard isDragging else {
+            stopAutoScroll()
+            return
+        }
+
+        if NSEvent.pressedMouseButtons == 0 {
+            stopAutoScroll()
+            DispatchQueue.main.async { [weak self] in
+                self?.onDragEnded?()
+            }
+            return
+        }
+
+        guard let scrollView = self.findScrollView,
+              let window = scrollView.window,
+              let clipView = scrollView.contentView as? NSClipView,
+              let docView = scrollView.documentView else { return }
+
+        let mouseLocationInWindow = window.mouseLocationOutsideOfEventStream
+        let scrollFrameInWindow = scrollView.convert(scrollView.bounds, to: nil)
+
+        // Margin: 50pt from bottom/top edge of scroll view in window space
+        let bottomThreshold = scrollFrameInWindow.minY + 50
+        let topThreshold = scrollFrameInWindow.maxY - 50
+
+        var scrollDelta: CGFloat = 0
+
+        if mouseLocationInWindow.y < bottomThreshold {
+            // Mouse is near bottom edge or below scroll view -> scroll DOWN
+            let distance = max(0, bottomThreshold - mouseLocationInWindow.y)
+            scrollDelta = min(36.0, max(5.0, distance * 0.5))
+        } else if mouseLocationInWindow.y > topThreshold {
+            // Mouse is near top edge or above scroll view -> scroll UP
+            let distance = max(0, mouseLocationInWindow.y - topThreshold)
+            scrollDelta = -min(36.0, max(5.0, distance * 0.5))
+        }
+
+        if scrollDelta != 0 {
+            let maxScroll = max(0, docView.frame.height - clipView.bounds.height)
+            var origin = clipView.bounds.origin
+            let newY = min(maxScroll, max(0, origin.y + scrollDelta))
+            if newY != origin.y {
+                origin.y = newY
+                clipView.scroll(to: origin)
+                scrollView.reflectScrolledClipView(clipView)
+            }
+        }
+
+        let mouseInDoc = docView.convert(mouseLocationInWindow, from: nil)
+        DispatchQueue.main.async { [weak self] in
+            self?.onAutoScrollTick?(CGPoint(x: mouseInDoc.x, y: mouseInDoc.y))
+        }
+    }
+
+    func scrollToTargetURL(_ targetURL: URL) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self,
+                  let scrollView = self.findScrollView,
+                  let clipView = scrollView.contentView as? NSClipView,
+                  let docView = scrollView.documentView else { return }
+
+            guard let targetIndex = self.items.firstIndex(where: { $0.url == targetURL }) else { return }
+
+            let cols = max(1, self.gridColumnCount)
+            let targetRow = targetIndex / cols
+
+            let currentIconSize = self.iconSize
+            let itemHeight = currentIconSize + 58
+            let rowStride = itemHeight + 24
+            let rowTop = 20 + CGFloat(targetRow) * rowStride
+            let rowBottom = rowTop + itemHeight
+
+            let visibleRect = clipView.documentVisibleRect
+            let maxScroll = max(0, docView.frame.height - visibleRect.height)
+
+            if rowBottom > visibleRect.maxY {
+                let desiredY = min(maxScroll, rowBottom + 28 - visibleRect.height)
+                clipView.scroll(to: NSPoint(x: 0, y: desiredY))
+                scrollView.reflectScrolledClipView(clipView)
+            } else if rowTop < visibleRect.minY {
+                let desiredY = max(0, rowTop - 28)
+                clipView.scroll(to: NSPoint(x: 0, y: desiredY))
+                scrollView.reflectScrolledClipView(clipView)
+            }
+        }
+    }
+}
+
+private extension NSView {
+    var findScrollView: NSScrollView? {
+        if let sv = self.enclosingScrollView { return sv }
+        var view: NSView? = self
+        while let current = view {
+            if let sv = current as? NSScrollView { return sv }
+            if let sv = current.enclosingScrollView { return sv }
+            view = current.superview
+        }
+        return nil
     }
 }

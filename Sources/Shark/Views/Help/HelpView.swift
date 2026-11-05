@@ -33,6 +33,7 @@ enum MouseHelp {
             summary: L10n.text("Pointing at an item."),
             bindings: [
                 HelpBinding(gesture: L10n.text("Click / ⌘-click / ⇧-click"), action: L10n.text("Select an item, toggle an item, or extend the selection from the last clicked item.")),
+                HelpBinding(gesture: L10n.text("⌘⇧-click"), action: L10n.text("Add everything from the last clicked item to this one, keeping the current selection.")),
                 HelpBinding(gesture: L10n.text("Double-click"), action: L10n.text("Open it.")),
                 HelpBinding(gesture: L10n.text("Middle-click a folder"), action: L10n.text("Open it in a new tab.")),
                 HelpBinding(gesture: L10n.text("Hover a folder"), action: L10n.text("A drop-down arrow appears beside its name. Click it to browse everything inside, to any depth.")),

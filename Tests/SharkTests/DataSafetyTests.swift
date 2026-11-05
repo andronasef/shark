@@ -204,7 +204,7 @@ final class DataSafetyTests: XCTestCase {
         nav.click(items[0], command: false, shift: true)
         XCTAssertEqual(nav.selectedItems.map(\.name), ["a", "b", "c"])
         nav.selectNextItem()
-        XCTAssertEqual(nav.selectedItems.map(\.name), ["d"], "Arrow keys move from the anchor, not an arbitrary item")
+        XCTAssertEqual(nav.selectedItems.map(\.name), ["b"], "Arrow keys move from the last-clicked item, as in Windows Explorer")
     }
 
     func testShellQuotedRoundTripsHostileNames() throws {

@@ -46,6 +46,10 @@ public final class NavigationState {
     }
     /// The item keyboard navigation and Shift-click ranges start from.
     public var selectionAnchorID: URL? = nil
+    /// The active cursor / lead item when extending selection with Shift+Arrow keys.
+    public var selectionLeadID: URL? = nil
+    /// Target URL that views should scroll into view (e.g. following keyboard selection or marquee).
+    public var scrollToURL: URL? = nil
     public var isLoading: Bool = false
     /// Set when the folder itself could not be listed; replaces the folder contents with an error page.
     public var errorMessage: String? = nil
@@ -521,20 +525,24 @@ public final class NavigationState {
         await reloadCurrentDirectory()
     }
 
-    // MARK: - Selection (Finder style)
+    // MARK: - Selection (Windows Explorer style)
 
-    /// Applies a click: ⌘ toggles the item, ⇧ extends from the anchor, a plain click selects only it.
+    /// Applies a click: ⌘ toggles the item, ⇧ selects the run from the anchor to it in display order
+    /// (⌘⇧ adds that run to the selection), a plain click selects only it.
     public func click(_ item: FileItem, command: Bool, shift: Bool) {
-        if command {
+        if shift, let to = visibleIndices[item.id], focusIndex() != nil {
+            let previous = selectedItemIDs
+            extendSelection(to: to)
+            if command { selectedItemIDs.formUnion(previous) }
+        } else if command {
             if selectedItemIDs.contains(item.id) {
                 selectedItemIDs.remove(item.id)
             } else {
                 selectedItemIDs.insert(item.id)
             }
             selectionAnchorID = item.id
-        } else if shift, let from = focusIndex(),
-                  let to = filteredAndSortedItems.firstIndex(where: { $0.id == item.id }) {
-            selectedItemIDs.formUnion(filteredAndSortedItems[min(from, to)...max(from, to)].map(\.id))
+            selectionLeadID = item.id
+            scrollToURL = item.id
         } else {
             selectOnly(item)
         }
@@ -548,49 +556,77 @@ public final class NavigationState {
         return selectedItemIDs.compactMap { visibleIndices[$0] }.min()
     }
 
+    /// The item the keyboard cursor is on: the lead of a Shift range, otherwise the anchor.
+    private func leadIndex() -> Int? {
+        if let lead = selectionLeadID, selectedItemIDs.contains(lead), let index = visibleIndices[lead] {
+            return index
+        }
+        return focusIndex()
+    }
+
     private func selectOnly(_ item: FileItem) {
         selectedItemIDs = [item.id]
         selectionAnchorID = item.id
+        selectionLeadID = item.id
+        scrollToURL = item.id
     }
 
-    /// Moves the keyboard selection by `offset` items; with no selection, selects the first item.
-    /// Out-of-range moves stay put unless `clamp` is set.
-    private func moveSelection(by offset: Int, clamp: Bool) {
+    /// Selects every item between the anchor and `lead` in display order (Windows Explorer: a run, never a rectangle).
+    private func extendSelection(to lead: Int) {
+        let items = filteredAndSortedItems
+        guard let anchor = focusIndex() else {
+            selectOnly(items[lead])
+            return
+        }
+        selectionAnchorID = items[anchor].id
+        selectedItemIDs = Set(items[min(anchor, lead)...max(anchor, lead)].map(\.id))
+        selectionLeadID = items[lead].id
+        scrollToURL = items[lead].id
+    }
+
+    /// Moves the cursor `delta` items in display order; with no selection, selects the first item.
+    /// Past the start it stays put, past the end it stops on the last item.
+    private func moveSelection(by delta: Int, extendingSelection: Bool) {
         let items = filteredAndSortedItems
         guard !items.isEmpty else { return }
-        guard let current = focusIndex() else {
+        guard let current = leadIndex() else {
             selectOnly(items[0])
             return
         }
-        let target = current + offset
-        if items.indices.contains(target) {
-            selectOnly(items[target])
-        } else if clamp {
-            selectOnly(items[max(0, min(items.count - 1, target))])
+        let target = current + delta
+        let lead = target < 0 ? current : min(target, items.count - 1)
+        if extendingSelection {
+            extendSelection(to: lead)
+        } else {
+            selectOnly(items[lead])
         }
     }
 
-    public func selectPreviousItem() {
-        moveSelection(by: -1, clamp: true)
+    private var rowLength: Int { viewMode == .grid ? max(1, gridColumnCount) : 1 }
+
+    public func selectPreviousItem(extendingSelection: Bool = false) {
+        moveSelection(by: -1, extendingSelection: extendingSelection)
     }
 
-    public func selectNextItem() {
-        moveSelection(by: 1, clamp: true)
+    public func selectNextItem(extendingSelection: Bool = false) {
+        moveSelection(by: 1, extendingSelection: extendingSelection)
     }
 
-    public func selectAboveItem(approximateColumns: Int? = nil) {
-        moveSelection(by: -max(1, approximateColumns ?? gridColumnCount), clamp: false)
+    public func selectAboveItem(approximateColumns: Int? = nil, extendingSelection: Bool = false) {
+        moveSelection(by: -max(1, approximateColumns ?? rowLength), extendingSelection: extendingSelection)
     }
 
-    public func selectBelowItem(approximateColumns: Int? = nil) {
-        moveSelection(by: max(1, approximateColumns ?? gridColumnCount), clamp: false)
+    public func selectBelowItem(approximateColumns: Int? = nil, extendingSelection: Bool = false) {
+        moveSelection(by: max(1, approximateColumns ?? rowLength), extendingSelection: extendingSelection)
     }
 
-    public func selectFirstItem() {
-        if let first = filteredAndSortedItems.first { selectOnly(first) }
+    public func selectFirstItem(extendingSelection: Bool = false) {
+        guard let first = filteredAndSortedItems.first else { return }
+        if extendingSelection { extendSelection(to: 0) } else { selectOnly(first) }
     }
 
-    public func selectLastItem() {
-        if let last = filteredAndSortedItems.last { selectOnly(last) }
+    public func selectLastItem(extendingSelection: Bool = false) {
+        guard let last = filteredAndSortedItems.last else { return }
+        if extendingSelection { extendSelection(to: filteredAndSortedItems.count - 1) } else { selectOnly(last) }
     }
 }

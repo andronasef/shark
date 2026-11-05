@@ -15,6 +15,9 @@ public struct DirectoryView: View {
     @State private var previewItem: FileItem? = nil
     @State private var lastClickedURL: URL? = nil
     @State private var lastClickTime: TimeInterval = 0
+
+    private var shiftHeld: Bool { NSEvent.clickModifiers.contains(.shift) }
+    private var canNavigateByKeyboard: Bool { !navigationState.isEditingPath && navigationState.renamingItemURL == nil }
     @State private var typeToSelectMonitor: Any? = nil
     @State private var diskSpaceSummary: String? = nil
 
@@ -154,39 +157,45 @@ public struct DirectoryView: View {
                     Button("") { navigationState.isEditingPath = true }
                         .keyboardShortcut("d", modifiers: .option)
 
-                    // Arrow Key Item Navigation (Windows Explorer & Finder)
-                    // Up / Down moves up and down row-by-row in both Grid and List views
+                    // Arrow / Home / End item navigation (Windows Explorer & Finder).
+                    // SwiftUI resolves a Shift+Arrow to the plain-arrow shortcut, so one set of bindings reads
+                    // the Shift state itself: Shift extends the selection, no Shift moves it.
+                    // Up / Down move row by row in Grid and one item at a time in List.
                     Button("") {
-                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                        if navigationState.viewMode == .grid {
-                            navigationState.selectAboveItem()
-                        } else {
-                            navigationState.selectAboveItem(approximateColumns: 1)
-                        }
+                        guard canNavigateByKeyboard else { return }
+                        navigationState.selectAboveItem(approximateColumns: navigationState.viewMode == .grid ? nil : 1, extendingSelection: shiftHeld)
                     }
                     .keyboardShortcut(.upArrow, modifiers: [])
 
                     Button("") {
-                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                        if navigationState.viewMode == .grid {
-                            navigationState.selectBelowItem()
-                        } else {
-                            navigationState.selectBelowItem(approximateColumns: 1)
-                        }
+                        guard canNavigateByKeyboard else { return }
+                        navigationState.selectBelowItem(approximateColumns: navigationState.viewMode == .grid ? nil : 1, extendingSelection: shiftHeld)
                     }
                     .keyboardShortcut(.downArrow, modifiers: [])
 
                     Button("") {
-                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                        navigationState.selectPreviousItem()
+                        guard canNavigateByKeyboard else { return }
+                        navigationState.selectPreviousItem(extendingSelection: shiftHeld)
                     }
                     .keyboardShortcut(.leftArrow, modifiers: [])
 
                     Button("") {
-                        guard !navigationState.isEditingPath && navigationState.renamingItemURL == nil else { return }
-                        navigationState.selectNextItem()
+                        guard canNavigateByKeyboard else { return }
+                        navigationState.selectNextItem(extendingSelection: shiftHeld)
                     }
                     .keyboardShortcut(.rightArrow, modifiers: [])
+
+                    Button("") {
+                        guard canNavigateByKeyboard else { return }
+                        navigationState.selectFirstItem(extendingSelection: shiftHeld)
+                    }
+                    .keyboardShortcut(.home, modifiers: [])
+
+                    Button("") {
+                        guard canNavigateByKeyboard else { return }
+                        navigationState.selectLastItem(extendingSelection: shiftHeld)
+                    }
+                    .keyboardShortcut(.end, modifiers: [])
 
                     // Return starts inline rename (Finder standard, CMD-03)
                     Button("") {
@@ -305,15 +314,17 @@ public struct DirectoryView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if navigationState.filteredAndSortedItems.isEmpty {
-            VStack(spacing: 8) {
-                Image(systemName: "folder")
-                    .font(.system(size: 40))
-                    .foregroundColor(.secondary.opacity(0.5))
-                Text(navigationState.filterText.isEmpty ? "Folder is Empty" : "No Matching Items")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-            }
+            DirectoryEmptyStateView(
+                isFilterActive: !navigationState.filterText.isEmpty,
+                onClearFilter: { navigationState.filterText = "" },
+                onNewFolder: { showingNewItemSheet = .folder }
+            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .background(Color.clear)
+            .contextMenu {
+                directoryBackgroundContextMenu
+            }
         } else {
             switch navigationState.viewMode {
             case .details:
@@ -395,8 +406,8 @@ public struct DirectoryView: View {
                         .onTapGesture {
                             navigationState.click(
                                 item,
-                                command: NSEvent.modifierFlags.contains(.command),
-                                shift: NSEvent.modifierFlags.contains(.shift)
+                                command: NSEvent.clickModifiers.contains(.command),
+                                shift: NSEvent.clickModifiers.contains(.shift)
                             )
                         }
                         .onTapGesture(count: 2) {
@@ -721,4 +732,10 @@ extension View {
             .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             .accessibilityAction { onOpen() }
     }
+}
+
+extension NSEvent {
+    /// Modifiers of the event being handled, falling back to the hardware state; unlike `modifierFlags`
+    /// this reflects the flags the click or key press itself carried.
+    static var clickModifiers: ModifierFlags { NSApp.currentEvent?.modifierFlags ?? modifierFlags }
 }

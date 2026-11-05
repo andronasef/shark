@@ -82,8 +82,8 @@ public struct DetailsTableView: View {
                     lastClickTime = now
                     navigationState.click(
                         item,
-                        command: NSEvent.modifierFlags.contains(.command),
-                        shift: NSEvent.modifierFlags.contains(.shift)
+                        command: NSEvent.clickModifiers.contains(.command),
+                        shift: NSEvent.clickModifiers.contains(.shift)
                     )
                 }
                 .onMiddleClick {
@@ -135,6 +135,7 @@ public struct DetailsTableView: View {
             }
         }
         .onTableMarginDoubleClick { navigationState.goUp() }
+        .overlay(TableScrollSynchronizer(targetURL: navigationState.scrollToURL, items: navigationState.filteredAndSortedItems))
     }
 
     private var keyPathComparator: KeyPathComparator<FileItem> {
@@ -169,5 +170,44 @@ public struct DetailsTableView: View {
             field = .permissions
         }
         navigationState.setSort(field: field, ascending: primary.order == .forward)
+    }
+}
+
+private struct TableScrollSynchronizer: NSViewRepresentable {
+    let targetURL: URL?
+    let items: [FileItem]
+
+    func makeNSView(context: Context) -> TableScrollNSView {
+        TableScrollNSView()
+    }
+
+    func updateNSView(_ nsView: TableScrollNSView, context: Context) {
+        guard let targetURL,
+              let row = items.firstIndex(where: { $0.url == targetURL }) else { return }
+        nsView.scrollToRow(row)
+    }
+}
+
+private final class TableScrollNSView: NSView {
+    func scrollToRow(_ row: Int) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self,
+                  let table = self.enclosingTableView,
+                  row >= 0, row < table.numberOfRows else { return }
+            table.scrollRowToVisible(row)
+        }
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
+}
+
+private extension NSView {
+    var enclosingTableView: NSTableView? {
+        var view: NSView? = self
+        while let current = view {
+            if let table = current as? NSTableView { return table }
+            view = current.superview
+        }
+        return nil
     }
 }
