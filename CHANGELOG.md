@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
 
 ### Fixed
+- The development app bundler handles both native SwiftPM and Xcode localization resource layouts.
 - Regional and script language catalogs now resolve when SwiftPM lowercases their resource directories, preserving Brazilian Portuguese and Simplified Chinese translations in native builds.
 - Long names in cascading folder menus use a middle ellipsis with the full path in the tooltip; header and bottom path segments now respect a 180 pt width limit.
 - Status bar selection totals now include calculated folder sizes and refresh after each calculation without reselecting the folder.

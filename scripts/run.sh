@@ -17,7 +17,9 @@ for bundle in .build/debug/Shark_*.bundle; do
     rm -rf "Shark.app/Contents/Resources/$(basename "$bundle")"
     cp -R "$bundle" Shark.app/Contents/Resources/
     # SwiftUI string literals resolve from the app's own Resources, so expose the .lproj folders there too.
-    cp -R "$bundle"/Contents/Resources/*.lproj Shark.app/Contents/Resources/
+    resource_dir="$bundle/Contents/Resources"
+    [ -d "$resource_dir" ] || resource_dir="$bundle"
+    cp -R "$resource_dir"/*.lproj Shark.app/Contents/Resources/
 done
 # Stable "Shark Dev" cert keeps macOS permission grants across builds; ad hoc if absent.
 security find-identity -v -p codesigning | grep -q "Shark Dev" && id="Shark Dev" || id=-
