@@ -14,7 +14,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SOURCES_DIR = PROJECT_ROOT / "Sources"
 APP_BUNDLE_EXEC = PROJECT_ROOT / "Shark.app" / "Contents" / "MacOS" / "Shark"
-BUILT_EXEC = PROJECT_ROOT / ".build" / "out" / "Products" / "Debug" / "Shark"
+BUILT_EXEC = PROJECT_ROOT / ".build" / "debug" / "Shark"
+if not BUILT_EXEC.exists():
+    BUILT_EXEC = PROJECT_ROOT / ".build" / "out" / "Products" / "Debug" / "Shark"
 
 def get_file_mtimes():
     mtimes = {}
