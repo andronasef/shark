@@ -69,4 +69,62 @@ final class PhotoViewerTests: XCTestCase {
     func testActualSizeUsesDisplayPixels() {
         XCTAssertEqual(PhotoViewerState.actualPointSize(pixels: CGSize(width: 4000, height: 3000), scale: 2), CGSize(width: 2000, height: 1500))
     }
+
+    func testRotationAndFlipTransformations() {
+        let state = PhotoViewerState(urls: urls, initialURL: urls[0])
+        XCTAssertEqual(state.rotation, 0)
+        XCTAssertFalse(state.isFlippedHorizontal)
+        XCTAssertFalse(state.isFlippedVertical)
+
+        state.rotateRight()
+        XCTAssertEqual(state.rotation, 90)
+
+        state.rotateRight()
+        XCTAssertEqual(state.rotation, 180)
+
+        state.rotateLeft()
+        XCTAssertEqual(state.rotation, 90)
+
+        state.flipHorizontal()
+        XCTAssertTrue(state.isFlippedHorizontal)
+
+        state.flipVertical()
+        XCTAssertTrue(state.isFlippedVertical)
+
+        // Advancing to next photo resets transformations
+        state.next()
+        XCTAssertEqual(state.rotation, 0)
+        XCTAssertFalse(state.isFlippedHorizontal)
+        XCTAssertFalse(state.isFlippedVertical)
+    }
+
+    func testZoomControlsAndPresets() {
+        let state = PhotoViewerState(urls: urls, initialURL: urls[0])
+        XCTAssertEqual(state.zoom, 1)
+
+        state.zoomIn()
+        XCTAssertGreaterThan(state.zoom, 1)
+
+        state.zoomToFit()
+        XCTAssertEqual(state.zoom, 1)
+        XCTAssertFalse(state.actualSize)
+
+        state.zoomToActualSize()
+        XCTAssertTrue(state.actualSize)
+
+        state.setZoom(factor: 2.5)
+        XCTAssertEqual(state.zoom, 2.5)
+        XCTAssertFalse(state.actualSize)
+    }
+
+    func testPhotoNavigationAndFirstLast() {
+        let state = PhotoViewerState(urls: urls, initialURL: urls[1])
+        XCTAssertEqual(state.index, 1)
+
+        state.first()
+        XCTAssertEqual(state.index, 0)
+
+        state.last()
+        XCTAssertEqual(state.index, 2)
+    }
 }

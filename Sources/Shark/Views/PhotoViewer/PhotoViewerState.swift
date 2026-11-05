@@ -3,12 +3,14 @@ import Observation
 
 @MainActor @Observable
 final class PhotoViewerState {
-    let urls: [URL]
+    var urls: [URL]
     private(set) var index: Int
     var zoom: CGFloat = 1
     var actualSize = false { didSet { if oldValue != actualSize && !resettingView { load() } } }
     var detailLimited = false
     var rotation: Double = 0
+    var isFlippedHorizontal = false
+    var isFlippedVertical = false
     var pan: CGSize = .zero
     var image: CGImage?
     var pixels: CGSize = .zero
@@ -17,6 +19,8 @@ final class PhotoViewerState {
     var loading = false
     var isPlaying = false
     var active = true
+    var showFilmstrip = true
+    var showMetadata = true
     private(set) var loadGeneration = UUID()
     @ObservationIgnored private let decoder = PhotoImageDecoder()
     @ObservationIgnored private var resettingView = false
@@ -36,6 +40,8 @@ final class PhotoViewerState {
     func acceptsLoad(generation: UUID) -> Bool { generation == loadGeneration }
     func next() { select(index + 1) }
     func previous() { select(index - 1) }
+    func first() { select(0) }
+    func last() { select(urls.count - 1) }
     func select(_ newIndex: Int) {
         pause()
         guard urls.indices.contains(newIndex), newIndex != index else { return }
@@ -43,10 +49,112 @@ final class PhotoViewerState {
         resetView()
         load()
     }
-    private func resetView() {
+    func resetView() {
         resettingView = true
         zoom = 1; actualSize = false; rotation = 0; pan = .zero
+        isFlippedHorizontal = false; isFlippedVertical = false
         resettingView = false
+    }
+
+    func rotateRight() {
+        pause()
+        rotation = (rotation + 90).truncatingRemainder(dividingBy: 360)
+    }
+
+    func rotateLeft() {
+        pause()
+        rotation = (rotation - 90).truncatingRemainder(dividingBy: 360)
+    }
+
+    func flipHorizontal() {
+        pause()
+        isFlippedHorizontal.toggle()
+    }
+
+    func flipVertical() {
+        pause()
+        isFlippedVertical.toggle()
+    }
+
+    func zoomIn() {
+        pause()
+        actualSize = false
+        zoom = min(8, zoom * 1.25)
+    }
+
+    func zoomOut() {
+        pause()
+        actualSize = false
+        zoom = max(0.1, zoom / 1.25)
+    }
+
+    func zoomToFit() {
+        pause()
+        actualSize = false
+        zoom = 1
+        pan = .zero
+    }
+
+    func zoomToActualSize() {
+        pause()
+        actualSize = true
+        zoom = 1
+        pan = .zero
+    }
+
+    func setZoom(factor: CGFloat) {
+        pause()
+        actualSize = false
+        zoom = min(max(factor, 0.1), 8)
+        pan = .zero
+    }
+
+    func copyImage() {
+        guard let currentURL else { return }
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        var objects: [NSPasteboardWriting] = [currentURL as NSURL]
+        if let image {
+            let rep = NSBitmapImageRep(cgImage: image)
+            if let data = rep.representation(using: .png, properties: [:]) {
+                if let nsImage = NSImage(data: data) {
+                    objects.append(nsImage)
+                }
+            }
+        }
+        pb.writeObjects(objects)
+    }
+
+    func revealInFinder() {
+        guard let currentURL else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([currentURL])
+    }
+
+    func openInDefaultApp() {
+        guard let currentURL else { return }
+        NSWorkspace.shared.open(currentURL)
+    }
+
+    func deleteCurrentPhoto() {
+        guard let currentURL else { return }
+        pause()
+        let target = currentURL
+        Task {
+            if let restorations = try? await FileOperationsService.shared.trash(items: [target]) {
+                FileUndoService.shared.record(.trash(restorations: restorations))
+            }
+        }
+        urls.removeAll { $0 == currentURL }
+        if urls.isEmpty {
+            image = nil
+            error = L10n.text("No photos remaining.")
+            return
+        }
+        if index >= urls.count {
+            index = urls.count - 1
+        }
+        resetView()
+        load()
     }
 
     func load() {
