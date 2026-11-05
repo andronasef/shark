@@ -13,6 +13,30 @@ private actor SizeReads {
 
 @MainActor
 struct FolderSizeTests {
+    @Test func selectionTotalUpdatesAfterCalculationAndRecalculation() async {
+        let folder = URL(fileURLWithPath: "/tmp/selected-folder")
+        let file = URL(fileURLWithPath: "/tmp/selected-file")
+        let reads = SizeReads()
+        let calculator = FolderSizeCalculator(concurrency: 1) { await reads.read($0) }
+        let state = NavigationState(initialURL: folder.deletingLastPathComponent())
+        state.items = [FileItem(url: folder, name: "folder", isDirectory: true),
+                       FileItem(url: file, name: "file", isDirectory: false, fileSize: 12)]
+        state.selectedItemIDs = [folder, file]
+        #expect(state.selectedTotalSize(using: calculator) == 12)
+        for size: Int64 in [100, 250] {
+            calculator.requestSize(for: folder)
+            while !(await reads.started(folder)) { await Task.yield() }
+            await reads.finish(folder, size: size)
+            while calculator.isCalculating(url: folder) { await Task.yield() }
+            #expect(state.selectedTotalSize(using: calculator) == size + 12)
+        }
+        state.selectedItemIDs = [file]
+        #expect(state.selectedTotalSize(using: calculator) == 12)
+        state.selectedItemIDs = [folder]
+        calculator.clearCache()
+        #expect(state.selectedTotalSize(using: calculator) == 0)
+    }
+
     @Test func independentCalculatorReceivesItsOwnResult() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

@@ -97,7 +97,6 @@ public final class NavigationState {
     @ObservationIgnored private var sortedItems: [FileItem] = []
     @ObservationIgnored private var visibleIndices: [URL: Int] = [:]
     @ObservationIgnored private var cachedSelectedItems: [FileItem]?
-    @ObservationIgnored private var cachedSelectedSize: Int64?
     @ObservationIgnored private var updatingSort = false
     @ObservationIgnored private var reloadTask: Task<[FileItem], any Error>?
     @ObservationIgnored private var reloadID = UUID()
@@ -161,14 +160,14 @@ public final class NavigationState {
     }
 
     public var selectedTotalSize: Int64 {
-        let selected = selectedItemIDs
-        let displayed = filteredAndSortedItems
-        if let cachedSelectedSize { return cachedSelectedSize }
-        let size = selected.reduce(Int64(0)) { total, id in
-            total + (visibleIndices[id].map { displayed[$0].fileSize } ?? 0)
+        selectedTotalSize(using: .shared)
+    }
+
+    /// Read the observable calculator every time so completed/repeated scans refresh the status bar.
+    func selectedTotalSize(using calculator: FolderSizeCalculator) -> Int64 {
+        selectedItems.reduce(Int64(0)) { total, item in
+            total + (item.isDirectory ? (calculator.size(for: item.url) ?? 0) : item.fileSize)
         }
-        cachedSelectedSize = size
-        return size
     }
 
     func contextItems(for clicked: FileItem) -> [FileItem] {
@@ -177,7 +176,6 @@ public final class NavigationState {
 
     private func invalidateSelectionSummary() {
         cachedSelectedItems = nil
-        cachedSelectedSize = nil
     }
 
     public func navigateTo(_ url: URL) {
