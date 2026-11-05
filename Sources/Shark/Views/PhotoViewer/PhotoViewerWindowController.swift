@@ -7,6 +7,9 @@ final class PhotoViewerWindowController: NSWindowController, NSWindowDelegate {
     private static var viewers: [PhotoViewerWindowController] = []
     let state: PhotoViewerState
 
+    /// The viewer that is the key window, if any. Edit › Copy copies its photo rather than the folder's selection.
+    static var keyViewer: PhotoViewerWindowController? { NSApp.keyWindow?.windowController as? PhotoViewerWindowController }
+
     static func supports(url: URL) -> Bool {
         UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) == true
     }

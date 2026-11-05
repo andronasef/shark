@@ -109,19 +109,22 @@ final class PhotoViewerState {
         pan = .zero
     }
 
+    /// The file and, when decoded, its image.
+    private func copyObjects() -> [NSPasteboardWriting] {
+        guard let currentURL else { return [] }
+        var objects: [NSPasteboardWriting] = [currentURL as NSURL]
+        if let image, let data = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]),
+           let nsImage = NSImage(data: data) {
+            objects.append(nsImage)
+        }
+        return objects
+    }
+
     func copyImage() {
-        guard let currentURL else { return }
+        let objects = copyObjects()
+        guard !objects.isEmpty else { return }
         let pb = NSPasteboard.general
         pb.clearContents()
-        var objects: [NSPasteboardWriting] = [currentURL as NSURL]
-        if let image {
-            let rep = NSBitmapImageRep(cgImage: image)
-            if let data = rep.representation(using: .png, properties: [:]) {
-                if let nsImage = NSImage(data: data) {
-                    objects.append(nsImage)
-                }
-            }
-        }
         pb.writeObjects(objects)
     }
 

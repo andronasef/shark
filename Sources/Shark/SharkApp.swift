@@ -309,6 +309,8 @@ struct ExplorerCommands: Commands {
 
             Button("Copy") {
                 if forwardToTextEditor(#selector(NSText.copy(_:))) { return }
+                // In a Photo Viewer, ⌘C copies the photo on screen, not the file selected in the folder window.
+                if let viewer = PhotoViewerWindowController.keyViewer { viewer.state.copyImage(); return }
                 nav.copySelected()
             }
             .keyboardShortcut("c", modifiers: .command)

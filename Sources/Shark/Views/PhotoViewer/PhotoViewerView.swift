@@ -163,7 +163,6 @@ struct PhotoViewerView: View {
             // Copy & File Operations
             Button(action: state.copyImage) { Image(systemName: "doc.on.doc") }
                 .disabled(state.currentURL == nil)
-                .keyboardShortcut("c", modifiers: .command)
                 .help(L10n.text("Copy Image (⌘C)"))
                 .accessibilityLabel(L10n.text("Copy Image"))
 
@@ -172,7 +171,7 @@ struct PhotoViewerView: View {
                     Label(L10n.text("Open in Default App"), systemImage: "arrow.up.forward.app")
                 }
                 Button(action: state.revealInFinder) {
-                    Label(L10n.text("Reveal in Finder"), systemImage: "folder")
+                    Label(L10n.text("Show in Finder"), systemImage: "folder")
                 }
             } label: {
                 Image(systemName: "square.and.arrow.up")
@@ -229,7 +228,7 @@ struct PhotoViewerView: View {
         Divider()
         Button(L10n.text("Copy Image")) { state.copyImage() }
         Button(L10n.text("Open in Default App")) { state.openInDefaultApp() }
-        Button(L10n.text("Reveal in Finder")) { state.revealInFinder() }
+        Button(L10n.text("Show in Finder")) { state.revealInFinder() }
         Divider()
         Button(role: .destructive, action: state.deleteCurrentPhoto) {
             Label(L10n.text("Move to Trash"), systemImage: "trash")
