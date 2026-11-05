@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [1.0.0-alpha.4] - 2026-11-05
 
 ### Added
+- Open With lists each compatible application with its native app icon.
 - Occasional status-bar tips: each folder visit has a 10% chance of showing a localized shortcut reminder. Tips clear on selection or file operations, hide when space is tight, and can be disabled in Settings › General.
 - Full-featured Shark Photo Viewer: added horizontal & vertical image flipping, counter-clockwise rotation (⇧⌘R), an interactive zoom presets menu (Fit, 100%, 25%–400%), quick Copy Image to clipboard (⌘C), Open in Default App, Reveal in Finder, Move to Trash (⌘⌫), and dedicated toggle shortcuts for the thumbnail filmstrip (⌘T) and image metadata panel (⌘I), along with a canvas context menu.
 - Windows-style range selection: Shift-click and Shift with the Arrow keys select every item from the anchor to the cursor in reading order, in both list and icon views, as Windows File Explorer does (a rectangle comes only from dragging). Command-Shift-click adds the run to the current selection, Shift+Home / Shift+End extend to the first / last item, and plain arrows continue from the last item you reached. Arrows, Home and End read the Shift state themselves and Shift-click reads it from the click, because SwiftUI otherwise ran the plain-arrow shortcut for Shift + Arrow.

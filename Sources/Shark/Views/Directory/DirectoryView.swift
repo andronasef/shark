@@ -558,8 +558,15 @@ public struct DirectoryView: View {
                     Text(isMultiple ? L10n.text("No app opens all of these files") : L10n.text("No compatible apps"))
                 }
                 ForEach(apps, id: \.self) { app in
-                    Button(app.deletingPathExtension().lastPathComponent) {
+                    Button {
                         OpenWithService.open(urls, with: app) { navigationState.operationError = $0 }
+                    } label: {
+                        Label {
+                            Text(app.deletingPathExtension().lastPathComponent)
+                        } icon: {
+                            Image(nsImage: OpenWithService.menuIcon(for: app))
+                                .renderingMode(.original)
+                        }
                     }
                 }
                 Divider()

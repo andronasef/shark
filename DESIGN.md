@@ -6,6 +6,8 @@ The Astro marketing website has its own responsive layout and web material rules
 
 ---
 
+Open With menu rows show the application’s original-color native icon at 16 × 16 pt beside its name.
+
 ## 1. Visual Hierarchy & Spatial Grid
 
 Shark strictly adheres to macOS Human Interface Guidelines (HIG) with an 8pt-based spatial layout grid:

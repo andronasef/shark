@@ -3,6 +3,12 @@ import UniformTypeIdentifiers
 
 @MainActor
 enum OpenWithService {
+    static func menuIcon(for application: URL) -> NSImage {
+        let icon = NSWorkspace.shared.icon(forFile: application.path).copy() as! NSImage
+        icon.size = NSSize(width: 16, height: 16)
+        return icon
+    }
+
     static func commonApplications(_ lists: [[URL]]) -> [URL] {
         guard let first = lists.first else { return [] }
         return Array(Set(first)).filter { app in lists.dropFirst().allSatisfy { $0.contains(app) } }
