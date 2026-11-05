@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.0-alpha.4] - 2026-11-05
+
 ### Added
+- Full-featured Shark Photo Viewer: added horizontal & vertical image flipping, counter-clockwise rotation (⇧⌘R), an interactive zoom presets menu (Fit, 100%, 25%–400%), quick Copy Image to clipboard (⌘C), Open in Default App, Reveal in Finder, Move to Trash (⌘⌫), and dedicated toggle shortcuts for the thumbnail filmstrip (⌘T) and image metadata panel (⌘I), along with a canvas context menu.
+- Windows-style range selection: Shift-click and Shift with the Arrow keys select every item from the anchor to the cursor in reading order, in both list and icon views, as Windows File Explorer does (a rectangle comes only from dragging). Command-Shift-click adds the run to the current selection, Shift+Home / Shift+End extend to the first / last item, and plain arrows continue from the last item you reached. Arrows, Home and End read the Shift state themselves and Shift-click reads it from the click, because SwiftUI otherwise ran the plain-arrow shortcut for Shift + Arrow.
+- High-Performance Icon Grid Rendering & Smooth Scrolling: removed blocking SwiftUI 120ms animations during rapid arrow navigation, decoupled `IconGridItemView` from `@Bindable NavigationState`, and conformed item views to `@preconcurrency Equatable` to eliminate redundant re-evaluations across hundreds of unchanged cells when updating selections.
 - Website: Google Analytics, loaded through Partytown so the tag runs in a web worker instead of slowing the page. The privacy policy has a new "This Website" section explaining what the website (not the app) collects and how to opt out.
 - Website: a custom 404 page with links to the home page, features and guides, kept out of search results with `noindex`.
 - Website: an HSTS header (`Strict-Transport-Security`) through Cloudflare's `_headers` file.
@@ -17,6 +22,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 - Website: the Shark icon in the header, footer and home page is served as a small WebP at the size it's shown (about 1–7 KB) instead of the 87 KB PNG. The home page title is shorter (55 characters) and the description fits Google's limit.
 - Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
+
+### Fixed
+- Release builds now include the Firebase config (`GoogleService-Info.plist`, written from the `GOOGLE_SERVICE_INFO_PLIST_BASE64` secret). The file is gitignored, so every CI release since Firebase was added skipped analytics and crash reporting without a warning. A release now fails if the secret is missing.
+- Marquee drag selection auto-scroll: dragging near or past the top/bottom viewport bounds in the icon grid now continuously auto-scrolls at 60 FPS and dynamically expands the selection box, enabling seamless multi-file selection across large folders.
+- Keyboard downward selection clamping and scroll synchronization: `selectBelowItem` and `selectAboveItem` now clamp to valid folder bounds and synchronize row visibility via AppKit `NSScrollView`, allowing Shift + Arrow range selection to reach incomplete trailing rows and auto-scroll the viewport.
+- Context menu in empty folders: right-clicking empty space in an empty folder now reliably presents the directory context menu (New Folder, Terminal, Reveal, etc.).
 
 ## [1.0.0-alpha.3] - 2026-10-27
 
