@@ -63,7 +63,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'sorting', title: 'Sorting controls', description: 'Sort by name, modified date, size, kind, or permissions from the toolbar or View › Sort By, and switch between ascending and descending order.' },
       { id: 'hidden-files', title: 'Hidden files & dotfiles', description: 'Show or hide dotfiles and other hidden items in the folder you are browsing.', shortcut: '⇧⌘.' },
       { id: 'live-updates', title: 'Live folder updates', description: 'The file list updates as the contents of the folder change.' },
-      { id: 'status-tips', title: 'Occasional shortcut tips', description: 'Each folder visit has a one-in-ten chance of showing a translated shortcut reminder in spare status-bar space. Selecting files or starting an operation clears it. Turn tips off in Settings › General.' },
+      { id: 'status-tips', title: 'Occasional shortcut tips', description: 'Each folder visit has a one-in-ten chance of showing one of 93 tips in spare status-bar space, translated into all eight app languages. Tips cover shortcuts, mouse gestures, tabs, file actions, previews, terminal, Photo Viewer, and settings; optional tab gestures respect your Mouse settings. Selecting files or starting an operation clears it. Turn tips off in Settings › General.' },
       { id: 'status-bar', title: 'Folder & selection status', description: 'See item counts, filtered results, the selected items’ total size (including calculated folder sizes), and available disk space in the status bar.' },
     ],
   },

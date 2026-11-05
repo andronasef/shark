@@ -33,7 +33,7 @@ Shark strictly adheres to macOS Human Interface Guidelines (HIG) with an 8pt-bas
 - **Status Bar**:
   - Height: `22` pt.
   - Standard font: `11pt` monospaced digits.
-  - Optional shortcut tips use secondary 11 pt text in spare status-bar space. Each folder visit has a 10% chance; selecting an item or starting an operation dismisses the tip for that visit. Hide the whole tip when space is insufficient. Settings › General disables tips (on by default).
+  - Optional shortcut tips use secondary 11 pt text in spare status-bar space. Each folder visit has a 10% chance; selecting an item or starting an operation dismisses the tip for that visit. Hide the whole tip when space is insufficient. Settings › General disables tips (on by default). The catalog has 93 reminders, with translated titles and hints in all eight languages. Tips specific to Photo Viewer or a menu name their context; optional mouse tips respect the corresponding Mouse setting.
 - **Toolbar Path Bar**:
   - Located beside Back/Forward in a `28` pt glass capsule, showing the active pane’s path. Navigation and Location share one native toolbar item with an `8` pt gap, keeping their order and placement together during launch and window restoration.
   - Ancestors support navigation and subfolder menus; `⌘L` edits the path.

@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Website: a generated `/llms.txt` for AI search tools, built from the guides and the feature catalog. The home FAQ now has `FAQPage` structured data and a "Does Shark replace Finder?" answer.
 
 ### Changed
+- Expanded status-bar tips from 5 to 93 localized reminders covering navigation, tabs, file actions, previews, terminal, Photo Viewer, settings, and mouse gestures. Photo Viewer tips identify their context; disabled optional tab gestures are not suggested.
 - Website: the Shark icon in the header, footer and home page is served as a small WebP at the size it's shown (about 1–7 KB) instead of the 87 KB PNG. The home page title is shorter (55 characters) and the description fits Google's limit.
 - Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
 

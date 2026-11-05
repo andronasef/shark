@@ -497,7 +497,7 @@ public struct DirectoryView: View {
             if statusBarTipsEnabled, navigationState.selectedItemIDs.isEmpty,
                navigationState.activeOperationTitle == nil, let tip = navigationState.statusBarTip {
                 ViewThatFits(in: .horizontal) {
-                    Text("💡 " + L10n.text(tip.title) + (tip.shortcut.isEmpty ? "" : " (" + L10n.text(tip.shortcut) + ")"))
+                    Text("💡 " + tip.localizedText())
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                         .fixedSize()
