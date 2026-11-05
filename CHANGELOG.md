@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
 
 ### Fixed
+- List view now scrolls to keep the selected row on screen when you move with the arrow keys, Shift + Arrow, Home or End. The scroll helper looked for the table inside itself, so it never found it, and it re-scrolled on every redraw. Checked in the running app with a 120-file folder.
+- Photo Viewer: Move to Trash removes the photo from the viewer only after the move succeeds. A failed move used to make a photo that was still on disk vanish from the viewer with no message.
 - Release builds now include the Firebase config (`GoogleService-Info.plist`, written from the `GOOGLE_SERVICE_INFO_PLIST_BASE64` secret). The file is gitignored, so every CI release since Firebase was added skipped analytics and crash reporting without a warning. A release now fails if the secret is missing.
 - Marquee drag selection auto-scroll: dragging near or past the top/bottom viewport bounds in the icon grid now continuously auto-scrolls at 60 FPS and dynamically expands the selection box, enabling seamless multi-file selection across large folders.
 - Keyboard downward selection clamping and scroll synchronization: `selectBelowItem` and `selectAboveItem` now clamp to valid folder bounds and synchronize row visibility via AppKit `NSScrollView`, allowing Shift + Arrow range selection to reach incomplete trailing rows and auto-scroll the viewport.
