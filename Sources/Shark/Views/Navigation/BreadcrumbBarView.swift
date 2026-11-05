@@ -73,6 +73,9 @@ public struct BreadcrumbBarView: View {
                                             .font(.caption)
                                     }
                                     Text(segment.title)
+                                        .lineLimit(1)
+                                        .truncationMode(.middle)
+                                        .frame(maxWidth: 180)
                                         .font(.system(size: 12, weight: segment.isLast ? .semibold : .regular))
                                 }
                                 .padding(.horizontal, 6)
@@ -83,6 +86,7 @@ public struct BreadcrumbBarView: View {
                                     )
                             }
                             .buttonStyle(.plain)
+                            .help(segment.url.path)
 
                             // Cascading Subfolder Chevron Menu (QT-01)
                             CascadingFolderChevronButton(url: segment.url) { targetURL, inNewTab in

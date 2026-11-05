@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Website: the site name in titles, social cards and structured data is now "Shark – File Manager", matching the Mac App Store listing.
 
 ### Fixed
+- Long names in cascading folder menus use a middle ellipsis with the full path in the tooltip; header and bottom path segments now respect a 180 pt width limit.
 - Status bar selection totals now include calculated folder sizes and refresh after each calculation without reselecting the folder.
 - Photo Viewer: ⌘C copies the photo on screen. It used to copy the file selected in the folder window, which could be a different photo, and selected text in the info panel copies as text.
 - New Photo Viewer and ⌘⇧-click strings are translated in Arabic, German, Spanish, French, Japanese, Brazilian Portuguese and Simplified Chinese; they showed in English before.

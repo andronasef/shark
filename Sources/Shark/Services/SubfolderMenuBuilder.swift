@@ -18,6 +18,12 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
     /// Menus past this size take seconds to build and are unusable anyway.
     static let maxItems = 500
 
+    /// Bound popup width while retaining the beginning and the extension/end of a name.
+    static func compactTitle(_ name: String) -> String {
+        guard name.count > 40 else { return name }
+        return String(name.prefix(24)) + "…" + String(name.suffix(15))
+    }
+
     public init(showHiddenFiles: Bool = false, onNavigate: @escaping NavigationHandler) {
         self.showHiddenFiles = showHiddenFiles
         self.navigationHandler = onNavigate
@@ -96,15 +102,15 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
             let displayName = itemURL.lastPathComponent
 
             let menuItem = NSMenuItem(
-                title: displayName,
+                title: Self.compactTitle(displayName),
                 action: #selector(menuItemClicked(_:)),
                 keyEquivalent: ""
             )
             menuItem.target = self
             menuItem.representedObject = itemURL
-            menuItem.toolTip = isDir
+            menuItem.toolTip = itemURL.path + "\n" + (isDir
                 ? "Click to open · ⌘-click opens in a new tab · ⌥-click copies"
-                : "Click to open · ⌥-click copies"
+                : "Click to open · ⌥-click copies")
 
             // Icon
             let icon = NSWorkspace.shared.icon(forFile: itemURL.path)
@@ -131,7 +137,7 @@ public final class SubfolderMenuBuilder: NSObject, NSMenuDelegate {
 
         if entries.count > Self.maxItems {
             menuItems.append(.separator())
-            let more = NSMenuItem(title: L10n.format("Open “%@” to See All %@", L10n.literal(dirURL.lastPathComponent), L10n.items(entries.count)),
+            let more = NSMenuItem(title: L10n.format("Open “%@” to See All %@", L10n.literal(Self.compactTitle(dirURL.lastPathComponent)), L10n.items(entries.count)),
                                   action: #selector(menuItemClicked(_:)), keyEquivalent: "")
             more.target = self
             more.representedObject = dirURL

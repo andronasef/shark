@@ -111,8 +111,7 @@ public struct BottomPathBarView: View {
                                     .foregroundStyle(seg.isLast ? (colorScheme == .dark ? Color.white : Color.primary) : (colorScheme == .dark ? Color.white.opacity(0.8) : Color.secondary))
                                     .lineLimit(1)
                                     .truncationMode(.middle)
-                                    .frame(maxWidth: inToolbar ? 180 : nil)
-                                    .fixedSize(horizontal: true, vertical: false)
+                                    .frame(maxWidth: 180)
                             }
                             .padding(.horizontal, 4)
                             .padding(.vertical, 2)

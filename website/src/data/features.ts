@@ -37,7 +37,7 @@ export const featureGroups: FeatureGroup[] = [
     id: 'navigation', title: 'Navigation & finding',
     description: 'A direct route to a folder, a file, or the action you need.',
     features: [
-      { id: 'editable-path', title: 'Editable folder paths', description: 'Click through ancestor folders in the location bar or type a path to go directly to a location. Show or hide the path bar from the View menu.', shortcut: '⌘L' },
+      { id: 'editable-path', title: 'Editable folder paths', description: 'Click through ancestor folders in the location bar or type a path to go directly to a location. Long path segments shorten in the middle and reveal their full path on hover. Show or hide the path bar from the View menu.', shortcut: '⌘L' },
       { id: 'folder-history', title: 'Back, forward & up', description: 'Retrace your folder history with Command-[ and Command-] (or Option-Left and Option-Right), or go to the enclosing folder with Command-Up.' },
       { id: 'command-palette', title: 'Command palette', description: 'Find actions, common places, recent and frequent folders, saved tab groups, and paths from one keyboard-driven panel.', shortcut: '⌘K' },
       { id: 'instant-filter', title: 'Instant filename filtering', description: 'Narrow the current folder by typing in the toolbar’s search field (⌘F). Filtering ignores case and accents, and hidden results leave the selection so file actions only affect visible items.' },
@@ -46,7 +46,7 @@ export const featureGroups: FeatureGroup[] = [
       { id: 'sidebar-sections', title: 'Collapsible sidebar sections', description: 'Keep the sections you use open. Expansion is remembered, headings support the keyboard, and collapsed sections can open temporarily during a drag.' },
       { id: 'folder-tree', title: 'File Explorer folder tree option', description: 'Switch the sidebar to an expandable folder tree, like Windows File Explorer, in place of Locations and Tags. Folders load lazily, reveal your active path automatically, and support keyboard and drag-and-drop navigation.' },
       { id: 'recent-frequent', title: 'Recent & frequent folders', description: 'Revisit your working locations from the Go menu or the command palette.' },
-      { id: 'subfolder-menus', title: 'Cascading subfolder menus', description: 'Use the arrow on a hovered folder or path segment to browse nested folders. Contents load asynchronously so browsing can stay responsive on large folders. Click to open, Command-click a folder for a new tab, or Option-click to copy. Switch the hovered-folder arrow off in Settings › Previews.' },
+      { id: 'subfolder-menus', title: 'Cascading subfolder menus', description: 'Use the arrow on a hovered folder or path segment to browse nested folders. Contents load asynchronously so browsing can stay responsive on large folders. Long names are shortened in the middle, with the full path available on hover. Click to open, Command-click a folder for a new tab, or Option-click to copy. Switch the hovered-folder arrow off in Settings › Previews.' },
       { id: 'local-volumes', title: 'Local folders & mounted volumes', description: 'Browse your Mac and volumes mounted in macOS from the sidebar. Shark does not include a built-in remote-protocol or cloud-account client.' },
     ],
   },

@@ -14,6 +14,24 @@ final class SubfolderMenuTests: XCTestCase {
     }
 
     @MainActor
+    func testLongMenuNameIsBoundedAndKeepsOriginalURLAndTooltip() async throws {
+        let name = String(repeating: "long-name-", count: 12) + ".json"
+        let file = root.appendingPathComponent(name)
+        try "x".write(to: file, atomically: true, encoding: .utf8)
+        let builder = SubfolderMenuBuilder { _, _ in }
+        let menu = builder.buildMenu(for: root)
+        await builder.loadContents(of: menu)
+        let item = try XCTUnwrap(menu.items.first)
+        XCTAssertEqual(item.title.count, 40)
+        XCTAssertTrue(item.title.hasSuffix(".json"))
+        XCTAssertTrue(item.toolTip?.contains(file.path) == true)
+        XCTAssertEqual((item.representedObject as? URL)?.resolvingSymlinksInPath(), file.resolvingSymlinksInPath())
+        XCTAssertEqual(SubfolderMenuBuilder.compactTitle("short.txt"), "short.txt")
+        let unicode = String(repeating: "👩🏽‍💻", count: 60)
+        XCTAssertEqual(SubfolderMenuBuilder.compactTitle(unicode).count, 40)
+    }
+
+    @MainActor
     func testMenuCascadesSixLevelsDeepAndListsTheFileAtTheBottom() async throws {
         var deepest = root!
         for level in 1...6 { deepest.appendPathComponent("level\(level)", isDirectory: true) }

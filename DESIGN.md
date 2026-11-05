@@ -37,6 +37,7 @@ Shark strictly adheres to macOS Human Interface Guidelines (HIG) with an 8pt-bas
   - Located beside Back/Forward in a `28` pt glass capsule, showing the active pane’s path. Navigation and Location share one native toolbar item with an `8` pt gap, keeping their order and placement together during launch and window restoration.
   - Ancestors support navigation and subfolder menus; `⌘L` edits the path.
   - The capsule starts directly beside Navigation and fills all remaining toolbar width (minimum `160` pt), so long paths stay readable. Toolbar items do not stretch on their own, so its width is the detail-column width minus a fixed allowance for the other items (`otherToolbarItemsWidth = 768` pt in `ContentView.swift`); add `collapsedSidebarInset = 116` pt when the sidebar is hidden (traffic lights join the toolbar row); retune both when toolbar items change. Breadcrumb separators are 7 pt medium chevrons in the tertiary label colour; only the current segment is emphasised (semibold on a neutral capsule, no tinted icon). One menu chevron per segment and a neutral current-folder highlight keep the path compact.
+  - Path segment labels truncate in the middle at 180 pt in the header and bottom bar; hover exposes the full path. Cascading folder-menu titles cap at 40 characters with a middle ellipsis, retaining the final 15 characters; tooltips preserve the full path.
   - Segment spacing: `2` pt with `8pt` chevron indicators.
 - **Inspector Panel**:
   - Width: `280` pt.
