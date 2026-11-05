@@ -77,6 +77,7 @@ public final class SharkSettings: ObservableObject {
     @AppStorage("appAppearance") public var appAppearance: String = AppAppearance.system.rawValue
     @AppStorage("defaultViewMode") public var defaultViewMode: String = DefaultViewModeSetting.list.rawValue
     @AppStorage("startupLocation") public var startupLocation: String = DefaultStartupLocation.home.rawValue
+    @AppStorage("statusBarTipsEnabled") public var statusBarTipsEnabled: Bool = true
     @AppStorage("showHiddenFilesByDefault") public var showHiddenFilesByDefault: Bool = false
     @AppStorage("hoverPreviewEnabled") public var hoverPreviewEnabled: Bool = true
     @AppStorage("hoverPreviewDelayMs") public var hoverPreviewDelayMs: Double = 350.0

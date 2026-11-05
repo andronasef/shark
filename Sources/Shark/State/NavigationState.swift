@@ -32,7 +32,12 @@ public enum ViewMode: String, CaseIterable, Identifiable, Sendable {
 @Observable
 @MainActor
 public final class NavigationState {
-    public var currentURL: URL
+    public var currentURL: URL {
+        didSet {
+            if currentURL != oldValue { statusBarTip = StatusBarTips.choose() }
+        }
+    }
+    var statusBarTip = StatusBarTips.choose()
     public private(set) var backStack: [URL] = []
     public private(set) var forwardStack: [URL] = []
 
@@ -42,7 +47,10 @@ public final class NavigationState {
     /// `items` after the filter and sort, recomputed only when one of them changes.
     public private(set) var filteredAndSortedItems: [FileItem] = []
     public var selectedItemIDs: Set<URL> = [] {
-        didSet { invalidateSelectionSummary() }
+        didSet {
+            invalidateSelectionSummary()
+            if !selectedItemIDs.isEmpty { statusBarTip = nil }
+        }
     }
     /// The item keyboard navigation and Shift-click ranges start from.
     public var selectionAnchorID: URL? = nil
@@ -88,7 +96,9 @@ public final class NavigationState {
     public var requestedNewItemType: NewItemType? = nil
     public var isBottomPathBarVisible: Bool = true
     public var activeOperationProgress: Double? = nil
-    public var activeOperationTitle: String? = nil
+    public var activeOperationTitle: String? = nil {
+        didSet { if activeOperationTitle != nil { statusBarTip = nil } }
+    }
     /// Stops the running operation shown in the status bar; nil when it can't be cancelled.
     public private(set) var cancelActiveOperation: (() -> Void)? = nil
 

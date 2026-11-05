@@ -683,3 +683,5 @@
 "Zoom Out (⌘-)" = "Zoom arrière (⌘-)";
 "Zoom Presets" = "Niveaux de zoom";
 "⌘⇧-click" = "⌘⇧-clic";
+
+"Show occasional tips in the status bar" = "Afficher des conseils occasionnels dans la barre d’état";

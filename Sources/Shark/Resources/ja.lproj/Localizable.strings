@@ -683,3 +683,5 @@
 "Zoom Out (⌘-)" = "ズームアウト (⌘-)";
 "Zoom Presets" = "ズームのプリセット";
 "⌘⇧-click" = "⌘⇧クリック";
+
+"Show occasional tips in the status bar" = "ステータスバーにヒントを時々表示";

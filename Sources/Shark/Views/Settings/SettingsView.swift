@@ -104,6 +104,7 @@ public struct SettingsView: View {
                     }
                 }
 
+                Toggle(L10n.text("Show occasional tips in the status bar"), isOn: $settings.statusBarTipsEnabled)
                 Toggle(L10n.text("Show hidden files and dotfiles by default"), isOn: $settings.showHiddenFilesByDefault)
                 Toggle(L10n.text("Enable Liquid Glass translucency and vibrancy"), isOn: $settings.liquidGlassTranslucency)
             }

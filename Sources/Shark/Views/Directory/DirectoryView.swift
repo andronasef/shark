@@ -7,6 +7,7 @@ public struct DirectoryView: View {
     @Environment(WorkspaceState.self) private var workspace: WorkspaceState?
     let pane: PaneIdentifier
 
+    @AppStorage("statusBarTipsEnabled") private var statusBarTipsEnabled = true
     @State private var owningWindowNumber: Int?
     @State private var fseventsWatcher = FSEventsWatcher()
     @State private var showingNewItemSheet: NewItemType? = nil
@@ -491,7 +492,19 @@ public struct DirectoryView: View {
                 }
             }
 
-            Spacer()
+            Spacer(minLength: 0)
+
+            if statusBarTipsEnabled, navigationState.selectedItemIDs.isEmpty,
+               navigationState.activeOperationTitle == nil, let tip = navigationState.statusBarTip {
+                ViewThatFits(in: .horizontal) {
+                    Text("💡 " + L10n.text(tip.title) + (tip.shortcut.isEmpty ? "" : " (" + L10n.text(tip.shortcut) + ")"))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                    Color.clear.frame(width: 0, height: 0)
+                }
+                .layoutPriority(-1)
+            }
 
             if navigationState.viewMode == .grid {
                 HStack(spacing: 6) {
