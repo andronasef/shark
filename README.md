@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://github.com/andronasef/shark/releases"><img alt="Download the latest release" src="https://img.shields.io/github/v/release/andronasef/shark?include_prereleases&label=download&logo=github&color=0069d4"></a>
   <a href="https://github.com/andronasef/homebrew-shark"><img alt="Homebrew cask: andronasef/shark/shark" src="https://img.shields.io/badge/brew-andronasef%2Fshark%2Fshark-fbb040?logo=homebrew&logoColor=white"></a>
-  <a href="https://apps.apple.com/us/app/shark-better-finder/id6825086341"><img alt="Mac App Store: in review" src="https://img.shields.io/badge/Mac_App_Store-in_review-0d96f6?logo=appstore&logoColor=white"></a>
+  <a href="https://apps.apple.com/app/shark-file-manager/id6825086341"><img alt="Mac App Store" src="https://img.shields.io/badge/Mac_App_Store-download-0d96f6?logo=apple&logoColor=white"></a>
   <a href="https://github.com/andronasef/shark/releases"><img alt="Total downloads" src="https://img.shields.io/github/downloads/andronasef/shark/total?color=586674"></a>
   <img alt="macOS 14 or later" src="https://img.shields.io/badge/macOS-14%2B-18232e?logo=apple&logoColor=white">
 </p>
@@ -65,7 +65,7 @@ brew install --cask shark
 
 ### Mac App Store
 
-[Shark on the Mac App Store](https://apps.apple.com/us/app/shark-better-finder/id6825086341) is waiting for Apple's review; the link works once it is approved.
+Get [Shark on the Mac App Store](https://apps.apple.com/app/shark-file-manager/id6825086341) for seamless installation and automatic updates.
 
 ### Direct download
 

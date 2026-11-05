@@ -12,7 +12,7 @@ Last updated 27 Oct 2026. Copy for every listing lives in [phase1-drafts.md](pha
 - Repo: https://github.com/andronasef/shark (Apache 2.0)
 - Trailer: https://youtu.be/SoQqCcbbE1c
 - Install: `brew install --cask andronasef/shark/shark`
-- Mac App Store: https://apps.apple.com/us/app/shark-better-finder/id6825086341 (in review, link not live yet)
+- Mac App Store: https://apps.apple.com/app/shark-file-manager/id6825086341 (live)
 - Version: 1.0.0-alpha.2, macOS 14+, 8 languages
 - Story: used Windows, missed File Explorer, built a Finder with superpowers that feels familiar. Also borrows from QTTabBar (Windows) and Dolphin (KDE).
 - Images: App Store screenshots only. Copies in the session scratchpad `shots/` (JPEG, about 500 KB each).
