@@ -135,24 +135,31 @@ final class PhotoViewerState {
         NSWorkspace.shared.open(currentURL)
     }
 
+    /// Moves the current photo to the Trash and drops it from the viewer only once that has succeeded,
+    /// so a failed move never makes a photo that is still on disk disappear.
     func deleteCurrentPhoto() {
-        guard let currentURL else { return }
+        guard let target = currentURL else { return }
         pause()
-        let target = currentURL
         Task {
-            if let restorations = try? await FileOperationsService.shared.trash(items: [target]) {
+            do {
+                let restorations = try await FileOperationsService.shared.trash(items: [target])
                 FileUndoService.shared.record(.trash(restorations: restorations))
+                remove(target)
+            } catch {
+                self.error = L10n.format("Move to Trash failed: %@", error.localizedDescription)
             }
         }
-        urls.removeAll { $0 == currentURL }
+    }
+
+    /// Removes a photo from the list, keeping the index on a valid photo.
+    func remove(_ url: URL) {
+        urls.removeAll { $0 == url }
         if urls.isEmpty {
             image = nil
             error = L10n.text("No photos remaining.")
             return
         }
-        if index >= urls.count {
-            index = urls.count - 1
-        }
+        index = min(index, urls.count - 1)
         resetView()
         load()
     }

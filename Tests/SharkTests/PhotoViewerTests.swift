@@ -21,6 +21,17 @@ final class PhotoViewerTests: XCTestCase {
         XCTAssertFalse(state.canGoNext)
     }
 
+    func testRemovingKeepsIndexOnAValidPhoto() {
+        let state = PhotoViewerState(urls: urls, initialURL: urls[2])
+        state.remove(urls[2])
+        XCTAssertEqual(state.currentURL, urls[1])
+        state.remove(urls[0])
+        XCTAssertEqual(state.currentURL, urls[1])
+        state.remove(urls[1])
+        XCTAssertNil(state.currentURL)
+        XCTAssertNotNil(state.error)
+    }
+
     func testSelectedSnapshotPreservesFolderOrder() {
         let items = urls.map { FileItem(url: $0, name: $0.lastPathComponent, isDirectory: false) }
         XCTAssertEqual(PhotoViewerWindowController.snapshot(items: items, selectedURLs: [urls[2], urls[0]]), [urls[0], urls[2]])
