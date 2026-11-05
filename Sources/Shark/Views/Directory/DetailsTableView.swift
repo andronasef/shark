@@ -189,24 +189,36 @@ private struct TableScrollSynchronizer: NSViewRepresentable {
 }
 
 private final class TableScrollNSView: NSView {
+    /// The last row scrolled to, so a redraw does not fight the user scrolling away.
+    private var lastScrolledRow: Int?
+
     func scrollToRow(_ row: Int) {
+        guard row != lastScrolledRow else { return }
+        lastScrolledRow = row
         DispatchQueue.main.async { [weak self] in
-            guard let self,
-                  let table = self.enclosingTableView,
+            guard let table = self?.adjacentTableView(),
                   row >= 0, row < table.numberOfRows else { return }
             table.scrollRowToVisible(row)
         }
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
+
+    /// SwiftUI hosts this overlay beside the table, not inside it, so search the nearest ancestor that contains one.
+    private func adjacentTableView() -> NSTableView? {
+        var ancestor = superview
+        while let current = ancestor {
+            if let table = current.firstDescendant(ofType: NSTableView.self) { return table }
+            ancestor = current.superview
+        }
+        return nil
+    }
 }
 
 private extension NSView {
-    var enclosingTableView: NSTableView? {
-        var view: NSView? = self
-        while let current = view {
-            if let table = current as? NSTableView { return table }
-            view = current.superview
+    func firstDescendant<T: NSView>(ofType type: T.Type) -> T? {
+        for sub in subviews {
+            if let match = sub as? T ?? sub.firstDescendant(ofType: type) { return match }
         }
         return nil
     }
