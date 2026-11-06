@@ -55,7 +55,9 @@ Every phase includes its meaningful tests, native UI inspection, Help/catalog/ch
   1. Sidebar color-name filters and inert All Tags are absent, including keyboard-focus stops, until actual tags are implemented in Phase 19.
   2. Help, welcome/onboarding and website FAQ plainly say that other applications' Open/Save dialogs remain the system interface.
   3. Existing sidebar favorites, locations, folder tree and keyboard navigation still work, and no public feature claim implies real tags have shipped.
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 12-01-PLAN.md — Remove false tag navigation and clarify the system Open/Save boundary, with native and responsive website verification.
 **UI hint**: yes
 
 ### Phase 13: Safe Shared Collision Choices
