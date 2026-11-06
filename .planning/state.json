@@ -1,0 +1,38 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v2.1",
+  "phases": [
+    {
+      "number": "7",
+      "name": "Pro Tab Strip & Session Restore",
+      "status": "complete"
+    },
+    {
+      "number": "8",
+      "name": "Explorer Ergonomics",
+      "status": "complete"
+    },
+    {
+      "number": "9",
+      "name": "QTTabBar Folder Power",
+      "status": "complete"
+    },
+    {
+      "number": "10",
+      "name": "Command Palette, Menus & Keyboard",
+      "status": "complete"
+    },
+    {
+      "number": "11",
+      "name": "Finder Fidelity Polish",
+      "status": "complete"
+    }
+  ],
+  "next": {
+    "command": "/gsd-discuss-phase",
+    "label": "Discuss the first phase",
+    "reason": "Project initialized — plan your first phase"
+  },
+  "updated_at": "2026-11-06T09:03:15.589Z"
+}

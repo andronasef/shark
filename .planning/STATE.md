@@ -1,41 +1,47 @@
 ---
 gsd_state_version: "1.0"
-milestone: v2.0
-current_phase: 11
-current_phase_name: Finder Fidelity Polish & Liquid Glass
-status: complete
-last_updated: "2026-10-21T21:02:51.630Z"
-last_activity: 2026-10-22
-last_activity_desc: "Completed quick task 261021-x6a: Add update-alert checker for DMG, Homebrew and App Store installs"
-state_head: 48e1df20e58601eda952315b8f4b4d2def15b118
+milestone: v2.1
+milestone_name: Everyday Mac Workflows
+status: planning
+current_phase: 12
+current_phase_name: Honest Sidebar and System Boundaries
+last_updated: "2026-11-06T09:03:15.585Z"
+last_activity: 2026-11-06
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
-milestone_name: Finder Look, QTTabBar Power
+  total_phases: 20
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-10-20)
+See: .planning/PROJECT.md (updated 2026-11-06)
 
-**Core value:** A file manager that looks like native macOS Finder but has the power of QTTabBar and the ease of Windows File Explorer.
-**Current focus:** Milestone v2.0 Complete! All 11 phases finished and verified.
+**Core value:** Native Finder familiarity with safe, fast daily file work reachable by mouse and keyboard.
+**Current focus:** v2.1 Everyday Mac Workflows — all three groups authorized; Phase 12 ready for context and planning.
 
 ## Current Position
 
-Phase: 11 of 11 (Finder Fidelity Polish & Liquid Glass) — COMPLETE
-Status: Complete
-Last activity: 2026-10-22 - Completed quick task 261021-x6a: Add update-alert checker for DMG, Homebrew and App Store installs
+Phase: 12 of 31 (Honest Sidebar and System Boundaries); milestone position 1 of 20
+Plan: —
+Status: Ready to plan
+Last activity: 2026-11-06 — Milestone v2.1 initialized with 47 mapped requirements and phases 12–31
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0% (0/20 phases complete)
 
 ## Accumulated Context
 
+- Latest authority: user requested gsd-autonomous implementation of all three groups on 2026-11-06. Group 3 is in scope; choose reasonable native defaults instead of reopening agreed questions.
+- Execution scope: EVERYDAY-MAC-MILESTONE.md; root ROADMAP.md explains decisions; REQUIREMENTS.md maps all 47 requirements exactly once.
+- Group ranges: Group 1 phases 12–19; Group 2 phases 20–25; Group 3 phases 26–31. Audit/complete/cleanup only after genuine verification; no public version bump, tag, deployment or release requested.
+- Baselines reported by parent 2026-11-06: swift test passed after clearing stale .build cache; website npm run build passed (10 pages). No source/dependency/toolchain changes were needed. cua-driver 0.37.0 daemon is healthy for native QA.
+- Preserve unrelated untracked .claude/. Volume eject already committed as a19a03d.
+- Phase research should validate public APIs, actual archive format support, iCloud metadata/account limits and real Services behavior. No new project-wide research was needed for milestone setup.
+- Previous milestone verification/invariants below are retained as historical records, not fresh verification for v2.1. Prior snapshots and phase artifacts are preserved in milestones/v2.0-*.
 - Design authority: PRODUCT.md (standing preference: Finder look), DESIGN.md, and .impeccable/surfaces/sources-shark-views-contentview-swift.md.
 - Build & run: `scripts/run.sh` builds, copies into Shark.app and relaunches. Tests: `swift test`.
 - Verification: 68 unit tests passing with 0 failures; live native test verified via cua-driver.
@@ -59,3 +65,11 @@ Progress: [██████████] 100%
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 261021-x6a | Add update-alert checker for DMG, Homebrew and App Store installs | 2026-10-22 | 48e1df2 | [261021-x6a-add-update-alert-checker-for-dmg-homebre](./quick/261021-x6a-add-update-alert-checker-for-dmg-homebre/) |
+
+## Blockers/Concerns
+
+None at initialization. Human system privacy prompts, iCloud account states, network servers, installed Services and AirDrop peers may limit live validation; record exact limits rather than fabricate completion.
+
+## Session Continuity
+
+Resume with gsd-autonomous at Phase 12. The task is all three groups, not planning alone. Preserve phase context/plans/summaries/verification and update this state after each phase.

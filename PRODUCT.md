@@ -10,7 +10,7 @@ Native macOS desktop app (not one of web/ios/android/adaptive). Swift 6, SwiftUI
 
 ## Users
 
-Power users on a Mac who manage many files every day (developers, designers, people coming from Windows or KDE) and find Finder slow for real work. They jump between project folders, copy between locations, open terminals in folders, and want everything one keystroke away. *(Inferred from the brief and repo; confirm.)*
+Power users on a Mac remain the primary audience: developers, designers, and people coming from Windows or KDE who jump between project folders, copy between locations, open terminals in folders, and want every action one keystroke away. Everyday Mac users moving off Finder are a second audience. Matching Finder's everyday capabilities is the minimum; power features build on that familiar base.
 
 ## Product Purpose
 
@@ -26,10 +26,11 @@ Long sessions in a window that stays open all day, often beside an editor and a 
 
 ## Capabilities and Constraints
 
-- Shipped: tabs, dual pane, four view modes, instant filter, Quick Look, PTY terminal drawer (SwiftTerm), inspector with checksums, async file ops, batch rename, FSEvents, drag and drop.
-- In scope next: tab pro features (reorder, pin/lock, reopen closed, session restore, middle-click close), subfolder hover menus and previews, a command palette with recent/frequent folders, and Explorer ergonomics (Cut/Paste, copy path, folder size, rich status bar, show hidden).
+- Shipped: pro tabs with session restore, dual pane, four view modes, instant filter, Quick Look, PTY terminal drawer (SwiftTerm), inspector with checksums, async file ops, batch rename, FSEvents, drag and drop, cascading subfolder menus, hover previews, command palette, Cut/Paste and undo, copy path, calculated folder sizes, and a rich status bar. The website feature catalog is the complete public inventory.
+- In scope next: all three groups in `ROADMAP.md`: everyday essentials (safe collision choices, extraction, Trash, extension warnings, iCloud, search and real Finder tags); expected Mac workflows (Recents, places, transfer controls, aliases, spring loading, Get Info, server mounting); and Quick Actions, grouping, saved searches, AirDrop, Print and Services. Planned features become public claims only after implementation and verification.
 - Constraints: pure Swift/SwiftUI/AppKit, no Qt/C++, trash before delete, never block the main thread.
-- Out of scope: remote protocols (sftp/smb), cloud provider APIs.
+- Remote connections are mounted by macOS and then browsed as ordinary mounted volumes. Connect to Server hands supported addresses to macOS; Shark does not implement SMB, AFP, NFS, SFTP, or other remote protocol stacks.
+- Out of scope: proprietary cloud provider APIs and replacing other applications' system Open/Save dialogs. Native iCloud file metadata and download APIs are in scope.
 
 ## Brand Commitments
 
@@ -46,6 +47,7 @@ No testimonials, benchmarks, or users to cite. Do not invent any.
 3. Nothing destructive without an undo or the Trash.
 4. Speed is a feature; the UI never waits on the disk.
 5. Explorer-familiar where habit helps, Shark-specific where it earns it.
+6. Match Finder's everyday workflows before adding new power features; explain system handoffs and limitations plainly.
 
 ## Accessibility & Inclusion
 
