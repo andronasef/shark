@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import DownloadLink from './DownloadLink.astro';
+import MacAppStoreLink from './MacAppStoreLink.astro';
 import icon from '../assets/icon.png';
 import ThemeToggle from './ThemeToggle.astro';
 interface Props { currentPage?: 'home' | 'features' | 'guides' | 'privacy'; }
@@ -16,7 +16,7 @@ const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
       </a>
       <div class="nav-actions">
         <ThemeToggle />
-        <DownloadLink compact />
+        <MacAppStoreLink compact />
         <button
           type="button"
           class="nav-toggle"

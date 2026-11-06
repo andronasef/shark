@@ -1,11 +1,18 @@
 ---
 import Icon from './Icon.astro';
-interface Props { compact?: boolean; }
-const { compact = false } = Astro.props;
+
+interface Props {
+  compact?: boolean;
+  primary?: boolean;
+}
+const { compact = false, primary = false } = Astro.props;
 ---
-<a class:list={['button', 'button-primary', 'js-download', { 'button-compact': compact }]} href="https://github.com/andronasef/shark/releases">
+<a
+  class:list={['button', primary ? 'button-primary' : 'button-secondary', 'js-download', { 'button-compact': compact }]}
+  href="https://github.com/andronasef/shark/releases/download/v1.0.0-alpha.3/Shark-1.0.0-alpha.3.dmg"
+>
   <Icon name="download" size={compact ? 16 : 19} />
-  <span>{compact ? 'Download' : 'Download for macOS'}</span>
+  <span>Download DMG</span>
 </a>
 <script>
   // /releases/latest skips prereleases, so list recent releases (alphas included) and link the newest DMG.
@@ -16,5 +23,5 @@ const { compact = false } = Astro.props;
       const dmg = releases.flatMap((r) => r.assets).find((a) => a.name.endsWith('.dmg'));
       if (dmg) document.querySelectorAll<HTMLAnchorElement>('.js-download').forEach((a) => (a.href = dmg.browser_download_url));
     })
-    .catch(() => {}); // keep the Releases page link
+    .catch(() => {}); // keep the direct DMG link
 </script>

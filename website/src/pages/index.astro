@@ -18,7 +18,7 @@ const faqs = [
   { q: "Is Shark free?", a: "Yes. Shark is free to download and use. You can also explore the source on <a href=\"https://github.com/andronasef/shark\">GitHub</a>." },
   { q: "Does Shark replace Finder?", a: "It can sit alongside Finder or take over. Shark opens folders in its own window, and Show in Finder is always one click away. Settings › General can ask macOS to make Shark your default folder app, or restore Finder. macOS does not always allow the change." },
   { q: "Will it work on my Mac?", a: "Shark requires macOS Sonoma 14 or later and supports Apple silicon and Intel Macs. Native Liquid Glass chrome is available on macOS 26; earlier versions use system materials." },
-  { q: "How do I install it?", a: "With Homebrew, run <code>brew install --cask andronasef/shark/shark</code>. Or download the latest Shark DMG, open it, and drag Shark.app to your Applications folder. The Mac App Store version is waiting for Apple’s review." },
+  { q: "How do I install it?", a: "Get it directly from the <a href=\"https://apps.apple.com/us/app/shark-file-manager/id6825086341\" target=\"_blank\" rel=\"noopener\">Mac App Store</a>. You can also download the latest Shark DMG, open it, and drag Shark.app to your Applications folder, or install with Homebrew: <code>brew install --cask andronasef/shark/shark</code>." },
   { q: "Why does it ask for folder access?", a: "macOS protects folders such as Documents and Downloads. Allow access to the folders you want to browse when macOS asks. You can manage those permissions in System Settings." },
   { q: "Can I use it with the keyboard?", a: "Yes. Open tabs with ⌘T, jump to a path with ⌘L, and open the command palette with ⌘K. F3 toggles split panes and F4 opens the terminal. Depending on your keyboard settings, hold Fn with the function keys." },
 ];
@@ -49,7 +49,7 @@ const tools = [
       <div class="hero-copy container">
         <h1 id="hero-heading">Your files.<br /><span>More possibilities.</span></h1>
         <p class="hero-description">Tabs, split panes, a built-in terminal, and quick previews.<br class="desktop-break" /> All in a familiar Mac interface.</p>
-        <div class="hero-actions"><DownloadLink /><MacAppStoreLink /><BrewCommand /><a class="text-link" href="#features">Meet Shark <Icon name="arrow" size={17} /></a></div>
+        <div class="hero-actions"><MacAppStoreLink /><DownloadLink /><BrewCommand /><a class="text-link" href="#features">Meet Shark <Icon name="arrow" size={17} /></a></div>
         <p class="compatibility">Free. Made for Mac. <span>macOS 14 or later.</span></p>
       </div>
       <div class="hero-stage">
@@ -104,7 +104,7 @@ const tools = [
       <Image src={icon} alt="" width={92} height={92} layout="fixed" />
       <h2 id="closing-heading">Make room for<br />a better workflow.</h2>
       <p>Your next favorite place for your files.</p>
-      <div class="cta-row"><DownloadLink /><MacAppStoreLink /><BrewCommand /></div>
+      <div class="cta-row"><MacAppStoreLink /><DownloadLink /><BrewCommand /></div>
       <p class="compatibility">Free · macOS 14+ · Apple silicon &amp; Intel</p>
     </section>
   </main>

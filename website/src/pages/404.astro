@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import MacAppStoreLink from '../components/MacAppStoreLink.astro';
 import DownloadLink from '../components/DownloadLink.astro';
 import Icon from '../components/Icon.astro';
 import '../styles/privacy.css';
@@ -24,7 +25,10 @@ const links = [
       <ul>
         {links.map(l => <li><a class="text-link" href={l.href}>{l.label} <Icon name="arrow" size={16} /></a><span>{l.text}</span></li>)}
       </ul>
-      <DownloadLink />
+      <div class="cta-row" style="justify-content: flex-start; margin-top: 10px;">
+        <MacAppStoreLink />
+        <DownloadLink />
+      </div>
     </div>
   </main>
   <SiteFooter />

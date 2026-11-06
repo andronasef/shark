@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
+import MacAppStoreLink from '../../components/MacAppStoreLink.astro';
 import DownloadLink from '../../components/DownloadLink.astro';
 import BrewCommand from '../../components/BrewCommand.astro';
 import '../../styles/guides.css';
@@ -62,7 +63,7 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': [article, breadcrum
       <aside class="guide-cta">
         <h2>Try Shark</h2>
         <p>Free, open source, macOS 14 or later. Tabs, split panes, a built-in terminal and hover previews.</p>
-        <div class="cta-row"><DownloadLink /><BrewCommand /></div>
+        <div class="cta-row"><MacAppStoreLink /><DownloadLink /><BrewCommand /></div>
       </aside>
     </article>
   </main>
