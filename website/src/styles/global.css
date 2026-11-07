@@ -549,7 +549,7 @@
     .hero-stage { padding: 0 14px 20px; margin-top: 39px; }
     .hero-stage::before { inset: 30px 0 0; border-radius: 25px; }
     .hero-window { border-radius: 6px; }
-    .feature-dock { gap: 0; padding: 5px; border-radius: 13px; margin-top: -10px; }
+    .feature-dock { gap: 0; padding: 5px; border-radius: 13px; margin-top: -10px; flex-wrap: wrap; justify-content: center; }
     .feature-dock a { padding: 8px; gap: 5px; font-size: 10px; }
     .feature-dock svg { width: 15px; height: 15px; }
     .feature-dock kbd, .dock-divider { display: none; }
