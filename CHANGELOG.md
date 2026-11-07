@@ -86,11 +86,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### User Changelog
 - **Windows-Style Folder Tree**: Switch between Finder-style Places and an expandable folder tree in the sidebar.
-- **Shark Photo Viewer**: Double-click images to open a dedicated, fast photo viewer with full-resolution display, thumbnail filmstrip, and slideshow mode.
-- **Customizable Toolbar**: Add, remove, and reorder toolbar buttons using the native macOS customization sheet, with optional text labels below icons.
-- **Multilingual Support**: Fully localized into English, Arabic, Spanish, French, German, Brazilian Portuguese, Simplified Chinese, and Japanese with native right-to-left layout for Arabic.
-- **Interactive Terminal Drawer**: Resize the built-in terminal drawer from its top edge and adjust font sizes with standard ⌘+ and ⌘- shortcuts.
-- **Update Alerts**: Automatic notifications when a new version of Shark is available for your install method (Mac App Store, Homebrew, or Direct Download).
+- **Built-in Photo Viewer**: Open images instantly in a full-resolution viewer with thumbnail filmstrip and slideshow mode.
+- **Customizable Toolbar**: Add, remove, and reorder toolbar buttons with optional text labels.
+- **Interactive Terminal Drawer**: Resize the built-in terminal from its top edge and adjust font sizes with ⌘+ and ⌘-.
 
 ### Added
 - The toolbar can show icons only or icons with labels (right-click the toolbar).
