@@ -177,6 +177,30 @@ struct HelpCommands: Commands {
 
             Divider()
 
+            if UpdateChecker.isAppStoreInstall {
+                Button(L10n.text("Rate Shark on Mac App Store…")) {
+                    EngagementPromptService.shared.rateDirectly()
+                }
+            }
+
+            Button(L10n.text("Share Shark with Friends…")) {
+                EngagementPromptService.shared.shareShark()
+            }
+
+            #if DEBUG
+            Divider()
+
+            Button("Debug: Show Rating Prompt") {
+                EngagementPromptService.shared.simulatePrompt(.rateAppStore)
+            }
+
+            Button("Debug: Show Share Prompt") {
+                EngagementPromptService.shared.simulatePrompt(.shareWithFriends)
+            }
+            #endif
+
+            Divider()
+
             Button("About Andrew Nasef") {
                 openURL(AppLinks.author)
             }

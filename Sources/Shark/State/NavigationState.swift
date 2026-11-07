@@ -34,7 +34,10 @@ public enum ViewMode: String, CaseIterable, Identifiable, Sendable {
 public final class NavigationState {
     public var currentURL: URL {
         didSet {
-            if currentURL != oldValue { statusBarTip = StatusBarTips.choose() }
+            if currentURL != oldValue {
+                statusBarTip = StatusBarTips.choose()
+                EngagementPromptService.shared.recordInteraction()
+            }
         }
     }
     var statusBarTip = StatusBarTips.choose()

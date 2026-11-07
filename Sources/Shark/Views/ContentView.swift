@@ -373,6 +373,34 @@ public struct ContentView: View {
                 CommandPaletteView(workspace: workspaceState)
             }
         }
+        .overlay(alignment: .bottomTrailing) {
+            if let prompt = EngagementPromptService.shared.activePrompt {
+                EngagementPromptCard(
+                    prompt: prompt,
+                    onPrimaryAction: {
+                        switch prompt {
+                        case .rateAppStore:
+                            EngagementPromptService.shared.rateDirectly()
+                        case .shareWithFriends:
+                            EngagementPromptService.shared.shareShark()
+                        }
+                    },
+                    onSnooze: {
+                        EngagementPromptService.shared.snooze(prompt: prompt)
+                    },
+                    onDismiss: {
+                        EngagementPromptService.shared.dismissPermanently(prompt: prompt)
+                    }
+                )
+                .padding(.trailing, 20)
+                .padding(.bottom, 24)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .bottom).combined(with: .opacity),
+                    removal: .opacity.combined(with: .scale(scale: 0.95))
+                ))
+            }
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: EngagementPromptService.shared.activePrompt)
         .sheet(isPresented: $showingBatchRenameSheet) {
             let selectedItems = activeState.items.filter { activeState.selectedItemIDs.contains($0.id) }
             BatchRenameSheet(

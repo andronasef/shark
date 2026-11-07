@@ -697,3 +697,18 @@
 "Right-click an ejectable volume" = "右键单击可推出的宗卷";
 
 "Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "推出宗卷。在“位置”和“文件夹树”中均可使用；如果宗卷正被使用，macOS 会报告错误。";
+
+// Engagement Prompts
+"Enjoying Shark?" = "喜欢使用 Shark 吗？";
+"100 Fast Hops! 🎉" = "完成 100 次快速跳转！🎉";
+"Mac App Store Review" = "Mac App Store 评价";
+"Milestone Reached" = "达成里程碑";
+"If Shark makes managing your files faster, rating it on the Mac App Store helps other Mac users discover it!" = "如果 Shark 提升了您的文件管理效率，在 Mac App Store 上评价将帮助更多 Mac 用户发现它！";
+"You've navigated over 100 folders and tabs! Share Shark with friends or coworkers who love fast Mac tools." = "您已浏览超过 100 个文件夹与标签页！向身边喜欢高效 Mac 工具的朋友或同事推荐 Shark 吧。";
+"Rate on App Store" = "前往 App Store 评价";
+"Share with Friends" = "与好友分享";
+"Maybe Later" = "稍后再说";
+"Don't ask again" = "不再提示";
+"Rate Shark on Mac App Store…" = "在 Mac App Store 评价 Shark…";
+"Share Shark with Friends…" = "与好友分享 Shark…";
+"Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "推荐 Shark — 一款专为 Mac 设计、极速且支持全键盘操作的双栏文件管理器！";

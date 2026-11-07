@@ -697,3 +697,18 @@
 "Right-click an ejectable volume" = "Clic droit sur un volume éjectable";
 
 "Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "Éjecter le volume. Disponible dans Emplacements et Arborescence ; macOS signale une erreur s’il est utilisé.";
+
+// Engagement Prompts
+"Enjoying Shark?" = "Vous appréciez Shark ?";
+"100 Fast Hops! 🎉" = "100 sauts rapides ! 🎉";
+"Mac App Store Review" = "Avis sur le Mac App Store";
+"Milestone Reached" = "Étape franchie";
+"If Shark makes managing your files faster, rating it on the Mac App Store helps other Mac users discover it!" = "Si Shark accélère la gestion de vos fichiers, donner votre avis sur le Mac App Store aide d'autres utilisateurs Mac à le découvrir !";
+"You've navigated over 100 folders and tabs! Share Shark with friends or coworkers who love fast Mac tools." = "Vous avez exploré plus de 100 dossiers et onglets ! Partagez Shark avec des amis ou collègues friands d'outils Mac ultra-rapides.";
+"Rate on App Store" = "Noter sur l'App Store";
+"Share with Friends" = "Partager avec des amis";
+"Maybe Later" = "Peut-être plus tard";
+"Don't ask again" = "Ne plus me demander";
+"Rate Shark on Mac App Store…" = "Noter Shark sur le Mac App Store…";
+"Share Shark with Friends…" = "Partager Shark avec des amis…";
+"Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Découvrez Shark — un gestionnaire de fichiers à double volet ultra-rapide et piloté au clavier pour Mac !";

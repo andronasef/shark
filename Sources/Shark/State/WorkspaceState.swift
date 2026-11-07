@@ -129,6 +129,7 @@ public final class WorkspaceState {
     ) {
         let targetURL = url ?? activeNavigationState.currentURL
         let tab = WorkspaceTab(initialURL: targetURL)
+        EngagementPromptService.shared.recordInteraction()
 
         let insertIndex: Int
         switch placement {

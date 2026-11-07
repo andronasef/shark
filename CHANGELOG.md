@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [1.0.0-alpha.4] - 2026-11-05
 
 ### Added
+- Mac App Store rating engagement prompt: discreet, non-intrusive floating liquid glass card inviting users of the Mac App Store build to rate Shark after 7 days, 3 active days, and 20 folder navigations. Includes "Maybe Later" (14-day snooze), "Don't ask again" permanent dismissal, maximum 2 presentations lifetime cap, and a "Rate Shark on Mac App Store…" action in the Help menu.
+- Share Shark with Friends milestone prompt: celebration card ("100 Fast Hops! 🎉") presented after reaching 100 folder navigations and tab actions, invoking the native macOS Share Sheet, with a 7-day buffer from rating prompts, snooze/dismiss options, and a permanent "Share Shark with Friends…" action in the Help menu.
+- Complete localization for engagement prompts across all 8 supported languages (English, Arabic, German, Spanish, French, Japanese, Brazilian Portuguese, and Simplified Chinese).
 - Mounted volumes now offer Eject in the Places and Folder Tree context menus, with busy-volume errors and automatic sidebar refresh after mounting or unmounting. Startup and internal system volumes are excluded.
 - Open With lists each compatible application with its native app icon.
 - Occasional status-bar tips: each folder visit has a 10% chance of showing a localized shortcut reminder. Tips clear on selection or file operations, hide when space is tight, and can be disabled in Settings › General.

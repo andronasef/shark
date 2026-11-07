@@ -697,3 +697,18 @@
 "Right-click an ejectable volume" = "Right-click an ejectable volume";
 
 "Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy.";
+
+// Engagement Prompts
+"Enjoying Shark?" = "Enjoying Shark?";
+"100 Fast Hops! 🎉" = "100 Fast Hops! 🎉";
+"Mac App Store Review" = "Mac App Store Review";
+"Milestone Reached" = "Milestone Reached";
+"If Shark makes managing your files faster, rating it on the Mac App Store helps other Mac users discover it!" = "If Shark makes managing your files faster, rating it on the Mac App Store helps other Mac users discover it!";
+"You've navigated over 100 folders and tabs! Share Shark with friends or coworkers who love fast Mac tools." = "You've navigated over 100 folders and tabs! Share Shark with friends or coworkers who love fast Mac tools.";
+"Rate on App Store" = "Rate on App Store";
+"Share with Friends" = "Share with Friends";
+"Maybe Later" = "Maybe Later";
+"Don't ask again" = "Don't ask again";
+"Rate Shark on Mac App Store…" = "Rate Shark on Mac App Store…";
+"Share Shark with Friends…" = "Share Shark with Friends…";
+"Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!";

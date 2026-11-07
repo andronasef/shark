@@ -148,11 +148,15 @@ enum UpdateChecker {
         Task { await check(manual: false) }
     }
 
-    private static var installChannel: InstallChannel {
+    public static var installChannel: InstallChannel {
         let fileManager = FileManager.default
         let hasReceipt = Bundle.main.appStoreReceiptURL.map { fileManager.fileExists(atPath: $0.path) } ?? false
         let hasCask = ["/opt/homebrew/Caskroom/shark", "/usr/local/Caskroom/shark"].contains { fileManager.fileExists(atPath: $0) }
         return channel(hasReceipt: hasReceipt, hasCask: hasCask)
+    }
+
+    public static var isAppStoreInstall: Bool {
+        installChannel == .appStore
     }
 
     private static func check(manual: Bool) async {

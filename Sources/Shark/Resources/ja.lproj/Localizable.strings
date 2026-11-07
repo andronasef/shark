@@ -697,3 +697,18 @@
 "Right-click an ejectable volume" = "取り出し可能なボリュームを右クリック";
 
 "Eject the volume. Available in Places and Folder Tree; macOS reports an error if it is busy." = "ボリュームを取り出します。「場所」と「フォルダツリー」で利用できます。使用中の場合はmacOSがエラーを表示します。";
+
+// Engagement Prompts
+"Enjoying Shark?" = "Shark を気に入っていただけましたか？";
+"100 Fast Hops! 🎉" = "100 回の高速移動！ 🎉";
+"Mac App Store Review" = "Mac App Store の評価";
+"Milestone Reached" = "マイルストーン達成";
+"If Shark makes managing your files faster, rating it on the Mac App Store helps other Mac users discover it!" = "Shark でファイル管理が快適になったら、Mac App Store でのレビューが他の Mac ユーザーの発見に役立ちます！";
+"You've navigated over 100 folders and tabs! Share Shark with friends or coworkers who love fast Mac tools." = "100 以上のフォルダとタブを移動しました！キーボード重視の高速 Mac ツールを好む友人や同僚と Shark を共有しましょう。";
+"Rate on App Store" = "App Store で評価";
+"Share with Friends" = "友達と共有";
+"Maybe Later" = "後で";
+"Don't ask again" = "今後表示しない";
+"Rate Shark on Mac App Store…" = "Mac App Store で Shark を評価…";
+"Share Shark with Friends…" = "Shark を友達と共有…";
+"Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Mac 向けの超高速・キーボード操作対応 2 画面ファイルマネージャー「Shark」をチェック！";

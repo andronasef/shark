@@ -9,6 +9,10 @@ public enum AppLinks {
     public static let features = website.appendingPathComponent("features", isDirectory: true)
     public static let author = URL(string: "https://andronasef.com/")!
     public static let feedback = URL(string: "https://userhq.increasinglabs.com/increasing-labs/shark")!
+    public static let macAppStoreId = "6825086341"
+    public static let macAppStore = URL(string: "https://apps.apple.com/app/shark-file-manager/id6825086341")!
+    public static let macAppStoreReview = URL(string: "macappstore://apps.apple.com/app/id6825086341?action=write-review")!
+    public static let macAppStoreWebReview = URL(string: "https://apps.apple.com/app/shark-file-manager/id6825086341?action=write-review")!
 
     /// Displays the standard About panel populated with credits and external links.
     public static func showAboutPanel() {
