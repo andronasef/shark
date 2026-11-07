@@ -6,7 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### User Changelog
+
 ## [1.0.0-alpha.4] - 2026-11-05
+
+### User Changelog
+- **App Store Rating & Share with Friends**: Polite, friendly prompts to rate Shark on the Mac App Store or share it with friends after reaching milestone navigation hops, with full options to snooze or dismiss.
+- **Enhanced Photo Viewer**: Browse pictures in a dedicated viewer with quick zoom presets, flip and rotate tools, instant image copying, and direct Trash shortcuts.
+- **Eject External Drives**: Safely unmount external disks and USB drives directly from the sidebar Places and folder tree.
+- **Helpful Status Bar Tips**: Occasional, friendly tips in the status bar help you discover useful keyboard shortcuts as you navigate.
+- **Windows-Style Range Selection**: Select files continuously using Shift + Click and Shift + Arrow keys across lists and icon grids.
+- **Auto-Scrolling Drag & Drop**: Dragging files near the top or bottom of a folder window automatically and smoothly scrolls through long lists.
+- **Fast, Responsive Scrolling**: Dramatically smoother scrolling and fluid file browsing in folders with hundreds or thousands of items.
+- **Complete International Translations**: All new actions and prompts are fully translated into Arabic, German, Spanish, French, Japanese, Brazilian Portuguese, and Simplified Chinese.
 
 ### Added
 - Mac App Store rating engagement prompt: discreet, non-intrusive floating liquid glass card inviting users of the Mac App Store build to rate Shark after 7 days, 3 active days, and 20 folder navigations. Includes "Maybe Later" (14-day snooze), "Don't ask again" permanent dismissal, maximum 2 presentations lifetime cap, and a "Rate Shark on Mac App Store…" action in the Help menu.
@@ -46,6 +58,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [1.0.0-alpha.3] - 2026-10-27
 
+### User Changelog
+- **Theme & Appearance Settings**: Choose between System Default, Light, or Dark mode in Settings › General with immediate live preview across all windows and dialogs.
+- **Responsive Navigation**: Smoother thumbnail loading and folder browsing that prioritizes what's on screen while scrolling.
+- **Polished Command Palette & Menus**: Arrow keys stay focused inside the command palette, and hover previews automatically step aside when right-click menus open.
+
 ### Added
 - Appearance setting in Settings › General: choose between System Default, Light, and Dark appearance. Applies instantly across all windows, sheets, dialogs, and the Shark Photo Viewer, and persists across launches. Full localization across all 8 supported languages.
 - Website dark mode support: automatic matching of system dark mode preference (`prefers-color-scheme: dark`) with zero flash on initial load, a theme toggle in the navigation header, and `localStorage` persistence.
@@ -69,6 +86,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Folder-size results return to the requesting calculator. At most two scans run at once; clearing the cache cancels work and rejects late results.
 
 ## [1.0.0-alpha.2] - 2026-10-25
+
+### User Changelog
+- **Windows-Style Folder Tree**: Switch between Finder-style Places and an expandable folder tree in the sidebar.
+- **Shark Photo Viewer**: Double-click images to open a dedicated, fast photo viewer with full-resolution display, thumbnail filmstrip, and slideshow mode.
+- **Customizable Toolbar**: Add, remove, and reorder toolbar buttons using the native macOS customization sheet, with optional text labels below icons.
+- **Multilingual Support**: Fully localized into English, Arabic, Spanish, French, German, Brazilian Portuguese, Simplified Chinese, and Japanese with native right-to-left layout for Arabic.
+- **Interactive Terminal Drawer**: Resize the built-in terminal drawer from its top edge and adjust font sizes with standard ⌘+ and ⌘- shortcuts.
+- **Update Alerts**: Automatic notifications when a new version of Shark is available for your install method (Mac App Store, Homebrew, or Direct Download).
 
 ### Added
 - The toolbar can show icons only or icons with labels (right-click the toolbar).
@@ -160,10 +185,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [1.0.0-alpha.1] - 2026-10-21
 
+### User Changelog
+- **Direct DMG Download**: Convenient drag-and-drop installer disk image (`Shark.dmg`) with automated notarization and gatekeeper signing.
+
 ### Added
 - Releases now include a signed, notarized `Shark-<version>.dmg` installer (drag Shark to Applications) in place of the ZIP, which is no longer published. The Homebrew cask now installs from the DMG.
 
 ## [1.0.0-alpha] - 2026-10-20
+
+### User Changelog
+- **Dual Pane & Native Tabs**: Browse multiple folders side by side or across tabs with equal-width design and smooth transitions.
+- **Rich Hover Previews**: Hover over files to preview images, audio, video, PDF, and text documents in a non-intrusive floating card.
+- **Cascading Subfolder Menus**: Hover any folder to explore deep folder structures without leaving your current view.
+- **Built-in Terminal**: Press F4 to open an integrated command line synchronized with your active directory.
+- **Mouse Gestures**: Double-click empty space to go up a folder, scroll over tabs to switch between them, and use mouse side buttons for back/forward navigation.
 
 ### Changed
 - Calmer Location breadcrumbs: lighter, thinner separator chevrons, and the current folder is marked once (bold label on a neutral capsule) instead of also getting a blue folder icon.

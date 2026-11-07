@@ -17,3 +17,6 @@ GoogleService-Info.plist
 
 # Provisioning profiles
 *.provisionprofile
+
+# Editor / assistant state
+.claude/

@@ -126,9 +126,15 @@ jobs:
           if [[ "$RELEASE_TAG" == *-* ]]; then
             extra_args+=(--prerelease)
           fi
+          notes_file="$RUNNER_TEMP/release-notes.md"
+          if bash scripts/extract-release-notes.sh "$version" > "$notes_file" && [[ -s "$notes_file" ]]; then
+            extra_args+=(--notes-file "$notes_file")
+          else
+            extra_args+=(--generate-notes)
+          fi
           gh release create "$RELEASE_TAG" \
             "dist/Shark-$version.dmg" "dist/Shark-$version.dmg.sha256" \
-            --verify-tag --title "Shark $version" --generate-notes "${extra_args[@]}"
+            --verify-tag --title "Shark $version" "${extra_args[@]}"
 
       - name: Update Homebrew Cask Tap
         env:

@@ -26,7 +26,7 @@ Keep certificates, private keys, and passwords out of Git. The action imports th
 
 ## Publish a version
 
-1. Update `CHANGELOG.md` and move the release's entries under a dated version heading.
+1. Update `CHANGELOG.md` and move the release's entries under a dated version heading. Ensure `### User Changelog` contains plain-English, non-technical descriptions of what's new and improved for users. This user changelog is automatically extracted by `scripts/extract-release-notes.sh` for GitHub Releases, in-app update alerts, and App Store Connect (`dist/appstore-whats-new.txt`).
 2. Build and test, then check the app on a clean Mac. Verify file access, split panes, previews, and the terminal. The universal package targets macOS 14+, but testing on supported macOS versions is still needed.
 3. Commit the release, then push an unused version tag:
 
@@ -35,7 +35,7 @@ Keep certificates, private keys, and passwords out of Git. The action imports th
    git push origin v1.0.0-alpha
    ```
 
-The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.dmg` and `Shark-<version>.dmg.sha256` with generated release notes (marked as prerelease when appropriate). A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
+The action accepts `vMAJOR.MINOR.PATCH` and semver prerelease tags (e.g. `v1.0.0-alpha`). It publishes `Shark-<version>.dmg` and `Shark-<version>.dmg.sha256` with release notes extracted from `CHANGELOG.md` featuring the User Changelog at top. A failure leaves the tag in place without publishing a new release. Fix the cause, then rerun the failed action for that tag when the code is unchanged; use a new version tag if you change the code. An existing release is never silently overwritten.
 
 For a workflow-only repair, use **Actions › Release › Run workflow** on `main` and enter the existing version tag in `release_tag`. This uses the repaired workflow from `main` but checks out and builds the existing tag; the tag is never moved. For the hover timing regression, only `HoverPreviewTests.swift` is taken from the workflow revision; all app sources remain at the tag. Manual runs skip App Store uploads by default to avoid duplicating an already successful upload; opt in with `upload_appstore=true` when needed. CLI equivalent: `gh workflow run release.yml --ref main -f release_tag=v1.0.0-alpha.2`.
 

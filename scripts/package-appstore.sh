@@ -47,10 +47,18 @@ xattr -c "$PKG_PATH" 2>/dev/null || true
 echo "==> Verifying package signature..."
 pkgutil --check-signature "$PKG_PATH"
 
+WHATS_NEW_PATH="dist/appstore-whats-new.txt"
+if bash scripts/extract-release-notes.sh "$VERSION" --user-only > "$WHATS_NEW_PATH" 2>/dev/null && [[ -s "$WHATS_NEW_PATH" ]]; then
+    echo "==> App Store What's New notes generated at: $WHATS_NEW_PATH"
+fi
+
 echo ""
 echo "============================================================"
 echo "SUCCESS: Created Mac App Store package:"
-echo "  $PKG_PATH"
+echo "  Package: $PKG_PATH"
+if [[ -f "$WHATS_NEW_PATH" ]]; then
+echo "  What's New: $WHATS_NEW_PATH"
+fi
 echo ""
 echo "You can now upload this .pkg to App Store Connect using:"
 echo "  1. The free 'Transporter' app from the Mac App Store (drag & drop $PKG_PATH)"
