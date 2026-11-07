@@ -5,13 +5,14 @@ import Testing
 struct ScrollActivityTests {
     @Test func scrollingSettlesAfterEventsStop() async throws {
         let activity = ScrollActivity(monitoring: false)
-        activity.noteScroll(settleMilliseconds: 40)
+        activity.noteScroll(settleMilliseconds: 250)
         #expect(activity.isScrolling)
-        try await Task.sleep(for: .milliseconds(20))
-        activity.noteScroll(settleMilliseconds: 40) // a later event extends the scroll
-        try await Task.sleep(for: .milliseconds(25))
+        try await Task.sleep(for: .milliseconds(40))
         #expect(activity.isScrolling)
-        try await Task.sleep(for: .milliseconds(120))
+        activity.noteScroll(settleMilliseconds: 250) // a later event extends the scroll
+        try await Task.sleep(for: .milliseconds(40))
+        #expect(activity.isScrolling)
+        try await Task.sleep(for: .milliseconds(350))
         #expect(!activity.isScrolling)
     }
 }

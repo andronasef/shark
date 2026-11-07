@@ -227,9 +227,14 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$PROVISIONING_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/Shark.provisionprofile"
-          # The App Store only accepts digits and dots, so v1.0.0-alpha.N uploads as another build of 1.0.0.
-          version="${RELEASE_TAG#v}"
-          version="${version%%-*}"
+          # The App Store only accepts digits and dots. 1.0.0 is closed in App Store Connect,
+          # so prerelease alpha.N maps to 1.0.N for App Store builds until alphas are complete.
+          tag_version="${RELEASE_TAG#v}"
+          if [[ "$tag_version" =~ ^([0-9]+)\.([0-9]+)\.0-alpha\.?([0-9]+)$ ]]; then
+            version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+          else
+            version="${tag_version%%-*}"
+          fi
           echo "APPSTORE_VERSION=$version" >> "$GITHUB_ENV"
           PROVISIONING_PROFILE="$RUNNER_TEMP/Shark.provisionprofile" bash scripts/package-appstore.sh "$version"
 
