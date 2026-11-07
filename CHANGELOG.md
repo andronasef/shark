@@ -11,14 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [1.0.0-alpha.4] - 2026-11-05
 
 ### User Changelog
-- **App Store Rating & Share with Friends**: Polite, friendly prompts to rate Shark on the Mac App Store or share it with friends after reaching milestone navigation hops, with full options to snooze or dismiss.
-- **Enhanced Photo Viewer**: Browse pictures in a dedicated viewer with quick zoom presets, flip and rotate tools, instant image copying, and direct Trash shortcuts.
-- **Eject External Drives**: Safely unmount external disks and USB drives directly from the sidebar Places and folder tree.
-- **Helpful Status Bar Tips**: Occasional, friendly tips in the status bar help you discover useful keyboard shortcuts as you navigate.
-- **Windows-Style Range Selection**: Select files continuously using Shift + Click and Shift + Arrow keys across lists and icon grids.
-- **Auto-Scrolling Drag & Drop**: Dragging files near the top or bottom of a folder window automatically and smoothly scrolls through long lists.
-- **Fast, Responsive Scrolling**: Dramatically smoother scrolling and fluid file browsing in folders with hundreds or thousands of items.
-- **Complete International Translations**: All new actions and prompts are fully translated into Arabic, German, Spanish, French, Japanese, Brazilian Portuguese, and Simplified Chinese.
+- **Dramatically Faster Scrolling**: Fluid, lag-free browsing and rapid arrow navigation in folders with hundreds or thousands of files.
+- **Windows-Style Range Selection**: Select continuous files easily using Shift + Click or Shift + Arrow keys in list and grid views.
+- **Auto-Scrolling Drag & Drop**: Dragging files near the top or bottom of a folder window now smoothly auto-scrolls through long lists.
+- **Enhanced Photo Viewer**: Quickly flip, rotate, copy, zoom, and trash photos directly inside the viewer.
+- **Eject External Drives**: Safely unmount USB drives and external volumes right from the sidebar.
 
 ### Added
 - Mac App Store rating engagement prompt: discreet, non-intrusive floating liquid glass card inviting users of the Mac App Store build to rate Shark after 7 days, 3 active days, and 20 folder navigations. Includes "Maybe Later" (14-day snooze), "Don't ask again" permanent dismissal, maximum 2 presentations lifetime cap, and a "Rate Shark on Mac App Store…" action in the Help menu.
