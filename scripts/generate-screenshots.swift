@@ -20,9 +20,34 @@ struct Target {
     let gap: Int
     let windowWidth: Int
     let outputDirs: [String]
+    let slides: [Slide]
 }
 
-let slides = [
+// App Store order: navigation depth first, then the switcher essentials, terminal last.
+let appStoreSlides = [
+    Slide(filename: "01-subfolder-menus.png",
+          headline: "Jump anywhere<br>in the folder tree",
+          source: "docs/screenshots/subfolder-menu.png",
+          base: "#1E1046", blooms: ["#A855F7", "#6366F1", "#EC4899"]),
+    Slide(filename: "02-command-palette.png",
+          headline: "Every action,<br>one keystroke away",
+          source: "docs/screenshots/command-palette.png",
+          base: "#0B1E4A", blooms: ["#0EA5E9", "#6366F1", "#22D3EE"]),
+    Slide(filename: "03-cut-and-paste.png",
+          headline: "Cut and paste,<br>finally",
+          source: "docs/screenshots/cut-paste.png",
+          base: "#04302E", blooms: ["#14B8A6", "#3B82F6", "#34D399"]),
+    Slide(filename: "04-tabs-and-split.png",
+          headline: "Two folders.<br>One window.",
+          source: "docs/screenshots/tabs-and-split.png",
+          base: "#0A1A4A", blooms: ["#3B82F6", "#22D3EE", "#8B5CF6"]),
+    Slide(filename: "05-integrated-terminal.png",
+          headline: "A terminal right<br>under your files",
+          source: "docs/screenshots/terminal.png",
+          base: "#052E2B", blooms: ["#10B981", "#84CC16", "#06B6D4"]),
+]
+
+let productHuntSlides = [
     Slide(filename: "01-tabs-and-split.png",
           headline: "Two folders.<br>One window.",
           source: "docs/screenshots/tabs-and-split.png",
@@ -43,9 +68,9 @@ let slides = [
 
 let targets = [
     Target(width: 1440, height: 900, headlineSize: 56, paddingTop: 64, gap: 40, windowWidth: 1200,
-           outputDirs: ["docs/appstore-screenshots", "dist/screenshots"]),
+           outputDirs: ["docs/appstore-screenshots", "dist/screenshots"], slides: appStoreSlides),
     Target(width: 1280, height: 720, headlineSize: 46, paddingTop: 44, gap: 30, windowWidth: 980,
-           outputDirs: ["docs/producthunt", "dist/producthunt"]),
+           outputDirs: ["docs/producthunt", "dist/producthunt"], slides: productHuntSlides),
 ]
 
 func html(_ slide: Slide, _ target: Target, image: String) -> String {
@@ -96,7 +121,7 @@ func html(_ slide: Slide, _ target: Target, image: String) -> String {
 }
 
 final class Renderer: NSObject, WKNavigationDelegate {
-    let jobs: [(Slide, Target)] = targets.flatMap { t in slides.map { ($0, t) } }
+    let jobs: [(Slide, Target)] = targets.flatMap { t in t.slides.map { ($0, t) } }
     var index = 0
     var webView: WKWebView!
 
