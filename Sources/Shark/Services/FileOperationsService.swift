@@ -95,7 +95,7 @@ struct PartialMoveError: LocalizedError, Sendable {
 public actor FileOperationsService {
     public static let shared = FileOperationsService()
 
-    private let fileManager: FileManager
+    let fileManager: FileManager
 
     init(fileManager: FileManager = .default) { self.fileManager = fileManager }
 
@@ -205,7 +205,7 @@ public actor FileOperationsService {
         return created
     }
 
-    private func availableCopyName(for filename: String, in directory: URL) -> URL {
+    func availableCopyName(for filename: String, in directory: URL) -> URL {
         var target = directory.appendingPathComponent(filename)
         let ext = (filename as NSString).pathExtension
         let base = (filename as NSString).deletingPathExtension

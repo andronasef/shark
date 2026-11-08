@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### User Changelog
+- **Replace, Keep Both, Skip or Stop**: when a copied or moved file already exists, you choose, with both versions shown side by side.
+
+### Added
+- Name conflicts in paste and drag-and-drop now open one sheet showing the existing and the new item (preview, size, modified date). Choose Replace, Keep Both, Skip or Stop; Apply to all answers the rest, and two folders can be merged. Replace sends the old item to the Trash and Undo restores it; Stop or an error keeps the work already done as one undo step. Keep Both names the new item "name 2", "name 3" and keeps the extension. Links to folders and packages are never merged into.
+
+### Changed
+- Pasting or dropping onto an existing name no longer refuses the move; it asks. Duplicate still makes "name copy" items.
 
 ### Fixed
 - The sidebar no longer shows a Tags section. Its color names only typed a word into the filter and "All Tags…" did nothing, so they looked like Finder tags without being them. Arrow-key navigation no longer stops on those rows. Real Finder tags are planned.

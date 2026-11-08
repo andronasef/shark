@@ -714,3 +714,17 @@
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "推荐 Shark — 一款专为 Mac 设计、极速且支持全键盘操作的双栏文件管理器！";
 "Shark and system dialogs" = "Shark 与系统对话框";
 "Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "其他App使用macOS的“打开”和“存储”对话框。将Shark设为默认文件夹App不会替换这些对话框。";
+"“%@” already exists" = "“%@”已存在";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re moving?" = "此位置已存在名为“%@”的项目。要用你正在移动的项目替换它吗？";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re copying?" = "此位置已存在名为“%@”的项目。要用你正在拷贝的项目替换它吗？";
+"Existing item" = "现有项目";
+"New item" = "新项目";
+"Older" = "较旧";
+"Newer" = "较新";
+"Apply to all" = "应用到全部";
+"Skip" = "跳过";
+"Replace" = "替换";
+"Merge" = "合并";
+"Keep Both" = "保留两者";
+"Drop onto a name that exists" = "拖放到已存在的名称上";
+"A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "会出现询问替换、保留两者、跳过还是停止的面板。替换会将旧项目移到废纸篓，“撤销”可将其恢复。";

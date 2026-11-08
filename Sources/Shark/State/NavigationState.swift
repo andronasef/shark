@@ -66,6 +66,9 @@ public final class NavigationState {
     public var errorMessage: String? = nil
     /// Set when a file operation (paste, drop, rename, trash, undo…) fails; shown as an alert.
     public var operationError: String? = nil
+    /// The name conflict waiting for an answer; shown as a sheet by the folder view.
+    public var pendingCollision: CollisionPrompt? = nil
+    @ObservationIgnored private var collisionAnswer: CheckedContinuation<(choice: CollisionChoice, applyToAll: Bool), Never>?
     /// True when the last directory load failed because macOS privacy protection (TCC) denied access.
     public var isPermissionError = false
 
@@ -398,21 +401,10 @@ public final class NavigationState {
 
     public func paste(into destination: URL? = nil) async {
         guard let (urls, mode) = FileClipboardService.shared.getPasteableURLs(), !urls.isEmpty else { return }
-        let targetDir = destination ?? currentURL
-
-        do {
-            if mode == .cut {
-                let pairs = try await FileOperationsService.shared.move(items: urls, to: targetDir)
-                if !pairs.isEmpty { FileUndoService.shared.record(.move(pairs: pairs)) }
-                FileClipboardService.shared.clear()
-            } else {
-                let created = try await FileOperationsService.shared.copy(items: urls, to: targetDir)
-                FileUndoService.shared.record(.create(urls: created, name: L10n.text("Copy")))
-            }
-        } catch {
-            if let partial = error as? PartialMoveError { FileUndoService.shared.record(.move(pairs: partial.remainingMoves)) }
-            operationError = L10n.format("Paste failed: %@", error.localizedDescription)
-        }
+        let result = await transfer(urls, to: destination ?? currentURL, mode: mode == .cut ? .move : .copy,
+                                    failureTitle: "Paste")
+        // Keep the clipboard when the move was stopped or failed, so it can be retried.
+        if mode == .cut, !result.stopped, result.error == nil { FileClipboardService.shared.clear() }
         await reloadCurrentDirectory()
     }
 
@@ -423,19 +415,38 @@ public final class NavigationState {
         guard !urls.isEmpty else { return }
         let crossesVolume = urls.contains { !FileOperationsService.isSameVolume($0, directory) }
         let copies = modifiers.contains(.option) || (crossesVolume && !modifiers.contains(.command))
-        do {
-            if copies {
-                let created = try await FileOperationsService.shared.copy(items: urls, to: directory)
-                FileUndoService.shared.record(.create(urls: created, name: L10n.text("Copy")))
-            } else {
-                let pairs = try await FileOperationsService.shared.move(items: urls, to: directory)
-                if !pairs.isEmpty { FileUndoService.shared.record(.move(pairs: pairs)) }
-            }
-        } catch {
-            if let partial = error as? PartialMoveError { FileUndoService.shared.record(.move(pairs: partial.remainingMoves)) }
-            operationError = L10n.format("%@ failed: %@", L10n.text(copies ? "Copy" : "Move"), error.localizedDescription)
-        }
+        await transfer(urls, to: directory, mode: copies ? .copy : .move,
+                       failureTitle: copies ? "Copy" : "Move")
         await reloadCurrentDirectory()
+    }
+
+    /// Paste and drop share this: conflicts are put to the user, and whatever got done is one undo step.
+    @discardableResult
+    private func transfer(_ urls: [URL], to directory: URL, mode: TransferMode, failureTitle: String) async -> TransferResult {
+        let result = await FileOperationsService.shared.transfer(items: urls, to: directory, mode: mode) { [weak self] prompt in
+            await self?.askCollision(prompt) ?? (.stop, false)
+        }
+        if let action = result.undoAction(for: mode) { FileUndoService.shared.record(action) }
+        if let error = result.error {
+            operationError = L10n.format("%@ failed: %@", L10n.text(failureTitle), error.localizedDescription)
+        }
+        return result
+    }
+
+    private func askCollision(_ prompt: CollisionPrompt) async -> (choice: CollisionChoice, applyToAll: Bool) {
+        // A second prompt cannot start before the first is answered: the transfer awaits each one.
+        await withCheckedContinuation { continuation in
+            collisionAnswer = continuation
+            pendingCollision = prompt
+        }
+    }
+
+    /// Called by the conflict sheet. Closing the sheet any other way counts as Stop.
+    public func answerCollision(_ choice: CollisionChoice, applyToAll: Bool = false) {
+        guard let continuation = collisionAnswer else { return }
+        collisionAnswer = nil
+        pendingCollision = nil
+        continuation.resume(returning: (choice, applyToAll))
     }
 
     public func duplicateSelected() async {

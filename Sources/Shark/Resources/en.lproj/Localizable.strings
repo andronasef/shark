@@ -714,3 +714,17 @@
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!";
 "Shark and system dialogs" = "Shark and system dialogs";
 "Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs.";
+"“%@” already exists" = "“%@” already exists";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re moving?" = "An item named “%@” already exists in this location. Do you want to replace it with the one you’re moving?";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re copying?" = "An item named “%@” already exists in this location. Do you want to replace it with the one you’re copying?";
+"Existing item" = "Existing item";
+"New item" = "New item";
+"Older" = "Older";
+"Newer" = "Newer";
+"Apply to all" = "Apply to all";
+"Skip" = "Skip";
+"Replace" = "Replace";
+"Merge" = "Merge";
+"Keep Both" = "Keep Both";
+"Drop onto a name that exists" = "Drop onto a name that exists";
+"A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back.";

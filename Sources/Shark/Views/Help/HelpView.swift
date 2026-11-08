@@ -41,6 +41,7 @@ enum MouseHelp {
                 HelpBinding(gesture: L10n.text("Hover a file"), action: L10n.text("After a short delay, a preview appears: images, text, video and audio with a seek bar, documents.")),
                 HelpBinding(gesture: L10n.text("Hover + Shift"), action: L10n.text("Preview only while Shift is held (turn on in Settings › Previews).")),
                 HelpBinding(gesture: L10n.text("Drag onto a folder"), action: L10n.text("Move it there, or copy it if the folder is on another disk. Hold ⌥ to copy, ⌘ to move.")),
+                HelpBinding(gesture: L10n.text("Drop onto a name that exists"), action: L10n.text("A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back.")),
                 HelpBinding(gesture: L10n.text("Drag a selected item"), action: L10n.text("Carry the whole selection. Dragging an item that is not selected moves only that item.")),
                 HelpBinding(gesture: L10n.text("Double-click an image"), action: L10n.text("Open it as usual, or in Shark Photo Viewer when that is switched on in Settings › Previews.")),
                 HelpBinding(gesture: L10n.text("Right-click"), action: L10n.text("Item menu.")),

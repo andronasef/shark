@@ -42,17 +42,23 @@ final class DataSafetyTests: XCTestCase {
         XCTAssertTrue(fm.fileExists(atPath: report.path))
     }
 
-    func testCutPasteNeverOverwritesExistingItem() async throws {
+    func testCutPasteAsksBeforeTouchingAnExistingItem() async throws {
         let source = try folder("src")
         let target = try folder("dst")
         let moving = try file("a.txt", in: source, "new")
         let existing = try file("A.txt", in: target, "keep me")
         let nav = NavigationState(initialURL: target)
         FileClipboardService.shared.cut([moving])
-        await nav.paste()
+        let paste = Task { await nav.paste() }
+        for _ in 0..<300 where nav.pendingCollision == nil { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertEqual(nav.pendingCollision?.existing.name.lowercased(), "a.txt", "the user is asked, case-insensitively")
+        XCTAssertEqual(try String(contentsOf: existing, encoding: .utf8), "keep me", "nothing changes while the question is open")
+        nav.answerCollision(.stop)
+        await paste.value
         XCTAssertEqual(try String(contentsOf: existing, encoding: .utf8), "keep me")
-        XCTAssertTrue(fm.fileExists(atPath: moving.path), "Source must stay put when the paste is refused")
-        XCTAssertNotNil(nav.operationError)
+        XCTAssertTrue(fm.fileExists(atPath: moving.path), "Source must stay put when the user stops")
+        XCTAssertNil(nav.operationError)
+        XCTAssertNotNil(FileClipboardService.shared.getPasteableURLs(), "a stopped cut stays on the clipboard to retry")
     }
 
     func testUndoOfCopyIntoSameFolderKeepsOriginal() async throws {

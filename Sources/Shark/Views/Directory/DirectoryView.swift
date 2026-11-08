@@ -67,6 +67,12 @@ public struct DirectoryView: View {
         } message: {
             Text(navigationState.operationError ?? "")
         }
+        .sheet(item: Binding(
+            get: { navigationState.pendingCollision },
+            set: { if $0 == nil { navigationState.answerCollision(.stop) } }
+        )) { prompt in
+            CollisionSheet(prompt: prompt) { choice, all in navigationState.answerCollision(choice, applyToAll: all) }
+        }
         .background(WindowNumberReader { owningWindowNumber = $0 })
         .onAppear {
             if typeToSelectMonitor == nil {

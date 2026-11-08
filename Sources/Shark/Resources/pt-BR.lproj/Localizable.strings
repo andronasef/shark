@@ -714,3 +714,17 @@
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Conheça o Shark — um gerenciador de arquivos em dois painéis ultrarrápido e focado em teclado para Mac!";
 "Shark and system dialogs" = "Shark e as caixas de diálogo do sistema";
 "Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "Outros apps usam as caixas de diálogo Abrir e Salvar do macOS. Tornar o Shark o app de pastas padrão não substitui essas caixas.";
+"“%@” already exists" = "“%@” já existe";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re moving?" = "Um item chamado “%@” já existe neste local. Deseja substituí-lo pelo item que você está movendo?";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re copying?" = "Um item chamado “%@” já existe neste local. Deseja substituí-lo pelo item que você está copiando?";
+"Existing item" = "Item existente";
+"New item" = "Item novo";
+"Older" = "Mais antigo";
+"Newer" = "Mais recente";
+"Apply to all" = "Aplicar a todos";
+"Skip" = "Ignorar";
+"Replace" = "Substituir";
+"Merge" = "Mesclar";
+"Keep Both" = "Manter os dois";
+"Drop onto a name that exists" = "Soltar sobre um nome que já existe";
+"A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "Uma folha pergunta se você quer substituir, manter os dois, ignorar ou parar. Substituir envia o item antigo para a Lixeira, e Desfazer o traz de volta.";

@@ -10,13 +10,16 @@ public enum FileUndoAction: Sendable {
     case create(urls: [URL], name: String)
     /// Redo of a `create`: the created items are put back from the Trash.
     case restoreCreated(restorations: [(original: URL, inTrash: URL)], name: String)
+    /// Several steps that undo and redo as one (a Replace is "trash the old item, then move the new one in").
+    /// Steps are listed in the order they were performed.
+    case batch(name: String, actions: [FileUndoAction])
 
     public var actionDescription: String {
         switch self {
         case .move: return L10n.text("Move")
         case .rename, .batchRename: return L10n.text("Rename")
         case .trash: return L10n.text("Trash")
-        case .create(_, let name), .restoreCreated(_, let name): return name
+        case .create(_, let name), .restoreCreated(_, let name), .batch(let name, _): return name
         }
     }
 }
@@ -120,6 +123,11 @@ public final class FileUndoService {
         case .restoreCreated(let restorations, let name):
             try moveBack(restorations.map { ($0.original, $0.inTrash) })
             return .create(urls: restorations.map(\.original), name: name)
+        case .batch(let name, let actions):
+            // Newest step first. moveBack skips what is already back, so retrying a failed batch is safe.
+            var inverses: [FileUndoAction] = []
+            for step in actions.reversed() { inverses.append(try await reverse(step)) }
+            return .batch(name: name, actions: inverses.reversed())
         }
     }
 
@@ -143,6 +151,10 @@ public final class FileUndoService {
             return .create(urls: restorations.map(\.original), name: name)
         case .create:
             return try await reverse(action)
+        case .batch(let name, let actions):
+            var done: [FileUndoAction] = []
+            for step in actions { done.append(try await replay(step)) }
+            return .batch(name: name, actions: done)
         }
     }
 

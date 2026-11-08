@@ -714,3 +714,17 @@
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Sieh dir Shark an — ein blitzschneller, tastaturgesteuerter Dual-Pane-Dateimanager für den Mac!";
 "Shark and system dialogs" = "Shark und Systemdialoge";
 "Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "Andere Apps verwenden die Öffnen- und Sichern-Dialoge von macOS. Wenn Sie Shark zur Standard-Ordner-App machen, werden diese Dialoge nicht ersetzt.";
+"“%@” already exists" = "„%@“ ist bereits vorhanden";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re moving?" = "An diesem Speicherort ist bereits ein Element mit dem Namen „%@“ vorhanden. Möchten Sie es durch das Element ersetzen, das Sie bewegen?";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re copying?" = "An diesem Speicherort ist bereits ein Element mit dem Namen „%@“ vorhanden. Möchten Sie es durch das Element ersetzen, das Sie kopieren?";
+"Existing item" = "Vorhandenes Element";
+"New item" = "Neues Element";
+"Older" = "Älter";
+"Newer" = "Neuer";
+"Apply to all" = "Auf alle anwenden";
+"Skip" = "Überspringen";
+"Replace" = "Ersetzen";
+"Merge" = "Zusammenführen";
+"Keep Both" = "Beide behalten";
+"Drop onto a name that exists" = "Auf einen vorhandenen Namen ablegen";
+"A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "Ein Dialog fragt, ob ersetzt, beide behalten, übersprungen oder gestoppt werden soll. Ersetzen legt das alte Element in den Papierkorb, und „Widerrufen“ holt es zurück.";

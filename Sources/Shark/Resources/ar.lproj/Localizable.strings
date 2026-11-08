@@ -714,3 +714,17 @@
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "جرّب Shark — مدير ملفات ثنائي اللوحة فائق السرعة ويعتمد على لوحة المفاتيح لأجهزة Mac!";
 "Shark and system dialogs" = "Shark وحوارات النظام";
 "Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "تستخدم التطبيقات الأخرى مربعات حوار «فتح» و«حفظ» في macOS. جعل Shark تطبيق المجلدات الافتراضي لا يستبدل هذه المربعات.";
+"“%@” already exists" = "\"%@\" موجود بالفعل";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re moving?" = "يوجد عنصر يسمى \"%@\" بالفعل في هذا الموقع. هل تريد استبداله بالعنصر الذي تنقله؟";
+"An item named “%@” already exists in this location. Do you want to replace it with the one you’re copying?" = "يوجد عنصر يسمى \"%@\" بالفعل في هذا الموقع. هل تريد استبداله بالعنصر الذي تنسخه؟";
+"Existing item" = "العنصر الموجود";
+"New item" = "العنصر الجديد";
+"Older" = "أقدم";
+"Newer" = "أحدث";
+"Apply to all" = "تطبيق على الكل";
+"Skip" = "تخطي";
+"Replace" = "استبدال";
+"Merge" = "دمج";
+"Keep Both" = "الاحتفاظ بالاثنين";
+"Drop onto a name that exists" = "الإفلات على اسم موجود";
+"A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "يسأل مربع حوار إن كنت تريد الاستبدال أو الاحتفاظ بالاثنين أو التخطي أو الإيقاف. يرسل الاستبدال العنصر القديم إلى المهملات، ويعيده التراجع.";
