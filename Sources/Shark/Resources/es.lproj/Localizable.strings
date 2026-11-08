@@ -226,7 +226,7 @@
 "Fit" = "Adaptar";
 "Focus Address Bar" = "Barra de direcciones de enfoque";
 "Folder Path" = "Ruta de la carpeta";
-"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "El árbol de carpetas muestra una lista expandible de carpetas, como el Explorador de archivos, en lugar de Ubicaciones y Etiquetas.";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations." = "El árbol de carpetas muestra una lista expandible de carpetas, como el Explorador de archivos, en lugar de Ubicaciones.";
 "Folder Tree" = "Árbol de carpetas";
 "Folder is Empty" = "La carpeta está vacía";
 "Folder is empty" = "La carpeta está vacía";
@@ -712,3 +712,5 @@
 "Rate Shark on Mac App Store…" = "Calificar Shark en Mac App Store…";
 "Share Shark with Friends…" = "Compartir Shark con amigos…";
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "¡Descubre Shark: un administrador de archivos de doble panel ultrarrápido y manejado por teclado para Mac!";
+"Shark and system dialogs" = "Shark y los diálogos del sistema";
+"Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "Las demás apps usan los diálogos Abrir y Guardar de macOS. Hacer de Shark tu app de carpetas predeterminada no sustituye esos diálogos.";

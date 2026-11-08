@@ -24,16 +24,6 @@ public struct PlacesSidebarView: View {
         self.navigationState = navigationState
     }
 
-    private let tagItems: [(name: String, color: Color)] = [
-        ("Red", Color(red: 1.0, green: 0.23, blue: 0.19)),
-        ("Orange", Color(red: 1.0, green: 0.58, blue: 0.0)),
-        ("Yellow", Color(red: 1.0, green: 0.9, blue: 0.12)),
-        ("Green", Color(red: 0.2, green: 0.9, blue: 0.34)),
-        ("Blue", Color(red: 0.0, green: 0.48, blue: 1.0)),
-        ("Purple", Color(red: 0.82, green: 0.36, blue: 0.96)),
-        ("Gray", Color(red: 0.56, green: 0.56, blue: 0.58))
-    ]
-
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
@@ -143,7 +133,7 @@ public struct PlacesSidebarView: View {
 
 
 
-                // Folder Tree replaces Locations and Tags
+                // Folder Tree replaces Locations
                 if isTree {
                     SidebarSectionGroup("Folders", focus: $sidebarFocus) {
                         FolderTreeRows(roots: treeRoots, navigationState: navigationState, tree: folderTree,
@@ -163,57 +153,6 @@ public struct PlacesSidebarView: View {
                             isEjectable: item.isEjectable
                             )
                     }
-                }
-
-                // Tags section
-                SidebarSectionGroup("Tags", focus: $sidebarFocus) {
-                    ForEach(tagItems, id: \.name) { tag in
-                        Button(action: {
-                            navigationState.filterText = tag.name
-                        }) {
-                            HStack(spacing: 10) {
-                                Circle()
-                                    .fill(tag.color)
-                                    .frame(width: 13, height: 13)
-                                    .frame(width: 22)
-                                Text(L10n.text(tag.name))
-                                    .font(.system(size: 14))
-                                Spacer()
-                            }
-                            .frame(height: 32)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .focusable()
-                        .focused($sidebarFocus, equals: "Tags:" + tag.name)
-                        .onKeyPress(.space) { navigationState.filterText = tag.name; return .handled }
-                        .onKeyPress(.return) { navigationState.filterText = tag.name; return .handled }
-                        .padding(.horizontal, 10)
-                        .modifier(SidebarRowFeedback(isFocused: sidebarFocus == "Tags:" + tag.name))
-                    }
-
-                    Button(action: {}) {
-                        HStack(spacing: 10) {
-                            HStack(spacing: -6) {
-                                Circle().stroke(lineWidth: 1.4)
-                                Circle().stroke(lineWidth: 1.4)
-                            }
-                            .frame(width: 18, height: 12)
-                            .frame(width: 22)
-                            .accessibilityHidden(true)
-                            Text(L10n.text("All Tags..."))
-                                .font(.system(size: 14))
-                                .foregroundColor(.primary)
-                            Spacer()
-                        }
-                        .frame(height: 32)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .focusable()
-                    .focused($sidebarFocus, equals: "Tags:all")
-                    .padding(.horizontal, 10)
-                    .modifier(SidebarRowFeedback(isFocused: sidebarFocus == "Tags:all"))
                 }
                 }
             }
@@ -450,11 +389,6 @@ public struct PlacesSidebarView: View {
         } else {
             order.append("Locations:header")
             if expanded("Locations") { order += locations.map { "Locations:" + $0.url.path } }
-            order.append("Tags:header")
-            if expanded("Tags") {
-                order += tagItems.map { "Tags:" + $0.name }
-                order.append("Tags:all")
-            }
         }
         let current = sidebarFocus.flatMap { order.firstIndex(of: $0) } ?? (offset > 0 ? -1 : order.count)
         sidebarFocus = order[max(0, min(current + offset, order.count - 1))]

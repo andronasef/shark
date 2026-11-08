@@ -226,7 +226,7 @@
 "Fit" = "合身";
 "Focus Address Bar" = "焦点地址栏";
 "Folder Path" = "文件夹路径";
-"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "文件夹树以可展开的文件夹列表（类似文件资源管理器）取代“位置”和“标签”。";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations." = "文件夹树以可展开的文件夹列表（类似文件资源管理器）取代“位置”。";
 "Folder Tree" = "文件夹树";
 "Folder is Empty" = "文件夹为空";
 "Folder is empty" = "文件夹为空";
@@ -712,3 +712,5 @@
 "Rate Shark on Mac App Store…" = "在 Mac App Store 评价 Shark…";
 "Share Shark with Friends…" = "与好友分享 Shark…";
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "推荐 Shark — 一款专为 Mac 设计、极速且支持全键盘操作的双栏文件管理器！";
+"Shark and system dialogs" = "Shark 与系统对话框";
+"Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "其他App使用macOS的“打开”和“存储”对话框。将Shark设为默认文件夹App不会替换这些对话框。";

@@ -226,7 +226,7 @@
 "Fit" = "フィット";
 "Focus Address Bar" = "フォーカスアドレスバー";
 "Folder Path" = "フォルダーのパス";
-"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "フォルダツリーは、「場所」と「タグ」の代わりに、エクスプローラーのような展開可能なフォルダ一覧を表示します。";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations." = "フォルダツリーは、「場所」の代わりに、エクスプローラーのような展開可能なフォルダ一覧を表示します。";
 "Folder Tree" = "フォルダツリー";
 "Folder is Empty" = "フォルダーが空です";
 "Folder is empty" = "フォルダーが空です";
@@ -712,3 +712,5 @@
 "Rate Shark on Mac App Store…" = "Mac App Store で Shark を評価…";
 "Share Shark with Friends…" = "Shark を友達と共有…";
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Mac 向けの超高速・キーボード操作対応 2 画面ファイルマネージャー「Shark」をチェック！";
+"Shark and system dialogs" = "Shark とシステムのダイアログ";
+"Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "ほかの App では macOS の「開く」ダイアログと「保存」ダイアログが使われます。Shark を既定のフォルダ App にしても、それらのダイアログは置き換わりません。";

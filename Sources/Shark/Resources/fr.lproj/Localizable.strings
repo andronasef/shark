@@ -226,7 +226,7 @@
 "Fit" = "Ajuster";
 "Focus Address Bar" = "Barre d'adresse de focus";
 "Folder Path" = "Chemin du dossier";
-"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags." = "L’arborescence affiche une liste de dossiers dépliable, comme l’Explorateur de fichiers, à la place des Emplacements et des Étiquettes.";
+"Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations." = "L’arborescence affiche une liste de dossiers dépliable, comme l’Explorateur de fichiers, à la place des Emplacements.";
 "Folder Tree" = "Arborescence des dossiers";
 "Folder is Empty" = "Le dossier est vide";
 "Folder is empty" = "Le dossier est vide";
@@ -712,3 +712,5 @@
 "Rate Shark on Mac App Store…" = "Noter Shark sur le Mac App Store…";
 "Share Shark with Friends…" = "Partager Shark avec des amis…";
 "Check out Shark — a lightning-fast, keyboard-driven dual-pane file manager for Mac!" = "Découvrez Shark — un gestionnaire de fichiers à double volet ultra-rapide et piloté au clavier pour Mac !";
+"Shark and system dialogs" = "Shark et les fenêtres système";
+"Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs." = "Les autres apps utilisent les fenêtres Ouvrir et Enregistrer de macOS. Faire de Shark votre app de dossiers par défaut ne remplace pas ces fenêtres.";

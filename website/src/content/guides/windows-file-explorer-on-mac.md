@@ -52,7 +52,7 @@ File Explorer shows the item count and the size of your selection at the bottom 
 File Explorer's navigation pane is an expandable tree of folders.
 
 - **Finder:** the sidebar is a list of favorites, not a tree. List view (<kbd>⌘2</kbd>) lets you expand folders in place with their disclosure triangles, which is the closest you'll get.
-- **Shark:** turn on the File Explorer folder tree option to replace Locations and Tags in the sidebar with an expandable tree that follows the folder you're in.
+- **Shark:** turn on the File Explorer folder tree option to replace Locations in the sidebar with an expandable tree that follows the folder you're in.
 
 ## Tabs and two folders side by side
 

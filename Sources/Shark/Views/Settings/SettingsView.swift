@@ -88,7 +88,7 @@ public struct SettingsView: View {
                         Text(style.displayName).tag(style.rawValue)
                     }
                 }
-                Text(L10n.text("Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations and Tags."))
+                Text(L10n.text("Folder Tree shows an expandable list of folders, like File Explorer, in place of Locations."))
                     .font(.caption).foregroundColor(.secondary)
             }
             Section {

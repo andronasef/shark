@@ -116,6 +116,14 @@ struct HelpView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.text("Shark and system dialogs"))
+                        .font(.title3.weight(.semibold))
+                    Text(L10n.text("Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs."))
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
                     Text(L10n.text("Mouse"))
                         .font(.largeTitle.bold())
                     Text(L10n.text("What a click or scroll does depends on where the pointer is. Optional actions can be turned off in Settings › Mouse."))

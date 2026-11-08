@@ -131,6 +131,10 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(L10n.text("Default folder app")).font(.headline)
                 DefaultFolderAppControls()
+                Text(L10n.text("Other apps use macOS Open and Save dialogs. Making Shark your default folder app does not replace those dialogs."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Divider()
             VStack(alignment: .leading, spacing: 8) {

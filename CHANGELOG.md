@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### User Changelog
 
+### Fixed
+- The sidebar no longer shows a Tags section. Its color names only typed a word into the filter and "All Tags…" did nothing, so they looked like Finder tags without being them. Arrow-key navigation no longer stops on those rows. Real Finder tags are planned.
+- Help, the welcome setup and the website FAQ now say that other apps keep using the macOS Open and Save dialogs even when Shark is your default folder app.
+
 ## [1.0.0-alpha.4] - 2026-11-05
 
 ### User Changelog
