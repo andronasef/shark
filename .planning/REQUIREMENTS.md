@@ -15,10 +15,10 @@ Every requirement below is authorized current scope, including Group 3. Details 
 
 ### Collision choices (COLL)
 
-- [ ] **COLL-01**: Copy, move, paste and drag/drop present one consistent Replace / Keep Both / Skip / Stop dialog when destination names collide, comparing both items' thumbnail, size and modified date.
-- [ ] **COLL-02**: Users can apply compatible choices to remaining conflicts in one operation and can recursively Merge colliding folders while still deciding child conflicts.
-- [ ] **COLL-03**: Replace preserves the old destination in Trash with undo; failures and Stop preserve originals and keep completed changes undoable.
-- [ ] **COLL-04**: Keep Both creates extension-preserving "name 2", "name 3" names, while Duplicate retains "name copy" behavior; recursive operations do not follow directory symlinks into unsafe copies.
+- [x] **COLL-01**: Copy, move, paste and drag/drop present one consistent Replace / Keep Both / Skip / Stop dialog when destination names collide, comparing both items' thumbnail, size and modified date.
+- [x] **COLL-02**: Users can apply compatible choices to remaining conflicts in one operation and can recursively Merge colliding folders while still deciding child conflicts.
+- [x] **COLL-03**: Replace preserves the old destination in Trash with undo; failures and Stop preserve originals and keep completed changes undoable.
+- [x] **COLL-04**: Keep Both creates extension-preserving "name 2", "name 3" names, while Duplicate retains "name copy" behavior; recursive operations do not follow directory symlinks into unsafe copies.
 
 ### Archive extraction (EXTRACT)
 
@@ -139,10 +139,10 @@ No capability from the three authorized groups is deferred. Git badges and an in
 |-------------|-------|--------|
 | HON-01 | Phase 12 | Complete |
 | HON-02 | Phase 12 | Complete |
-| COLL-01 | Phase 13 | Pending |
-| COLL-02 | Phase 13 | Pending |
-| COLL-03 | Phase 13 | Pending |
-| COLL-04 | Phase 13 | Pending |
+| COLL-01 | Phase 13 | Complete |
+| COLL-02 | Phase 13 | Complete |
+| COLL-03 | Phase 13 | Complete |
+| COLL-04 | Phase 13 | Complete |
 | EXTRACT-01 | Phase 14 | Pending |
 | EXTRACT-02 | Phase 14 | Pending |
 | EXTRACT-03 | Phase 14 | Pending |
