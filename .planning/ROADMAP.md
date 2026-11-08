@@ -18,7 +18,7 @@ Every phase includes its meaningful tests, native UI inspection, Help/catalog/ch
 
 ### Group 1 — everyday essentials
 
-- [ ] **Phase 12: Honest Sidebar and System Boundaries** — Remove fake tags and explain system Open/Save limits.
+- [x] **Phase 12: Honest Sidebar and System Boundaries** — Remove fake tags and explain system Open/Save limits. (completed 2026-11-08)
 - [ ] **Phase 13: Safe Shared Collision Choices** — Replace, Keep Both, Skip, Stop and folder Merge across file-operation entry points.
 - [ ] **Phase 14: Safe Archive Extraction** — Extract with staging, collision choices and native fallback.
 - [ ] **Phase 15: Trash Recovery and Empty Trash** — Persistent Put Back and confirmed Finder-mediated emptying.
@@ -48,6 +48,7 @@ Every phase includes its meaningful tests, native UI inspection, Help/catalog/ch
 ## Phase Details
 
 ### Phase 12: Honest Sidebar and System Boundaries
+
 **Goal**: Users see only functional tag navigation and understand where macOS retains its own dialogs.
 **Depends on**: Nothing (first phase of this milestone; v2.0 is recorded complete)
 **Requirements**: HON-01, HON-02
@@ -55,12 +56,15 @@ Every phase includes its meaningful tests, native UI inspection, Help/catalog/ch
   1. Sidebar color-name filters and inert All Tags are absent, including keyboard-focus stops, until actual tags are implemented in Phase 19.
   2. Help, welcome/onboarding and website FAQ plainly say that other applications' Open/Save dialogs remain the system interface.
   3. Existing sidebar favorites, locations, folder tree and keyboard navigation still work, and no public feature claim implies real tags have shipped.
-**Plans**: 1 plan
+
+**Plans**: 1/1 plans complete
 Plans:
-- [ ] 12-01-PLAN.md — Remove false tag navigation and clarify the system Open/Save boundary, with native and responsive website verification.
+- [x] 12-01-PLAN.md — Remove false tag navigation and clarify the system Open/Save boundary, with native and responsive website verification.
+
 **UI hint**: yes
 
 ### Phase 13: Safe Shared Collision Choices
+
 **Goal**: Users can resolve conflicting file names consistently without silent loss of originals.
 **Depends on**: Phase 12
 **Requirements**: COLL-01, COLL-02, COLL-03, COLL-04
@@ -69,10 +73,12 @@ Plans:
   2. Replace sends the existing destination to Trash and undo restores it; errors and Stop preserve originals and completed work remains undoable.
   3. Keep Both produces extension-preserving numeric suffixes while Duplicate still creates "copy" names.
   4. Folder Merge recursively handles child conflicts through the same choices without following directory symlinks into unsafe recursion.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 14: Safe Archive Extraction
+
 **Goal**: Users can unpack supported archives beside their source with predictable, safe results.
 **Depends on**: Phase 13
 **Requirements**: EXTRACT-01, EXTRACT-02, EXTRACT-03
@@ -80,10 +86,12 @@ Plans:
   1. Extract puts one top-level item directly beside its archive or several in an archive-named folder, asking the shared collision questions when necessary.
   2. Double-click keeps the default-app behavior; unsupported formats offer Archive Utility rather than a misleading success or format claim.
   3. Extraction stays responsive and reports progress/errors; malicious path/link fixtures cannot write outside allowed output, and failed/cancelled staging is cleaned safely.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 15: Trash Recovery and Empty Trash
+
 **Goal**: Users can recover Shark-trashed items across launches and intentionally ask macOS to empty Trash.
 **Depends on**: Phase 13, Phase 14
 **Requirements**: TRASH-01, TRASH-02, TRASH-03
@@ -91,20 +99,24 @@ Plans:
   1. After relaunch, Put Back restores tracked items to their original locations, asks collision choices and handles stale records without losing files.
   2. Untracked items offer Show in Finder; the interface does not pretend Shark can recover unknown original locations.
   3. Empty Trash confirms irreversibility, delegates to Finder and offers Show Trash in Finder on Automation denial; applicable distribution permissions/review notes explain the route honestly.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 16: Extension Change Warnings
+
 **Goal**: Users cannot accidentally change a file's type during rename without choosing the extension change.
 **Depends on**: Phase 15
 **Requirements**: EXT-01
 **Success Criteria** (what must be TRUE):
   1. Inline and other rename entry points ask Keep the existing extension / Use the new extension before changing or removing it.
   2. Normal stem renames, folders and dotfiles behave sensibly, and extensions remain visible in directory views.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 17: iCloud Availability and Actions
+
 **Goal**: Users understand cloud file availability and can request or remove local downloads.
 **Depends on**: Phase 16
 **Requirements**: CLOUD-01, CLOUD-02
@@ -112,10 +124,12 @@ Plans:
   1. Cloud-only, downloading, uploading, errors and shared-item badges reflect available public metadata; synchronized files have no unnecessary status icon.
   2. Eligible context-menu items provide Download Now / Remove Download and opening a cloud-only item requests download before opening.
   3. Available progress and errors are clear without invented values; unavailable account/provider validation is recorded as such.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 18: Scoped Live Search Locations
+
 **Goal**: Users can find files beyond the current folder and act on live results as a navigation location.
 **Depends on**: Phase 17
 **Requirements**: SEARCH-01, SEARCH-02, SEARCH-03, SEARCH-04
@@ -124,10 +138,12 @@ Plans:
   2. Deep Spotlight search streams live uncapped name/content results with Searching state, best-match default and usable ordinary sort controls, without stale-query flashes.
   3. Results show original locations; Back/Escape return to the originating folder, and file actions/Quick Look target real URLs while paste/create destinations remain explicit.
   4. Subfolders on unindexed volumes offers cancellable name-only walking with honest progress and contents limitations.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 19: Real Finder Tags
+
 **Goal**: Users can organize files with the same tags Finder reads and writes.
 **Depends on**: Phase 18
 **Requirements**: TAG-01, TAG-02, TAG-03
@@ -135,10 +151,12 @@ Plans:
   1. Context-menu color dots/custom Tags and inspector edits change real Finder metadata for one or several selected files.
   2. Standard/used sidebar tags perform actual Spotlight tag searches rather than filtering names.
   3. Tag dots appear in all four views in the agreed positions, with three-dot/+N overflow and accessible labels; optional sortable Tags column starts off.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 20: Recents and Configurable Places
+
 **Goal**: Users can start from recently used files and familiar configurable Mac places.
 **Depends on**: Phase 18, Phase 19
 **Requirements**: PLACE-01, PLACE-02, PLACE-03
@@ -146,10 +164,12 @@ Plans:
   1. Recents shows Spotlight files used in the past 30 days, newest first, with working result actions rather than opening Home.
   2. Applications, Desktop, Documents, Downloads, available iCloud Drive, Network and Recents have useful default entries and independent hide/show settings.
   3. Favorites, mounted-volume eject and folder tree still work; AirDrop is a sharing action and no longer a fake browsable directory.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 21: Transfer Progress and Controls
+
 **Goal**: Users can assess and control long copies without risking original files.
 **Depends on**: Phase 13, Phase 20
 **Requirements**: TRANSFER-01, TRANSFER-02
@@ -157,30 +177,36 @@ Plans:
   1. A copy lasting about two seconds shows speed/time remaining in the status bar and opens an operation list when clicked.
   2. Pause/Resume and Cancel work while browsing stays responsive.
   3. Cancel removes incomplete output while preserving sources, old destinations and completed work, including when collision choices or merges occurred.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 22: Aliases and Symbolic Links
+
 **Goal**: Users can create native file references without duplicating target contents.
 **Depends on**: Phase 13, Phase 21
 **Requirements**: LINK-01, LINK-02
 **Success Criteria** (what must be TRUE):
   1. Make Alias creates a real macOS alias beside its original using safe "name alias" naming.
   2. Holding Option reveals Make Symbolic Link; the resulting symlink points to the original without modifying it, including when reference names collide.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 23: Spring-loaded Navigation
+
 **Goal**: Users can reach nested drop destinations by holding a drag over navigation targets.
 **Depends on**: Phase 22
 **Requirements**: SPRING-01, SPRING-02
 **Success Criteria** (what must be TRUE):
   1. Drag-hover over folders, tabs or path segments opens after the system delay; Space opens the active target immediately.
   2. Leaving or ending a drag cancels pending opening, system preferences are respected and drops continue to resolve into the intended destination.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 24: Get Info and Batch Metadata
+
 **Goal**: Users can inspect and edit everyday file metadata and app associations for one or many items.
 **Depends on**: Phase 19, Phase 23
 **Requirements**: INFO-01, INFO-02
@@ -188,10 +214,12 @@ Plans:
   1. Single-item Get Info edits Comments/Locked, chooses Open with and confirms an accurate system Change All action.
   2. Multi-item Get Info shows count, total size and kinds and applies tags/Open with to the selection with accurate per-item failures.
   3. Existing inspector metadata, checksums and file actions remain available without misleading app-association claims.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 25: Connect to Server
+
 **Goal**: Users can ask macOS to mount supported servers and return to them safely.
 **Depends on**: Phase 20, Phase 24
 **Requirements**: SERVER-01, SERVER-02
@@ -199,10 +227,12 @@ Plans:
   1. Go > Connect to Server opens a native address/recent-server window, validates supported smb/afp/nfs URLs and hands the connection to macOS.
   2. Mounted servers appear in the existing volume sidebar; invalid/unsupported addresses get clear errors.
   3. Recent addresses survive relaunch without persisted passwords or other embedded credentials.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 26: Quick Actions
+
 **Goal**: Users can perform useful image/PDF actions directly from applicable file selections.
 **Depends on**: Phase 13, Phase 25
 **Requirements**: QUICK-01, QUICK-02, QUICK-03
@@ -210,10 +240,12 @@ Plans:
   1. Rotate and Convert Image operate on applicable image selections using native facilities and preserve originals for derived output with safe collision naming.
   2. Create PDF produces a usable document from supported selections in predictable order without silently replacing existing output.
   3. Markup works through a public native surface or an explicitly labeled Preview handoff; unsupported selections do not get inert or misleading commands.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 27: Group By Kind and Date
+
 **Goal**: Users can organize list/icon contents into understandable groups without losing navigation control.
 **Depends on**: Phase 26
 **Requirements**: GROUP-01, GROUP-02
@@ -221,10 +253,12 @@ Plans:
   1. Kind/Date grouping displays useful stable headers in list and icon views; None restores normal ordering and within-group sorting works.
   2. Keyboard range selection and file actions follow visible order across group boundaries and mode changes.
   3. Grouping large directories remains responsive without invalidating selected file identities.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 28: Smart Folders
+
 **Goal**: Users can return to named live searches without recreating the query.
 **Depends on**: Phase 18, Phase 27
 **Requirements**: SMART-01, SMART-02
@@ -232,36 +266,43 @@ Plans:
   1. Saving a deep search preserves its name, query, scope and Name only state and provides a persistent sidebar entry that reopens live results after relaunch.
   2. Renaming/removing a Smart Folder affects only its definition; matching files remain untouched.
   3. Missing search roots and empty results have clear states; Help accurately describes Shark persistence without unimplemented Finder interoperability claims.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 29: Direct AirDrop Sharing
+
 **Goal**: Users can send applicable files with native AirDrop directly from their context menu.
 **Depends on**: Phase 20, Phase 28
 **Requirements**: AIR-01
 **Success Criteria** (what must be TRUE):
   1. AirDrop is available directly for eligible selected files and opens normal macOS receiver selection through NSSharingService.
   2. Unavailable service/selection states are honest and do not launch Finder as a fake browsable AirDrop folder.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 30: Print Selected Documents
+
 **Goal**: Users can start supported file printing with familiar native controls and Cmd-P.
 **Depends on**: Phase 29
 **Requirements**: PRINT-01, PRINT-02
 **Success Criteria** (what must be TRUE):
   1. Cmd-P and a discoverable menu item print supported selections through native facilities or an accurately labeled system-app handoff.
   2. Unsupported files receive clear behavior, while text editors/terminal or other active responders do not accidentally trigger file printing.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 31: Native macOS Services
+
 **Goal**: Users can apply installed macOS Services to their selected files through the real system integration.
 **Depends on**: Phase 30
 **Requirements**: SERVICE-01, SERVICE-02
 **Success Criteria** (what must be TRUE):
   1. The real system Services menu receives selected file URLs through the responder chain/pasteboard and can invoke applicable installed Services.
   2. Availability tracks selection/focus without breaking copy, ordinary text selection or keyboard behavior; unavailable local Services verification is reported honestly.
+
 **Plans**: TBD
 **UI hint**: yes
 
@@ -269,7 +310,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 12. Honest Sidebar and System Boundaries | v2.1 | 0/TBD | Not started | - |
+| 12. Honest Sidebar and System Boundaries | v2.1 | 1/1 | Complete    | 2026-11-08 |
 | 13. Safe Shared Collision Choices | v2.1 | 0/TBD | Not started | - |
 | 14. Safe Archive Extraction | v2.1 | 0/TBD | Not started | - |
 | 15. Trash Recovery and Empty Trash | v2.1 | 0/TBD | Not started | - |

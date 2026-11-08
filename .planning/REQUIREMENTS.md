@@ -10,8 +10,8 @@ Every requirement below is authorized current scope, including Group 3. Details 
 
 ### Honest baseline (HON)
 
-- [ ] **HON-01**: Users no longer see fake color-name filters or an inert All Tags action presented as Finder tags, and keyboard focus skips removed rows until real tags land.
-- [ ] **HON-02**: Help, onboarding and the website FAQ accurately explain that other apps' Open/Save dialogs remain the system interface.
+- [x] **HON-01**: Users no longer see fake color-name filters or an inert All Tags action presented as Finder tags, and keyboard focus skips removed rows until real tags land.
+- [x] **HON-02**: Help, onboarding and the website FAQ accurately explain that other apps' Open/Save dialogs remain the system interface.
 
 ### Collision choices (COLL)
 
@@ -137,8 +137,8 @@ No capability from the three authorized groups is deferred. Git badges and an in
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HON-01 | Phase 12 | Pending |
-| HON-02 | Phase 12 | Pending |
+| HON-01 | Phase 12 | Complete |
+| HON-02 | Phase 12 | Complete |
 | COLL-01 | Phase 13 | Pending |
 | COLL-02 | Phase 13 | Pending |
 | COLL-03 | Phase 13 | Pending |
