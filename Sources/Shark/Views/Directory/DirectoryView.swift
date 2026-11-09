@@ -67,6 +67,14 @@ public struct DirectoryView: View {
         } message: {
             Text(navigationState.operationError ?? "")
         }
+        .alert(item: Binding(get: { navigationState.archiveFallback }, set: { navigationState.archiveFallback = $0 })) { fallback in
+            Alert(
+                title: Text(L10n.text("The archive couldn’t be extracted")),
+                message: Text(fallback.message),
+                primaryButton: .default(Text(L10n.text("Open with Archive Utility"))) { OpenWithService.openWithArchiveUtility(fallback.archive) },
+                secondaryButton: .cancel()
+            )
+        }
         .sheet(item: Binding(
             get: { navigationState.pendingCollision },
             set: { if $0 == nil { navigationState.answerCollision(.stop) } }
@@ -626,6 +634,9 @@ public struct DirectoryView: View {
         }
         Button(L10n.text("Duplicate"), systemImage: "plus.square.on.square") { performContextOperation(.duplicate, urls: urls) }
         Button(L10n.text("Compress"), systemImage: "archivebox") { performContextOperation(.compress, urls: urls) }
+        if urls.allSatisfy(ArchiveExtractor.isArchive) {
+            Button(L10n.text("Extract"), systemImage: "tray.and.arrow.up") { Task { await navigationState.extract(urls) } }
+        }
         Menu(L10n.text("Copy Path"), systemImage: "link") {
             Button(L10n.text("Full Path")) { copyContextText(urls.map(\.path).joined(separator: "\n")) }
             Button(L10n.text("Relative Path")) { copyContextText(targets.map(\.name).joined(separator: "\n")) }
@@ -705,6 +716,9 @@ public struct DirectoryView: View {
             }
             Button(L10n.text("Duplicate"), systemImage: "plus.square.on.square") { performContextOperation(.duplicate, urls: urls) }
             Button(L10n.text("Compress"), systemImage: "archivebox") { performContextOperation(.compress, urls: urls) }
+            if urls.allSatisfy(ArchiveExtractor.isArchive) {
+                Button(L10n.text("Extract"), systemImage: "tray.and.arrow.up") { Task { await navigationState.extract(urls) } }
+            }
             Divider()
             Button(count == 1 ? L10n.text("Move to Trash") : L10n.format("Move %d Items to Trash", count), systemImage: "trash", role: .destructive) {
                 performContextOperation(.trash, urls: urls)

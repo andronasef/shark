@@ -728,3 +728,12 @@
 "Keep Both" = "両方を保持";
 "Drop onto a name that exists" = "すでにある名前の上にドロップ";
 "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "置き換える、両方を保持、スキップ、停止のどれにするかを尋ねるシートが表示されます。置き換えると古いアイテムはゴミ箱に入り、「取り消す」で元に戻せます。";
+"Extract" = "展開";
+"Extracting “%@”…" = "「%@」を展開中…";
+"“%@” was not extracted because it contains items that would be written outside its folder." = "「%@」には、フォルダの外に書き込まれてしまう項目が含まれているため、展開されませんでした。";
+"“%@” is empty." = "「%@」は空です。";
+"Shark can’t read “%@”." = "Sharkは「%@」を読み込めません。";
+"“%@” couldn’t be extracted: %@" = "「%@」を展開できませんでした: %@";
+"tar failed with status %d" = "tarがステータス%dで失敗しました";
+"Open with Archive Utility" = "アーカイブユーティリティで開く";
+"The archive couldn’t be extracted" = "アーカイブを展開できませんでした";

@@ -728,3 +728,12 @@
 "Keep Both" = "Keep Both";
 "Drop onto a name that exists" = "Drop onto a name that exists";
 "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back.";
+"Extract" = "Extract";
+"Extracting “%@”…" = "Extracting “%@”…";
+"“%@” was not extracted because it contains items that would be written outside its folder." = "“%@” was not extracted because it contains items that would be written outside its folder.";
+"“%@” is empty." = "“%@” is empty.";
+"Shark can’t read “%@”." = "Shark can’t read “%@”.";
+"“%@” couldn’t be extracted: %@" = "“%@” couldn’t be extracted: %@";
+"tar failed with status %d" = "tar failed with status %d";
+"Open with Archive Utility" = "Open with Archive Utility";
+"The archive couldn’t be extracted" = "The archive couldn’t be extracted";

@@ -728,3 +728,12 @@
 "Keep Both" = "Garder les deux";
 "Drop onto a name that exists" = "Déposer sur un nom existant";
 "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "Une fenêtre demande s’il faut remplacer, garder les deux, ignorer ou arrêter. Remplacer place l’ancien élément dans la corbeille, et Annuler le rétablit.";
+"Extract" = "Extraire";
+"Extracting “%@”…" = "Extraction de « %@ »…";
+"“%@” was not extracted because it contains items that would be written outside its folder." = "« %@ » n’a pas été extrait car il contient des éléments qui seraient écrits en dehors de son dossier.";
+"“%@” is empty." = "« %@ » est vide.";
+"Shark can’t read “%@”." = "Shark ne peut pas lire « %@ ».";
+"“%@” couldn’t be extracted: %@" = "« %@ » n’a pas pu être extrait : %@";
+"tar failed with status %d" = "tar a échoué avec le statut %d";
+"Open with Archive Utility" = "Ouvrir avec Utilitaire d’archive";
+"The archive couldn’t be extracted" = "L’archive n’a pas pu être extraite";

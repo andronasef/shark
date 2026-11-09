@@ -728,3 +728,12 @@
 "Keep Both" = "保留两者";
 "Drop onto a name that exists" = "拖放到已存在的名称上";
 "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "会出现询问替换、保留两者、跳过还是停止的面板。替换会将旧项目移到废纸篓，“撤销”可将其恢复。";
+"Extract" = "解压缩";
+"Extracting “%@”…" = "正在解压缩“%@”…";
+"“%@” was not extracted because it contains items that would be written outside its folder." = "未解压缩“%@”，因为它包含会被写到其文件夹之外的项目。";
+"“%@” is empty." = "“%@”是空的。";
+"Shark can’t read “%@”." = "Shark无法读取“%@”。";
+"“%@” couldn’t be extracted: %@" = "无法解压缩“%@”：%@";
+"tar failed with status %d" = "tar失败，状态为%d";
+"Open with Archive Utility" = "用“归档实用工具”打开";
+"The archive couldn’t be extracted" = "无法解压缩该归档";

@@ -728,3 +728,12 @@
 "Keep Both" = "الاحتفاظ بالاثنين";
 "Drop onto a name that exists" = "الإفلات على اسم موجود";
 "A sheet asks whether to Replace, Keep Both, Skip or Stop. Replace sends the old item to the Trash, and Undo brings it back." = "يسأل مربع حوار إن كنت تريد الاستبدال أو الاحتفاظ بالاثنين أو التخطي أو الإيقاف. يرسل الاستبدال العنصر القديم إلى المهملات، ويعيده التراجع.";
+"Extract" = "استخراج";
+"Extracting “%@”…" = "جارٍ استخراج «%@»…";
+"“%@” was not extracted because it contains items that would be written outside its folder." = "لم يتم استخراج «%@» لأنه يحتوي على عناصر ستُكتب خارج مجلده.";
+"“%@” is empty." = "«%@» فارغ.";
+"Shark can’t read “%@”." = "لا يستطيع Shark قراءة «%@».";
+"“%@” couldn’t be extracted: %@" = "تعذّر استخراج «%@»: %@";
+"tar failed with status %d" = "فشل tar بالحالة %d";
+"Open with Archive Utility" = "فتح باستخدام Archive Utility";
+"The archive couldn’t be extracted" = "تعذّر استخراج الأرشيف";

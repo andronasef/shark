@@ -61,6 +61,12 @@ enum OpenWithService {
         }
     }
 
+    /// Archive Utility reads more formats than bsdtar and asks for passwords itself.
+    static func openWithArchiveUtility(_ archive: URL) {
+        let app = URL(fileURLWithPath: "/System/Library/CoreServices/Applications/Archive Utility.app")
+        NSWorkspace.shared.open([archive], withApplicationAt: app, configuration: NSWorkspace.OpenConfiguration())
+    }
+
     static func share(_ urls: [URL]) {
         guard let view = NSApp.keyWindow?.contentView else { return }
         let picker = NSSharingServicePicker(items: urls)

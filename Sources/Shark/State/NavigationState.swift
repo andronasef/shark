@@ -68,6 +68,8 @@ public final class NavigationState {
     public var operationError: String? = nil
     /// The name conflict waiting for an answer; shown as a sheet by the folder view.
     public var pendingCollision: CollisionPrompt? = nil
+    /// An archive Shark could not extract but Archive Utility may; shown as an alert with that choice.
+    public var archiveFallback: ArchiveFallback? = nil
     @ObservationIgnored private var collisionAnswer: CheckedContinuation<(choice: CollisionChoice, applyToAll: Bool), Never>?
     /// True when the last directory load failed because macOS privacy protection (TCC) denied access.
     public var isPermissionError = false
@@ -509,6 +511,43 @@ public final class NavigationState {
         renamingItemURL = nil
     }
 
+    public func extract(_ urls: [URL]) async {
+        guard cancelActiveOperation == nil else { return }
+        let archives = urls.filter(ArchiveExtractor.isArchive)
+        guard !archives.isEmpty else { return }
+        var created: [URL] = []
+        defer {
+            activeOperationTitle = nil
+            cancelActiveOperation = nil
+        }
+        for archive in archives {
+            activeOperationTitle = L10n.format("Extracting “%@”…", L10n.literal(archive.lastPathComponent))
+            let task = Task {
+                try await ArchiveExtractor.extract(archive) { [weak self] prompt in await self?.askCollision(prompt) ?? (.stop, false) }
+            }
+            cancelActiveOperation = { task.cancel() }
+            do {
+                let result = try await task.value
+                if let action = result.undoAction(for: .move) { FileUndoService.shared.record(action) }
+                for case .create(let urls, _) in result.actions { created += urls }
+                if let error = result.error {
+                    operationError = L10n.format("%@ failed: %@", L10n.text("Extract"), error.localizedDescription)
+                }
+                if result.stopped || result.error != nil { break }
+            } catch is CancellationError {
+                break
+            } catch let error as ArchiveError where error.offersArchiveUtility {
+                archiveFallback = ArchiveFallback(archive: archive, message: error.localizedDescription)
+                break
+            } catch {
+                operationError = error.localizedDescription
+                break
+            }
+        }
+        await reloadCurrentDirectory()
+        if !created.isEmpty { selectedItemIDs = Set(created.map(\.standardizedFileURL)) }
+    }
+
     public func compressSelected() async {
         guard cancelActiveOperation == nil else { return }
         let urls = selectedItems.map(\.url)
@@ -651,4 +690,11 @@ public final class NavigationState {
         guard let last = filteredAndSortedItems.last else { return }
         if extendingSelection { extendSelection(to: filteredAndSortedItems.count - 1) } else { selectOnly(last) }
     }
+}
+
+/// What the alert for an unreadable archive needs.
+public struct ArchiveFallback: Identifiable, Sendable {
+    public let id = UUID()
+    public let archive: URL
+    public let message: String
 }
