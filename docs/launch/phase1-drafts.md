@@ -31,30 +31,32 @@ Not claimed anywhere: speed numbers, memory numbers, user counts, testimonials. 
 
 ## 0. Shared copy
 
+Updated 8 Nov 2026 to the five headline features (subfolder menus, ⌘K, cut and paste, split panes, terminal). The sections below this one are the copy as it was submitted, kept as a record.
+
 ### Maker story (the base for every post)
 
 I used Windows for years. After I moved to a Mac, the thing I missed most was File Explorer. I could type a path into the address bar, cut and paste files, keep a folder tree on the left, and read the item count in a status bar. Finder hides most of that or doesn't have it.
 
-I wanted a Finder with superpowers that still felt familiar, so I built Shark. It's native Swift and SwiftUI. It has tabs, split panes (F3), a terminal drawer that follows your folder (F4), hover previews, cascading subfolder menus, and an optional Explorer-style folder tree in the sidebar.
+I wanted a Finder with superpowers that still felt familiar, so I built Shark. It's native Swift and SwiftUI. It lets you jump anywhere in the folder tree with cascading subfolder menus, run every action from a ⌘K command palette, cut and paste files with ⌘X and ⌘V, see two folders in one window (F3), and keep a terminal right under your files (F4).
 
 It's free, open source under Apache 2.0, and still alpha, so expect rough edges. I'd like to hear what's missing.
 
 ### Taglines (60 characters max)
 
 - A Finder alternative with Windows Explorer's familiar power (59)
-- Tabs, split panes and a terminal for your Mac's files (53)
+- Cut, paste, ⌘K and a terminal for your Mac's files (51)
 
 ### One-liner (about 140 characters)
 
-Shark is a free, open source Mac file manager with tabs, split panes, a built-in terminal and hover previews. Built for people who left Windows Explorer behind.
+Shark is a free, open source Mac file manager with subfolder menus, a ⌘K command palette, cut and paste, split panes and a built-in terminal.
 
 ### Short description (about 400 characters)
 
-Shark is a native macOS file manager for people who live in their folders. It keeps Finder's look and adds what Windows File Explorer, QTTabBar and Dolphin users expect: tabs, side-by-side panes, an editable path bar, cut and paste, a status bar, a command palette, and a terminal drawer that follows the folder you're in. Free, open source (Apache 2.0), macOS 14+. Currently alpha.
+Shark is a native macOS file manager for people who live in their folders. It keeps Finder's look and adds five things: cascading subfolder menus to jump anywhere in the folder tree, a ⌘K command palette for every action, cut and paste with ⌘X and ⌘V, two folders side by side in one window, and a terminal right under your files. Free, open source (Apache 2.0), macOS 14+. Currently alpha.
 
 ### Tags and keywords
 
-file manager, finder alternative, dual pane, tabs, terminal, quick look, swift, swiftui, open source, macOS
+file manager, finder alternative, cut and paste, command palette, dual pane, terminal, swift, swiftui, open source, macOS
 
 ---
 

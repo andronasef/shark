@@ -13,7 +13,7 @@ Last updated 27 Oct 2026. Copy for every listing lives in [phase1-drafts.md](pha
 - Trailer: https://youtu.be/SoQqCcbbE1c
 - Install: `brew install --cask andronasef/shark/shark`
 - Mac App Store: https://apps.apple.com/app/shark-file-manager/id6825086341 (live)
-- Version: 1.0.0-alpha.2, macOS 14+, 8 languages
+- Version: 1.0.0-alpha.4, macOS 14+, 8 languages
 - Story: used Windows, missed File Explorer, built a Finder with superpowers that feels familiar. Also borrows from QTTabBar (Windows) and Dolphin (KDE).
 - Images: App Store screenshots only. Copies in the session scratchpad `shots/` (JPEG, about 500 KB each).
 
@@ -69,7 +69,7 @@ You only authorised Phase 1. Each of these needs a draft and your review first.
 | Platform | Angle |
 | --- | --- |
 | Show HN | "Show HN: Shark – File Manager, a native Mac file manager with tabs, split panes and a terminal". Post on a weekday morning US time. Be ready to answer comments for a few hours. |
-| r/macapps | Allowed to self-promote with disclosure. Lead with the story and a screenshot. |
+| r/macapps | Drafted in [reddit.md](reddit.md), with the sub's developer rules (PCP format, one post per 30 days, disclosure). |
 | r/macOS, r/MacOSApps, r/swift, r/opensource | Check each sidebar for self-promotion rules before posting. |
 | Indie Hackers | Product page plus a build story post. |
 | dev.to or Hashnode | "Why I built a Finder with the things I missed from Windows Explorer." Embed the trailer. |
