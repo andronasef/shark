@@ -142,6 +142,15 @@ public struct PlacesSidebarView: View {
                     }
                 }
 
+                if isTree {
+                    // The tree lists real folders and volumes; AirDrop and Trash are not folders in it.
+                    SidebarSectionGroup("Places", focus: $sidebarFocus) {
+                        ForEach(treeExtraPlaces) { item in
+                            sidebarRow(name: item.name, iconName: item.iconName, url: item.url)
+                        }
+                    }
+                }
+
                 if !isTree {
                 // Locations section
                 SidebarSectionGroup("Locations", focus: $sidebarFocus) {
@@ -391,6 +400,8 @@ public struct PlacesSidebarView: View {
         if isTree {
             order.append("Folders:header")
             if expanded("Folders") { order += folderTree.rows(for: treeRoots).map { "Tree:" + $0.id } }
+            order.append("Places:header")
+            if expanded("Places") { order += treeExtraPlaces.map { "Locations:" + $0.url.path } }
         } else {
             order.append("Locations:header")
             if expanded("Locations") { order += locations.map { "Locations:" + $0.url.path } }
@@ -402,9 +413,16 @@ public struct PlacesSidebarView: View {
     /// Home first, then iCloud, the startup disk, and mounted volumes (like Explorer's This PC).
     private var treeRoots: [FolderTreeRoot] {
         let home = FileManager.default.homeDirectoryForCurrentUser.standardizedFileURL
-        let places = locations.filter { $0.name != "AirDrop" && $0.name != "Trash" }
+        let places = locations.filter { !Self.isVirtualPlace($0) }
         let ordered = places.filter { $0.url.standardizedFileURL == home } + places.filter { $0.url.standardizedFileURL != home }
         return ordered.map { FolderTreeRoot(url: $0.url, name: $0.name, icon: $0.iconName) }
+    }
+
+    /// AirDrop and Trash are not folders in the tree. Matched by icon, since names are translated.
+    private static func isVirtualPlace(_ item: SidebarItem) -> Bool { item.iconName == "airdrop" || item.iconName == "trash" }
+
+    private var treeExtraPlaces: [SidebarItem] {
+        locations.filter { Self.isVirtualPlace($0) }
     }
 
     private func favoriteInsertion(at index: Int) -> some View {
