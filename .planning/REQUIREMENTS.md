@@ -28,9 +28,9 @@ Every requirement below is authorized current scope, including Group 3. Details 
 
 ### Trash recovery (TRASH)
 
-- [ ] **TRASH-01**: Users can Put Back items Shark trashed after relaunch using persisted original/Trash URLs, with shared collision handling and safe stale-record pruning.
-- [ ] **TRASH-02**: Items without Shark recovery records offer Show in Finder rather than a falsely available Put Back.
-- [ ] **TRASH-03**: Empty Trash clearly confirms irreversibility and asks Finder to perform it; Automation denial offers Show Trash in Finder, with applicable distribution configuration and App Review notes.
+- [x] **TRASH-01**: Users can Put Back items Shark trashed after relaunch using persisted original/Trash URLs, with shared collision handling and safe stale-record pruning.
+- [x] **TRASH-02**: Items without Shark recovery records offer Show in Finder rather than a falsely available Put Back.
+- [x] **TRASH-03**: Empty Trash clearly confirms irreversibility and asks Finder to perform it; Automation denial offers Show Trash in Finder, with applicable distribution configuration and App Review notes.
 
 ### Extension changes (EXT)
 
@@ -146,9 +146,9 @@ No capability from the three authorized groups is deferred. Git badges and an in
 | EXTRACT-01 | Phase 14 | Complete |
 | EXTRACT-02 | Phase 14 | Complete |
 | EXTRACT-03 | Phase 14 | Complete |
-| TRASH-01 | Phase 15 | Pending |
-| TRASH-02 | Phase 15 | Pending |
-| TRASH-03 | Phase 15 | Pending |
+| TRASH-01 | Phase 15 | Complete |
+| TRASH-02 | Phase 15 | Complete |
+| TRASH-03 | Phase 15 | Complete |
 | EXT-01 | Phase 16 | Pending |
 | CLOUD-01 | Phase 17 | Pending |
 | CLOUD-02 | Phase 17 | Pending |
