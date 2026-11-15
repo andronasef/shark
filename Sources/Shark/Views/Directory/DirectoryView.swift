@@ -545,6 +545,18 @@ public struct DirectoryView: View {
 
     // MARK: - Actions
     private func handleActivate(_ item: FileItem) {
+        if item.cloudState == .cloudOnly && !item.isNavigableDirectory {
+            Task {
+                guard await navigationState.ensureDownloaded(item.url) else { return }
+                openActivated(item)
+                await navigationState.reloadCurrentDirectory()
+            }
+        } else {
+            openActivated(item)
+        }
+    }
+
+    private func openActivated(_ item: FileItem) {
         if item.isNavigableDirectory {
             let isCmd = NSEvent.modifierFlags.contains(.command)
             if let workspace {
@@ -620,6 +632,7 @@ public struct DirectoryView: View {
         Button(L10n.text("Share…"), systemImage: "square.and.arrow.up") { OpenWithService.share(urls) }
         Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting(urls) }
         if navigationState.isTrashFolder { trashMenuItems(urls) }
+        cloudMenuItems(targets)
         Divider()
         TerminalMenuItems(url: isMultiple ? navigationState.currentURL : item.url, workspace: workspace, source: navigationState)
         Divider()
@@ -701,6 +714,19 @@ public struct DirectoryView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    /// Download Now for items that are only in iCloud; Remove Download for items kept on this Mac.
+    @ViewBuilder
+    private func cloudMenuItems(_ items: [FileItem]) -> some View {
+        let downloadable = items.filter { $0.cloudState == .cloudOnly }.map(\.url)
+        let removable = items.filter { $0.cloudState == .synced }.map(\.url)
+        if !downloadable.isEmpty {
+            Button(L10n.text("Download Now"), systemImage: "icloud.and.arrow.down") { Task { await navigationState.downloadCloudItems(downloadable) } }
+        }
+        if !removable.isEmpty {
+            Button(L10n.text("Remove Download"), systemImage: "icloud.slash") { Task { await navigationState.removeCloudDownloads(removable) } }
+        }
+    }
+
     /// Put Back only for items Shark trashed (it knows where they came from); Empty Trash goes through Finder.
     @ViewBuilder
     private func trashMenuItems(_ urls: [URL]) -> some View {
@@ -747,6 +773,7 @@ public struct DirectoryView: View {
             Button(L10n.text("Quick Look"), systemImage: "eye") { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
             Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting(urls) }
             if navigationState.isTrashFolder { trashMenuItems(urls) }
+            cloudMenuItems(selected)
             Divider()
             Button(L10n.text("Cut"), systemImage: "scissors") { FileClipboardService.shared.cut(urls) }
             Button(L10n.text("Copy"), systemImage: "doc.on.doc") { FileClipboardService.shared.copy(urls) }

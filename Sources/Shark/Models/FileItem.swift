@@ -18,6 +18,8 @@ public struct FileItem: Identifiable, Hashable, Sendable {
     public let posixPermissions: Int
     public let ownerName: String
     public let groupName: String
+    public let cloudState: CloudState
+    public let isCloudShared: Bool
 
     public init(
         url: URL,
@@ -33,7 +35,9 @@ public struct FileItem: Identifiable, Hashable, Sendable {
         kindDescription: String = "",
         posixPermissions: Int = 0o644,
         ownerName: String = "",
-        groupName: String = ""
+        groupName: String = "",
+        cloudState: CloudState = .notCloud,
+        isCloudShared: Bool = false
     ) {
         self.url = url
         self.name = name
@@ -49,6 +53,8 @@ public struct FileItem: Identifiable, Hashable, Sendable {
         self.posixPermissions = posixPermissions
         self.ownerName = ownerName
         self.groupName = groupName
+        self.cloudState = cloudState
+        self.isCloudShared = isCloudShared
     }
 
     public var isNavigableDirectory: Bool {

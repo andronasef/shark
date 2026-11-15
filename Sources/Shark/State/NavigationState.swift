@@ -623,6 +623,53 @@ public final class NavigationState {
         }
     }
 
+    // MARK: - iCloud
+
+    public func downloadCloudItems(_ urls: [URL]) async {
+        do { try CloudService.download(urls) } catch {
+            operationError = L10n.format("%@ failed: %@", L10n.text("Download Now"), error.localizedDescription)
+        }
+        await refreshWhileDownloading(urls)
+    }
+
+    public func removeCloudDownloads(_ urls: [URL]) async {
+        do { try CloudService.removeDownload(urls) } catch {
+            operationError = L10n.format("%@ failed: %@", L10n.text("Remove Download"), error.localizedDescription)
+        }
+        await reloadCurrentDirectory()
+    }
+
+    /// Reloads while items are still arriving so the badges settle without a manual refresh.
+    private func refreshWhileDownloading(_ urls: [URL]) async {
+        for _ in 0..<150 {
+            await reloadCurrentDirectory()
+            let pending = urls.contains { [.cloudOnly, .downloading].contains(CloudState.read($0).state) }
+            if !pending { return }
+            try? await Task.sleep(for: .seconds(2))
+        }
+    }
+
+    /// Opening a cloud-only file asks iCloud for it first. Returns true once it can be opened.
+    public func ensureDownloaded(_ url: URL) async -> Bool {
+        guard CloudState.read(url).state == .cloudOnly else { return true }
+        guard cancelActiveOperation == nil else { return false }
+        activeOperationTitle = L10n.format("Downloading “%@” from iCloud…", L10n.literal(url.lastPathComponent))
+        defer { activeOperationTitle = nil; cancelActiveOperation = nil }
+        let task = Task { try await CloudService.waitUntilDownloaded(url) }
+        cancelActiveOperation = { task.cancel() }
+        do {
+            try CloudService.download([url])
+            try await task.value
+            return true
+        } catch is CancellationError {
+            return false
+        } catch {
+            task.cancel()
+            operationError = L10n.format("“%@” couldn’t be downloaded: %@", L10n.literal(url.lastPathComponent), error.localizedDescription)
+            return false
+        }
+    }
+
     // MARK: - Trash recovery
 
     public var isTrashFolder: Bool { TrashLocation.isTrash(currentURL) }

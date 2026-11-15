@@ -760,3 +760,12 @@
 "Use No Extension" = "بدون امتداد";
 "Shark can’t read the Trash yet" = "لا يستطيع Shark قراءة سلة المهملات بعد";
 "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "يحتفظ macOS بسلة المهملات خاصة. فعّل Shark ضمن الوصول الكامل إلى القرص، ثم أغلق Shark وأعد فتحه. حتى ذلك الحين يمكنك فتح سلة المهملات في Finder.";
+"Download Now" = "تنزيل الآن";
+"Remove Download" = "إزالة التنزيل";
+"Downloading “%@” from iCloud…" = "جارٍ تنزيل “%@” من iCloud…";
+"“%@” couldn’t be downloaded: %@" = "تعذّر تنزيل “%@”: %@";
+"iCloud error: %@" = "خطأ في iCloud: %@";
+"Downloading from iCloud" = "جارٍ التنزيل من iCloud";
+"Uploading to iCloud" = "جارٍ الرفع إلى iCloud";
+"In iCloud, not downloaded" = "في iCloud، غير منزَّل";
+"Shared in iCloud" = "مشترك في iCloud";

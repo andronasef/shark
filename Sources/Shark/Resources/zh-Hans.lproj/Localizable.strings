@@ -760,3 +760,12 @@
 "Use No Extension" = "不使用扩展名";
 "Shark can’t read the Trash yet" = "Shark 暂时无法读取废纸篓";
 "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOS 将废纸篓设为私密。请在“完全磁盘访问权限”中开启 Shark，然后退出并重新打开 Shark。在此之前，你可以在访达中打开废纸篓。";
+"Download Now" = "立即下载";
+"Remove Download" = "移除下载";
+"Downloading “%@” from iCloud…" = "正在从 iCloud 下载“%@”…";
+"“%@” couldn’t be downloaded: %@" = "无法下载“%@”：%@";
+"iCloud error: %@" = "iCloud 错误：%@";
+"Downloading from iCloud" = "正在从 iCloud 下载";
+"Uploading to iCloud" = "正在上传到 iCloud";
+"In iCloud, not downloaded" = "在 iCloud 中，尚未下载";
+"Shared in iCloud" = "已在 iCloud 中共享";

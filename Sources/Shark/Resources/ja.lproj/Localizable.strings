@@ -760,3 +760,12 @@
 "Use No Extension" = "拡張子なしにする";
 "Shark can’t read the Trash yet" = "Sharkはまだゴミ箱を読み込めません";
 "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOSはゴミ箱を非公開にしています。「フルディスクアクセス」でSharkをオンにして、Sharkを終了してから開き直してください。それまではFinderでゴミ箱を開けます。";
+"Download Now" = "今すぐダウンロード";
+"Remove Download" = "ダウンロードを削除";
+"Downloading “%@” from iCloud…" = "「%@」をiCloudからダウンロード中…";
+"“%@” couldn’t be downloaded: %@" = "「%@」をダウンロードできませんでした: %@";
+"iCloud error: %@" = "iCloudエラー: %@";
+"Downloading from iCloud" = "iCloudからダウンロード中";
+"Uploading to iCloud" = "iCloudへアップロード中";
+"In iCloud, not downloaded" = "iCloud上のみ（未ダウンロード）";
+"Shared in iCloud" = "iCloudで共有中";

@@ -760,3 +760,12 @@
 "Use No Extension" = "Sem extensão";
 "Shark can’t read the Trash yet" = "O Shark ainda não consegue ler o Lixo";
 "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "O macOS mantém o Lixo privado. Ative o Shark em Acesso Total ao Disco e reabra o Shark. Até lá, você pode abrir o Lixo no Finder.";
+"Download Now" = "Baixar agora";
+"Remove Download" = "Remover download";
+"Downloading “%@” from iCloud…" = "Baixando “%@” do iCloud…";
+"“%@” couldn’t be downloaded: %@" = "Não foi possível baixar “%@”: %@";
+"iCloud error: %@" = "Erro do iCloud: %@";
+"Downloading from iCloud" = "Baixando do iCloud";
+"Uploading to iCloud" = "Enviando para o iCloud";
+"In iCloud, not downloaded" = "No iCloud, não baixado";
+"Shared in iCloud" = "Compartilhado no iCloud";

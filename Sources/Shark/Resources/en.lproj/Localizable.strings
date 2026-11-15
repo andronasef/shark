@@ -760,3 +760,12 @@
 "Use No Extension" = "Use No Extension";
 "Shark can’t read the Trash yet" = "Shark can’t read the Trash yet";
 "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder.";
+"Download Now" = "Download Now";
+"Remove Download" = "Remove Download";
+"Downloading “%@” from iCloud…" = "Downloading “%@” from iCloud…";
+"“%@” couldn’t be downloaded: %@" = "“%@” couldn’t be downloaded: %@";
+"iCloud error: %@" = "iCloud error: %@";
+"Downloading from iCloud" = "Downloading from iCloud";
+"Uploading to iCloud" = "Uploading to iCloud";
+"In iCloud, not downloaded" = "In iCloud, not downloaded";
+"Shared in iCloud" = "Shared in iCloud";

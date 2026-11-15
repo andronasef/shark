@@ -343,6 +343,7 @@ private struct IconGridItemView: View {
                 }
             }
             .frame(width: iconSize, height: iconSize)
+            .cloudBadge(item, size: iconSize)
 
             // The editor floats over the label slot so the cell keeps its normal height.
             Text(item.name)

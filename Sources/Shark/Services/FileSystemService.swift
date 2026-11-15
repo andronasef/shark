@@ -60,6 +60,7 @@ public actor FileSystemService {
                     permissions = Int(info.st_mode & 0o7777)
                 }
 
+                let cloud = CloudState.read(fileURL)
                 let item = FileItem(
                     url: fileURL,
                     name: name,
@@ -72,7 +73,9 @@ public actor FileSystemService {
                     dateModified: dateModified,
                     dateCreated: dateCreated,
                     kindDescription: kindDescription,
-                    posixPermissions: permissions
+                    posixPermissions: permissions,
+                    cloudState: cloud.state,
+                    isCloudShared: cloud.isShared
                 )
                 items.append(item)
             } catch {

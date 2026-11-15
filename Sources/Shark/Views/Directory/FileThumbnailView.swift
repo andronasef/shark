@@ -21,6 +21,7 @@ struct FileThumbnailView: View {
             }
         }
         .frame(width: size, height: size)
+        .cloudBadge(item, size: size)
         .task(id: "\(item.url.absoluteString)|\(item.dateModified)|\(item.fileSize)|\(item.isDirectory)|\(requestSize)|\(displayScale)|\(isScrolling)") {
             if thumbnailURL != item.url { thumbnail = nil }
             guard !item.isDirectory else { thumbnail = nil; return }

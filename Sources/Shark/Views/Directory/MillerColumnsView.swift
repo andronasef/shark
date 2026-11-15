@@ -115,6 +115,7 @@ public struct MillerColumnsView: View {
                             HStack(spacing: 6) {
                                 FileItemIconView(item: item, size: 16)
                                     .frame(width: 16, height: 16)
+                                    .cloudBadge(item, size: 16)
 
                                 Text(item.name)
                                     .font(.system(size: 12))

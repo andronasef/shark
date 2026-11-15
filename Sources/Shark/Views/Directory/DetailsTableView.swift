@@ -35,6 +35,7 @@ public struct DetailsTableView: View {
                     HStack(spacing: 8) {
                         FileItemIconView(item: item, size: 18)
                             .frame(width: 18, height: 18)
+                            .cloudBadge(item, size: 18)
 
                         if navigationState.renamingItemURL == item.url {
                             InlineRenameField(

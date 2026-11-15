@@ -760,3 +760,12 @@
 "Use No Extension" = "Ohne Endung";
 "Shark can’t read the Trash yet" = "Shark kann den Papierkorb noch nicht lesen";
 "macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOS hält den Papierkorb privat. Aktiviere Shark unter „Vollständiger Festplattenzugriff“ und starte Shark neu. Bis dahin kannst du den Papierkorb im Finder öffnen.";
+"Download Now" = "Jetzt laden";
+"Remove Download" = "Download entfernen";
+"Downloading “%@” from iCloud…" = "„%@“ wird aus iCloud geladen …";
+"“%@” couldn’t be downloaded: %@" = "„%@“ konnte nicht geladen werden: %@";
+"iCloud error: %@" = "iCloud-Fehler: %@";
+"Downloading from iCloud" = "Wird aus iCloud geladen";
+"Uploading to iCloud" = "Wird in iCloud hochgeladen";
+"In iCloud, not downloaded" = "In iCloud, nicht geladen";
+"Shared in iCloud" = "In iCloud geteilt";
