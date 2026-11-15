@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Renaming in icon view shows the whole file name wrapped over up to five centered lines (longer names scroll) instead of cutting it to one line. List and column views keep the single-line field.
 
 ### Fixed
+- Opening the Trash without Full Disk Access now explains that macOS keeps it private and offers Open Full Disk Access Settings, Show Shark in Finder and Show Trash in Finder, instead of a generic "Grant Access…" button that could not help.
 - The sidebar no longer shows a Tags section. Its color names only typed a word into the filter and "All Tags…" did nothing, so they looked like Finder tags without being them. Arrow-key navigation no longer stops on those rows. Real Finder tags are planned.
 - Help, the welcome setup and the website FAQ now say that other apps keep using the macOS Open and Save dialogs even when Shark is your default folder app.
 - The selection rectangle in icon view no longer selects icons beside, above or below it; column width, the column cap and cell size are now taken from the real grid layout, and icons that are on screen are decided by their exact frames.

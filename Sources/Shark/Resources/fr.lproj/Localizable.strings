@@ -758,3 +758,5 @@
 "Keep “.%@”" = "Conserver « .%@ »";
 "Use “.%@”" = "Utiliser « .%@ »";
 "Use No Extension" = "Aucune extension";
+"Shark can’t read the Trash yet" = "Shark ne peut pas encore lire la corbeille";
+"macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOS garde la corbeille privée. Activez Shark dans Accès complet au disque, puis quittez et rouvrez Shark. En attendant, vous pouvez ouvrir la corbeille dans le Finder.";

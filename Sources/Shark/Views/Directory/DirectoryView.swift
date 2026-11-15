@@ -286,6 +286,8 @@ public struct DirectoryView: View {
                     .font(.callout)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if navigationState.errorMessage != nil && navigationState.isPermissionError && navigationState.isTrashFolder {
+            trashAccessView
         } else if let error = navigationState.errorMessage {
             VStack(spacing: 12) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -670,6 +672,33 @@ public struct DirectoryView: View {
             if items.count > 1 && item.isNavigableDirectory { workspace?.newTab(url: item.url, select: false) }
             else { handleActivate(item) }
         }
+    }
+
+    /// macOS keeps the Trash private; only Full Disk Access lets Shark list it, and it applies after a relaunch.
+    private var trashAccessView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "trash.slash")
+                .font(.system(size: 36))
+                .foregroundColor(.secondary)
+            Text(L10n.text("Shark can’t read the Trash yet"))
+                .font(.headline)
+            Text(L10n.text("macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder."))
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            HStack(spacing: 8) {
+                Button(L10n.text("Open Full Disk Access Settings…")) {
+                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
+                }
+                .buttonStyle(.borderedProminent)
+                Button(L10n.text("Show Shark in Finder")) { NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL]) }
+                Button(L10n.text("Show Trash in Finder")) { NavigationState.showTrashInFinder() }
+            }
+            Button(L10n.text("Try Again")) { Task { await navigationState.reloadCurrentDirectory() } }
+                .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     /// Put Back only for items Shark trashed (it knows where they came from); Empty Trash goes through Finder.

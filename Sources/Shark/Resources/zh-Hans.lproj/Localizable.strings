@@ -758,3 +758,5 @@
 "Keep “.%@”" = "保留“.%@”";
 "Use “.%@”" = "使用“.%@”";
 "Use No Extension" = "不使用扩展名";
+"Shark can’t read the Trash yet" = "Shark 暂时无法读取废纸篓";
+"macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOS 将废纸篓设为私密。请在“完全磁盘访问权限”中开启 Shark，然后退出并重新打开 Shark。在此之前，你可以在访达中打开废纸篓。";

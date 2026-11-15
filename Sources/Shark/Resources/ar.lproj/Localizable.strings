@@ -758,3 +758,5 @@
 "Keep “.%@”" = "الإبقاء على “.%@”";
 "Use “.%@”" = "استخدام “.%@”";
 "Use No Extension" = "بدون امتداد";
+"Shark can’t read the Trash yet" = "لا يستطيع Shark قراءة سلة المهملات بعد";
+"macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "يحتفظ macOS بسلة المهملات خاصة. فعّل Shark ضمن الوصول الكامل إلى القرص، ثم أغلق Shark وأعد فتحه. حتى ذلك الحين يمكنك فتح سلة المهملات في Finder.";

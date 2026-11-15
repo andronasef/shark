@@ -758,3 +758,5 @@
 "Keep “.%@”" = "「.%@」を残す";
 "Use “.%@”" = "「.%@」を使用";
 "Use No Extension" = "拡張子なしにする";
+"Shark can’t read the Trash yet" = "Sharkはまだゴミ箱を読み込めません";
+"macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOSはゴミ箱を非公開にしています。「フルディスクアクセス」でSharkをオンにして、Sharkを終了してから開き直してください。それまではFinderでゴミ箱を開けます。";

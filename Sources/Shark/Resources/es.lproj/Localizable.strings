@@ -758,3 +758,5 @@
 "Keep “.%@”" = "Mantener “.%@”";
 "Use “.%@”" = "Usar “.%@”";
 "Use No Extension" = "Sin extensión";
+"Shark can’t read the Trash yet" = "Shark aún no puede leer la papelera";
+"macOS keeps the Trash private. Turn on Shark under Full Disk Access, then quit and reopen Shark. Until then you can open the Trash in Finder." = "macOS mantiene la papelera privada. Activa Shark en Acceso total al disco y vuelve a abrir Shark. Mientras tanto puedes abrir la papelera en el Finder.";
