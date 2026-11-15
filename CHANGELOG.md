@@ -10,10 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Replace, Keep Both, Skip or Stop**: when a copied or moved file already exists, you choose, with both versions shown side by side.
 - **Extract Archives**: right-click a ZIP, 7z, RAR or TAR file to unpack it safely, with Stop and Undo.
 - **Put Back & Empty Trash**: restore things you trashed in Shark to where they came from, even after a restart, and empty the Trash safely.
-- **Reveal in Shark**: when another app asks the system's file viewer to show a file, Shark opens its folder with the file selected.
+- **Safer Renames**: Shark asks before a rename changes or removes a file extension, so files don't stop opening by accident.
 - **Accurate Drag Selection**: dragging a selection box in icon view now selects only the items it touches.
 
 ### Added
+- Renaming a file so its extension changes or is removed now asks Keep “.old” / Use “.new” / Cancel first. Folders, dotfiles, newly added extensions and case-only changes are not asked about.
 - Put Back in the Trash context menu for items Shark moved to the Trash, remembered across launches (`trash-records.json` in Application Support). It asks the shared Replace / Keep Both / Skip / Stop question on a name clash, restores a name the Trash changed, leaves items whose folder is gone in the Trash with a message, and offers only Show in Finder for items Shark did not trash.
 - Empty Trash… in the Trash folder's menu and on the sidebar Trash row. It confirms that this cannot be undone and asks Finder to empty the Trash; if Automation is denied it offers Show Trash in Finder. Adds the Apple Events entitlement (direct build), a Finder-only temporary exception (App Store build) and `NSAppleEventsUsageDescription`.
 - Extract in the context menu for ZIP, TAR (gz, bz2, xz), 7z, RAR, cpio and similar archives. Entries are validated before anything is written, extraction happens in a staging folder, conflicts use the shared Replace / Keep Both / Skip / Stop sheet, Stop cancels cleanly, and Undo removes the result in one step. StuffIt, ZIPX and unreadable archives offer Archive Utility.
