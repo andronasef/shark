@@ -60,7 +60,7 @@ Press <kbd>⌘Z</kbd> in Finder, or choose **Edit › Undo Move**. Do it straigh
 [Shark](/) is a free Mac file manager that supports <kbd>⌘X</kbd> and <kbd>⌘V</kbd> for files, the way Windows does:
 
 - Cut items look dimmed, so you can see what's ready to move.
-- Pasting never replaces an existing file. If an item with that name is already there, Shark refuses the move instead of overwriting it.
+- Pasting never replaces a file silently. If an item with that name is already there, Shark shows both and asks: Replace (the old item goes to the Trash and Undo brings it back), Keep Both, Skip, or Stop. Two folders can also be merged.
 - <kbd>⌘Z</kbd> undoes the move.
 
 With split panes (<kbd>F3</kbd>) you can cut from one folder and paste into the other without switching windows.
