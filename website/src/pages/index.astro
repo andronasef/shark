@@ -58,7 +58,7 @@ const features = [
     id: 'cut-paste',
     icon: 'scissors' as const,
     title: 'Cut and paste,\nfinally.',
-    description: 'Move files the way you always expected. Press ⌘X to cut and ⌘V to paste. Items stay visually dimmed while queued, moves never overwrite by accident, and every action is fully undoable with ⌘Z.',
+    description: 'Move files the way you always expected. Press ⌘X to cut and ⌘V to paste. Items stay visually dimmed while queued, a name that already exists gets a Replace, Keep Both, Skip or Stop choice instead of an overwrite, and every action is fully undoable with ⌘Z.',
     action: 'Moving files just makes sense.',
     shortcut: '⌘X / ⌘V',
     shortcutLabel: 'Cut and paste',
@@ -95,7 +95,7 @@ const tools = [
   ['Four ways to see your files', 'Icons, list, columns, or gallery. Choose the view that fits what you’re doing.'],
   ['Quick previews on hover', 'Peek inside images, documents, and code without opening another app, or press Space for Quick Look.'],
   ['The details, on hand', 'Check sizes, permissions, metadata, and SHA-256 checksums in the inspector.'],
-  ['Thoughtful file operations', 'Batch rename with live preview, duplicate, archive, and calculated folder sizes in the status bar.'],
+  ['Thoughtful file operations', 'Batch rename with live preview, safe archive extraction, Put Back from the Trash, iCloud download status, and calculated folder sizes in the status bar.'],
 ];
 ---
 <Layout jsonLd={faqJsonLd}>
