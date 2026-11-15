@@ -4,5 +4,8 @@
 <dict>
     <!-- Hardened Runtime for Developer ID direct distribution. No exceptions: the release build
          needs no JIT, unsigned executable memory, or unsigned libraries (Inject is debug-only). -->
+    <!-- Empty Trash asks Finder to do it (Apple Events). Without this the Automation prompt never appears. -->
+    <key>com.apple.security.automation.apple-events</key>
+    <true/>
 </dict>
 </plist>

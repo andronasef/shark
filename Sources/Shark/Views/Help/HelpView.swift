@@ -45,6 +45,7 @@ enum MouseHelp {
                 HelpBinding(gesture: L10n.text("Drag a selected item"), action: L10n.text("Carry the whole selection. Dragging an item that is not selected moves only that item.")),
                 HelpBinding(gesture: L10n.text("Double-click an image"), action: L10n.text("Open it as usual, or in Shark Photo Viewer when that is switched on in Settings › Previews.")),
                 HelpBinding(gesture: L10n.text("Right-click"), action: L10n.text("Item menu.")),
+                HelpBinding(gesture: L10n.text("Right-click in the Trash"), action: L10n.text("Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder.")),
                 HelpBinding(gesture: L10n.text("Right-click a selection"), action: L10n.text("Act on the whole selection when the item is part of it; otherwise only on the item.")),
             ]
         ),

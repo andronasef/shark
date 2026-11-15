@@ -617,6 +617,7 @@ public struct DirectoryView: View {
         Button(L10n.text("Quick Look"), systemImage: "eye") { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
         Button(L10n.text("Share…"), systemImage: "square.and.arrow.up") { OpenWithService.share(urls) }
         Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting(urls) }
+        if navigationState.isTrashFolder { trashMenuItems(urls) }
         Divider()
         TerminalMenuItems(url: isMultiple ? navigationState.currentURL : item.url, workspace: workspace, source: navigationState)
         Divider()
@@ -671,6 +672,16 @@ public struct DirectoryView: View {
         }
     }
 
+    /// Put Back only for items Shark trashed (it knows where they came from); Empty Trash goes through Finder.
+    @ViewBuilder
+    private func trashMenuItems(_ urls: [URL]) -> some View {
+        if navigationState.canPutBack(urls) {
+            Button(L10n.text("Put Back"), systemImage: "arrow.uturn.backward") { Task { await navigationState.putBack(urls) } }
+        }
+        Button(L10n.text("Empty Trash…"), systemImage: "trash.slash", role: .destructive) { Task { await navigationState.emptyTrash() } }
+        if urls.isEmpty { Divider() }
+    }
+
     private enum ContextOperation { case duplicate, compress, trash }
     private func performContextOperation(_ operation: ContextOperation, urls: [URL]) {
         guard !urls.isEmpty else { return }
@@ -706,6 +717,7 @@ public struct DirectoryView: View {
             }
             Button(L10n.text("Quick Look"), systemImage: "eye") { QuickLookCoordinator.shared.toggleQuickLook(for: urls) }
             Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting(urls) }
+            if navigationState.isTrashFolder { trashMenuItems(urls) }
             Divider()
             Button(L10n.text("Cut"), systemImage: "scissors") { FileClipboardService.shared.cut(urls) }
             Button(L10n.text("Copy"), systemImage: "doc.on.doc") { FileClipboardService.shared.copy(urls) }
@@ -726,6 +738,7 @@ public struct DirectoryView: View {
             Divider()
         }
 
+        if navigationState.isTrashFolder && count == 0 { trashMenuItems([]) }
         Button(L10n.text("New Folder"), systemImage: "folder.badge.plus") { showingNewItemSheet = .folder }
         Button(L10n.text("New File"), systemImage: "doc.badge.plus") { showingNewItemSheet = .file }
         if FileClipboardService.shared.hasItemsToPaste {

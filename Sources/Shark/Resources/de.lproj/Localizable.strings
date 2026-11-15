@@ -737,3 +737,17 @@
 "tar failed with status %d" = "tar ist mit Status %d fehlgeschlagen";
 "Open with Archive Utility" = "Mit Archiv-Dienstprogramm öffnen";
 "The archive couldn’t be extracted" = "Das Archiv konnte nicht entpackt werden";
+"Put Back" = "Zurücklegen";
+"Empty Trash…" = "Papierkorb entleeren …";
+"Empty Trash" = "Papierkorb entleeren";
+"Empty the Trash?" = "Papierkorb entleeren?";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "Alle Objekte im Papierkorb werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden. Shark bittet den Finder darum.";
+"Shark isn’t allowed to control Finder" = "Shark darf den Finder nicht steuern";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "Erlaube Shark unter Systemeinstellungen › Datenschutz & Sicherheit › Automation, den Papierkorb zu entleeren. Du kannst ihn auch im Finder entleeren.";
+"Show Trash in Finder" = "Papierkorb im Finder zeigen";
+"Shark has no record of where this item came from." = "Shark weiß nicht, woher dieses Objekt stammt.";
+"The folder “%@” no longer exists." = "Der Ordner „%@“ existiert nicht mehr.";
+"“%@” stayed in the Trash. %@" = "„%@“ blieb im Papierkorb. %@";
+"Finder did not empty the Trash." = "Der Finder hat den Papierkorb nicht entleert.";
+"Right-click in the Trash" = "Rechtsklick im Papierkorb";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Zurücklegen für Objekte, die Shark in den Papierkorb gelegt hat (es kennt ihren Ort), oder Papierkorb entleeren über den Finder. Andere Objekte bieten Im Finder zeigen.";

@@ -737,3 +737,17 @@
 "tar failed with status %d" = "فشل tar بالحالة %d";
 "Open with Archive Utility" = "فتح باستخدام Archive Utility";
 "The archive couldn’t be extracted" = "تعذّر استخراج الأرشيف";
+"Put Back" = "إعادة";
+"Empty Trash…" = "إفراغ سلة المهملات…";
+"Empty Trash" = "إفراغ سلة المهملات";
+"Empty the Trash?" = "هل تريد إفراغ سلة المهملات؟";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "سيتم حذف جميع العناصر في سلة المهملات نهائيًا. لا يمكن التراجع عن ذلك. يطلب Shark من Finder تنفيذ ذلك.";
+"Shark isn’t allowed to control Finder" = "Shark غير مسموح له بالتحكم في Finder";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "اسمح لـ Shark في إعدادات النظام › الخصوصية والأمان › الأتمتة لإفراغ سلة المهملات من Shark. يمكنك أيضًا إفراغها في Finder.";
+"Show Trash in Finder" = "إظهار سلة المهملات في Finder";
+"Shark has no record of where this item came from." = "لا يعرف Shark من أين جاء هذا العنصر.";
+"The folder “%@” no longer exists." = "المجلد “%@” لم يعد موجودًا.";
+"“%@” stayed in the Trash. %@" = "بقي “%@” في سلة المهملات. %@";
+"Finder did not empty the Trash." = "لم يُفرغ Finder سلة المهملات.";
+"Right-click in the Trash" = "انقر بالزر الأيمن في سلة المهملات";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "إعادة للعناصر التي نقلها Shark (يعرف مكانها الأصلي)، أو إفراغ سلة المهملات عبر Finder. العناصر الأخرى تعرض إظهار في Finder.";

@@ -179,7 +179,10 @@ extension FileOperationsService {
             var trashed: NSURL?
             try fileManager.trashItem(at: destination, resultingItemURL: &trashed)
             let recorded = run.actions.count
-            if let inTrash = trashed as URL? { run.actions.append(.trash(restorations: [(destination, inTrash)])) }
+            if let inTrash = trashed as URL? {
+                run.actions.append(.trash(restorations: [(destination, inTrash)]))
+                TrashRecordStore.shared.add([(destination, inTrash)])
+            }
             do {
                 try perform(item, to: destination, run: &run)
             } catch {
@@ -197,7 +200,10 @@ extension FileOperationsService {
                (try? fileManager.contentsOfDirectory(atPath: item.path))?.isEmpty == true {
                 var trashed: NSURL?
                 try fileManager.trashItem(at: item, resultingItemURL: &trashed)
-                if let inTrash = trashed as URL? { run.actions.append(.trash(restorations: [(item, inTrash)])) }
+                if let inTrash = trashed as URL? {
+                    run.actions.append(.trash(restorations: [(item, inTrash)]))
+                    TrashRecordStore.shared.add([(item, inTrash)])
+                }
             }
         }
     }

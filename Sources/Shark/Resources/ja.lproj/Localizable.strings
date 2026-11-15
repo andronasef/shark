@@ -737,3 +737,17 @@
 "tar failed with status %d" = "tarがステータス%dで失敗しました";
 "Open with Archive Utility" = "アーカイブユーティリティで開く";
 "The archive couldn’t be extracted" = "アーカイブを展開できませんでした";
+"Put Back" = "元に戻す";
+"Empty Trash…" = "ゴミ箱を空にする…";
+"Empty Trash" = "ゴミ箱を空にする";
+"Empty the Trash?" = "ゴミ箱を空にしますか？";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "ゴミ箱の項目はすべて完全に削除されます。この操作は取り消せません。SharkがFinderに依頼します。";
+"Shark isn’t allowed to control Finder" = "SharkにFinderの操作は許可されていません";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "システム設定 › プライバシーとセキュリティ › オートメーションでSharkを許可すると、Sharkからゴミ箱を空にできます。Finderで空にすることもできます。";
+"Show Trash in Finder" = "Finderでゴミ箱を表示";
+"Shark has no record of where this item came from." = "この項目の元の場所をSharkは把握していません。";
+"The folder “%@” no longer exists." = "フォルダ“%@”は存在しません。";
+"“%@” stayed in the Trash. %@" = "“%@”はゴミ箱に残りました。%@";
+"Finder did not empty the Trash." = "Finderがゴミ箱を空にしませんでした。";
+"Right-click in the Trash" = "ゴミ箱で右クリック";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Sharkがゴミ箱に入れた項目は元に戻せます（元の場所を記録）。ゴミ箱を空にする操作はFinderに依頼します。それ以外の項目はFinderで表示のみです。";

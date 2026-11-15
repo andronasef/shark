@@ -737,3 +737,17 @@
 "tar failed with status %d" = "tar failed with status %d";
 "Open with Archive Utility" = "Open with Archive Utility";
 "The archive couldn’t be extracted" = "The archive couldn’t be extracted";
+"Put Back" = "Put Back";
+"Empty Trash…" = "Empty Trash…";
+"Empty Trash" = "Empty Trash";
+"Empty the Trash?" = "Empty the Trash?";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it.";
+"Shark isn’t allowed to control Finder" = "Shark isn’t allowed to control Finder";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder.";
+"Show Trash in Finder" = "Show Trash in Finder";
+"Shark has no record of where this item came from." = "Shark has no record of where this item came from.";
+"The folder “%@” no longer exists." = "The folder “%@” no longer exists.";
+"“%@” stayed in the Trash. %@" = "“%@” stayed in the Trash. %@";
+"Finder did not empty the Trash." = "Finder did not empty the Trash.";
+"Right-click in the Trash" = "Right-click in the Trash";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder.";

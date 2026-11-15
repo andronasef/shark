@@ -23,5 +23,11 @@
     <!-- Outgoing network client for remote disk mounts and network shares -->
     <key>com.apple.security.network.client</key>
     <true/>
+
+    <!-- Empty Trash: Shark asks Finder to empty the Trash. Only Finder is addressed, only after the user confirms. -->
+    <key>com.apple.security.temporary-exception.apple-events</key>
+    <array>
+        <string>com.apple.finder</string>
+    </array>
 </dict>
 </plist>

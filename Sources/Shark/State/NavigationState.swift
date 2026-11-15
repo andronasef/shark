@@ -589,6 +589,58 @@ public final class NavigationState {
         }
     }
 
+    // MARK: - Trash recovery
+
+    public var isTrashFolder: Bool { TrashLocation.isTrash(currentURL) }
+
+    /// Put Back is offered only for items Shark itself moved to the Trash.
+    public func canPutBack(_ urls: [URL]) -> Bool {
+        !urls.isEmpty && urls.allSatisfy { TrashRecordStore.shared.original(forTrashed: $0) != nil }
+    }
+
+    public func putBack(_ urls: [URL]) async {
+        let result = await FileOperationsService.shared.putBack(items: urls) { [weak self] prompt in
+            await self?.askCollision(prompt) ?? (.stop, false)
+        }
+        if let action = result.transfer.undoAction(for: .move) { FileUndoService.shared.record(action) }
+        if let error = result.transfer.error {
+            operationError = L10n.format("%@ failed: %@", L10n.text("Put Back"), error.localizedDescription)
+        } else if let first = result.skipped.first {
+            operationError = L10n.format("“%@” stayed in the Trash. %@", L10n.literal(first.url.lastPathComponent), first.reason)
+        }
+        selectedItemIDs.removeAll()
+        await reloadCurrentDirectory()
+    }
+
+    /// Confirms, then asks Finder to empty the Trash. Emptying cannot be undone.
+    public func emptyTrash() async {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = L10n.text("Empty the Trash?")
+        alert.informativeText = L10n.text("All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it.")
+        alert.addButton(withTitle: L10n.text("Empty Trash"))
+        alert.addButton(withTitle: L10n.text("Cancel"))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        switch await TrashEmptier.emptyViaFinder() {
+        case .done:
+            FileUndoService.shared.clear()  // what was in the Trash can no longer be restored
+        case .notAllowed:
+            let denied = NSAlert()
+            denied.messageText = L10n.text("Shark isn’t allowed to control Finder")
+            denied.informativeText = L10n.text("Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder.")
+            denied.addButton(withTitle: L10n.text("Show Trash in Finder"))
+            denied.addButton(withTitle: L10n.text("Cancel"))
+            if denied.runModal() == .alertFirstButtonReturn { Self.showTrashInFinder() }
+        case .failed(let message):
+            operationError = L10n.format("%@ failed: %@", L10n.text("Empty Trash"), message)
+        }
+        await reloadCurrentDirectory()
+    }
+
+    public static func showTrashInFinder() {
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: TrashLocation.userTrash.path)
+    }
+
     public func trashSelected() async {
         let urls = selectedItems.map(\.url)
         guard !urls.isEmpty else { return }

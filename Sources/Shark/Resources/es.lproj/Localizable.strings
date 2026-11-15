@@ -737,3 +737,17 @@
 "tar failed with status %d" = "tar falló con el estado %d";
 "Open with Archive Utility" = "Abrir con Utilidad de Archivos";
 "The archive couldn’t be extracted" = "No se pudo extraer el archivo";
+"Put Back" = "Volver a poner";
+"Empty Trash…" = "Vaciar la papelera…";
+"Empty Trash" = "Vaciar la papelera";
+"Empty the Trash?" = "¿Vaciar la papelera?";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "Todos los elementos de la papelera se eliminarán de forma permanente. No se puede deshacer. Shark se lo pide al Finder.";
+"Shark isn’t allowed to control Finder" = "Shark no tiene permiso para controlar el Finder";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "Permite a Shark en Ajustes del Sistema › Privacidad y seguridad › Automatización vaciar la papelera. También puedes vaciarla en el Finder.";
+"Show Trash in Finder" = "Mostrar la papelera en el Finder";
+"Shark has no record of where this item came from." = "Shark no sabe de dónde procede este elemento.";
+"The folder “%@” no longer exists." = "La carpeta “%@” ya no existe.";
+"“%@” stayed in the Trash. %@" = "“%@” se quedó en la papelera. %@";
+"Finder did not empty the Trash." = "El Finder no vació la papelera.";
+"Right-click in the Trash" = "Clic derecho en la papelera";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Volver a poner para lo que Shark envió a la papelera (conoce su origen) o Vaciar la papelera, que pide al Finder hacerlo. Los demás elementos ofrecen Mostrar en el Finder.";

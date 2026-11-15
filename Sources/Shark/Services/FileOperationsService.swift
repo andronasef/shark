@@ -245,6 +245,7 @@ public actor FileOperationsService {
             }
             if let inTrash = resulting as URL? { done.append((item, inTrash)) }
         }
+        TrashRecordStore.shared.add(done)
         return done
     }
 

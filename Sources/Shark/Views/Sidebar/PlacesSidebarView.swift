@@ -348,6 +348,11 @@ public struct PlacesSidebarView: View {
             .disabled(!available)
             Button(L10n.text("Show in Finder"), systemImage: "folder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                 .disabled(!available)
+            if TrashLocation.isTrash(url) {
+                Button(L10n.text("Empty Trash…"), systemImage: "trash.slash", role: .destructive) {
+                    Task { await navigationState.emptyTrash() }
+                }
+            }
             if isEjectable {
                 Divider()
                 Button(L10n.format("Eject “%@”", L10n.literal(name)), systemImage: "eject") { ejectVolume(url) }

@@ -737,3 +737,17 @@
 "tar failed with status %d" = "tar a échoué avec le statut %d";
 "Open with Archive Utility" = "Ouvrir avec Utilitaire d’archive";
 "The archive couldn’t be extracted" = "L’archive n’a pas pu être extraite";
+"Put Back" = "Remettre";
+"Empty Trash…" = "Vider la corbeille…";
+"Empty Trash" = "Vider la corbeille";
+"Empty the Trash?" = "Vider la corbeille ?";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "Tous les éléments de la corbeille seront supprimés définitivement. Cette action est irréversible. Shark le demande au Finder.";
+"Shark isn’t allowed to control Finder" = "Shark n’est pas autorisé à contrôler le Finder";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "Autorisez Shark dans Réglages Système › Confidentialité et sécurité › Automatisation pour vider la corbeille. Vous pouvez aussi la vider dans le Finder.";
+"Show Trash in Finder" = "Afficher la corbeille dans le Finder";
+"Shark has no record of where this item came from." = "Shark ne sait pas d’où vient cet élément.";
+"The folder “%@” no longer exists." = "Le dossier « %@ » n’existe plus.";
+"“%@” stayed in the Trash. %@" = "« %@ » est resté dans la corbeille. %@";
+"Finder did not empty the Trash." = "Le Finder n’a pas vidé la corbeille.";
+"Right-click in the Trash" = "Clic droit dans la corbeille";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Remettre pour les éléments mis à la corbeille par Shark (il connaît leur origine), ou Vider la corbeille, que le Finder exécute. Les autres éléments proposent Afficher dans le Finder.";

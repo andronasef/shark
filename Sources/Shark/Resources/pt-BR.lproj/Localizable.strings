@@ -737,3 +737,17 @@
 "tar failed with status %d" = "O tar falhou com o status %d";
 "Open with Archive Utility" = "Abrir com o Utilitário de Arquivos";
 "The archive couldn’t be extracted" = "Não foi possível extrair o arquivo";
+"Put Back" = "Colocar de volta";
+"Empty Trash…" = "Esvaziar Lixo…";
+"Empty Trash" = "Esvaziar Lixo";
+"Empty the Trash?" = "Esvaziar o Lixo?";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "Todos os itens do Lixo serão excluídos permanentemente. Isso não pode ser desfeito. O Shark pede ao Finder para fazer isso.";
+"Shark isn’t allowed to control Finder" = "O Shark não tem permissão para controlar o Finder";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "Permita o Shark em Ajustes do Sistema › Privacidade e Segurança › Automação para esvaziar o Lixo. Você também pode esvaziá-lo no Finder.";
+"Show Trash in Finder" = "Mostrar Lixo no Finder";
+"Shark has no record of where this item came from." = "O Shark não sabe de onde veio este item.";
+"The folder “%@” no longer exists." = "A pasta “%@” não existe mais.";
+"“%@” stayed in the Trash. %@" = "“%@” ficou no Lixo. %@";
+"Finder did not empty the Trash." = "O Finder não esvaziou o Lixo.";
+"Right-click in the Trash" = "Clique direito no Lixo";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Colocar de volta para itens que o Shark enviou ao Lixo (ele sabe de onde vieram) ou Esvaziar Lixo, que pede ao Finder. Outros itens oferecem Mostrar no Finder.";

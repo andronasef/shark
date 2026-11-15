@@ -737,3 +737,17 @@
 "tar failed with status %d" = "tar失败，状态为%d";
 "Open with Archive Utility" = "用“归档实用工具”打开";
 "The archive couldn’t be extracted" = "无法解压缩该归档";
+"Put Back" = "放回原处";
+"Empty Trash…" = "清倒废纸篓…";
+"Empty Trash" = "清倒废纸篓";
+"Empty the Trash?" = "要清倒废纸篓吗？";
+"All items in the Trash will be deleted permanently. This can’t be undone. Shark asks Finder to do it." = "废纸篓中的所有项目将被永久删除，无法撤销。Shark 会请求访达执行。";
+"Shark isn’t allowed to control Finder" = "Shark 无权控制访达";
+"Allow Shark under System Settings › Privacy & Security › Automation to empty the Trash from Shark. You can also empty it in Finder." = "请在“系统设置 › 隐私与安全性 › 自动化”中允许 Shark，以便从 Shark 清倒废纸篓。你也可以在访达中清倒。";
+"Show Trash in Finder" = "在访达中显示废纸篓";
+"Shark has no record of where this item came from." = "Shark 不知道此项目来自哪里。";
+"The folder “%@” no longer exists." = "文件夹“%@”已不存在。";
+"“%@” stayed in the Trash. %@" = "“%@”仍在废纸篓中。%@";
+"Finder did not empty the Trash." = "访达未清倒废纸篓。";
+"Right-click in the Trash" = "在废纸篓中右键点按";
+"Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "对 Shark 移入废纸篓的项目可“放回原处”（它记得来源），或“清倒废纸篓”（由访达执行）。其他项目只提供“在访达中显示”。";
