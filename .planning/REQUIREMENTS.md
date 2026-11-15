@@ -38,8 +38,8 @@ Every requirement below is authorized current scope, including Group 3. Details 
 
 ### iCloud (CLOUD)
 
-- [ ] **CLOUD-01**: Users see accurate cloud-only, downloading, uploading, error and shared-item badges where public APIs supply those states, without clutter for fully synchronized files.
-- [ ] **CLOUD-02**: Download Now / Remove Download apply to eligible items; opening a cloud-only item requests download first and reports available progress/errors without fabricated values.
+- [x] **CLOUD-01**: Users see accurate cloud-only, downloading, uploading, error and shared-item badges where public APIs supply those states, without clutter for fully synchronized files.
+- [x] **CLOUD-02**: Download Now / Remove Download apply to eligible items; opening a cloud-only item requests download first and reports available progress/errors without fabricated values.
 
 ### Scoped live search (SEARCH)
 
@@ -150,8 +150,8 @@ No capability from the three authorized groups is deferred. Git badges and an in
 | TRASH-02 | Phase 15 | Complete |
 | TRASH-03 | Phase 15 | Complete |
 | EXT-01 | Phase 16 | Complete |
-| CLOUD-01 | Phase 17 | Pending |
-| CLOUD-02 | Phase 17 | Pending |
+| CLOUD-01 | Phase 17 | Complete |
+| CLOUD-02 | Phase 17 | Complete |
 | SEARCH-01 | Phase 18 | Pending |
 | SEARCH-02 | Phase 18 | Pending |
 | SEARCH-03 | Phase 18 | Pending |

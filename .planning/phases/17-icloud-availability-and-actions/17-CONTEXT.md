@@ -1,0 +1,2 @@
+# Phase 17: iCloud Availability and Actions — Context
+CLOUD-01/02. State from public URL resource values (isUbiquitousItem, ubiquitousItemDownloadingStatus, IsDownloading/IsUploading/IsShared, Downloading/UploadingError). Badge only for cloud-only / downloading / uploading / error / shared. No percentage: no public progress value exists. Download Now = startDownloadingUbiquitousItem; Remove Download = evictUbiquitousItem; opening a cloud-only file downloads first (status-bar title, Stop). Legacy ".name.icloud" placeholders are not handled.
