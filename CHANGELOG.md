@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.0-alpha.5] - 2026-11-16
+
 ### User Changelog
 - **Replace, Keep Both, Skip or Stop**: when a copied or moved file already exists, you choose, with both versions shown side by side.
 - **Extract Archives**: right-click a ZIP, 7z, RAR or TAR file to unpack it safely, with Stop and Undo.

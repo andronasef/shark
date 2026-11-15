@@ -223,7 +223,8 @@ final class ExternalFolderOpeningTests: XCTestCase {
         let nav = workspace.activeNavigationState
         XCTAssertEqual(nav.currentURL, target)
         await nav.reloadCurrentDirectory()
-        XCTAssertEqual(nav.selectedItemIDs, [file])
+        // Listings resolve links such as /var -> /private/var, so compare resolved paths.
+        XCTAssertEqual(Set(nav.selectedItemIDs.map { $0.resolvingSymlinksInPath().path }), [file.resolvingSymlinksInPath().path])
         XCTAssertEqual(workspace.reveal([root.appendingPathComponent("missing")]).count, 1)
     }
 
