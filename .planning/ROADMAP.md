@@ -20,7 +20,7 @@ Every phase includes its meaningful tests, native UI inspection, Help/catalog/ch
 
 - [x] **Phase 12: Honest Sidebar and System Boundaries** — Remove fake tags and explain system Open/Save limits. (completed 2026-11-08)
 - [x] **Phase 13: Safe Shared Collision Choices** — Replace, Keep Both, Skip, Stop and folder Merge across file-operation entry points.
-- [ ] **Phase 14: Safe Archive Extraction** — Extract with staging, collision choices and native fallback.
+- [x] **Phase 14: Safe Archive Extraction** — Extract with staging, collision choices and native fallback.
 - [ ] **Phase 15: Trash Recovery and Empty Trash** — Persistent Put Back and confirmed Finder-mediated emptying.
 - [ ] **Phase 16: Extension Change Warnings** — Protect file-type changes across rename entry points.
 - [ ] **Phase 17: iCloud Availability and Actions** — Accurate state badges, download and remove-download workflows.

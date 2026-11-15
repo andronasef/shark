@@ -22,9 +22,9 @@ Every requirement below is authorized current scope, including Group 3. Details 
 
 ### Archive extraction (EXTRACT)
 
-- [ ] **EXTRACT-01**: Users can Extract supported archives beside the source from a context-menu action; one top-level item appears directly and multiple items appear under the archive's name, with shared collision choices.
-- [ ] **EXTRACT-02**: Unsupported formats offer Archive Utility; double-click continues to use the configured default app, and responsive progress/errors make extraction state clear.
-- [ ] **EXTRACT-03**: Malicious absolute/traversal/link paths cannot write outside safe staging/output; failure or cancellation cleans incomplete staging without losing existing files.
+- [x] **EXTRACT-01**: Users can Extract supported archives beside the source from a context-menu action; one top-level item appears directly and multiple items appear under the archive's name, with shared collision choices.
+- [x] **EXTRACT-02**: Unsupported formats offer Archive Utility; double-click continues to use the configured default app, and responsive progress/errors make extraction state clear.
+- [x] **EXTRACT-03**: Malicious absolute/traversal/link paths cannot write outside safe staging/output; failure or cancellation cleans incomplete staging without losing existing files.
 
 ### Trash recovery (TRASH)
 
@@ -143,9 +143,9 @@ No capability from the three authorized groups is deferred. Git badges and an in
 | COLL-02 | Phase 13 | Complete |
 | COLL-03 | Phase 13 | Complete |
 | COLL-04 | Phase 13 | Complete |
-| EXTRACT-01 | Phase 14 | Pending |
-| EXTRACT-02 | Phase 14 | Pending |
-| EXTRACT-03 | Phase 14 | Pending |
+| EXTRACT-01 | Phase 14 | Complete |
+| EXTRACT-02 | Phase 14 | Complete |
+| EXTRACT-03 | Phase 14 | Complete |
 | TRASH-01 | Phase 15 | Pending |
 | TRASH-02 | Phase 15 | Pending |
 | TRASH-03 | Phase 15 | Pending |
