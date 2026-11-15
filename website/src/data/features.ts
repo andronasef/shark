@@ -55,7 +55,7 @@ export const featureGroups: FeatureGroup[] = [
     id: 'views', title: 'Views & organization',
     description: 'See your files in the form that makes the most sense.',
     features: [
-      { id: 'icon-view', title: 'Icon view', description: 'Browse a grid of folders and file thumbnails with adjustable icon sizes and drag selection.', shortcut: '⌘1' },
+      { id: 'icon-view', title: 'Icon view', description: 'Browse a grid of folders and file thumbnails with adjustable icon sizes and drag selection. Apps and other bundles show their own icons.', shortcut: '⌘1' },
       { id: 'list-view', title: 'List view', description: 'Compare names, modified dates, sizes, kinds, and permissions in a sortable details table. Command-click toggles items and Shift-click selects a range from the last clicked item. The list scrolls to keep the selected row on screen as you move with the arrow keys.', shortcut: '⌘2' },
       { id: 'column-view', title: 'Column view', description: 'Follow a folder hierarchy across cascading columns, with arrow-key navigation, a preview, and file details at the end.', shortcut: '⌘3' },
       { id: 'gallery-view', title: 'Gallery view', description: 'Give the selected file a large preview, with real image previews, while keeping a thumbnail strip in reach. Files without a preview show their icon.', shortcut: '⌘4' },
