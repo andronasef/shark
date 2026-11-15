@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "Der Finder hat den Papierkorb nicht entleert.";
 "Right-click in the Trash" = "Rechtsklick im Papierkorb";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Zurücklegen für Objekte, die Shark in den Papierkorb gelegt hat (es kennt ihren Ort), oder Papierkorb entleeren über den Finder. Andere Objekte bieten Im Finder zeigen.";
+"Remove the file extension?" = "Dateiendung entfernen?";
+"Change the file extension?" = "Dateiendung ändern?";
+"Removing “.%@” may make the file open in a different app or not open at all." = "Wenn „.%@“ entfernt wird, öffnet sich die Datei möglicherweise in einem anderen Programm oder gar nicht.";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "Wenn „.%@“ in „.%@“ geändert wird, öffnet sich die Datei möglicherweise in einem anderen Programm oder gar nicht.";
+"Keep “.%@”" = "„.%@“ behalten";
+"Use “.%@”" = "„.%@“ verwenden";
+"Use No Extension" = "Ohne Endung";

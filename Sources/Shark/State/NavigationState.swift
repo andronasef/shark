@@ -510,6 +510,18 @@ public final class NavigationState {
             renamingItemURL = nil
             return
         }
+        var newName = newName
+        let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
+        let isFolder = (values?.isDirectory ?? false) && !(values?.isPackage ?? false)
+        if let change = ExtensionChange.check(oldName: url.lastPathComponent, newName: newName, isFolder: isFolder) {
+            switch askExtensionChange(change) {
+            case .keep: newName = change.keepingName
+            case .use: break
+            case .cancel:
+                renamingItemURL = nil
+                return
+            }
+        }
         do {
             let newURL = try await FileOperationsService.shared.rename(item: url, to: newName)
             FileUndoService.shared.record(.rename(original: url, current: newURL))
@@ -520,6 +532,28 @@ public final class NavigationState {
         } catch {
             self.operationError = L10n.format("Rename failed: %@", error.localizedDescription)
             renamingItemURL = nil
+        }
+    }
+
+    private enum ExtensionAnswer { case keep, use, cancel }
+
+    private func askExtensionChange(_ change: ExtensionChange) -> ExtensionAnswer {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        if change.isRemoval {
+            alert.messageText = L10n.text("Remove the file extension?")
+            alert.informativeText = L10n.format("Removing “.%@” may make the file open in a different app or not open at all.", L10n.literal(change.oldExtension))
+        } else {
+            alert.messageText = L10n.text("Change the file extension?")
+            alert.informativeText = L10n.format("Changing “.%@” to “.%@” may make the file open in a different app or not open at all.", L10n.literal(change.oldExtension), L10n.literal(change.newExtension))
+        }
+        alert.addButton(withTitle: L10n.format("Keep “.%@”", L10n.literal(change.oldExtension)))
+        alert.addButton(withTitle: change.isRemoval ? L10n.text("Use No Extension") : L10n.format("Use “.%@”", L10n.literal(change.newExtension)))
+        alert.addButton(withTitle: L10n.text("Cancel"))
+        switch alert.runModal() {
+        case .alertFirstButtonReturn: return .keep
+        case .alertSecondButtonReturn: return .use
+        default: return .cancel
         }
     }
 

@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "Finder did not empty the Trash.";
 "Right-click in the Trash" = "Right-click in the Trash";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder.";
+"Remove the file extension?" = "Remove the file extension?";
+"Change the file extension?" = "Change the file extension?";
+"Removing “.%@” may make the file open in a different app or not open at all." = "Removing “.%@” may make the file open in a different app or not open at all.";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "Changing “.%@” to “.%@” may make the file open in a different app or not open at all.";
+"Keep “.%@”" = "Keep “.%@”";
+"Use “.%@”" = "Use “.%@”";
+"Use No Extension" = "Use No Extension";

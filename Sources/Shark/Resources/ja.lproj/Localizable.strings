@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "Finderがゴミ箱を空にしませんでした。";
 "Right-click in the Trash" = "ゴミ箱で右クリック";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Sharkがゴミ箱に入れた項目は元に戻せます（元の場所を記録）。ゴミ箱を空にする操作はFinderに依頼します。それ以外の項目はFinderで表示のみです。";
+"Remove the file extension?" = "拡張子を削除しますか？";
+"Change the file extension?" = "拡張子を変更しますか？";
+"Removing “.%@” may make the file open in a different app or not open at all." = "「.%@」を削除すると、ファイルが別のアプリで開くか、開けなくなる場合があります。";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "「.%@」を「.%@」に変更すると、ファイルが別のアプリで開くか、開けなくなる場合があります。";
+"Keep “.%@”" = "「.%@」を残す";
+"Use “.%@”" = "「.%@」を使用";
+"Use No Extension" = "拡張子なしにする";

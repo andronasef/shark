@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "Le Finder n’a pas vidé la corbeille.";
 "Right-click in the Trash" = "Clic droit dans la corbeille";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Remettre pour les éléments mis à la corbeille par Shark (il connaît leur origine), ou Vider la corbeille, que le Finder exécute. Les autres éléments proposent Afficher dans le Finder.";
+"Remove the file extension?" = "Supprimer l’extension du fichier ?";
+"Change the file extension?" = "Modifier l’extension du fichier ?";
+"Removing “.%@” may make the file open in a different app or not open at all." = "Supprimer « .%@ » peut faire ouvrir le fichier dans une autre app, ou ne plus l’ouvrir du tout.";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "Remplacer « .%@ » par « .%@ » peut faire ouvrir le fichier dans une autre app, ou ne plus l’ouvrir du tout.";
+"Keep “.%@”" = "Conserver « .%@ »";
+"Use “.%@”" = "Utiliser « .%@ »";
+"Use No Extension" = "Aucune extension";

@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "O Finder não esvaziou o Lixo.";
 "Right-click in the Trash" = "Clique direito no Lixo";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "Colocar de volta para itens que o Shark enviou ao Lixo (ele sabe de onde vieram) ou Esvaziar Lixo, que pede ao Finder. Outros itens oferecem Mostrar no Finder.";
+"Remove the file extension?" = "Remover a extensão do arquivo?";
+"Change the file extension?" = "Alterar a extensão do arquivo?";
+"Removing “.%@” may make the file open in a different app or not open at all." = "Remover “.%@” pode fazer o arquivo abrir em outro app ou não abrir.";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "Alterar “.%@” para “.%@” pode fazer o arquivo abrir em outro app ou não abrir.";
+"Keep “.%@”" = "Manter “.%@”";
+"Use “.%@”" = "Usar “.%@”";
+"Use No Extension" = "Sem extensão";

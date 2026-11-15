@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "访达未清倒废纸篓。";
 "Right-click in the Trash" = "在废纸篓中右键点按";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "对 Shark 移入废纸篓的项目可“放回原处”（它记得来源），或“清倒废纸篓”（由访达执行）。其他项目只提供“在访达中显示”。";
+"Remove the file extension?" = "要移除文件扩展名吗？";
+"Change the file extension?" = "要更改文件扩展名吗？";
+"Removing “.%@” may make the file open in a different app or not open at all." = "移除“.%@”可能导致文件用其他 App 打开，或无法打开。";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "将“.%@”更改为“.%@”可能导致文件用其他 App 打开，或无法打开。";
+"Keep “.%@”" = "保留“.%@”";
+"Use “.%@”" = "使用“.%@”";
+"Use No Extension" = "不使用扩展名";

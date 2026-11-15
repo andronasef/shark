@@ -751,3 +751,10 @@
 "Finder did not empty the Trash." = "لم يُفرغ Finder سلة المهملات.";
 "Right-click in the Trash" = "انقر بالزر الأيمن في سلة المهملات";
 "Put Back for items Shark trashed (it knows where they came from), or Empty Trash, which asks Finder to do it. Other items offer Show in Finder." = "إعادة للعناصر التي نقلها Shark (يعرف مكانها الأصلي)، أو إفراغ سلة المهملات عبر Finder. العناصر الأخرى تعرض إظهار في Finder.";
+"Remove the file extension?" = "إزالة امتداد الملف؟";
+"Change the file extension?" = "تغيير امتداد الملف؟";
+"Removing “.%@” may make the file open in a different app or not open at all." = "قد تؤدي إزالة “.%@” إلى فتح الملف في تطبيق مختلف أو عدم فتحه إطلاقًا.";
+"Changing “.%@” to “.%@” may make the file open in a different app or not open at all." = "قد يؤدي تغيير “.%@” إلى “.%@” إلى فتح الملف في تطبيق مختلف أو عدم فتحه إطلاقًا.";
+"Keep “.%@”" = "الإبقاء على “.%@”";
+"Use “.%@”" = "استخدام “.%@”";
+"Use No Extension" = "بدون امتداد";
