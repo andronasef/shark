@@ -235,12 +235,17 @@ public struct PlacesSidebarView: View {
         let rowID = "\(section):\(url.path)"
         let available = favorite?.isAvailable ?? true
         let isAncestor = favorite != nil && SidebarFavoritesStore.contains(url, currentFolder: navigationState.currentURL)
-        let isSelected = name != "Recents" && navigationState.currentURL.standardizedFileURL.path == url.standardizedFileURL.path
+        let isSelected = name != "Recents" && iconName != "airdrop" && navigationState.currentURL.standardizedFileURL.path == url.standardizedFileURL.path
 
         let activate = {
             sidebarFocus = rowID
             guard available else {
                 if let favorite { locateFavorite(favorite) }
+                return
+            }
+            // AirDrop is not a folder: hand it to the system's AirDrop window instead of browsing Finder.app.
+            if iconName == "airdrop" {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/CoreServices/Finder.app/Contents/Applications/AirDrop.app"))
                 return
             }
             let isCmd = NSEvent.modifierFlags.contains(.command)

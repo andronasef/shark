@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Renaming in icon view shows the whole file name wrapped over up to five centered lines (longer names scroll) instead of cutting it to one line. List and column views keep the single-line field.
 
 ### Fixed
+- Clicking AirDrop in the sidebar opened the inside of Finder.app as a folder. It now opens the system AirDrop window, and the row is never shown as the current folder.
 - The Folder Tree sidebar had no AirDrop or Trash. They now sit in a Places section below the tree, with Empty Trash on the Trash row and keyboard navigation reaching both.
 - Opening the Trash without Full Disk Access now explains that macOS keeps it private and offers Open Full Disk Access Settings, Show Shark in Finder and Show Trash in Finder, instead of a generic "Grant Access…" button that could not help.
 - The sidebar no longer shows a Tags section. Its color names only typed a word into the filter and "All Tags…" did nothing, so they looked like Finder tags without being them. Arrow-key navigation no longer stops on those rows. Real Finder tags are planned.
