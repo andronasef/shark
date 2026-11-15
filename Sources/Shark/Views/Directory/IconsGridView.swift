@@ -129,6 +129,7 @@ public struct IconsGridView: View {
                         .fileItemAccessibility(item, isSelected: isSelected, isRenaming: navigationState.renamingItemURL == item.url) {
                             onActivate(item)
                         }
+                        .zIndex(navigationState.renamingItemURL == item.url ? 1 : 0)
                     }
                 }
                 .padding(20)
@@ -343,26 +344,29 @@ private struct IconGridItemView: View {
             }
             .frame(width: iconSize, height: iconSize)
 
-            if isRenaming {
-                InlineRenameField(
-                    initialName: item.name,
-                    onCommit: onCommitRename,
-                    onCancel: onCancelRename
+            // The editor floats over the label slot so the cell keeps its normal height.
+            Text(item.name)
+                .font(.system(size: 11, weight: isSelected ? .medium : .regular))
+                .foregroundColor(isSelected ? .white : .primary)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(isSelected ? Color.accentColor : Color.clear)
                 )
-                .frame(width: 90, height: 20)
-            } else {
-                Text(item.name)
-                    .font(.system(size: 11, weight: isSelected ? .medium : .regular))
-                    .foregroundColor(isSelected ? .white : .primary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(isSelected ? Color.accentColor : Color.clear)
-                    )
-            }
+                .opacity(isRenaming ? 0 : 1)
+                .overlay(alignment: .top) {
+                    if isRenaming {
+                        WrappingRenameField(
+                            initialName: item.name,
+                            width: max(iconSize + 28, 104) - 4,
+                            onCommit: onCommitRename,
+                            onCancel: onCancelRename
+                        )
+                    }
+                }
         }
         .frame(width: max(iconSize + 28, 104))
         .contentShape(Rectangle())
