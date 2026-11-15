@@ -1,0 +1,2 @@
+# Phase 16: Extension Change Warnings — Context
+EXT-01. Single choke point `NavigationState.commitRename` (used by list and icon inline rename). `ExtensionChange.check` ignores folders (non-package), dotfiles, added extensions and case-only changes. Alert: Keep “.old” (default, appends old extension to the typed name) / Use “.new” or No Extension / Cancel. No Settings toggle (YAGNI). Batch Rename is rule-based and not covered. Directory views never hide extensions.

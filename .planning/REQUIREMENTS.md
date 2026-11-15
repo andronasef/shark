@@ -34,7 +34,7 @@ Every requirement below is authorized current scope, including Group 3. Details 
 
 ### Extension changes (EXT)
 
-- [ ] **EXT-01**: Rename entry points warn before changing/removing a file extension and offer Keep the old extension / Use the new extension; folder/dotfile cases are handled sensibly and extensions remain visible.
+- [x] **EXT-01**: Rename entry points warn before changing/removing a file extension and offer Keep the old extension / Use the new extension; folder/dotfile cases are handled sensibly and extensions remain visible.
 
 ### iCloud (CLOUD)
 
@@ -149,7 +149,7 @@ No capability from the three authorized groups is deferred. Git badges and an in
 | TRASH-01 | Phase 15 | Complete |
 | TRASH-02 | Phase 15 | Complete |
 | TRASH-03 | Phase 15 | Complete |
-| EXT-01 | Phase 16 | Pending |
+| EXT-01 | Phase 16 | Complete |
 | CLOUD-01 | Phase 17 | Pending |
 | CLOUD-02 | Phase 17 | Pending |
 | SEARCH-01 | Phase 18 | Pending |
