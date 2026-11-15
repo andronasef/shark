@@ -8,11 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### User Changelog
 - **Replace, Keep Both, Skip or Stop**: when a copied or moved file already exists, you choose, with both versions shown side by side.
+- **Extract Archives**: right-click a ZIP, 7z, RAR or TAR file to unpack it safely, with Stop and Undo.
 - **Reveal in Shark**: when another app asks the system's file viewer to show a file, Shark opens its folder with the file selected.
 - **Accurate Drag Selection**: dragging a selection box in icon view now selects only the items it touches.
 - **Real App Icons**: apps and other bundles show their own icon instead of a generic orange box.
 
 ### Added
+- Extract in the context menu for ZIP, TAR (gz, bz2, xz), 7z, RAR, cpio and similar archives. Entries are validated before anything is written, extraction happens in a staging folder, conflicts use the shared Replace / Keep Both / Skip / Stop sheet, Stop cancels cleanly, and Undo removes the result in one step. StuffIt, ZIPX and unreadable archives offer Archive Utility.
 - Shark answers Reveal / Select Apple events and reveals files or packages passed to it. It opens the item's folder and selects it, also when Shark was not running. Fixes Shark opening its home folder when set through `NSFileViewer`.
 - Name conflicts in paste and drag-and-drop now open one sheet showing the existing and the new item (preview, size, modified date). Choose Replace, Keep Both, Skip or Stop; Apply to all answers the rest, and two folders can be merged. Replace sends the old item to the Trash and Undo restores it; Stop or an error keeps the work already done as one undo step. Keep Both names the new item "name 2", "name 3" and keeps the extension. Links to folders and packages are never merged into.
 
