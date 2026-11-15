@@ -130,6 +130,7 @@ Shark uses the macOS San Francisco system font family with tabular figures where
   - Multi-item operations are all-or-nothing: a failure part-way rolls back the finished items. Failures show an alert; they are never silent.
   - Compress: one archive operation per pane; the status bar Stop button cancels it and removes its private partial output. Only a finished ZIP appears in the folder.
   - Full Undo/Redo (`⌘Z` / `⇧⌘Z`) for every file operation: move, copy, duplicate, new item, rename, batch rename, compress, and trash. Undoing something Shark created moves it to the Trash, never deletes it.
+  - Icon view rename uses a wrapping editor, cell width minus 4 pt wide (100 pt at the default size), centered, 12 pt, up to 5 lines then scrolls, floating over the cell without changing row height; the base name is selected first; Return commits, Escape cancels, losing focus commits; line breaks and tabs never enter the name; list view keeps the single-line field.
   - With a text field or the terminal focused, the Edit-menu shortcuts (`⌘X` `⌘C` `⌘V` `⌘A` `⌘Z` `⌘⌫`) edit text, not files.
 - **Subfolder Menus (QT-01 & QT-02)**:
   - Breadcrumb segment chevrons reveal cascading popover menus.

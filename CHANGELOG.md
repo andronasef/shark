@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### User Changelog
 - **Replace, Keep Both, Skip or Stop**: when a copied or moved file already exists, you choose, with both versions shown side by side.
 - **Reveal in Shark**: when another app asks the system's file viewer to show a file, Shark opens its folder with the file selected.
+- **Accurate Drag Selection**: dragging a selection box in icon view now selects only the items it touches.
+- **Real App Icons**: apps and other bundles show their own icon instead of a generic orange box.
 
 ### Added
 - Shark answers Reveal / Select Apple events and reveals files or packages passed to it. It opens the item's folder and selects it, also when Shark was not running. Fixes Shark opening its home folder when set through `NSFileViewer`.
@@ -16,10 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - Pasting or dropping onto an existing name no longer refuses the move; it asks. Duplicate still makes "name copy" items.
+- Renaming in icon view shows the whole file name wrapped over up to five centered lines (longer names scroll) instead of cutting it to one line. List and column views keep the single-line field.
 
 ### Fixed
 - The sidebar no longer shows a Tags section. Its color names only typed a word into the filter and "All Tags…" did nothing, so they looked like Finder tags without being them. Arrow-key navigation no longer stops on those rows. Real Finder tags are planned.
 - Help, the welcome setup and the website FAQ now say that other apps keep using the macOS Open and Save dialogs even when Shark is your default folder app.
+- The selection rectangle in icon view no longer selects icons beside, above or below it; column width, the column cap and cell size are now taken from the real grid layout, and icons that are on screen are decided by their exact frames.
+- Apps and other packages show their real system icon in icon, list and column views instead of the generic shipping-box symbol.
 
 ## [1.0.0-alpha.4] - 2026-11-05
 
