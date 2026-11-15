@@ -11,7 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Extract Archives**: right-click a ZIP, 7z, RAR or TAR file to unpack it safely, with Stop and Undo.
 - **Put Back & Empty Trash**: restore things you trashed in Shark to where they came from, even after a restart, and empty the Trash safely.
 - **Safer Renames**: Shark asks before a rename changes or removes a file extension, so files don't stop opening by accident.
+- **Reveal in Shark**: when another app asks the system's file viewer to show a file, Shark opens its folder with the file selected.
 - **Accurate Drag Selection**: dragging a selection box in icon view now selects only the items it touches.
+- **Real App Icons**: apps and other bundles show their own icon instead of a generic orange box.
 
 ### Added
 - Renaming a file so its extension changes or is removed now asks Keep “.old” / Use “.new” / Cancel first. Folders, dotfiles, newly added extensions and case-only changes are not asked about.
