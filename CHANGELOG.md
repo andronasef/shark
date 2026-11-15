@@ -11,11 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Extract Archives**: right-click a ZIP, 7z, RAR or TAR file to unpack it safely, with Stop and Undo.
 - **Put Back & Empty Trash**: restore things you trashed in Shark to where they came from, even after a restart, and empty the Trash safely.
 - **Safer Renames**: Shark asks before a rename changes or removes a file extension, so files don't stop opening by accident.
+- **iCloud Status & Downloads**: see which iCloud files are only online, download or remove them from the menu, and open them with an automatic download.
 - **Reveal in Shark**: when another app asks the system's file viewer to show a file, Shark opens its folder with the file selected.
 - **Accurate Drag Selection**: dragging a selection box in icon view now selects only the items it touches.
 - **Real App Icons**: apps and other bundles show their own icon instead of a generic orange box.
 
 ### Added
+- iCloud Drive badges for cloud-only, downloading, uploading, shared and error items (nothing for synchronized files), Download Now and Remove Download in the context menu, and opening a cloud-only file downloads it first with Stop in the status bar. Uses public file APIs only; no download percentage exists, so none is shown.
 - Renaming a file so its extension changes or is removed now asks Keep “.old” / Use “.new” / Cancel first. Folders, dotfiles, newly added extensions and case-only changes are not asked about.
 - Put Back in the Trash context menu for items Shark moved to the Trash, remembered across launches (`trash-records.json` in Application Support). It asks the shared Replace / Keep Both / Skip / Stop question on a name clash, restores a name the Trash changed, leaves items whose folder is gone in the Trash with a message, and offers only Show in Finder for items Shark did not trash.
 - Empty Trash… in the Trash folder's menu and on the sidebar Trash row. It confirms that this cannot be undone and asks Finder to empty the Trash; if Automation is denied it offers Show Trash in Finder. Adds the Apple Events entitlement (direct build), a Finder-only temporary exception (App Store build) and `NSAppleEventsUsageDescription`.
