@@ -267,32 +267,17 @@ public struct IconsGridView: View {
         let items = navigationState.filteredAndSortedItems
         guard !items.isEmpty else { return }
 
-        let cols = max(1, navigationState.gridColumnCount)
-        let currentIconSize = navigationState.iconSize
-        let cellMinWidth = max(currentIconSize + 28, 96)
-        let availableWidth = max(0, containerWidth - 40)
-        let colWidth = max(cellMinWidth, (availableWidth - CGFloat(cols - 1) * 20) / CGFloat(cols))
-        let colStride = colWidth + 20
-        let itemHeight = currentIconSize + 58
-        let rowStride = itemHeight + 24
-
-        let minRow = max(0, Int((rect.minY - 20) / rowStride))
-        let maxRow = max(0, Int((rect.maxY - 20) / rowStride))
-        let minCol = max(0, min(cols - 1, Int((rect.minX - 20) / colStride)))
-        let maxCol = max(0, min(cols - 1, Int((rect.maxX - 20) / colStride)))
-
         var activeDragSelection = Set<URL>()
 
-        // 1. Mathematical grid intersection for visible and off-screen / incoming rows
-        if minRow <= maxRow && minCol <= maxCol {
-            for r in minRow...maxRow {
-                for c in minCol...maxCol {
-                    let idx = r * cols + c
-                    if idx >= 0 && idx < items.count {
-                        activeDragSelection.insert(items[idx].id)
-                    }
-                }
-            }
+        // 1. Estimated cell frames for items that are not rendered (rendered items use exact frames in step 2)
+        for idx in IconGridGeometry.indices(
+            intersecting: rect,
+            itemCount: items.count,
+            columns: max(1, navigationState.gridColumnCount),
+            iconSize: navigationState.iconSize,
+            containerWidth: containerWidth
+        ) where marqueeState.itemFrames[items[idx].url] == nil {
+            activeDragSelection.insert(items[idx].id)
         }
 
         // 2. Exact frame matching for currently rendered items
