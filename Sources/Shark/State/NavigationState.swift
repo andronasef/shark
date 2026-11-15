@@ -61,6 +61,8 @@ public final class NavigationState {
     public var selectionLeadID: URL? = nil
     /// Target URL that views should scroll into view (e.g. following keyboard selection or marquee).
     public var scrollToURL: URL? = nil
+    /// File to select once its folder has loaded (set by Reveal-style open requests from other apps).
+    @ObservationIgnored private var pendingReveal: URL?
     public var isLoading: Bool = false
     /// Set when the folder itself could not be listed; replaces the folder contents with an error page.
     public var errorMessage: String? = nil
@@ -208,6 +210,19 @@ public final class NavigationState {
         renamingItemURL = nil
     }
 
+    /// Selects `url` in the current listing, or as soon as its folder finishes loading.
+    func reveal(_ url: URL) {
+        pendingReveal = url.standardizedFileURL
+        applyPendingReveal()
+    }
+
+    private func applyPendingReveal() {
+        guard let target = pendingReveal,
+              let item = items.first(where: { $0.id.standardizedFileURL == target }) else { return }
+        pendingReveal = nil
+        selectOnly(item)
+    }
+
     public func goBack() {
         guard canGoBack, let previous = backStack.popLast() else { return }
         forwardStack.append(currentURL)
@@ -293,6 +308,7 @@ public final class NavigationState {
             } onCancel: { task.cancel() }
             guard reloadID == id, url == currentURL, !Task.isCancelled, !task.isCancelled else { return }
             items = fetchedItems
+            applyPendingReveal()
             if lastRecordedVisit != url {
                 lastRecordedVisit = url
                 RecentFoldersService.shared.recordVisit(to: url)

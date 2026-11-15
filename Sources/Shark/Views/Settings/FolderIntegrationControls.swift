@@ -57,10 +57,15 @@ private struct ManualFolderSetupView: View {
     @State private var copiedCommand: String?
 
     // Same folder-handler preference used in other Mac file managers' manual setup guides.
-    // Do not change NSFileViewer: Shark only claims folder-open events, not Finder reveal events.
+    // Shark never writes NSFileViewer itself; it does answer Reveal events if the user sets it.
     private func command(for identifier: String) -> String {
-        "defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType=\"public.folder\";LSHandlerRoleAll=\"\(identifier)\";}'"
+        if identifier == Self.fileViewerKey { return "defaults write -g NSFileViewer -string com.increasinglabs.shark" }
+        if identifier == Self.fileViewerRestoreKey { return "defaults delete -g NSFileViewer" }
+        return "defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType=\"public.folder\";LSHandlerRoleAll=\"\(identifier)\";}'"
     }
+
+    private static let fileViewerKey = "NSFileViewer"
+    private static let fileViewerRestoreKey = "NSFileViewer.restore"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -76,6 +81,15 @@ private struct ManualFolderSetupView: View {
             commandRow("Make Shark the default", identifier: "com.increasinglabs.shark")
             Divider()
             commandRow("Restore Finder", identifier: "com.apple.finder")
+            Divider()
+            Text(L10n.text("Alternative: use Shark as the file viewer"))
+                .font(.headline)
+            Text(L10n.text("If the commands above do not work, this makes “Show in Folder” and “Reveal” from other apps open Shark on the right folder with the item selected. It takes effect the next time you sign in or restart apps."))
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            commandRow("Use Shark as the file viewer", identifier: Self.fileViewerKey)
+            commandRow("Restore the system file viewer", identifier: Self.fileViewerRestoreKey)
             Text(L10n.text("These commands only add a folder-opening preference for your account. They do not grant Full Disk Access or change the default apps for individual file types."))
                 .font(.caption)
                 .foregroundStyle(.secondary)

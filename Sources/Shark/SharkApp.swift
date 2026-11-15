@@ -22,6 +22,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         super.init()
     }
 
+    /// Handlers must exist before launch finishes: a Reveal sent to a cold-started Shark arrives immediately.
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Reveal / select events from the system's file viewer (NSFileViewer) and Finder-style scripts.
+        for (eventClass, eventID) in [("misc", "mvis"), ("core", "slct")] {
+            NSAppleEventManager.shared().setEventHandler(
+                self,
+                andSelector: #selector(handleRevealEvent(_:withReply:)),
+                forEventClass: fourCharCode(eventClass),
+                andEventID: fourCharCode(eventID))
+        }
+    }
+
+    /// Apple event class and ID codes are four ASCII characters packed into a UInt32.
+    private func fourCharCode(_ code: String) -> UInt32 {
+        code.utf8.reduce(0) { $0 << 8 | UInt32($1) }
+    }
+
+    @objc private func handleRevealEvent(_ event: NSAppleEventDescriptor, withReply reply: NSAppleEventDescriptor) {
+        guard let target = event.paramDescriptor(forKeyword: keyDirectObject) else { return }
+        let urls = Self.fileURLs(in: target)
+        guard !urls.isEmpty else { return }
+        workspace.reveal(urls)
+        showMainWindow?()
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// File URLs in an Apple event parameter, which may be one item or a list.
+    static func fileURLs(in descriptor: NSAppleEventDescriptor) -> [URL] {
+        guard descriptor.numberOfItems > 0, descriptor.descriptorType == typeAEList else {
+            return descriptor.coerce(toDescriptorType: typeFileURL)?.fileURLValue.map { [$0] } ?? []
+        }
+        return (1...descriptor.numberOfItems).compactMap {
+            descriptor.atIndex($0)?.coerce(toDescriptorType: typeFileURL)?.fileURLValue
+        }
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         SharkSettings.shared.applyAppearance()
         // Start debounced autosave
@@ -46,9 +82,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
                 _ = try? SecurityScopedBookmarkManager.shared.saveBookmark(for: url)
             }
         }
-        let rejected = workspace.openExternalFolders(urls)
+        // Files and packages are revealed in their folder, which is what a file viewer is asked to do.
+        let rejected = workspace.reveal(workspace.openExternalFolders(urls))
         if !rejected.isEmpty {
-            folderOpenError = "Shark opens existing folders, not individual files or app packages. Check that the folder exists and that Shark has permission to access it."
+            folderOpenError = "Shark could not open that location. Check that it exists and that Shark has permission to access it."
         }
         showMainWindow?()
         application.activate(ignoringOtherApps: true)

@@ -214,6 +214,19 @@ final class ExternalFolderOpeningTests: XCTestCase {
         XCTAssertEqual(workspace.tabs.count, 1)
     }
 
+    func testRevealOpensParentFolderAndSelectsItem() async throws {
+        let target = try folder("Target")
+        let file = target.appendingPathComponent("note.txt")
+        try Data("x".utf8).write(to: file)
+        let workspace = WorkspaceState(initialURL: root)
+        XCTAssertTrue(workspace.reveal([file]).isEmpty)
+        let nav = workspace.activeNavigationState
+        XCTAssertEqual(nav.currentURL, target)
+        await nav.reloadCurrentDirectory()
+        XCTAssertEqual(nav.selectedItemIDs, [file])
+        XCTAssertEqual(workspace.reveal([root.appendingPathComponent("missing")]).count, 1)
+    }
+
     func testStandardizedAndSymbolicLinkPathsReuseExistingTab() throws {
         let target = try folder("Target")
         let alias = root.appendingPathComponent("Link")

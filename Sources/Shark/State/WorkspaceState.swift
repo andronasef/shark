@@ -122,6 +122,21 @@ public final class WorkspaceState {
         return rejected
     }
 
+    /// Opens each item's folder and selects the item, like Finder's Reveal. Returns URLs that do not exist.
+    @discardableResult
+    func reveal(_ urls: [URL]) -> [URL] {
+        var rejected: [URL] = []
+        for url in urls {
+            guard url.isFileURL, FileManager.default.fileExists(atPath: url.path) else {
+                rejected.append(url)
+                continue
+            }
+            openExternalFolders([url.deletingLastPathComponent()])
+            activeNavigationState.reveal(url)
+        }
+        return rejected
+    }
+
     public func newTab(
         url: URL? = nil,
         placement: TabPlacement = .end,
