@@ -77,4 +77,6 @@ Repository secrets:
 
 Encode with `base64 -i file | pbcopy`. After the upload processes in App Store Connect, pick the build on the app version, finish screenshots, privacy and review notes, and submit it yourself.
 
+App Review note for the Mac App Store build: Shark's **Empty Trash** command asks Finder to empty the Trash with Apple Events, which needs the `com.apple.security.temporary-exception.apple-events` entitlement limited to `com.apple.finder`. Explain in the review notes that it only runs after the user confirms, that macOS asks the user for Automation permission, and that Shark otherwise only offers Show Trash in Finder. Reading `~/.Trash` also requires the user to grant Full Disk Access.
+
 Before the first submission, verify the sandboxed build by running it: folder access and bookmarks across launches, the embedded terminal, and compression behave differently under App Sandbox. Run `bash scripts/package-appstore.sh 1.0.0` locally to produce the same package.
