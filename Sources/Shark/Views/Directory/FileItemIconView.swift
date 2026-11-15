@@ -24,6 +24,12 @@ public struct FileItemIconView: View {
                         .foregroundColor(.accentColor)
                         .frame(width: size, height: size)
                 }
+            } else if item.isPackage {
+                // Apps and other bundles carry their own icon, as in Finder.
+                Image(nsImage: PackageIconCache.icon(for: item.url))
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: size, height: size)
             } else {
                 Image(systemName: item.systemIconName)
                     .font(.system(size: size * 0.8))
@@ -31,5 +37,19 @@ public struct FileItemIconView: View {
                     .frame(width: size, height: size)
             }
         }
+    }
+}
+
+/// NSWorkspace icons for bundles, cached by path so scrolling a long Applications folder stays cheap.
+@MainActor
+enum PackageIconCache {
+    private static let cache = NSCache<NSString, NSImage>()
+
+    static func icon(for url: URL) -> NSImage {
+        let key = url.path as NSString
+        if let cached = cache.object(forKey: key) { return cached }
+        let icon = NSWorkspace.shared.icon(forFile: url.path)
+        cache.setObject(icon, forKey: key)
+        return icon
     }
 }
