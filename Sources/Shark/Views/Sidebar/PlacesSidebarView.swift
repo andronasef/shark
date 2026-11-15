@@ -139,12 +139,7 @@ public struct PlacesSidebarView: View {
                         FolderTreeRows(roots: treeRoots, navigationState: navigationState, tree: folderTree,
                                        favoritesStore: favoritesStore, focus: $sidebarFocus,
                                        ejectableVolumes: Set(locations.filter(\.isEjectable).map(\.url)), onEject: ejectVolume)
-                    }
-                }
-
-                if isTree {
-                    // The tree lists real folders and volumes; AirDrop and Trash are not folders in it.
-                    SidebarSectionGroup("Places", focus: $sidebarFocus) {
+                        // Not folders, so they sit under the tree instead of in it.
                         ForEach(treeExtraPlaces) { item in
                             sidebarRow(name: item.name, iconName: item.iconName, url: item.url)
                         }
@@ -405,8 +400,7 @@ public struct PlacesSidebarView: View {
         if isTree {
             order.append("Folders:header")
             if expanded("Folders") { order += folderTree.rows(for: treeRoots).map { "Tree:" + $0.id } }
-            order.append("Places:header")
-            if expanded("Places") { order += treeExtraPlaces.map { "Locations:" + $0.url.path } }
+            if expanded("Folders") { order += treeExtraPlaces.map { "Locations:" + $0.url.path } }
         } else {
             order.append("Locations:header")
             if expanded("Locations") { order += locations.map { "Locations:" + $0.url.path } }
